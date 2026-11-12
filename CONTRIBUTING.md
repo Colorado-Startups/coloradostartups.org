@@ -41,6 +41,8 @@ The Team page shows fake people from `data/fixtures/team/`. The real Team data l
 | `npm run check:push` passes before you push | CI runs the same |
 | The hooks pass; never `--no-verify` | They run the content gate and the secret scan |
 | Sign off each commit: `git commit -s` | The DCO check requires it |
+| Your contribution goes out on the repo's terms: CC0 1.0, and code also 0BSD ([`README.md`](README.md#license)) | Inbound equals outbound, so everyone can use all of it |
+| Add third-party work only with its license, and list it under the README's Exceptions | It is not ours to give away |
 | No em dashes; short sentences; plain words | The site's voice |
 | Say "contributor", never "volunteer", "paid" or "hiring", about a seat | The positions rule |
 | Every AI keeper is named as an AI agent wherever it appears | Disclosure is required |

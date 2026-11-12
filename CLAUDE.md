@@ -14,7 +14,7 @@
 ```
 01_doctrine/  brand tokens and voice
 04_tools/     content gate, contract test, merge policy, export manifest
-art/          art direction and prompts (all rights reserved)
+art/          art direction and prompts (CC0, like the rest; README.md, License)
 data/         site content; data/fixtures/ for local builds
 packages/     shared schemas
 scripts/      build and data scripts

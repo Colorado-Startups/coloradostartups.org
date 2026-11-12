@@ -140,7 +140,7 @@ describe("one entity graph across the site", () => {
     expect(blocks).toHaveLength(tagCount);
     expect(blocks.map((b) => b.route)).toContain("/");
     // On fixtures the Team page shows fake people, so a reference to a real person's card has no target.
-    const problems = entityProblems(blocks).filter((p) => !(ON_FIXTURES && /\/team\/#[a-z0-9-]+ is declared on no page$/.test(p)));
+    const problems = entityProblems(blocks).filter((p) => !(ON_FIXTURES && /^[^ ]+: https:\/\/coloradostartups\.org\/team\/#[a-z0-9-]+ is declared on no page$/.test(p)));
     expect(problems).toEqual([]);
   });
 });

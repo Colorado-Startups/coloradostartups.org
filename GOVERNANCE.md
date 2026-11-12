@@ -7,7 +7,8 @@ Colorado Startups owns the project. The maintainers ([`MAINTAINERS.md`](MAINTAIN
 | An idea becomes an issue | A maintainer, in Discussions |
 | An AI-mergeable PR merges | An AI agent, after the required checks and both AI reviews pass ([`CONTRIBUTING.md`](CONTRIBUTING.md)) |
 | Any other PR | The orchestrator rebuilds it with the contributor as co-author, until a maintainer holds the seat ([`CONTRIBUTING.md`](CONTRIBUTING.md)) |
-| The merge policy, the gates, the license, these rules | Paul |
+| The merge policy, the gates, these rules | Paul |
+| The license: CC0 1.0, and code also 0BSD ([`README.md`](README.md#license)) | Paul. A change applies only to work after it; CC0 cannot be taken back |
 
 ## The Website maintainer seat
 

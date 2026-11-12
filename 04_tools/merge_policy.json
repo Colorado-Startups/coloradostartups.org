@@ -84,7 +84,7 @@
     "art/**",
     "site/src/assets/art/**",
     "LICENSE",
-    "TRADEMARKS.md",
+    "LICENSES/**",
     "GOVERNANCE.md",
     "MAINTAINERS.md",
     "SECURITY.md",

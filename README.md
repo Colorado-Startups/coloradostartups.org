@@ -45,8 +45,43 @@ npm run dev
 
 | File | Covers |
 | --- | --- |
-| [`LICENSE`](LICENSE) | MIT, for the source code only; not the name, logo, Hall art or keepers |
-| [`TRADEMARKS.md`](TRADEMARKS.md) | The name, logo, Hall art and keepers: all rights reserved |
+| [`LICENSE`](LICENSE) | CC0 1.0: everything Colorado Startups owns here, in the public domain |
+| [`LICENSES/0BSD.txt`](LICENSES/0BSD.txt) | The second choice for code |
 | [`SECURITY.md`](SECURITY.md) | How to report a vulnerability privately |
 | [`GOVERNANCE.md`](GOVERNANCE.md), [`MAINTAINERS.md`](MAINTAINERS.md) | Who decides and who merges |
 | [`ROADMAP.md`](ROADMAP.md) | Where ideas go and where to help |
+
+## License
+
+Use anything here for anything, except as the Exceptions below say. You need not ask, credit us or keep a notice.
+
+| What | License |
+| --- | --- |
+| Everything Colorado Startups owns here: code, docs, data, the name, the logo, the Hall art, the keepers and `01_doctrine/` | [CC0 1.0](LICENSE) |
+| Code, as you choose | `CC0-1.0 OR 0BSD`. [0BSD](LICENSES/0BSD.txt) is OSI-approved and asks for no notice |
+
+CC0 waives no trademark or patent rights (its section 4(a)). We will not enforce ours against you.
+
+### Exceptions
+
+These are not Colorado Startups' to give away. Each keeps its own license.
+
+| Thing | Where | Its license |
+| --- | --- | --- |
+| npm packages | `package.json`, `package-lock.json`; `npm install` downloads them | Each package's own |
+| The web fonts, Alegreya Sans and Cinzel | The build downloads them (`site/astro.config.mjs`); the repo holds none | SIL Open Font License 1.1 |
+| `04_tools/voice_lint.py` | Vendored from `SoulCraft-Org/git-crafter` | Apache 2.0 ([`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt)) |
+| The Code of Conduct's Covenant text | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | CC BY-SA 4.0, from the Contributor Covenant |
+| gitleaks, the secret scanner | CI downloads the release binary | MIT |
+| Other companies' names and marks | `data/` | Theirs |
+| The Hall art and clips made with AI models, and the Open Graph cards built from them | `art/`, `site/src/assets/art/`, `site/public/og/` | CC0 for our part. The model makers' terms still apply: [`art/LICENSES.md`](art/LICENSES.md) |
+
+The model makers' terms set three duties for that art ([`art/licenses/duties.md`](art/licenses/duties.md)):
+
+| Duty | Source |
+| --- | --- |
+| Never train a model or a LoRA on it | LTX Attachment A(18); Bria's Terms of Use (f) |
+| Keep its watermarks and provenance metadata | LTX §6 and Attachment A(19); Bria's Terms of Use (i) |
+| Label it as AI-made | LTX Attachment A(5) and §6 |
+
+The older art was made with Anima, which is under the CircleStone Labs Non-Commercial License v1.2. That license limits running the model. Its §2(e) allows outputs for any purpose.
