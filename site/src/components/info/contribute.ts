@@ -3,20 +3,18 @@
 // site, how AI review works and that merges reach staging first. Its copy says
 // "contributor" (decision 44).
 //
-// CONTRIBUTE_LIVE stays false until phase 6, when the public repo exists: the
-// route then builds no page, so nothing points at a repo that is not there
-// yet. Production deploys every green main commit (deploy-gate.yml),
-// so merging this file publishes nothing while the flag is false.
+// CONTRIBUTE_LIVE turned on on 2026-11-12, when this public repo opened to
+// contributors. Off, the route builds no page.
 
-/** Phase 6 sets this to true, with the repo name Paul picked in REPO_URL. */
-export const CONTRIBUTE_LIVE = false;
+/** The page is live: the repo is public and takes contributions. */
+export const CONTRIBUTE_LIVE = true;
 
 /** The route's static paths: the one /contribute/ page when live, none when not. */
 export function contributePaths(live: boolean): { params: { path: undefined } }[] {
   return live ? [{ params: { path: undefined } }] : [];
 }
 
-/** The public repo. The plan's suggested name until Paul picks one. */
+/** The public repo. */
 export const REPO_URL = "https://github.com/Colorado-Startups/coloradostartups.org";
 export const DISCUSSIONS_URL = `${REPO_URL}/discussions/categories/ideas`;
 export const GOOD_FIRST_ISSUES_URL = `${REPO_URL}/labels/good%20first%20issue`;
@@ -33,13 +31,13 @@ export interface FlowStep {
 /** How an idea reaches the live site, in order. */
 export const FLOW: FlowStep[] = [
   { title: "Share the idea", body: "Start a discussion in Ideas. Say who it helps and what they do today." },
-  { title: "It becomes an issue", body: "A maintainer turns an accepted idea into an issue anyone can pick up." },
+  { title: "It becomes an issue", body: "An accepted idea becomes an issue anyone can pick up." },
   { title: "Open a pull request", body: "Fork the repo, make one change with a test, and open a pull request." },
   {
     title: "Checks and AI review",
-    body: "Tests run, and two AI agents review the code and its security. A maintainer reviews anything outside the AI-mergeable list.",
+    body: "Tests run, and two AI agents review the code and its security. Agents never approve a pull request.",
   },
-  { title: "Staging, then live", body: "A merge goes to staging first, then to coloradostartups.org." },
+  { title: "Staging, then live", body: "A merge goes to staging first. A contributor's change waits 30 minutes there, then goes to coloradostartups.org." },
 ];
 
 /** The three commands that run the site locally. */
@@ -53,11 +51,11 @@ export interface ReviewRow {
 /** Who merges which change (04_tools/merge_policy.json is the one definition). */
 export const REVIEW_ROWS: ReviewRow[] = [
   {
-    change: "Pages, components, styles, tests and most site content",
-    merges: "An AI agent, once the checks and both AI reviews pass",
+    change: "Site content: events, regions, resources, positions, dispatches and credits",
+    merges: "An AI agent merges it, once the checks and both AI reviews pass",
   },
   {
-    change: "Dependencies, build settings, CI, gates, Workers, team data, art and the repo's own rules",
-    merges: "A maintainer",
+    change: "Code, styles, tests, dependencies, build settings, CI, gates, team data, art and the repo's own rules",
+    merges: "An AI agent rebuilds the change in its own pull request, with you credited as co-author",
   },
 ];

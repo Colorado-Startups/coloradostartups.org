@@ -116,3 +116,13 @@
     - Send founder wins, lessons and events worth sharing.
     - Help draft editions for review.
   status: open
+
+- id: website-maintainer
+  title: Website maintainer
+  area: project
+  summary: Help steer coloradostartups.org. Review changes, guide new contributors and keep the site fast, safe and kind.
+  what_you_do:
+    - Review pull requests that wait for a maintainer, such as build, gate and data changes.
+    - Help new contributors pick a good first issue and land it.
+    - Check staging before a change reaches the live site.
+  status: open

@@ -77,7 +77,7 @@ describe("comparePositions over data/team/positions.yaml", () => {
   const file = path.resolve(import.meta.dirname, "../../../../data/team/positions.yaml");
   const positions = (parse(readFileSync(file, "utf8")) as unknown[]).map((p) => PositionSchema.parse(p));
 
-  it("lists the eight seats in the order /get-involved/ shows them", () => {
+  it("lists the nine seats in the order /get-involved/ shows them", () => {
     expect(ids([...positions].sort(comparePositions(REGIONS)))).toEqual([
       "community-organizer",
       "linkedin-moderator",
@@ -87,6 +87,7 @@ describe("comparePositions over data/team/positions.yaml", () => {
       "fusion-canyon-connector",
       "resources-curator",
       "startupers-contributor",
+      "website-maintainer",
     ]);
   });
 });
