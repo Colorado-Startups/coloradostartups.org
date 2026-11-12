@@ -1,0 +1,15 @@
+id: tahoma-ventures
+name: Tahoma Ventures
+url: https://tahomaventures.com/
+stage: launch
+substage: investors
+city: Boulder
+type: investor
+description: Seed-stage venture capital firm in Boulder.
+tags:
+  - seed
+  - venture-capital
+  - technology
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

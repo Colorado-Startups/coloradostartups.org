@@ -1,0 +1,17 @@
+{
+  "id": "resp_fixture_02",
+  "object": "response",
+  "status": "incomplete",
+  "incomplete_details": { "reason": "max_output_tokens" },
+  "model": "gpt-5.5",
+  "output": [
+    {
+      "type": "message",
+      "id": "msg_fixture_02",
+      "status": "incomplete",
+      "role": "assistant",
+      "content": [{ "type": "output_text", "text": "Colorado Springs has a growing scene around", "annotations": [] }]
+    }
+  ],
+  "usage": { "input_tokens": 3000, "output_tokens": 4000, "total_tokens": 7000 }
+}

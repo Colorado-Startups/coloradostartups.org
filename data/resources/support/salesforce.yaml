@@ -1,0 +1,13 @@
+id: salesforce
+name: Salesforce
+url: https://www.salesforce.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: CRM software with sales, service and marketing tools. It is for businesses of all sizes. It has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

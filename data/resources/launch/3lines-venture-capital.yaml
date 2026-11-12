@@ -1,0 +1,15 @@
+id: 3lines-venture-capital
+name: 3Lines Venture Capital
+url: https://3lines.vc/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: An early-stage venture capital firm in Denver and Dallas. It invests in startups with AI and disruptive software at their core. It covers the future of work, enterprise and industry.
+tags:
+  - seed
+  - venture-capital
+  - technology
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

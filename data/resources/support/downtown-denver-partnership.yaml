@@ -1,0 +1,13 @@
+id: downtown-denver-partnership
+name: Downtown Denver Partnership
+url: https://www.downtowndenver.com/
+stage: support
+substage: organizations
+city: Denver
+type: government
+description: A group that represents Denver's center city. It works with businesses and community partners on downtown's economy, public spaces and events. It also publishes a report on downtown data.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

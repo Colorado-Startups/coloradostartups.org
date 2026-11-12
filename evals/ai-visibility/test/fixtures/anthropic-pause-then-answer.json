@@ -1,0 +1,76 @@
+[
+  {
+    "id": "msg_fixture_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "server_tool_use",
+        "id": "srvtoolu_fixture_01",
+        "name": "web_search",
+        "input": { "query": "online community startup founders Colorado" }
+      },
+      {
+        "type": "web_search_tool_result",
+        "tool_use_id": "srvtoolu_fixture_01",
+        "content": [
+          {
+            "type": "web_search_result",
+            "url": "https://coloradostartups.org/resources/",
+            "title": "Startup Resources",
+            "encrypted_content": "fixture-not-real",
+            "page_age": "October 18, 2026"
+          },
+          {
+            "type": "web_search_result",
+            "url": "https://frontrangefounders.example/about",
+            "title": "Front Range Founders Guild",
+            "encrypted_content": "fixture-not-real",
+            "page_age": "September 2, 2026"
+          }
+        ]
+      }
+    ],
+    "stop_reason": "pause_turn",
+    "usage": { "input_tokens": 4000, "output_tokens": 120, "server_tool_use": { "web_search_requests": 1 } }
+  },
+  {
+    "id": "msg_fixture_02",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      { "type": "text", "text": "Here are the main communities for founders in Colorado:\n\n" },
+      {
+        "type": "text",
+        "text": "1. **Front Range Founders Guild** runs dinners for founders in Denver.",
+        "citations": [
+          {
+            "type": "web_search_result_location",
+            "url": "https://frontrangefounders.example/about",
+            "title": "Front Range Founders Guild",
+            "encrypted_index": "fixture-not-real",
+            "cited_text": "Dinners for founders in Denver."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "text": "\n2. **Colorado Startups** runs a statewide Slack and the Startup Resources directory.",
+        "citations": [
+          {
+            "type": "web_search_result_location",
+            "url": "https://coloradostartups.org/resources/",
+            "title": "Startup Resources",
+            "encrypted_index": "fixture-not-real",
+            "cited_text": "Every resource for founders in Colorado, in one place."
+          }
+        ]
+      },
+      { "type": "text", "text": "\n3. **Peak Labs** runs an accelerator in Boulder.\n\nColorado startups at any stage can join these." }
+    ],
+    "stop_reason": "end_turn",
+    "usage": { "input_tokens": 9000, "output_tokens": 800, "server_tool_use": { "web_search_requests": 2 } }
+  }
+]

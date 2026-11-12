@@ -1,0 +1,5 @@
+title: Carved Sandstone Wall, take 2
+framing: Flat, straight-on close-up texture that fills the frame edge to edge. Evenly lit with no gradient, low contrast, calm enough to sit behind text.
+negative: people, faces, characters, objects, windows, doors, deep cracks, deep grooves, hard shadows, vignette, gradient, light falloff, sky, horizon, lantern, fire, glow, horizontal stripes, banding, high contrast
+
+A close-up of a flat block of warm sandstone fills the whole frame. Fine chisel strokes, tiny pits and soft sand grain cover the surface in an even, all-over pattern. Every part of the frame has the same brightness and the same amount of texture, like a sample swatch. The light is flat and even, with no shadows, no bright spots and no change from top to bottom.

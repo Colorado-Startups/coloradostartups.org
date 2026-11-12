@@ -1,0 +1,182 @@
+---
+// /team/: who runs the Hall. Owner: L9 (decisions 19, 43, 44 and 51).
+//
+// Order is a contract (lane file L9):
+//   1. Paul (leadership)
+//   2. The keepers, each with its disclosure in full (hard constraint 10)
+//   3. The community team: people in filled positions, then a line to /get-involved/
+//   4. Community volunteers (Ryan Shuken, decision 19)
+//   5. With thanks: Micah and Lindsey, in the Oct 6 wording (people.yaml)
+//
+// Every name and line comes from data/team/*.yaml. Section ids are stable
+// anchors: leadership, keepers, community-team, volunteers, with-thanks.
+import { comparePositions } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { organizationRef, orgId, personId, websiteId } from "../../components/hall/org";
+import KeeperCard from "../../components/team/KeeperCard.astro";
+import { inFileOrder } from "../../components/team/order";
+import PersonCard from "../../components/team/PersonCard.astro";
+import Button from "../../components/ui/Button.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { REGIONS } from "../../lib/regions/match";
+
+const people = inFileOrder("people", (await getCollection("people")).map((e) => e.data));
+const keepers = inFileOrder("dwarves", (await getCollection("dwarves")).map((e) => e.data));
+const regions = [...REGIONS];
+const positions = (await getCollection("positions")).map((e) => e.data).sort(comparePositions(regions));
+
+const inGroup = (group: (typeof people)[number]["group"]) => people.filter((p) => p.group === group);
+const leaders = inGroup("leadership");
+const volunteers = inGroup("volunteers");
+const withThanks = inGroup("with-thanks");
+
+// The community team follows its seats in comparePositions() order, the same
+// order /get-involved/ lists them in. Anyone in the community group without a
+// seat comes last.
+const filled = positions.filter((p) => p.status === "filled");
+const community = inGroup("community")
+  .map((person) => ({ person, seat: filled.find((p) => p.holder === person.id) }))
+  .sort((a, b) => (a.seat ? positions.indexOf(a.seat) : Infinity) - (b.seat ? positions.indexOf(b.seat) : Infinity));
+const anyOpen = positions.some((p) => p.status === "open");
+
+// JSON-LD (GO-LIVE C3): this page is about the home page's Organization and
+// points at it by @id. Its facts (founding date, founder, address, sameAs)
+// live once, in org.ts. Paul's Person node has the @id the home page's founder
+// uses, so the two pages describe one person.
+const site = Astro.site!;
+const paul = leaders.find((p) => p.id === "paul-foley");
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      name: "Team",
+      url: new URL("/team/", site).toString(),
+      isPartOf: { "@id": websiteId(site) },
+      mainEntity: organizationRef(site),
+    },
+    ...(paul
+      ? [
+          {
+            "@type": "Person",
+            "@id": personId(site, paul.id),
+            name: paul.name,
+            jobTitle: paul.title,
+            sameAs: paul.links.map((l) => l.href),
+            worksFor: { "@id": orgId(site) },
+          },
+        ]
+      : []),
+  ],
+};
+---
+
+<BaseLayout
+  title="Team"
+  description="The people who run Colorado Startups, the AI keepers who help them, and the open seats where you can step in."
+  ogImage="team"
+  jsonLd={jsonLd}
+>
+  <section class="section section--band" aria-labelledby="team-title">
+    <div class="wrap stack">
+      <h1 id="team-title">Team</h1>
+      <p class="lede">
+        People run Colorado Startups. AI keepers help them, and each keeper says it is an AI wherever it appears.
+      </p>
+      {
+        anyOpen && (
+          <p class="btn-row">
+            <Button href="/get-involved/">See the open positions</Button>
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section section--lit" id="leadership" aria-labelledby="leadership-title">
+    <div class="wrap stack">
+      <h2 id="leadership-title">Leadership</h2>
+      <ul class="hall-grid team-grid team-grid--wide" aria-label="Leadership">
+        {/* Paul's photo sits in the first screen at 375 and 1280 px, so the first leader's loads eagerly. Every photo
+        and portrait below it stays lazy (#258). */}
+        {leaders.map((person, i) => <PersonCard person={person} element="li" loading={i === 0 ? "eager" : "lazy"} />)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--band" id="keepers" aria-labelledby="keepers-title">
+    <div class="wrap stack">
+      <h2 id="keepers-title">The keepers</h2>
+      <p>
+        The Hall's keepers are dwarves and gnomes. Each one is an AI agent run by Colorado Startups, and a person
+        reviews its work. The keepers never moderate: those seats are for people.
+      </p>
+      <ul class="hall-grid team-grid team-grid--wide" aria-label="The keepers">
+        {keepers.map((keeper) => <KeeperCard keeper={keeper} element="li" />)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--lit" id="community-team" aria-labelledby="community-team-title">
+    <div class="wrap stack">
+      <h2 id="community-team-title">The community team</h2>
+      {
+        community.length > 0 ? (
+          <>
+            <p>The people who moderate, organize and keep the community's shared work going.</p>
+            <ul class="hall-grid team-grid" aria-label="The community team">
+              {community.map(({ person, seat }) => (
+                <PersonCard person={person} seat={seat?.title} element="li" />
+              ))}
+            </ul>
+            {anyOpen && (
+              <p data-get-involved>
+                More seats are open. <a href="/get-involved/">See the open positions</a> and raise your hand.
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            <p data-get-involved>
+              Every seat on the community team is open right now. The seats include moderators for the Slack and the
+              LinkedIn Group, organizers for each region, and help with Startup Resources and the Startupers newsletter.
+            </p>
+            <p class="btn-row">
+              <Button href="/get-involved/">See the open positions</Button>
+            </p>
+          </>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section section--band" id="volunteers" aria-labelledby="volunteers-title">
+    <div class="wrap stack">
+      <h2 id="volunteers-title">Community volunteers</h2>
+      <ul class="hall-grid team-grid" aria-label="Community volunteers">
+        {volunteers.map((person) => <PersonCard person={person} element="li" />)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--lit" id="with-thanks" aria-labelledby="with-thanks-title">
+    <div class="wrap stack">
+      <h2 id="with-thanks-title">With thanks</h2>
+      <p>Thank you, Micah and Lindsey, for leading Colorado Startups these past few years.</p>
+      <ul class="hall-grid team-grid" aria-label="With thanks">
+        {withThanks.map((person) => <PersonCard person={person} element="li" />)}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* L12's .hall-grid, with wider tracks: people and keepers lay out in rows. */
+  .team-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+  }
+  .team-grid--wide {
+    grid-template-columns: 1fr;
+  }
+</style>

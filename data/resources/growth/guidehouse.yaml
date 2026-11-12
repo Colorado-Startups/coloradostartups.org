@@ -1,0 +1,15 @@
+id: guidehouse
+name: Guidehouse
+url: https://guidehouse.com/
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: A firm that sells consulting, technology and managed services. It serves commercial and government clients. Its clients work in healthcare, financial services, energy and national security.
+tags:
+  - consulting
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

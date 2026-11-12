@@ -1,0 +1,14 @@
+id: meritage-funds
+name: Meritage Funds
+url: https://meritagefunds.com/
+stage: growth
+substage: investors
+city: Denver
+type: investor
+description: Venture capital firm for Series A rounds in Denver. Listed in the Ecosystem Canvas for founders at the growth stage.
+tags:
+  - venture-capital
+  - series-a
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

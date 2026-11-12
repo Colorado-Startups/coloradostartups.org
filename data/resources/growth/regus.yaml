@@ -1,0 +1,13 @@
+id: regus
+name: Regus
+url: https://www.regus.com/en-us/united-states/colorado
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: A flexible workspace company. It offers private offices, coworking desks, meeting rooms and virtual offices. It serves solo professionals, startups and growing teams.
+tags:
+  - real-estate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,15 @@
+id: ibex-investors
+name: Ibex Investors
+url: https://www.ibexinvestors.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A multi-strategy investment firm that has offices in Denver, Tel Aviv and Silicon Valley. Its venture work focuses on early-stage Israeli companies. It also focuses on mobility technology.
+tags:
+  - seed
+  - venture-capital
+  - technology
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

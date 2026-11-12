@@ -1,0 +1,13 @@
+id: redstone-strategy-group
+name: Redstone Strategy Group
+url: https://www.redstonestrategy.com/
+stage: growth
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A Boulder strategy consulting firm. It advises philanthropies, nonprofits and governments on social issues in health, education and climate.
+tags:
+  - consulting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

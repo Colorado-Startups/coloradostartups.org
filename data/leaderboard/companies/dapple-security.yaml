@@ -1,0 +1,10 @@
+id: dapple-security
+name: "Dapple Security"
+website: "https://dapplesecurity.com/"
+hq_city: "Centennial"
+founded_year: 2022
+sector: "Cybersecurity"
+description: "Builds passwordless login for businesses. It turns a fingerprint into a passkey on demand and stores no biometric data."
+sources:
+  - "https://www.engine.is/news/startupseverywhere-centennial-colo"
+  - "https://www.prweb.com/releases/cybersecurity-startup-dapple-security-raises-2-3-million-in-pre-seed-round-302062740.html"

@@ -1,0 +1,5 @@
+title: Polished Granite
+framing: Flat, straight-on texture that fills the frame edge to edge. Very low detail and low contrast, evenly lit, calm enough to sit behind text.
+negative: people, faces, characters, objects, veins, cracks, large spots, hard shadows, vignette, busy detail, high contrast
+
+A smooth polished granite surface fills the whole frame. Fine, even speckles of light and mid gray are spread across it with no large spots or veins. The light is soft and even, so there are no reflections or shadows. There are no objects and no edges, only calm stone texture.

@@ -1,0 +1,13 @@
+id: nextcept
+name: Nextcept
+url: https://nextcept.com/
+stage: launch
+substage: service-providers
+city: Westminster
+type: service-provider
+description: A Westminster firm. It helps groups decide where AI adds value. It designs solutions around their existing tools.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

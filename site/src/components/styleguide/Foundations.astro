@@ -1,0 +1,264 @@
+---
+// The style guide's first half: every color token by material, the contrast
+// table and the type scale, read from brand_tokens.yaml at build time.
+// Rendered by pages/styleguide.astro; its look is styleguide.css.
+import { parse } from "yaml";
+
+import tokensYaml from "../../../../01_doctrine/brand_tokens.yaml?raw";
+
+interface Pairing {
+  fg: string;
+  bg: string;
+  ratio: number;
+  min: number;
+}
+const tokens = parse(tokensYaml) as {
+  color: Record<string, string>;
+  type: Record<string, string>;
+  contrast: Pairing[];
+};
+const steps = Object.entries(tokens.type).filter(([k]) => k.startsWith("step"));
+
+// Colors by material. Any role not listed lands in "Other", so a new token
+// still shows up here.
+const GROUPS: [string, string[]][] = [
+  ["Daylight and stone", ["ground", "surface", "surface-2", "stone", "stone-edge", "rule", "border"]],
+  ["Ink", ["text", "text-dim", "link", "community", "danger", "focus", "on-accent", "on-bronze"]],
+  ["Forge metals", ["accent", "accent-deep", "accent-ledge", "molten", "brass", "bronze", "bronze-deep", "fire"]],
+  ["Night", ["night", "on-night", "on-night-dim", "gold-on-night", "focus-on-night", "danger-on-night"]],
+  ["Tag washes", ["sky-wash", "copper-wash", "pine", "pine-wash"]],
+  ["Brand marks, logo only", ["brand-teal", "brand-purple"]],
+];
+const grouped = new Set(GROUPS.flatMap(([, names]) => names));
+const other = Object.keys(tokens.color).filter((name) => !grouped.has(name));
+const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string, string[]]] : [])].map(
+  ([label, names]) => [label, names.filter((n) => n in tokens.color)] as const,
+);
+---
+
+<section class="section section--lit">
+  <div class="wrap stack">
+    <h1>Style guide</h1>
+    <p class="lede">
+      Every color, type size and primitive the Hall uses. Tokens live in 01_doctrine/brand_tokens.yaml; the
+      primitives live in site/src/components/ui/ and site/src/styles/hall.css.
+    </p>
+    <p>
+      Each primitive is one material in a forge-kingdom carved into the Front Range: carved stone, forge gold,
+      hammered bronze, gnome brass and molten channels. Cards and callouts below use sample text.
+    </p>
+    <nav aria-label="On this page">
+      <ul class="sg-toc">
+        <li><a href="#color">Color</a></li>
+        <li><a href="#contrast">Contrast</a></li>
+        <li><a href="#type">Type</a></li>
+        <li><a href="#button">Button</a></li>
+        <li><a href="#banner">Banner</a></li>
+        <li><a href="#panel">Panel</a></li>
+        <li><a href="#card">Card</a></li>
+        <li><a href="#frame">Frame</a></li>
+        <li><a href="#badge">Badge</a></li>
+        <li><a href="#callout">Callout</a></li>
+        <li><a href="#night">On a night band</a></li>
+        <li><a href="#forms">Forms</a></li>
+        <li><a href="#sections">Sections</a></li>
+        <li><a href="#focus">Focus and motion</a></li>
+      </ul>
+    </nav>
+
+    <h2 id="color">Color</h2>
+    {
+      colorGroups.map(([label, names]) => (
+        <>
+          <h3>{label}</h3>
+          <ul class="swatches">
+            {names.map((name) => (
+              <li>
+                <span class="chipcolor" style={`background:${tokens.color[name]}`} />
+                <span>
+                  <strong>{name}</strong>
+                  <br />
+                  <code>{tokens.color[name]}</code>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ))
+    }
+  </div>
+</section>
+
+<section class="section section--band">
+  <div class="wrap stack">
+    <h2 id="contrast">Contrast</h2>
+    <p>
+      Every text and UI pairing, recomputed from the hex values by test/unit/l12/contrast.test.ts. Body text needs
+      4.5:1; borders and focus rings need 3:1 (WCAG 2.2 AA). A text pairing shows as Aa; a border or focus pairing
+      shows as the shape it colors.
+    </p>
+    {/* The table fits a phone; the scroller is a net for narrower screens,
+        so it takes focus and a name, as a scrolling region must. */}
+    <div class="sg-scroll" role="region" aria-labelledby="contrast" tabindex="0">
+      <table class="sg-contrast">
+        <thead>
+          <tr><th scope="col">Sample</th><th scope="col">Pairing</th><th scope="col">Ratio</th><th
+              scope="col">Needs</th></tr>
+        </thead>
+        <tbody>
+          {
+            tokens.contrast.map((p) => (
+              <tr>
+                <td>
+                  {p.min === 3 ? (
+                    <span
+                      class:list={["sg-sample", "sg-sample--ui", p.fg.startsWith("focus") && "sg-sample--ring"]}
+                      style={`--fg:${tokens.color[p.fg]};--bg:${tokens.color[p.bg]}`}
+                      data-ui-sample
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <span
+                      class="sg-sample"
+                      style={`color:${tokens.color[p.fg]};background:${tokens.color[p.bg]}`}
+                    >
+                      Aa
+                    </span>
+                  )}
+                </td>
+                <td>
+                  {p.fg} on {p.bg}
+                </td>
+                <td>{p.ratio.toFixed(2)}:1</td>
+                <td>{p.min}:1</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section section--lit">
+  <div class="wrap stack">
+    <h2 id="type">Type</h2>
+    {
+      steps.map(([name, size]) => (
+        <p style={`font-size:${size}; max-width:none`}>
+          {name} {size}: Founders build on the Front Range.
+        </p>
+      ))
+    }
+    <p class="sg-display sg-display--800">Find your people</p>
+    <p class="meta">Cinzel 800: the page title (h1) and Banner headings.</p>
+    <p class="sg-display">Find your people</p>
+    <p class="meta">Cinzel 700: section headings (h2). Cinzel is for h1 and h2 only (decision 15).</p>
+    <h3>Heading three, in Alegreya Sans</h3>
+    <h4>Heading four, in Alegreya Sans</h4>
+    <p>
+      Body text in Alegreya Sans at 18 pixels with a 1.55 line height and a 68 character measure. Links look{" "}
+      <a href="/styleguide/">like this</a>, and community links look <a class="community" href="/links/">like this</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .sg-toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    list-style: none;
+    padding: 0;
+    max-width: none;
+  }
+  .swatches {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--s-4);
+    max-width: none;
+  }
+  .swatches li {
+    display: flex;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .swatches li > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .chipcolor {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-chisel);
+    border: var(--line-hair) solid var(--c-rule);
+    flex: none;
+  }
+  /* Two swatches to a row on a phone, with a smaller chip, instead of one. */
+  @media (max-width: 40rem) {
+    .swatches {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .swatches li {
+      gap: var(--s-2);
+    }
+    .chipcolor {
+      width: 36px;
+      height: 36px;
+    }
+  }
+  .sg-scroll {
+    overflow-x: auto;
+  }
+  .sg-contrast {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 48rem;
+  }
+  .sg-contrast :is(th, td) {
+    padding: var(--s-2) var(--s-3);
+    border-bottom: var(--line-hair) solid var(--c-rule);
+    text-align: left;
+  }
+  /* On a phone the pairing names get the room the cell padding took. */
+  @media (max-width: 40rem) {
+    .sg-contrast :is(th, td) {
+      padding-inline: var(--s-2);
+    }
+  }
+  .sg-sample {
+    display: inline-block;
+    padding: 2px var(--s-2);
+    border: var(--line-hair) solid var(--c-rule);
+    border-radius: var(--r-chisel);
+    font-weight: 700;
+  }
+  /* Borders and focus rings need 3:1 as UI parts, not as text, so their
+     samples carry no text: a square edged in the color, or ringed in it the
+     way a focus outline draws. */
+  .sg-sample--ui {
+    width: var(--s-5);
+    height: var(--s-5);
+    padding: 0;
+    vertical-align: middle;
+    background: var(--bg);
+    border: var(--line-bold) solid var(--fg);
+  }
+  .sg-sample--ring {
+    border-color: var(--bg);
+    outline: var(--line-bold) solid var(--fg);
+  }
+  .sg-display {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--t-step-4);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+  }
+  .sg-display--800 {
+    font-weight: 800;
+  }
+</style>

@@ -1,0 +1,13 @@
+id: the-studio
+name: The Studio
+url: https://www.thestudioboulder.com/
+stage: launch
+substage: service-providers
+city: Boulder
+type: coworking
+description: A Boulder coworking space and event venue. Members get punch passes, dedicated desks and private offices. It also has space for workshops and private events.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

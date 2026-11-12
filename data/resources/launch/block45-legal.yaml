@@ -1,0 +1,13 @@
+id: block45-legal
+name: Block45 Legal
+url: https://block45legal.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Law firm in Denver.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

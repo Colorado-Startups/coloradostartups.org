@@ -1,0 +1,13 @@
+id: ai-capital
+name: AI Capital
+url: https://www.ai.vc/
+stage: growth
+substage: investors
+city: Denver
+type: investor
+description: A venture capital firm in Denver. It invests in enterprise software companies at an early growth stage. Its companies are built on applied artificial intelligence.
+tags:
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

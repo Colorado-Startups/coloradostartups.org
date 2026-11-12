@@ -1,0 +1,13 @@
+id: watson-institute-semester-accelerator
+name: Watson Institute Semester Accelerator
+url: https://watson.is/watson-accelerator/
+stage: launch
+substage: develop
+city: Boulder
+type: accelerator
+description: The flagship Fellowship from Boulder's Watson Institute. It is a fully funded program for impact entrepreneurs. It offers training and mentors. It also offers connections to capital and a global peer community.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

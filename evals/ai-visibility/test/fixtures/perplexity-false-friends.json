@@ -1,0 +1,23 @@
+{
+  "id": "pplx_fixture_02",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1792368000,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Here are resources for Colorado startups:\n\n- State grants for small companies [1].\n- Lists at notcoloradostartups.org and coloradostartups.org.example.net [2].\n- A roundup at https://evil.example/?ref=coloradostartups.org [3]."
+      }
+    }
+  ],
+  "citations": [
+    "https://notcoloradostartups.org/grants",
+    "https://coloradostartups.org.example.net/",
+    "https://evil.example/?ref=coloradostartups.org"
+  ],
+  "search_results": [],
+  "usage": { "prompt_tokens": 10, "completion_tokens": 90, "total_tokens": 100 }
+}

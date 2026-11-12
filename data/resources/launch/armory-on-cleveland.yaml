@@ -1,0 +1,13 @@
+id: armory-on-cleveland
+name: Armory on Cleveland
+url: https://armorycoworking.com/
+stage: launch
+substage: service-providers
+city: Loveland
+type: coworking
+description: A coworking space in Loveland.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

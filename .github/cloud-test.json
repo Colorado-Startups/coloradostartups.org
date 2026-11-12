@@ -1,0 +1,17 @@
+{
+  "$comment": "What .github/workflows/cloud-test.yml may run: names a session dispatches instead of running a suite on the Mac. The shared workflow reads this file from main, so a new name works by dispatch after it merges. The format is cloud-test/README.md in Colorado-Startups/.github.",
+  "version": 1,
+  "scripts": {
+    "check:push": {"run": ["npm", "run", "check:push"]},
+    "check": {"run": ["npm", "run", "check"]},
+    "test": {"run": ["npm", "test"]},
+    "test:unit": {"run": ["npm", "run", "test:unit"], "shard": ["--", "--shard={index}/{total}"]},
+    "test:worker": {"run": ["npm", "run", "test:worker"], "shard": ["--", "--shard={index}/{total}"]},
+    "test:dom": {"run": ["npm", "run", "test:dom"], "shard": ["--", "--shard={index}/{total}"], "before": [["npm", "run", "build"]], "timeout": 30},
+    "test:communitas": {"run": ["npm", "run", "test:communitas"], "shard": ["--", "--shard={index}/{total}"]},
+    "test:e2e": {"run": ["npm", "run", "test:e2e"], "shard": ["--", "--shard={index}/{total}"], "before": [["npm", "run", "-w", "@cs/site", "e2e:install"]], "timeout": 30},
+    "test:ai-visibility": {"run": ["npm", "run", "test:ai-visibility"]},
+    "lint:selftest": {"run": ["npm", "run", "lint:selftest"]},
+    "build": {"run": ["npm", "run", "build"], "timeout": 30}
+  }
+}

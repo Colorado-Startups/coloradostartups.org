@@ -1,0 +1,10 @@
+id: doowii
+name: "Doowii"
+website: "https://doowii.io"
+hq_city: "Denver"
+founded_year: 2023
+sector: "Education"
+description: "Runs a managed data platform for schools and colleges. It unites institutional data with analytics and AI."
+sources:
+  - "https://doowii.io"
+  - "https://www.wgulabs.org/who-we-work-with/doowii"

@@ -1,0 +1,13 @@
+id: go-code-colorado
+name: Go Code Colorado
+url: http://gocode.colorado.gov/
+stage: idea
+substage: validate
+city: Denver
+type: event
+description: A hackathon or maker community in Denver.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

@@ -1,0 +1,13 @@
+id: zoom
+name: Zoom
+url: http://zoom.us/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Large company with an office in Denver. Listed in the Ecosystem Canvas as support for founders at any stage.
+tags:
+  - corporate
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

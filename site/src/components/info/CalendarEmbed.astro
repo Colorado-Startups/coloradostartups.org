@@ -1,0 +1,72 @@
+---
+// The Google Calendar embed on /event-calendar/, with the cookie note the
+// privacy policy promises ("The event calendar" in data/legal/privacy.md).
+// No JavaScript: the iframe loads lazily, and a plain link opens the same
+// calendar on Google for anyone whose browser blocks the frame. Owner: L13.
+import { calendarEmbedUrl, GOOGLE_PRIVACY } from "./links";
+
+const src = calendarEmbedUrl();
+---
+
+<figure class="calendar">
+  <div class="frame">
+    {/* Sits behind the iframe: a slow, blocked or hidden frame shows it, and a
+        loaded calendar covers it. Hidden from the accessibility tree and the tab
+        order, because the caption carries the same link for everyone. */}
+    <div class="fallback" aria-hidden="true">
+      <p>
+        Loading the calendar from Google. If it stays blank,{" "}
+        <a href={src} rel="noopener" tabindex="-1">open the calendar on Google</a>.
+      </p>
+    </div>
+    <iframe
+      src={src}
+      title="Colorado Startups event calendar, from Google Calendar"
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+  </div>
+  <figcaption class="meta">
+    Google Calendar provides this calendar. When it loads, Google may set cookies and collect information under{" "}
+    <a href={GOOGLE_PRIVACY} rel="noopener">Google's privacy policy</a>. Our <a href="/privacy/">privacy policy</a>{" "}
+    says what we collect. <a href={src} rel="noopener">Open the calendar on Google</a>.
+  </figcaption>
+</figure>
+
+<style>
+  .calendar {
+    margin: 0;
+  }
+  .frame {
+    position: relative;
+    min-height: clamp(480px, 70vh, 720px);
+    border: var(--line-hair) solid var(--c-rule);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-edge);
+    overflow: hidden;
+    background: var(--c-surface);
+  }
+  .fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: var(--s-5);
+    text-align: center;
+  }
+  .fallback p {
+    margin: 0;
+  }
+  iframe {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: clamp(480px, 70vh, 720px);
+    border: 0;
+  }
+  /* global.css gives p, ul, ol and dl the measure; a figcaption needs its own. */
+  figcaption {
+    margin-top: var(--s-3);
+    max-width: var(--t-measure);
+  }
+</style>

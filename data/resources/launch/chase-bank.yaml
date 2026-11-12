@@ -1,0 +1,13 @@
+id: chase-bank
+name: Chase Bank
+url: https://www.chase.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A bank. It offers business checking, merchant services, small business loans and business credit cards.
+tags:
+  - banking
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

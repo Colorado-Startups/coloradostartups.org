@@ -1,0 +1,13 @@
+id: vivim
+name: Vivim
+url: https://vivim.net/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver-area design and development firm. It builds mobile apps, websites and brand identities for startups, founders and large brands.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

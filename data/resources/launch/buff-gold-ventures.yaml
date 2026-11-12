@@ -1,0 +1,17 @@
+id: buff-gold-ventures
+name: Buff Gold Ventures
+url: http://www.buffgoldventures.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A venture investor that backs University of Colorado Boulder founders. Faculty, students and alumni are among them. Some of them run startups that license university technology. It invests from pre-seed through Series A.
+tags:
+  - seed
+  - venture-capital
+  - technology
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

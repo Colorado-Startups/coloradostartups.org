@@ -1,0 +1,161 @@
+---
+// The Communitas welcome desk. Owner of the internals: L5 Communitas.
+// Frozen props: L1 places it on the home page and on /community/.
+//
+//   compact?: boolean   home-page version (default false): a one-line intro
+//
+// Static HTML compiled at build time from data/communitas/routes.yaml through
+// deskSteps() in src/lib/communitas/route.ts. No API, no model call and no
+// JavaScript: each answer is a <details> door, and the shared `name` makes
+// them one group, so opening a door closes the others. Every link goes
+// through WAYS_IN. Free-text questions go to Resourcus on the Canvas.
+//
+// Styling uses design v2 role tokens only (never gold as text on a light
+// ground). Visual polish waits for Gate A v2.
+//
+// L7's small portrait of Communitas sits beside the heading and the line that
+// names it (#209). Its alt text, from portraitAlt(), says it is an AI agent,
+// and the disclosure line from dwarves.yaml stays at the foot of the desk.
+import { VISITOR_KINDS, WAYS_IN } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { deskSteps } from "../../lib/communitas/route";
+import { portraitAlt } from "../art/keepers";
+import Portrait from "../art/Portrait.astro";
+
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+
+const routes = (await getCollection("welcomeRoutes")).map((entry) => entry.data);
+const order = new Map(VISITOR_KINDS.map((kind, i) => [kind, i]));
+const doors = routes
+  .map((route) => ({ route, steps: deskSteps(route.id, routes) }))
+  .filter((door) => door.steps.length > 0)
+  .sort((a, b) => (order.get(a.route.id) ?? 0) - (order.get(b.route.id) ?? 0));
+
+const communitas = (await getCollection("dwarves")).find((d) => d.data.id === "communitas");
+const disclosure = communitas?.data.disclosure;
+
+// Two desks never share a page today; the variant keeps ids unique if they do.
+const variant = compact ? "compact" : "full";
+const headingId = `welcome-desk-heading-${variant}`;
+const group = `welcome-desk-${variant}`;
+---
+
+<section class="panel welcome-desk" data-compact={String(compact)} aria-labelledby={headingId}>
+  <div class="desk-head">
+    {
+      communitas && (
+        <Portrait
+          id="communitas"
+          size="small"
+          alt={portraitAlt("communitas", communitas.data.name, communitas.data.title)}
+          sizes="64px"
+          widths={[64, 128, 320]}
+        />
+      )
+    }
+    <h3 id={headingId}>Where do you want to start?</h3>
+    {
+      compact ? (
+        <p class="meta">Communitas, the keeper of the doors, points you to the right room.</p>
+      ) : (
+        <p class="meta">
+          Founders come first here, and everyone is welcome. Pick the door that fits you, and Communitas, the keeper of
+          the doors, points you to the right room.
+        </p>
+      )
+    }
+  </div>
+  <div class="doors">
+    {
+      doors.map(({ route, steps }) => (
+        <details class="door" name={group}>
+          <summary>{route.label}</summary>
+          <ul class="steps">
+            {steps.map((step) => (
+              <li>
+                <a class="community" href={step.href}>
+                  {step.label}
+                </a>
+                <span class="note">{step.note}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))
+    }
+  </div>
+  <p class="handoff">
+    Have a specific question? <a href={WAYS_IN.canvas}>Ask Resourcus in Startup Resources</a>.
+  </p>
+  {disclosure && <p class="ai-note">{disclosure}</p>}
+</section>
+
+<style>
+  /* The keeper's portrait beside the heading and the line that names it.
+     It floats, so on a narrow screen the intro wraps under it. */
+  .desk-head {
+    --portrait-small: 64px;
+    display: flow-root;
+    margin-bottom: var(--s-4);
+  }
+  .desk-head :global(.portrait) {
+    float: left;
+    margin: 0 var(--s-4) var(--s-2) 0;
+  }
+  .desk-head > h3,
+  .desk-head > p {
+    margin: 0;
+  }
+  .desk-head > p {
+    margin-top: var(--s-1);
+  }
+  .doors {
+    display: grid;
+    gap: var(--s-2);
+    margin-bottom: var(--s-4);
+  }
+  .door {
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    background: var(--c-surface-2);
+  }
+  /* list-item keeps the native disclosure triangle, so a door reads as one. */
+  .door summary {
+    display: list-item;
+    list-style: disclosure-closed inside;
+    min-height: var(--size-tap);
+    padding: var(--s-3) var(--s-4);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .door[open] summary {
+    list-style-type: disclosure-open;
+    border-bottom: var(--line-hair) solid var(--c-border);
+  }
+  .door summary::marker {
+    color: var(--c-link);
+  }
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: var(--s-3) var(--s-4);
+    display: grid;
+    gap: var(--s-3);
+  }
+  .steps li {
+    display: grid;
+    gap: var(--s-1);
+  }
+  .steps a {
+    font-weight: 700;
+  }
+  .note {
+    font-size: var(--t-step--1);
+    color: var(--c-text-dim);
+  }
+</style>

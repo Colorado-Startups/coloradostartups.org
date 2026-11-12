@@ -1,0 +1,37 @@
+title: The Passage under Pikes Peak, bare walls
+use: the 404 page; Colorado first, then the Hall carved into it (Paul, 2026-11-03)
+
+{
+  "short_description": "Pikes Peak rises above Colorado Springs, and a bright dwarven hall is carved deep into its pink granite. A lantern-lit workshop passage runs straight ahead beside a brass cog railway and ends at a smooth, blank stone wall, a friendly dead end.",
+  "objects": [
+    {
+      "description": "a smooth, blank wall of warm pink granite with no door, carving or marks, softly lit",
+      "location": "center, at the far end of the passage",
+      "relationship": "where the passage ends and the light gathers"
+    },
+    {
+      "description": "a brass cog railway track with a toothed center rail, stopping at a brass buffer just before the blank wall",
+      "location": "center of the floor, from the foreground to the far wall",
+      "relationship": "leads the eye to the dead end"
+    },
+    {
+      "description": "a small brass cog-railway cart carrying a gleaming prototype rocket engine wrapped in copper pipes",
+      "location": "on the track in the middle distance",
+      "relationship": "a build on its way to a workshop"
+    },
+    {
+      "description": "brass lanterns and copper pipes with softly glowing gauges",
+      "location": "along the left and right walls, getting smaller toward the far end",
+      "relationship": "they light and power the passage"
+    },
+    {
+      "description": "a round window framing the broad, snow-dusted summit of Pikes Peak under clear blue sky",
+      "location": "high on the left wall",
+      "relationship": "shows the hall is carved into Pikes Peak"
+    }
+  ],
+  "background_setting": "an arched passage with chisel-cut pink granite and red sandstone walls and thick timber beams overhead. It runs inside a grand dwarven mountain hall carved into Pikes Peak above Colorado Springs. Its walls are bare chisel-cut stone, with no signs, plaques or pictures.",
+  "lighting_direction": "warm lantern light from both walls and a glow from the gauges, brightest on the blank wall at the far end",
+  "composition": "centered one-point perspective down the passage from eye level, with the blank wall in the middle third and calm stone on both sides",
+  "context": "an illustration for a website's page-not-found screen: a friendly passage that leads nowhere"
+}

@@ -1,0 +1,136 @@
+name: e2e
+
+# REQUIRED. The repository ruleset "main: required checks" requires the e2e
+# check on main (gh api repos/{repo}/rulesets/26477102, created 2026-11-03), so
+# a red or missing e2e check blocks a merge, and this workflow keeps no trigger
+# path filter: its verdict job always reports.
+# Nothing else runs the Playwright journeys or the axe checks in site/e2e/
+# (#308) on every change, and this Mac runs no tests (Paul, 2026-11-02).
+#
+# Runs on every pull request and decides in its first job whether the site
+# changed, like site-tests.yml: a path-filtered trigger never reports on PRs
+# that miss the path. The other jobs' steps run only when 04_tools/site_changed.sh
+# finds an e2e input in the change; otherwise they are skipped. That script
+# holds the path list, the one definition this workflow and site-tests.yml
+# share (#336). It leaves out workers/, evals/ and ops/ for e2e on purpose,
+# and site-tests.yml runs its self-test.
+#
+# Two Playwright shards run in parallel, each with `npm run test:e2e --
+# --shard=N/2`; Playwright's webServer builds the site and serves dist/.
+# Two, not more: GitHub bills every job by the whole minute, and each shard
+# spends about 50 s on setup and Chromium before its specs (#524's runs).
+# Each shard builds its own dist/ rather than waiting for a build job, since
+# the build takes 9 s. Chromium's headless shell comes from
+# `npm run -w @cs/site e2e:install`. There is no browser cache: e2e never runs
+# on main, and a cache saved from a pull request stays scoped to that pull
+# request. The change job picks the shards' runner through
+# 04_tools/ci_runner.sh, which takes only an empty CI_RUNNER or a GitHub-hosted
+# standard Linux label. The change and verdict jobs run only bash and git, so
+# they stay on ubuntu-slim, the cheapest hosted runner. The last job, named
+# e2e, keeps the one check this workflow always reported. It fails when a job
+# failed or was cancelled, when the change job gave no clear answer, or when
+# a shard was skipped although the change touched an e2e input. The specs
+# never submit a form, so the run needs no Turnstile, D1 or email.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: "e2e: changes"
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.changes.outputs.run }}
+      runner: ${{ steps.runner.outputs.runner }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect site changes
+        id: changes
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: bash 04_tools/site_changed.sh e2e "$PR_BASE"
+
+      - name: Pick the shards' runner
+        id: runner
+        env:
+          CI_RUNNER: ${{ vars.CI_RUNNER }}
+        run: bash 04_tools/ci_runner.sh
+
+  shard:
+    name: "e2e: shard ${{ matrix.shard }}/2"
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    runs-on: ${{ needs.changes.outputs.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium and its system libraries
+        run: npm run -w @cs/site e2e:install
+
+      # Playwright's JSON report beside the list output: per-file and per-test
+      # timings for the Quality page's Tests tab, which runs no suite (#538).
+      - name: Build the site and run this shard's Playwright and axe specs
+        # A test build, never a deploy: fixtures when no people data is there (#695).
+        env:
+          CS_PEOPLE_FIXTURES: "1"
+          SHARD: ${{ matrix.shard }}
+          PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/test-report/e2e-shard-${{ matrix.shard }}.json
+        run: npm run test:e2e -- --shard="$SHARD/2" --reporter=list,json
+
+      - uses: actions/upload-artifact@v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: test-report-e2e-shard-${{ matrix.shard }}
+          path: ${{ runner.temp }}/test-report/
+          retention-days: 7
+          if-no-files-found: warn
+
+  # The one check under the workflow's old name. Its steps read only the
+  # results of the jobs above; they check no content.
+  e2e:
+    name: e2e
+    needs: [changes, shard]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Fail on a failed, cancelled or unexpectedly skipped job
+        if: >-
+          needs.changes.result != 'success'
+          || (needs.changes.outputs.run != 'true' && needs.changes.outputs.run != 'false')
+          || contains(needs.*.result, 'failure')
+          || contains(needs.*.result, 'cancelled')
+          || (needs.changes.outputs.run == 'true' && contains(needs.*.result, 'skipped'))
+        env:
+          RUN: ${{ needs.changes.outputs.run }}
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "changes said run=$RUN"
+          echo "$RESULTS"
+          exit 1
+      - name: Every job passed, or was skipped because no e2e input changed
+        run: echo "e2e passed"

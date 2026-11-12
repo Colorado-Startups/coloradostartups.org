@@ -1,0 +1,15 @@
+id: colorado-impact-fund
+name: Colorado Impact Fund
+url: https://www.coloradoimpactfund.com/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: A Denver venture capital firm backing Colorado companies. The companies have scalable business models and a commitment to their communities. It works in clean energy, education, healthcare, natural foods and technology.
+tags:
+  - seed
+  - venture-capital
+  - sustainability
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

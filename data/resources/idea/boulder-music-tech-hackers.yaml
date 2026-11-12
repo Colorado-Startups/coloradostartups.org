@@ -1,0 +1,14 @@
+id: boulder-music-tech-hackers
+name: Boulder Music Tech Hackers
+url: https://www.meetup.com/Boulder-Music-Tech-Hackers/
+stage: idea
+substage: validate
+city: Boulder
+type: community
+description: Meetup for people who build products in Boulder.
+tags:
+  - product
+  - meetup
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

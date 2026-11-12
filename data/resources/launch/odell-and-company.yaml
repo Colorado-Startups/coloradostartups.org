@@ -1,0 +1,13 @@
+id: odell-and-company
+name: O'Dell & Company
+url: https://www.odellandco.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: A Fort Collins CPA firm. It offers accounting, tax, bookkeeping and entity-choice advice to small businesses and people.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,8 @@
+id: kai-health
+name: "Kai Health"
+website: "https://kaihealth.ai"
+hq_city: "Denver"
+sector: "Health care"
+description: "Sells an AI platform for health care organizations. It helps find and close gaps in clinical care, documentation and revenue."
+sources:
+  - "https://kaihealth.ai"

@@ -1,0 +1,13 @@
+id: the-business-law-group
+name: The Business Law Group
+url: http://www.businesslawgroup.us/
+stage: launch
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: A Colorado Springs law firm. It serves startups and established businesses on formation, contracts, employment, IP and real estate.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

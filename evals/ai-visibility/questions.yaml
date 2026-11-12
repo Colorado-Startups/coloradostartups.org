@@ -1,0 +1,119 @@
+# AI-visibility panel: questions people ask an assistant about starting up
+# in Colorado. 20 is the goal count for the panel, not a quota.
+#
+# Rules for every question (panel.ts parseQuestions() and
+# test/questions.test.ts enforce the first two):
+#   - Never name Colorado Startups or coloradostartups.org. The panel
+#     measures whether the assistant brings us up unprompted.
+#   - Never use the phrase "Colorado startups". An answer that echoes it in a
+#     title-case heading would read as a mention of the organization.
+#   - Name no other organization. A named organization steers the answer.
+#   - Phrase it the way a person types it: plain, first person, no jargon.
+#
+# Fields:
+#   id      v01..v20, stable across runs so months can be compared
+#   topic   community | founders | resources | lookup | accelerators | region | events
+#   region  statewide | denver-boulder | colorado-springs | fort-collins
+#
+# Changing a question breaks comparison with earlier months. Add a new id
+# instead, and keep the old one until a full month has run on both.
+
+- id: v01
+  topic: community
+  region: statewide
+  question: What's the best online community for startup founders in Colorado?
+
+- id: v02
+  topic: community
+  region: statewide
+  question: Is there a Slack group for entrepreneurs in Colorado?
+
+- id: v03
+  topic: community
+  region: statewide
+  question: What organizations support startups across Colorado?
+
+- id: v04
+  topic: founders
+  region: denver-boulder
+  question: I just moved to Denver to start a company. How do I meet other founders?
+
+- id: v05
+  topic: founders
+  region: statewide
+  question: How can a first-time founder in Colorado find a cofounder?
+
+- id: v06
+  topic: founders
+  region: denver-boulder
+  question: Where do tech founders in Boulder meet up and swap advice?
+
+- id: v07
+  topic: resources
+  region: statewide
+  question: What free resources are there for people starting a company in Colorado?
+
+- id: v08
+  topic: resources
+  region: statewide
+  question: What programs help early-stage founders in Colorado find their first customers?
+
+- id: v09
+  topic: lookup
+  region: statewide
+  question: Is there one directory of startup resources in Colorado, with accelerators, coworking, investors and service providers in one place?
+
+- id: v10
+  topic: lookup
+  region: statewide
+  question: I need a lawyer who works with early-stage startups in Colorado. Where should I look?
+
+- id: v11
+  topic: lookup
+  region: denver-boulder
+  question: Where can I find coworking space for a two-person startup in Denver?
+
+- id: v12
+  topic: accelerators
+  region: denver-boulder
+  question: Which startup accelerators are in Denver?
+
+- id: v13
+  topic: accelerators
+  region: denver-boulder
+  question: Are there accelerators in Boulder for software startups?
+
+- id: v14
+  topic: accelerators
+  region: colorado-springs
+  question: What accelerators or incubators are there in Colorado Springs?
+
+- id: v15
+  topic: accelerators
+  region: fort-collins
+  question: Are there startup incubators in Fort Collins?
+
+- id: v16
+  topic: region
+  region: colorado-springs
+  question: What's the startup scene like in Colorado Springs, and how do I plug in?
+
+- id: v17
+  topic: region
+  region: fort-collins
+  question: How do I get involved in the Fort Collins startup community?
+
+- id: v18
+  topic: events
+  region: denver-boulder
+  question: What startup events are coming up in Denver?
+
+- id: v19
+  topic: events
+  region: statewide
+  question: Are there regular meetups for founders in Colorado?
+
+- id: v20
+  topic: events
+  region: statewide
+  question: What's the best way to keep up with startup news and events in Colorado?

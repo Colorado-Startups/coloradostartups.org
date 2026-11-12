@@ -1,0 +1,9 @@
+{
+  "extends": "../../site/tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": ["./*.ts", "../../site/worker-configuration.d.ts", "../../site/worker/env.d.ts"],
+  "exclude": []
+}

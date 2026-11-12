@@ -1,0 +1,13 @@
+id: fort-collins-coworking-alliance
+name: Fort Collins Coworking Alliance
+url: http://focoworks.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: coworking
+description: Coworking space in Fort Collins. Listed in the Ecosystem Canvas for founders at the launch stage.
+tags:
+  - coworking
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

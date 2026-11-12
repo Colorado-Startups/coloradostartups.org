@@ -1,0 +1,13 @@
+id: holland-and-knight-denver
+name: Holland & Knight (Denver)
+url: https://www.hklaw.com/en
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A law firm office in Denver. It works on mergers and acquisitions. It also works on securities and financing. It works on intellectual property and employment matters too.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

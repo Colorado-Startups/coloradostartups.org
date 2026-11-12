@@ -1,0 +1,10 @@
+id: lunar-outpost
+name: "Lunar Outpost"
+website: "https://www.lunaroutpost.com/"
+hq_city: "Golden"
+founded_year: 2017
+sector: "Space and aerospace"
+description: "Builds lunar rovers and robotic systems that carry payloads and crews. It builds them for space agencies and commercial customers."
+sources:
+  - "https://www.lunaroutpost.com/"
+  - "https://www.denvergazette.com/2026/05/26/golden-startup-wins-220m-contract-to-build-first-fleet-of-lunar-rovers-for-nasas-moon-base/"

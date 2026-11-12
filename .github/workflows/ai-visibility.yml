@@ -1,0 +1,75 @@
+name: ai-visibility
+
+# ADVISORY. No ruleset requires this check, so it reports and never blocks a
+# merge.
+#
+# The AI-visibility baseline (evals/ai-visibility/REPORT.md): one live run of
+# the panel against Anthropic alone, with the repo secret ANTHROPIC_API_KEY
+# (registry row API-Key-Anthropic-AIVisibility). It spends money, so it waits
+# for a dispatch, and only the orchestrator dispatches it, after Paul sets the
+# secret:
+#
+#   gh workflow run ai-visibility.yml
+#   gh run download <id> -n ai-visibility-results
+#
+# The live step runs only on a dispatch from main, so a dispatch on any other
+# branch never runs that branch's code with the paid key; it plans and stops.
+#
+# No schedule, no OpenAI and no Perplexity. A pull request that changes this
+# file or the panel's code runs the plan alone (cli.ts with no flags): it
+# prints the questions, the model and the estimate and sends nothing, and
+# never sees the secret. The results upload as the artifact
+# "ai-visibility-results", even after a failed run, so a paid answer is never
+# lost; commit them by PR.
+#
+# ubuntu-slim, a fixed GitHub-hosted label: the job holds a paid key, and it
+# mostly waits on the API.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/ai-visibility.yml"
+      - "evals/ai-visibility/**"
+
+permissions:
+  contents: read
+
+# One live run at a time, so two dispatches never spend twice at once.
+concurrency:
+  group: ai-visibility-${{ github.event_name == 'pull_request' && github.ref || 'live' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  panel:
+    name: ai-visibility
+    runs-on: ubuntu-slim
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Plan, which sends nothing
+        run: npm run eval:ai-visibility -- --providers anthropic
+
+      - name: Live run, Anthropic only
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npm run eval:ai-visibility -- --live --confirm-spend --providers anthropic
+
+      - uses: actions/upload-artifact@v7.0.2
+        if: always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        with:
+          name: ai-visibility-results
+          path: evals/ai-visibility/results/
+          retention-days: 30
+          if-no-files-found: warn

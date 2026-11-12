@@ -1,0 +1,14 @@
+id: pitch-colorado
+name: Pitch Colorado
+url: https://www.pitchcolorado.com/
+stage: launch
+substage: develop
+city: statewide
+type: event
+description: Event or group that connects founders with investors. Listed in the Ecosystem Canvas for founders at the launch stage.
+tags:
+  - investors
+  - networking
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

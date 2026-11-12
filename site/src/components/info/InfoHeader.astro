@@ -1,0 +1,29 @@
+---
+// The top of every info page. The kicker carries the Hall's metaphor; the h1
+// and the lede stay literal, so nobody decodes a metaphor to find a policy
+// (01_doctrine/voice.md). Owner: L13.
+interface Props {
+  kicker: string;
+  title: string;
+  /** id for the h1, so the page's main section can point aria-labelledby at it. */
+  id?: string;
+}
+
+const { kicker, title, id = "page-title" } = Astro.props;
+---
+
+<div class="info-header">
+  <p class="kicker">{kicker}</p>
+  <h1 id={id}>{title}</h1>
+  <slot />
+</div>
+
+<style>
+  /* The kicker's look is the global .kicker in global.css (#217, #419). */
+  .info-header {
+    margin-bottom: var(--s-6);
+  }
+  h1 {
+    margin-bottom: var(--s-4);
+  }
+</style>

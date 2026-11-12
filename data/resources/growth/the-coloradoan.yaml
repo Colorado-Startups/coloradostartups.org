@@ -1,0 +1,13 @@
+id: the-coloradoan
+name: The Coloradoan
+url: https://www.coloradoan.com/business/
+stage: growth
+substage: service-providers
+city: Fort Collins
+type: media
+description: Regional news outlet in Fort Collins.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

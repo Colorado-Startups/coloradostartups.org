@@ -1,0 +1,14 @@
+id: hacks-hackers-colorado
+name: Hacks/Hackers Colorado
+url: https://www.meetup.com/hackshackersco/
+stage: idea
+substage: validate
+city: Denver
+type: community
+description: Meetup for people who build products in Denver.
+tags:
+  - product
+  - meetup
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

@@ -1,0 +1,9 @@
+id: deterrence
+name: "Deterrence"
+website: "https://deterrence.com/"
+hq_city: "Denver"
+sector: "Defense and public safety"
+description: "Builds autonomous manufacturing systems. Suppliers in the defense industrial base use them to grow production capacity."
+sources:
+  - "https://deterrence.com/privacy"
+  - "https://deterrence.com/"

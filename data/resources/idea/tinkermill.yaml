@@ -1,0 +1,13 @@
+id: tinkermill
+name: TINKERMILL
+url: https://www.tinkermill.org/
+stage: idea
+substage: validate
+city: Longmont
+type: event
+description: A makerspace in Longmont. It has shared tools, equipment and classes for members and the community.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

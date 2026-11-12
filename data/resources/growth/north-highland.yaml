@@ -1,0 +1,13 @@
+id: north-highland
+name: North Highland
+url: https://www.northhighland.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A consulting firm focused on change and transformation. It serves large organizations. Its clients are in energy, financial services, healthcare and the public sector.
+tags:
+  - consulting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

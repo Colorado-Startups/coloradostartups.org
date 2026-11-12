@@ -1,0 +1,13 @@
+id: watson-institute
+name: Watson Institute
+url: https://watson.is/
+stage: launch
+substage: develop
+city: Boulder
+type: incubator
+description: A Boulder institute powering fellowships with corporate and foundation partners. Fellows are entrepreneurs, mostly from historically disenfranchised backgrounds. Each gets training, mentors and a venture stipend.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

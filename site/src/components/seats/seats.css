@@ -1,0 +1,767 @@
+/* The volunteer seat pages (lane L38): /get-involved/<seat id>/.
+   Global on purpose: the SVG figures arrive as strings from lib/seats/viz.ts,
+   which Astro's scoped styles cannot reach. Every selector starts with .seat-
+   or .sv-, and every color is a site token. */
+
+/* ---------- Hero ---------- */
+/* The breadcrumb's look is the global .crumbs in global.css (#195). */
+.seat-hero .crumbs {
+  margin-bottom: var(--s-4);
+}
+.seat-hero__art.art-image {
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-glow);
+}
+.seat-hero__plaque {
+  position: relative;
+  max-width: 46rem;
+  margin: calc(-1 * var(--s-8)) 0 0 var(--s-5);
+  border-top: 4px solid var(--c-accent);
+}
+.seat-hero__plaque h1 {
+  margin-bottom: var(--s-2);
+  /* "Connector" and "Community" are nine display capitals: they fit a
+     375 px phone only below the site's h1 size. The floor is the 36 px
+     step, so a phone gets a size on the type scale (#233). */
+  font-size: clamp(var(--t-step-3), 7.6vw + 0.4rem, var(--t-step-5));
+  overflow-wrap: break-word;
+}
+.seat-status {
+  font-weight: 700;
+  margin-bottom: var(--s-3);
+}
+@media (max-width: 48rem) {
+  .seat-hero__plaque {
+    margin: var(--s-4) 0 0;
+  }
+}
+
+/* ---------- Section heads ---------- */
+/* The hero's kicker and each section's kicker wear the global .kicker
+   (#217, #683). */
+.seat-section > .wrap > * + * {
+  margin-top: var(--s-6);
+}
+.seat-section > .wrap > h2 {
+  margin-top: 0;
+}
+.seat-section > .wrap > .kicker + h2 {
+  margin-top: 0;
+}
+#how-to-apply {
+  scroll-margin-top: var(--s-4);
+}
+
+/* ---------- Layout ---------- */
+.seat-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6);
+  align-items: start;
+}
+.seat-split > div > * + * {
+  margin-top: var(--s-5);
+}
+@media (max-width: 52rem) {
+  .seat-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* A split with a map or network diagram (#367). Half the row drew the
+   680-unit drawings 410 to 574 px wide, so their 15-unit labels drew 9 to
+   12.7 px. Here the drawing's column is 43rem: 680 px of drawing and its
+   2 px of border, rounded up to a whole rem. Beside it the text keeps
+   20rem, two 9.5rem tiles and their gap. With the 2rem gap that needs a
+   65rem wrap, a 68rem screen with the gutters; below that the split stacks.
+   Stacked, the drawing stops at the same 43rem. */
+.seat-split--figure {
+  grid-template-columns: 43rem minmax(0, 1fr);
+}
+@media (max-width: 68rem) {
+  .seat-split--figure {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.seat-figure__wide {
+  max-width: 43rem;
+}
+.seat-figure {
+  margin: 0;
+}
+.seat-figure figcaption {
+  margin-top: var(--s-2);
+  font-size: var(--t-step--1);
+  color: var(--ink-dim, var(--c-text-dim));
+  max-width: var(--t-measure);
+}
+/* Each map and network diagram is drawn twice (#329). Up to 45.625rem
+   (730 px: 680 units, the page's 48 px of gutters and the figure's 2 px of
+   border, #374) the 680-unit drawing would show under 680 px wide and draw
+   its 15-unit labels under 15 px; there the phone drawing shows instead, at
+   its own 310-unit width, where a unit is a pixel. The hidden one is
+   display: none, so assistive tech meets one figure. */
+.seat-figure__narrow {
+  display: none;
+}
+@media (max-width: 45.625rem) {
+  .seat-figure__wide {
+    display: none;
+  }
+  .seat-figure__narrow {
+    display: block;
+  }
+}
+/* Every seat figure's SVG fills its column at its own ratio. */
+.seat-figure .sv-map,
+.seat-figure .sv-net,
+.seat-trail .sv-trail,
+.seat-hours .sv-hours {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.seat-figure .sv-map,
+.seat-figure .sv-net {
+  border: var(--line-hair) solid var(--c-rule);
+  border-radius: var(--r-card);
+  background: var(--c-ground);
+}
+.seat-plaque {
+  max-width: 46rem;
+  padding: var(--s-4) var(--s-5);
+  background: var(--c-stone);
+  border: var(--line-hair) solid var(--c-stone-edge);
+  border-radius: var(--r-bevel-sm);
+  box-shadow: var(--sh-ledge);
+}
+.seat-plaque > * {
+  margin: 0;
+}
+.seat-plaque > * + * {
+  margin-top: var(--s-2);
+}
+.seat-plaque ul:not(.seat-pills) {
+  padding-left: 1.2em;
+  display: grid;
+  gap: var(--s-2);
+}
+.seat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  padding: 0;
+  list-style: none;
+}
+.seat-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: none;
+  color: var(--c-bronze);
+}
+
+/* ---------- Lists drawn as grids ---------- */
+/* No bullets, no indent, the full column. Each list's own rule below sets
+   its grid; the steps list sets its own top margin after this. */
+.seat-perks,
+.seat-traits,
+.seat-tiles,
+.seat-bars,
+.seat-week,
+.seat-steps__list {
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  list-style: none;
+}
+
+/* ---------- Perks, tiles and trait cards ---------- */
+.seat-perks,
+.seat-traits {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--s-4);
+}
+/* Five perks (common.yaml) leave none alone on a row only in five, three or
+   one columns (#231). Five fit a wrap of 1104 px or more (five 13rem tracks
+   and their gaps), a 72rem screen. Below it, three, down to three 13rem
+   tracks in a 656 px wrap, a 44rem screen. Below that, one. A bare
+   auto-fit 13rem grid would put four in a row from 928 to 1151 px, the
+   fifth alone below. */
+.seat-perks {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+@media (max-width: 72rem) {
+  .seat-perks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 44rem) {
+  .seat-perks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.seat-perk,
+.seat-tile,
+.seat-trait {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  padding: var(--s-4);
+  background: var(--c-ground);
+  border: var(--line-hair) solid var(--c-rule);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-ledge);
+}
+/* auto-fit drops the empty tracks, so four tiles across the 1180 px wrap
+   share the row instead of filling four of seven (#231). */
+.seat-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: var(--s-3);
+}
+.seat-tile {
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+}
+.seat-tile__label {
+  font-weight: 700;
+}
+.seat-tile__note {
+  font-size: var(--t-step--1);
+  color: var(--c-text-dim);
+}
+.seat-perks__rule {
+  font-size: var(--t-step--1);
+}
+
+/* ---------- Stats ---------- */
+.seat-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--s-4);
+}
+.seat-stat {
+  padding: var(--s-4) var(--s-5);
+  background: var(--c-surface);
+  border: var(--line-hair) solid var(--c-stone-edge);
+  border-left: 6px solid var(--c-accent);
+  border-radius: var(--r-bevel-sm);
+}
+.seat-stat > p {
+  margin: 0;
+}
+.seat-stat__num {
+  font-family: var(--font-display);
+  font-size: var(--t-step-3);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--c-bronze-deep);
+  overflow-wrap: anywhere;
+}
+.seat-stat__label {
+  margin-top: var(--s-2);
+  font-size: var(--t-step--1);
+}
+
+/* ---------- Bars ---------- */
+.seat-bars {
+  display: grid;
+  gap: var(--s-3);
+}
+.seat-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s-1) var(--s-3);
+  align-items: center;
+}
+.seat-bar__label {
+  grid-column: 1 / -1;
+  font-size: var(--t-step--1);
+}
+.seat-bar__track {
+  height: 1.25rem;
+  background: var(--c-surface-2);
+  border-radius: var(--r-chisel);
+  overflow: hidden;
+}
+.seat-bar__fill {
+  display: block;
+  height: 100%;
+  width: var(--w);
+  background: linear-gradient(90deg, var(--c-accent-deep), var(--c-accent));
+  border-right: var(--line-edge) solid var(--c-accent-ledge);
+}
+.seat-bar__value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Footnote markers ---------- */
+/* The type scale's smallest step, 15 px, wherever the marker sits; 0.7em
+   came to 12.6 px in body text. Underlined on hover like every link (#232). */
+.seat-fn {
+  margin-left: 0.15em;
+  font-family: var(--font-body);
+  font-size: var(--t-step--1);
+  font-weight: 700;
+  text-decoration: none;
+}
+.seat-fn:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+.seat-fn sup {
+  font-size: 1em;
+  vertical-align: super;
+}
+
+/* ---------- The Slack week ---------- */
+.seat-week {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--s-3);
+}
+.seat-day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4) var(--s-3);
+  background: var(--c-ground);
+  border: var(--line-hair) solid var(--c-rule);
+  border-radius: var(--r-card);
+}
+.seat-day--on {
+  background: var(--c-surface);
+  border-color: var(--c-accent-ledge);
+  box-shadow: var(--sh-ledge-gold);
+}
+.seat-day__name {
+  font-size: var(--t-step--1);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+.seat-day__label strong {
+  display: block;
+}
+@media (max-width: 48rem) {
+  .seat-week {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .seat-day {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .seat-day__name {
+    flex-basis: 100%;
+  }
+}
+
+/* ---------- Keeper and you ---------- */
+.seat-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--s-4);
+  align-items: stretch;
+}
+.seat-flow__card {
+  padding: var(--s-5);
+  background: var(--c-ground);
+  border: var(--line-hair) solid var(--c-rule);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-ledge);
+}
+.seat-flow__card > * {
+  margin: 0;
+}
+.seat-flow__card > * + * {
+  margin-top: var(--s-2);
+}
+.seat-flow__card ul {
+  padding-left: 1.2em;
+}
+.seat-flow__arrow {
+  align-self: center;
+  width: 2.5rem;
+  height: 4px;
+  background: var(--c-accent-ledge);
+  position: relative;
+}
+.seat-flow__arrow::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -8px;
+  border-left: 12px solid var(--c-accent-ledge);
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+}
+@media (max-width: 48rem) {
+  .seat-flow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .seat-flow__arrow {
+    justify-self: center;
+    width: 4px;
+    height: 2rem;
+  }
+  .seat-flow__arrow::after {
+    right: -8px;
+    top: auto;
+    bottom: -10px;
+    border-top: 12px solid var(--c-accent-ledge);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0;
+  }
+}
+
+/* ---------- Steps and courses ---------- */
+.seat-trail .sv-trail {
+  max-width: 48rem;
+}
+/* The trail is 720 units wide and its step numbers 18 units, so drawn under
+   600 px wide (a screen under 648 px) they would draw under 15 px. There they
+   hide; the numbered steps list beside the trail says the same (#329). */
+@media (max-width: 40.5rem) {
+  .sv .sv-waypoint-num {
+    display: none;
+  }
+}
+.seat-steps__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-4);
+  margin: var(--s-4) 0 0;
+  counter-reset: seat-step;
+}
+.seat-steps__list > li {
+  counter-increment: seat-step;
+  padding: var(--s-4) var(--s-5);
+  background: var(--c-ground);
+  border: var(--line-hair) solid var(--c-rule);
+  border-radius: var(--r-card);
+}
+.seat-steps__list h3 {
+  font-size: var(--t-step-1);
+}
+.seat-steps__list h3::before {
+  content: counter(seat-step) ". ";
+  color: var(--c-bronze);
+}
+.seat-steps__list p {
+  margin: 0;
+}
+@media (max-width: 52rem) {
+  .seat-steps__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.seat-table-wrap {
+  max-width: 44rem;
+  overflow-x: auto;
+}
+.seat-courses {
+  width: 100%;
+  border-collapse: collapse;
+}
+.seat-courses th,
+.seat-courses td {
+  padding: var(--s-2) var(--s-3);
+  border-bottom: var(--line-hair) solid var(--c-rule);
+  text-align: left;
+  vertical-align: top;
+}
+.seat-courses thead th {
+  font-size: var(--t-step--1);
+  color: var(--c-text-dim);
+}
+/* Each course link meets the 44 px tap target goal (#234): it stays inline,
+   and 12 px of block padding adds to its hit area without moving its text,
+   45 px in Chrome at 375 px (review of #490). An inline-block link wrapped a
+   long course name below its color swatch on a phone. */
+.seat-courses tbody th {
+  font-weight: 500;
+}
+.seat-courses tbody th a {
+  padding-block: var(--s-3);
+}
+.seat-courses td {
+  white-space: nowrap;
+}
+.seat-courses tfoot th,
+.seat-courses tfoot td {
+  font-weight: 700;
+  border-bottom: 0;
+}
+.seat-swatch {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-right: var(--s-2);
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+.seat-hours .sv-hours {
+  max-width: 44rem;
+}
+.seat-apply {
+  max-width: 44rem;
+}
+.seat-apply > * {
+  margin: 0;
+}
+.seat-apply > * + * {
+  margin-top: var(--s-3);
+}
+
+/* ---------- Other seats and sources ---------- */
+/* Two classes, so this track size beats .hall-grid's own; auto-fit drops
+   empty tracks, so three cards span the width (#207). */
+.hall-grid.seat-others {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+.seat-sources__list {
+  display: grid;
+  gap: var(--s-3);
+  max-width: var(--t-measure);
+  padding-left: 1.6em;
+  font-size: var(--t-step--1);
+}
+.seat-sources__list li > p {
+  margin: 0;
+}
+.seat-sources__list a {
+  overflow-wrap: anywhere;
+}
+.seat-sources__list li:target {
+  outline: var(--line-bold) solid var(--c-focus);
+  outline-offset: 4px;
+}
+
+/* ---------- SVG figures (lib/seats/viz.ts) ---------- */
+/* Text sizes are type scale tokens. Inside an SVG they count in the
+   figure's viewBox units, so the drawn size scales with the figure. */
+.sv text {
+  font-family: var(--font-body);
+  fill: var(--c-text);
+}
+.sv-halo {
+  paint-order: stroke;
+  stroke: var(--c-ground);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.sv-label {
+  font-size: var(--t-step--1);
+  font-weight: 600;
+}
+.sv-label-strong {
+  font-size: var(--t-step-0);
+  font-weight: 700;
+}
+.sv-small {
+  font-size: var(--t-step--1);
+}
+.sv-bold {
+  font-weight: 700;
+}
+.sv-italic {
+  font-style: italic;
+}
+.sv .sv-region {
+  font-family: var(--font-display);
+  font-size: var(--t-step-1);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  fill: var(--c-bronze-deep);
+}
+.sv-plain {
+  fill: color-mix(in oklab, var(--c-surface) 60%, var(--c-ground));
+}
+.sv-land {
+  fill: var(--c-stone);
+}
+.sv-ridge {
+  fill: var(--c-surface-2);
+  stroke: var(--c-stone-edge);
+  stroke-width: 1;
+  opacity: 0.75;
+}
+.sv-zone {
+  fill: var(--c-accent);
+  fill-opacity: 0.16;
+  stroke: var(--c-accent-ledge);
+  stroke-width: 2;
+  stroke-dasharray: 7 5;
+}
+.sv-core-link {
+  stroke: var(--c-accent-ledge);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.sv-route {
+  fill: none;
+  stroke: var(--c-link);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+.sv .sv-route-label {
+  font-style: italic;
+  fill: var(--c-link);
+}
+.sv-landmark {
+  fill: var(--c-link);
+  stroke: var(--c-ground);
+  stroke-width: 1.5;
+}
+.sv-peak {
+  fill: var(--c-bronze);
+  stroke: var(--c-ground);
+  stroke-width: 1.5;
+}
+.sv-dim {
+  fill: var(--c-text-dim);
+  opacity: 0.6;
+}
+.sv-city-core {
+  fill: var(--c-accent);
+  stroke: var(--c-accent-ledge);
+  stroke-width: 2.5;
+}
+.sv-city {
+  fill: var(--c-bronze);
+}
+.sv-inset {
+  fill: var(--c-ground);
+  stroke: var(--c-border);
+  stroke-width: 1.2;
+}
+.sv-inset-view {
+  fill: var(--c-accent);
+  fill-opacity: 0.45;
+  stroke: var(--c-accent-ledge);
+  stroke-width: 1;
+}
+.sv-inset-frame {
+  fill: none;
+  stroke: var(--c-accent-ledge);
+  stroke-width: 2;
+  stroke-dasharray: 5 3;
+}
+.sv-north {
+  fill: var(--c-bronze);
+}
+.sv-edge {
+  fill: none;
+}
+.sv-edge--main {
+  stroke: var(--c-accent-ledge);
+  stroke-width: 3;
+}
+.sv-edge--bridge {
+  stroke: var(--c-link);
+  stroke-width: 2.2;
+  stroke-dasharray: 7 5;
+}
+.sv-edge--thin {
+  stroke: var(--c-stone-edge);
+  stroke-width: 1.5;
+}
+.sv-edge--faint {
+  stroke: var(--c-stone-edge);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 5;
+}
+.sv-edge--ai {
+  stroke: var(--c-pine);
+  stroke-width: 2;
+  stroke-dasharray: 2 4;
+}
+.sv-you {
+  fill: var(--c-accent);
+  stroke: var(--c-accent-ledge);
+  stroke-width: 4;
+}
+.sv .sv-center {
+  font-family: var(--font-display);
+  font-size: var(--t-step-1);
+  font-weight: 800;
+  fill: var(--c-on-accent);
+}
+.sv-hub {
+  fill: var(--c-bronze);
+  stroke: var(--c-ground);
+  stroke-width: 3;
+}
+.sv-far {
+  fill: var(--c-surface);
+  stroke: var(--c-link);
+  stroke-width: 2.5;
+  stroke-dasharray: 5 4;
+}
+.sv-ai {
+  fill: var(--c-pine);
+  stroke: var(--c-ground);
+  stroke-width: 3;
+}
+.sv-sat {
+  fill: var(--c-stone);
+  stroke: var(--c-accent-ledge);
+  stroke-width: 2;
+}
+.sv-seg-0 {
+  fill: var(--c-accent);
+  background: var(--c-accent);
+}
+.sv-seg-1 {
+  fill: var(--c-bronze);
+  background: var(--c-bronze);
+}
+.sv-seg-2 {
+  fill: var(--c-pine);
+  background: var(--c-pine);
+}
+.sv-seg-3 {
+  fill: var(--c-link);
+  background: var(--c-link);
+}
+.sv-trail-ridge {
+  fill: var(--c-surface-2);
+  stroke: var(--c-stone-edge);
+  stroke-width: 1.5;
+}
+.sv-trail-path {
+  fill: none;
+  stroke: var(--c-link);
+  stroke-width: 3;
+  stroke-dasharray: 2 8;
+  stroke-linecap: round;
+}
+.sv-waypoint {
+  fill: var(--c-accent);
+  stroke: var(--c-accent-ledge);
+  stroke-width: 3;
+}
+.sv .sv-waypoint-num {
+  font-family: var(--font-display);
+  font-size: var(--t-step-0);
+  font-weight: 800;
+  fill: var(--c-on-accent);
+}
+.sv-flag {
+  fill: var(--c-fire);
+  stroke: var(--c-bronze);
+  stroke-width: 2;
+}
+
+/* A phone drawing shows at its own 310-unit width, never stretched, so a
+   unit is a pixel and the labels above draw at the type scale's own sizes:
+   15 px, 18 strong, 21 for region names and the center (#329). */
+.seat-figure .sv--narrow {
+  width: auto;
+  max-width: 100%;
+}

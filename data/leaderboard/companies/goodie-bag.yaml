@@ -1,0 +1,9 @@
+id: goodie-bag
+name: "Goodie Bag"
+website: "https://www.goodiebag.co/"
+hq_city: "Boulder"
+sector: "Food and beverage"
+description: "Runs an app where local restaurants and shops sell unsold food at a discount. The food comes as mystery bags that shoppers pick up."
+sources:
+  - "https://www.goodiebag.co/news/goodie-bag-app-to-save-money-and-food-waste-in-the-springs"
+  - "https://www.goodiebag.co/"

@@ -1,0 +1,15 @@
+id: blackhorn
+name: BlackHorn
+url: http://www.blackhornvc.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A venture capital firm with offices in Denver and New York. It backs startups using data, AI and robotics. The startups change how industries build, power and move.
+tags:
+  - seed
+  - venture-capital
+  - sustainability
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: fast-enterprises
+name: Fast Enterprises
+url: https://www.fastenterprises.com/
+stage: support
+substage: organizations
+city: Centennial
+type: other
+description: The company makes software products for government agencies that deliver essential services. It has an office in Centennial.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

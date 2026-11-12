@@ -1,0 +1,13 @@
+id: access-venture-partners
+name: Access Venture Partners
+url: https://www.accessvp.com/
+stage: growth
+substage: investors
+city: Denver
+type: investor
+description: An early-stage venture capital firm. It has offices in Westminster and Denver. It invests at seed and Series A in SaaS, cybersecurity and marketplace startups.
+tags:
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

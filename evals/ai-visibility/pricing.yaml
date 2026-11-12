@@ -1,0 +1,60 @@
+# Prices for the spend estimate and the actual-cost line of a live run.
+#
+# Every price below comes from the page in its block's `source`, read on the
+# date in `read`. Prices change: re-read each page before a run that matters,
+# and update `read` with the figures.
+#
+# `assume` holds per-question guesses for the estimate. They are assumptions,
+# not measurements. A live run reports what each provider's usage block says
+# it billed, and summary.md shows that next to the estimate.
+
+anthropic:
+  source: https://platform.claude.com/docs/en/about-claude/pricing
+  read: 2026-10-18
+  model: claude-sonnet-5-5
+  # The source page says Claude Sonnet 5.5 costs $2 / MTok base input and $10 / MTok output.
+  input_per_mtok: 2
+  output_per_mtok: 10
+  # The source page says "Web search is available on the Claude API for $10
+  # per 1,000 searches, plus standard token costs for search-generated content."
+  search_per_1k: 10
+  assume:
+    # Search results count as input tokens on the same page.
+    input_tokens: 25000
+    output_tokens: 3000
+    # The runner caps searches at max_uses 5 per request, so 5 is the most.
+    searches: 5
+
+openai:
+  source: https://developers.openai.com/api/docs/pricing
+  read: 2026-10-18
+  model: gpt-5.5
+  # The source page says "gpt-5.5 (<272K context length): input $5.00, output $30.00" per 1M tokens.
+  input_per_mtok: 5
+  output_per_mtok: 30
+  # The source page says "Web search (all models): $10.00 / 1k calls + Search
+  # content tokens billed at model rates."
+  search_per_1k: 10
+  assume:
+    input_tokens: 20000
+    output_tokens: 3000
+    searches: 3
+
+perplexity:
+  source: https://docs.perplexity.ai/getting-started/pricing
+  read: 2026-10-18
+  model: sonar
+  # The source page says Sonar costs $1 input and $1 output per 1M tokens.
+  input_per_mtok: 1
+  output_per_mtok: 1
+  # The source page says the Sonar request fee per 1,000 requests depends on search context size.
+  request_per_1k:
+    low: 5
+    medium: 8
+    high: 12
+  assume:
+    input_tokens: 2000
+    output_tokens: 1000
+    searches: 0
+    # The estimate takes the high fee, the most one request can cost.
+    context_size: high

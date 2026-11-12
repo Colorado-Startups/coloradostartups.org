@@ -1,0 +1,17 @@
+---
+// A footnote marker beside a figure on a seat page (lane L38). It links to
+// the figure's entry in the Sources list, and its accessible name gives the
+// short source, so the figure is attributed where it stands.
+interface Props {
+  n: number;
+  /** The short source tag, such as "Deloitte survey, 2016". */
+  short: string;
+}
+
+const { n, short } = Astro.props;
+---
+
+<a class="seat-fn" href={`#source-${n}`} data-note={n}><sup aria-hidden="true">{n}</sup><span class="visually-hidden">
+    (source {n}: {short})</span
+  ></a
+>

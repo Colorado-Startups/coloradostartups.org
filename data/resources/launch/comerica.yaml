@@ -1,0 +1,13 @@
+id: comerica
+name: Comerica
+url: https://www.comerica.com/business/industry-solutions/technology.html
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A national bank or business banking service in Denver.
+tags:
+  - banking
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

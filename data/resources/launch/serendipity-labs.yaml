@@ -1,0 +1,13 @@
+id: serendipity-labs
+name: Serendipity Labs
+url: https://serendipitylabs.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: coworking
+description: A workspace company with a Denver LoDo location. It offers private offices, coworking and drop-in desks. It also offers meeting and event space and virtual office services.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

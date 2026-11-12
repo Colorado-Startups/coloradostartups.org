@@ -1,0 +1,13 @@
+id: apple
+name: Apple
+url: https://www.apple.com/
+stage: support
+substage: organizations
+city: Boulder
+type: other
+description: Consumer hardware such as Mac, iPhone and iPad. It also has subscriptions and business purchase programs. It has an office in Boulder.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

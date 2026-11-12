@@ -1,0 +1,10 @@
+id: harvest-hosts
+name: "Harvest Hosts"
+website: "https://harvesthosts.com"
+hq_city: "Vail"
+founded_year: 2010
+sector: "Travel, hospitality and events"
+description: "Runs a paid membership network. RV travelers join to stay overnight at farms, wineries, breweries and attractions."
+sources:
+  - "https://harvesthosts.com/pages/about"
+  - "https://www.theepochtimes.com/bright/tired-of-crowded-campgrounds-colorado-company-taps-businesses-to-host-rv-travelers-overnight-5670482"

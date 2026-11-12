@@ -1,0 +1,14 @@
+id: upc-capital
+name: UPC Capital
+url: http://upccapitalventures.com/
+stage: growth
+substage: investors
+city: statewide
+type: investor
+description: The Boulder venture capital arm of the UPC Energy Group. It invests in energy technology and energy efficiency. It also backs sustainability, water resource management, SaaS and financial technology companies.
+tags:
+  - venture-capital
+  - series-c
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

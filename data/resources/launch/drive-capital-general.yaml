@@ -1,0 +1,14 @@
+id: drive-capital-general
+name: Drive Capital (general)
+url: https://drivecapital.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A Columbus venture capital firm. It invests from idea to IPO. It backs founders building in cities between the coasts, Denver among them.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

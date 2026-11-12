@@ -1,0 +1,13 @@
+id: fort-collins-startup-week
+name: Fort Collins Startup Week
+url: https://startupfoco.com/
+stage: idea
+substage: educate
+city: Fort Collins
+type: event
+description: Startup week or weekend in Fort Collins.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

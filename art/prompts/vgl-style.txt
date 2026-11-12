@@ -1,0 +1,8 @@
+{
+  "lighting_conditions": "luminous golden light from glowing lanterns and warm forge fire",
+  "lighting_shadows": "soft, warm bronze shadows",
+  "color_scheme": "warm cream, honey gold, ember orange, copper and bronze, with one clear note of Colorado blue sky",
+  "mood_atmosphere": "bright, glowing, cheerful and welcoming",
+  "style_medium": "stylized hand-painted high-fantasy illustration with bold chunky shapes, thick confident outlines, visible painted brush texture and soft cel shading",
+  "artistic_style": "stylized, painterly, bold"
+}

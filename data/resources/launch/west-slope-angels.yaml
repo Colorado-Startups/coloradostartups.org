@@ -1,0 +1,14 @@
+id: west-slope-angels
+name: West Slope Angels
+url: https://www.westslopeangels.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: An angel network. It organizes angel investment in rural Colorado companies. It focuses on the West Slope. It offers founders mentors, connections and investor events.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: startup-colorado-events
+name: Startup Colorado Events
+url: https://startupcolorado.org/events
+stage: idea
+substage: educate
+city: statewide
+type: event
+description: A calendar of workshops, pitch sessions and meetups for rural Colorado entrepreneurs.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

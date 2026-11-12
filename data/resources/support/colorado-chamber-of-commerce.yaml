@@ -1,0 +1,13 @@
+id: colorado-chamber-of-commerce
+name: Colorado Chamber of Commerce
+url: https://cochamber.com/
+stage: support
+substage: organizations
+city: statewide
+type: government
+description: A statewide chamber of commerce. It has industry alliances and workforce initiatives. It has jobs market reports. It also has research such as the Colorado Salary Explorer.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

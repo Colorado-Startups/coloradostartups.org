@@ -1,0 +1,13 @@
+id: accenture
+name: Accenture
+url: https://www.accenture.com/us-en
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A consulting company. It offers technology and managed services. It serves large companies and the public sector.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

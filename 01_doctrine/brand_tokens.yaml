@@ -1,0 +1,204 @@
+# The Hall: design tokens for coloradostartups.org (v2, after Gate A feedback).
+# One definition. site/scripts/sync-brand.mjs generates site/src/styles/tokens.css
+# from this file on every dev and build; test/unit/brand-tokens-sync.test.ts
+# fails if the generated file drifts. Edit here, never in tokens.css.
+#
+# Direction (decision 21, Paul, 2026-10-08): gold, fire and light. An illuminated
+# hall inside the Front Range, bright and warm. Colorado and startups first.
+#   Ground and surfaces are warm daylight. Text is bronze, never black.
+#   Gold is a fill (buttons, glows, rules), never text on a light ground (1.95:1).
+#   Copper carries links. Colorado sky blue carries community links.
+#   Fire (ember) is accent and glow only. Night is the dark band for the footer
+#   and city-lights sections, where gold and light text sit.
+# Hall materials (L12, Paul's brief of 2026-10-18): a dwarven forge-kingdom
+# carved into the Front Range. Carved stone, hammered bronze, forge gold,
+# gnome brass and molten channels, in bold chunky shapes. Each material below
+# is a role, so components name what a surface is made of, not its hex.
+#
+# Contrast: every text and UI pairing is listed in the contrast block at the end,
+# with its WCAG 2.2 ratio. test/unit/l12/contrast.test.ts recomputes each ratio
+# from the hex values here and fails if one drifts or drops below its minimum.
+#
+# Lengths (#330, 2026-11-02): a length the components repeat is a token here:
+# space, radius, line, size and type. A one-off ornament (a rivet, a finial, a
+# keystone) is written in rem in its own rule, so it scales with the reader's
+# text size and still draws the same at the default 16 px root.
+
+color:
+  ground: "#FFFBF3"        # page ground, warm daylight
+  surface: "#FDF1D8"       # panels and cards, lantern light
+  surface-2: "#F8E3B8"     # raised surface, hover, section band (sunstone)
+  rule: "#E6D3AE"          # decorative rules only, not UI boundaries
+  border: "#8A7152"        # form fields and UI boundaries (3:1 or better)
+  text: "#2B1D12"          # body text, bronze
+  text-dim: "#5A4632"      # secondary text
+  accent: "#F0A92B"        # gold fill: buttons, glows, highlights
+  accent-deep: "#D9921A"   # pressed gold
+  on-accent: "#2B1D12"     # text on gold
+  link: "#A3400F"          # copper links
+  community: "#1A5CA8"     # Colorado sky: community links
+  fire: "#E2561C"          # ember accent and glow, decoration and large text only
+  focus: "#1A5CA8"         # keyboard focus ring
+  danger: "#B42318"        # form errors
+  night: "#14223F"         # dark band: footer, city lights
+  on-night: "#FFFBF3"      # text on night
+  on-night-dim: "#E9DCC0"  # secondary text on night
+  gold-on-night: "#F0A92B" # links and accents on night
+  brand-teal: "#02718D"    # CS brand teal, logo context only
+  brand-purple: "#5D4276"  # CS brand purple, logo context only
+  # Hall materials (L12, 2026-10-18).
+  stone: "#EFE3CC"         # carved stone face: lintels, stone panels
+  stone-edge: "#C9AD7F"    # carved edge and the ledge under stone; decoration only
+  bronze: "#7A4B24"        # hammered bronze: secondary buttons, plaques, rods
+  bronze-deep: "#5A3416"   # bronze ledge and pressed bronze
+  on-bronze: "#FFFBF3"     # text on bronze
+  accent-ledge: "#B0701A"  # the forged ledge under gold; decoration only
+  molten: "#FFD66E"        # molten-gold highlight in gradients
+  brass: "#B8862F"         # gnome brass: gears and rivets; decoration only
+  focus-on-night: "#F0A92B" # keyboard focus ring on night bands
+  danger-on-night: "#FF8A7A" # form errors on night bands
+  night-ceiling: "#1E2E50"  # lightest pixel a night-stone tile may paint; decoration only
+  # Tag washes: a light ground paired with one ink, for badges.
+  sky-wash: "#E4EEF9"      # with community ink
+  copper-wash: "#FBE5D6"   # with link ink
+  pine: "#3E5A4A"          # evergreen, from art/DIRECTION.md; ink only
+  pine-wash: "#E3EEE6"     # with pine ink
+
+# Old names from the dark v1 palette, kept so lane code written against them
+# still renders. New code uses the names above; these go away after Wave 2.
+alias:
+  deepstone: ground
+  granite: surface
+  granite-2: surface-2
+  strata: rule
+  border-strong: border
+  quartz: text
+  quartz-dim: text-dim
+  gold: accent
+  gold-deep: accent-deep
+  ember: fire
+  glacier: community
+  twilight: brand-purple
+
+space:
+  "1": "4px"
+  "2": "8px"
+  "3": "12px"
+  "4": "16px"
+  "5": "24px"
+  "6": "32px"
+  "7": "48px"
+  "8": "64px"
+  "9": "96px"
+
+radius:
+  chisel: "4px"            # buttons, inputs: cut stone, not pills
+  card: "10px"             # panels and image frames
+  none: "0"
+  # Chamfer depths. Where corner-shape is supported, corners are cut flat
+  # (bevel); elsewhere these radii round them a little.
+  bevel: "14px"            # stone panels, cards, callouts
+  bevel-sm: "8px"          # buttons and badges
+
+# Line widths, for borders, rules, underlines and focus rings (#330).
+line:
+  hair: "1px"              # field borders, chips, carved grooves; a link's resting underline
+  edge: "2px"              # carved edges of panels, cards and buttons; a hovered link's underline
+  bold: "3px"              # the focus ring, gilded edges, gold and ember rules, a hovered card title
+
+# Fixed sizes for depth, targets, controls and the page column (#330).
+size:
+  ledge: "4px"             # depth of the solid ledge under a raised material
+  ring-offset: "3px"       # gap between an element and its focus ring
+  tap: "44px"              # smallest standalone target (WCAG 2.2 SC 2.5.5, 44 by 44)
+  control: "48px"          # button height
+  control-lg: "56px"       # hero button height
+  check: "1.25rem"         # checkbox and radio box: rem, never the control font's em
+  wrap: "1180px"           # widest content column
+
+shadow:
+  glow: "0 10px 30px rgb(240 169 43 / 0.22)"       # warm lantern glow under raised items
+  edge: "inset 0 1px 0 rgb(255 255 255 / 0.6)"     # lit top edge on panels
+  # Solid ledges, not soft grey shadows: the chunky painted depth of the Hall.
+  ledge: "0 var(--size-ledge) 0 var(--c-stone-edge)"         # under carved stone
+  ledge-gold: "0 var(--size-ledge) 0 var(--c-accent-ledge)"  # under forged gold
+  ledge-bronze: "0 var(--size-ledge) 0 var(--c-bronze-deep)" # under hammered bronze
+
+type:
+  # The classic scale (Bringhurst): 15, 18, 21, 24, 36, 48, 60, 72 px.
+  step--1: "0.9375rem"
+  step-0: "1.125rem"
+  step-1: "1.3125rem"
+  step-2: "1.5rem"
+  step-3: "2.25rem"
+  step-4: "3rem"
+  step-5: "3.75rem"
+  step-6: "4.5rem"
+  measure: "68ch"
+
+# Every text and UI pairing the components use, with its WCAG 2.2 contrast
+# ratio (computed 2026-10-18 from the hex values above). min is 4.5 for body
+# text, 3 for large text and for UI parts such as borders and focus rings.
+# test/unit/l12/contrast.test.ts recomputes each ratio and fails on any drift.
+contrast:
+  - { fg: text, bg: ground, ratio: 15.81, min: 4.5 }
+  - { fg: text, bg: surface, ratio: 14.57, min: 4.5 }
+  - { fg: text, bg: surface-2, ratio: 12.95, min: 4.5 }
+  - { fg: text, bg: stone, ratio: 12.84, min: 4.5 }
+  - { fg: text-dim, bg: ground, ratio: 8.63, min: 4.5 }
+  - { fg: text-dim, bg: surface, ratio: 7.96, min: 4.5 }
+  - { fg: text-dim, bg: surface-2, ratio: 7.07, min: 4.5 }
+  - { fg: text-dim, bg: stone, ratio: 7.01, min: 4.5 }
+  - { fg: link, bg: ground, ratio: 6.17, min: 4.5 }
+  - { fg: link, bg: surface, ratio: 5.69, min: 4.5 }
+  - { fg: link, bg: surface-2, ratio: 5.06, min: 4.5 }
+  - { fg: link, bg: stone, ratio: 5.01, min: 4.5 }
+  - { fg: community, bg: ground, ratio: 6.48, min: 4.5 }
+  - { fg: community, bg: surface, ratio: 5.97, min: 4.5 }
+  - { fg: community, bg: surface-2, ratio: 5.31, min: 4.5 }
+  - { fg: community, bg: stone, ratio: 5.26, min: 4.5 }
+  - { fg: danger, bg: surface, ratio: 5.87, min: 4.5 }
+  - { fg: danger, bg: ground, ratio: 6.37, min: 4.5 }
+  - { fg: danger, bg: stone, ratio: 5.17, min: 4.5 }
+  - { fg: on-accent, bg: accent, ratio: 8.09, min: 4.5 }
+  - { fg: on-accent, bg: molten, ratio: 11.73, min: 4.5 }
+  - { fg: on-accent, bg: accent-deep, ratio: 6.27, min: 4.5 }
+  - { fg: on-bronze, bg: bronze, ratio: 7.12, min: 4.5 }
+  - { fg: on-bronze, bg: bronze-deep, ratio: 10.50, min: 4.5 }
+  - { fg: ground, bg: link, ratio: 6.17, min: 4.5 }
+  - { fg: ground, bg: community, ratio: 6.48, min: 4.5 }
+  - { fg: on-night, bg: night, ratio: 15.29, min: 4.5 }
+  - { fg: on-night-dim, bg: night, ratio: 11.62, min: 4.5 }
+  - { fg: gold-on-night, bg: night, ratio: 7.83, min: 4.5 }
+  - { fg: danger-on-night, bg: night, ratio: 6.89, min: 4.5 }
+  - { fg: community, bg: sky-wash, ratio: 5.70, min: 4.5 }
+  - { fg: link, bg: copper-wash, ratio: 5.24, min: 4.5 }
+  - { fg: pine, bg: pine-wash, ratio: 6.38, min: 4.5 }
+  - { fg: border, bg: ground, ratio: 4.46, min: 3 }
+  - { fg: border, bg: surface, ratio: 4.11, min: 3 }
+  - { fg: border, bg: stone, ratio: 3.62, min: 3 }
+  - { fg: focus, bg: ground, ratio: 6.48, min: 3 }
+  - { fg: focus, bg: surface, ratio: 5.97, min: 3 }
+  - { fg: focus, bg: stone, ratio: 5.26, min: 3 }
+  - { fg: focus-on-night, bg: night, ratio: 7.83, min: 3 }
+
+# Texture limits (L12 and L7 contract, 2026-10-18). A light tile in
+# site/src/assets/art/textures/ never goes darker than its floor color; a dark
+# tile never goes lighter than its ceiling. The CSS lays the veil color over
+# each tile at the given opacity, and may lay a tint (the footer's lantern
+# glow) over that at up to tint_opacity. Every ink listed must still meet its
+# minimum on that worst-case composite: 3:1 for a focus ring, 4.5:1 for text.
+# This block is the one source of these limits. L7's art/tools/make-tiles.mjs
+# names its floors by token; L12 asked L7 on 2026-10-18 to name the night
+# ceiling by token too. test/unit/l12/contrast.test.ts computes the
+# composites and checks that the CSS uses the same veil and no stronger tint.
+texture:
+  stone: { floor: rule, veil: stone, opacity: 0.5, inks: [text, text-dim, link, community] }
+  parchment: { floor: surface-2, veil: surface, opacity: 0, inks: [text, text-dim, link, community] }
+  night-stone:
+    ceiling: night-ceiling
+    veil: night
+    opacity: 0
+    tint: gold-on-night
+    tint_opacity: 0.1
+    inks: [on-night, on-night-dim, gold-on-night, danger-on-night, focus-on-night]

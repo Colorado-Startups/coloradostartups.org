@@ -1,0 +1,130 @@
+---
+// One person on the Team page. Owner: L9. Built on L12's Card (row layout,
+// inset media) with a round photo. Every field comes from
+// data/team/people.yaml. The card id is the person id, so a filled position
+// can link to /team/#<id>.
+import type { Person } from "@cs/shared";
+import { Image } from "astro:assets";
+
+import Card from "../ui/Card.astro";
+import { personPhoto } from "./images";
+import { photoCropStyle, photoWidths } from "./photo-crops";
+
+interface Props {
+  person: Person;
+  /** Optional line under the title, e.g. the seat a community member holds. */
+  seat?: string;
+  element?: "article" | "li" | "div";
+  /** "eager" for a photo in the first screen (Paul's on /team/); every other photo stays lazy. */
+  loading?: "eager" | "lazy";
+}
+
+const { person, seat, element = "article", loading = "lazy" } = Astro.props;
+const photo = personPhoto(person.photo);
+const initials = person.name
+  .split(/\s+/)
+  .map((part) => part.charAt(0))
+  .join("")
+  .slice(0, 2);
+// A photo framed unlike the others zooms to its crop inside the ring (#256),
+// and gets wider files so the crop stays sharp.
+const cropStyle = photo ? photoCropStyle(person.photo) : undefined;
+const widths = photo ? photoWidths(person.photo, [176, 352], photo.width) : [];
+---
+
+<Card
+  title={person.name}
+  layout="row"
+  mediaInset
+  element={element}
+  class="person"
+  id={person.id}
+  data-person={person.id}
+  data-group={person.group}
+>
+  <div slot="media" class="person__frame" style={cropStyle}>
+    {
+      photo ? (
+        <Image
+          class="person__photo"
+          src={photo}
+          alt={`Photo of ${person.name}`}
+          widths={widths}
+          sizes="176px"
+          loading={loading}
+        />
+      ) : (
+        <div class="person__photo person__initials" aria-hidden="true">
+          {initials}
+        </div>
+      )
+    }
+  </div>
+  <div class="person__text">
+    <p class="person__title">{person.title}</p>
+    {seat && <p class="meta">{seat}</p>}
+    <p>{person.bio}</p>
+  </div>
+  {
+    person.links.length > 0 && (
+      <Fragment slot="actions">
+        {person.links.map((link) => (
+          <a href={link.href}>
+            {link.label}
+            <span class="visually-hidden">: {person.name}</span>
+          </a>
+        ))}
+      </Fragment>
+    )
+  }
+</Card>
+
+<style>
+  /* The ring is a frame around the photo, so a cropped photo can zoom inside
+     it and stay round (#256). */
+  .person__frame {
+    display: block;
+    width: min(100%, 11rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    isolation: isolate;
+    border: var(--line-bold) solid var(--c-accent);
+    box-shadow: var(--sh-glow);
+  }
+  /* :global because <Image> renders the img inside Card's media slot. */
+  .person__photo,
+  :global(.hall-card__media--inset img.person__photo) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+  /* One treatment for every photo (#256). Paul's photo is black and white, so
+     the color photos show in black and white too, warmed toward the Hall's
+     bronze. A crop from photo-crops.ts zooms the photo from its top-left
+     corner: --photo-x and --photo-y move the crop's corner to the frame's,
+     then --photo-zoom scales the crop to fill the frame. */
+  :global(.hall-card__media--inset img.person__photo) {
+    filter: grayscale(1) sepia(0.2);
+    transform-origin: 0 0;
+    transform: scale(var(--photo-zoom, 1)) translate(var(--photo-x, 0), var(--photo-y, 0));
+  }
+  .person__initials {
+    display: grid;
+    place-items: center;
+    background: var(--c-surface-2);
+    color: var(--c-text);
+    font-family: var(--font-display);
+    font-size: var(--t-step-3);
+    font-weight: 700;
+  }
+  .person__text > * + * {
+    margin-top: var(--s-3);
+  }
+  .person__title {
+    font-weight: 700;
+    color: var(--c-text-dim);
+  }
+</style>

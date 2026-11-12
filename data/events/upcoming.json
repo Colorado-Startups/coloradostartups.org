@@ -1,0 +1,658 @@
+{
+  "source": "https://calendar.google.com/calendar/ical/c_9ae087f89282cf071479ae85476c1f22a42706b2cb05d9d3eb99204a41a5aaed%40group.calendar.google.com/public/basic.ics",
+  "fetchedAt": "2026-11-02T23:50:57.641Z",
+  "timeZone": "America/Denver",
+  "windowDays": 60,
+  "events": [
+    {
+      "id": "60mj6390i3mgo6fa42g51mtkli@google.com#2026-11-03T08:00:00-07:00",
+      "title": "Boulder Open Coffee Club (BOCC)",
+      "start": "2026-11-03T08:00:00-07:00",
+      "end": "2026-11-03T09:00:00-07:00",
+      "allDay": false,
+      "location": "Virtual and in person (check registration)",
+      "url": "https://www.meetup.com/boulder-open-coffee/",
+      "inPerson": false
+    },
+    {
+      "id": "uqu3cudnjrj281vs2cll94uu0j_R20260804T220000@google.com#2026-11-03T16:00:00-07:00",
+      "title": "Founders & Friends: Welcome to Denver (fka Startup Happy Hour)",
+      "start": "2026-11-03T16:00:00-07:00",
+      "end": "2026-11-03T18:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://lu.ma/coloradostartups",
+      "inPerson": true
+    },
+    {
+      "id": "34pn1vi49nv9hvb5f8cbvtf1tf_R20260707T220000@google.com#2026-11-03T16:00:00-07:00",
+      "title": "Let's Vibe AI Meetup at Junkyard Social in Boulder by Let’s Vibe",
+      "start": "2026-11-03T16:00:00-07:00",
+      "end": "2026-11-03T18:00:00-07:00",
+      "allDay": false,
+      "location": "Junkyard Social Club, 2525 Frontier Ave Suite A, Boulder, CO 80301, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-11-04T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-11-04T08:30:00-07:00",
+      "end": "2026-11-04T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "7bhd7u1iacpod1ptku2bvk5f2b@google.com#2026-11-04T15:30:00-07:00",
+      "title": "Beck Venture Center Startup Forum: Biology and the New Frontier of Mining",
+      "start": "2026-11-04T15:30:00-07:00",
+      "end": "2026-11-04T19:30:00-07:00",
+      "allDay": false,
+      "location": "Beck Venture Center, 1700 Washington Ave, Golden, CO 80401, USA",
+      "url": "https://bit.ly/45PJU3e",
+      "inPerson": true
+    },
+    {
+      "id": "55u7e2pvnanme0s7e0erk603rf_R20260701T214500@google.com#2026-11-04T15:45:00-07:00",
+      "title": "Let's Vibe AI Power Hour",
+      "start": "2026-11-04T15:45:00-07:00",
+      "end": "2026-11-04T17:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "6v985kmbevdffr5slsiri7gc2v_R20251022T230000@google.com#2026-11-04T17:00:00-07:00",
+      "title": "Vibe AI Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-11-04T17:00:00-07:00",
+      "end": "2026-11-04T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-11-05T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-11-05T09:00:00-07:00",
+      "end": "2026-11-05T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "88ndjv15h75j54lnclb57od3ng@google.com#2026-11-05T12:00:00-07:00",
+      "title": "The Startup School Conference",
+      "start": "2026-11-05T12:00:00-07:00",
+      "end": "2026-11-05T13:00:00-07:00",
+      "allDay": false,
+      "location": "University of Denver, Denver, CO",
+      "url": "http://startupschoolconference.com/",
+      "inPerson": true
+    },
+    {
+      "id": "144pv1p50gi9prt5eak6cioo77_R20250207T010000@google.com#2026-11-05T18:00:00-07:00",
+      "title": "Thunderview CEO Dinners",
+      "start": "2026-11-05T18:00:00-07:00",
+      "end": "2026-11-05T21:00:00-07:00",
+      "allDay": false,
+      "location": null,
+      "url": "https://www.thunderviewceodinners.com/",
+      "inPerson": false
+    },
+    {
+      "id": "pe1fs9480pabm6p38m41umgm1v_R20260606T160000@google.com#2026-11-07T10:00:00-07:00",
+      "title": "Baby Rave at id345",
+      "start": "2026-11-07T10:00:00-07:00",
+      "end": "2026-11-07T11:30:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://babyrave.club/",
+      "inPerson": true
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-11-11T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-11-11T08:30:00-07:00",
+      "end": "2026-11-11T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "fm60o2g4sqi248bjidstsnv4dv@google.com#2026-11-11T09:00:00-07:00",
+      "title": "Golden Startup Coffee",
+      "start": "2026-11-11T09:00:00-07:00",
+      "end": "2026-11-11T11:00:00-07:00",
+      "allDay": false,
+      "location": "Morris & Mae Food Hall, 18475 W Colfax Ave Suite 132, Golden, CO 80401, USA",
+      "url": "https://www.connectsworkspace.com/golden-startup-coffee",
+      "inPerson": true
+    },
+    {
+      "id": "pbd25lql1dkosgdn23u35a53rl@google.com#2026-11-11T16:30:00-07:00",
+      "title": "Boulder Meetup for entrepreneurs and startups",
+      "start": "2026-11-11T16:30:00-07:00",
+      "end": "2026-11-11T19:00:00-07:00",
+      "allDay": false,
+      "location": "1515 Walnut St #200, Boulder, CO 80302, USA",
+      "url": "https://meetup.com/entrepreneur-startups",
+      "inPerson": true
+    },
+    {
+      "id": "3686t31g8j400hpc5ffpi3b8t8@google.com#2026-11-11T17:00:00-07:00",
+      "title": "GenAI Media Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-11-11T17:00:00-07:00",
+      "end": "2026-11-11T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": null,
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-11-12T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-11-12T09:00:00-07:00",
+      "end": "2026-11-12T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "5bl96bqkhp85jgofuaag5vej99@google.com#2026-11-12T17:00:00-07:00",
+      "title": "Let's Vibe AI Meetup at Exponential Impact in Colorado Springs",
+      "start": "2026-11-12T17:00:00-07:00",
+      "end": "2026-11-12T19:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "1qs2b0s87920t94ibs3so9g9gd@google.com#2026-11-12T17:00:00-07:00",
+      "title": "Welcome to Boulder",
+      "start": "2026-11-12T17:00:00-07:00",
+      "end": "2026-11-12T18:00:00-07:00",
+      "allDay": false,
+      "location": "Wild Provisions by 4 Noses Brewing Company, 2209 Central Ave, Boulder, CO 80301, USA",
+      "url": "https://lu.ma/coloradostartups",
+      "inPerson": true
+    },
+    {
+      "id": "663que6kb769ke6vvsr3k9trcf_R20251212T010000@google.com#2026-11-12T18:00:00-07:00",
+      "title": "Boulder New Tech",
+      "start": "2026-11-12T18:00:00-07:00",
+      "end": "2026-11-12T20:00:00-07:00",
+      "allDay": false,
+      "location": "Founder Central by Sweater, 2000 Central Ave #100, Boulder, CO 80301, USA",
+      "url": "https://www.meetup.com/bdnewtech/",
+      "inPerson": true
+    },
+    {
+      "id": "0vi4e20g1t2hf31icd4iranajb@google.com#2026-11-12T18:00:00-07:00",
+      "title": "Supabase: Mile High Demo Night @ ID345",
+      "start": "2026-11-12T18:00:00-07:00",
+      "end": "2026-11-12T20:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://luma.com/veetlvjc",
+      "inPerson": true
+    },
+    {
+      "id": "60mj6390i3mgo6fa42g51mtkli@google.com#2026-11-17T08:00:00-07:00",
+      "title": "Boulder Open Coffee Club (BOCC)",
+      "start": "2026-11-17T08:00:00-07:00",
+      "end": "2026-11-17T09:00:00-07:00",
+      "allDay": false,
+      "location": "Virtual and in person (check registration)",
+      "url": "https://www.meetup.com/boulder-open-coffee/",
+      "inPerson": false
+    },
+    {
+      "id": "21qrbac2luc3n5t0t7hcm9tbvo@google.com#2026-11-17T17:30:00-07:00",
+      "title": "Business Growth Society | Your Local Connect & Collaborate Event",
+      "start": "2026-11-17T17:30:00-07:00",
+      "end": "2026-11-17T19:30:00-07:00",
+      "allDay": false,
+      "location": null,
+      "url": "https://www.eventbrite.com/e/business-growth-society-your-local-connect-collaborate-event-tickets-1353767357609?aff=oddtdtcreator",
+      "inPerson": false
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-11-18T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-11-18T08:30:00-07:00",
+      "end": "2026-11-18T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "5d5gdc7gal0n6ogjgpf7cgd77b@google.com#2026-11-18T15:30:00-07:00",
+      "title": "Beck Venture Center Startup Forum: Smart Money Investor Panel",
+      "start": "2026-11-18T15:30:00-07:00",
+      "end": "2026-11-18T19:30:00-07:00",
+      "allDay": false,
+      "location": "Beck Venture Center, 1700 Washington Ave, Golden, CO 80401, USA",
+      "url": "https://bit.ly/3ShAWbY",
+      "inPerson": true
+    },
+    {
+      "id": "55u7e2pvnanme0s7e0erk603rf_R20260701T214500@google.com#2026-11-18T15:45:00-07:00",
+      "title": "Let's Vibe AI Power Hour",
+      "start": "2026-11-18T15:45:00-07:00",
+      "end": "2026-11-18T17:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "6v985kmbevdffr5slsiri7gc2v_R20251022T230000@google.com#2026-11-18T17:00:00-07:00",
+      "title": "Vibe AI Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-11-18T17:00:00-07:00",
+      "end": "2026-11-18T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-11-19T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-11-19T09:00:00-07:00",
+      "end": "2026-11-19T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "5sdjgs5gjh9o91ust9536qrpe2@google.com#2026-11-24T18:00:00-07:00",
+      "title": "Let's Vibe AI Meetup at The Guild in South Denver by Let’s Vibe",
+      "start": "2026-11-24T18:00:00-07:00",
+      "end": "2026-11-24T20:30:00-07:00",
+      "allDay": false,
+      "location": "The Guild, 3435 S Inca St Apt C, Englewood, CO 80110, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-11-25T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-11-25T08:30:00-07:00",
+      "end": "2026-11-25T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "3686t31g8j400hpc5ffpi3b8t8@google.com#2026-11-25T17:00:00-07:00",
+      "title": "GenAI Media Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-11-25T17:00:00-07:00",
+      "end": "2026-11-25T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": null,
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-11-26T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-11-26T09:00:00-07:00",
+      "end": "2026-11-26T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "60mj6390i3mgo6fa42g51mtkli@google.com#2026-12-01T08:00:00-07:00",
+      "title": "Boulder Open Coffee Club (BOCC)",
+      "start": "2026-12-01T08:00:00-07:00",
+      "end": "2026-12-01T09:00:00-07:00",
+      "allDay": false,
+      "location": "Virtual and in person (check registration)",
+      "url": "https://www.meetup.com/boulder-open-coffee/",
+      "inPerson": false
+    },
+    {
+      "id": "uqu3cudnjrj281vs2cll94uu0j_R20260804T220000@google.com#2026-12-01T16:00:00-07:00",
+      "title": "Founders & Friends: Welcome to Denver (fka Startup Happy Hour)",
+      "start": "2026-12-01T16:00:00-07:00",
+      "end": "2026-12-01T18:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://lu.ma/coloradostartups",
+      "inPerson": true
+    },
+    {
+      "id": "34pn1vi49nv9hvb5f8cbvtf1tf_R20260707T220000@google.com#2026-12-01T16:00:00-07:00",
+      "title": "Let's Vibe AI Meetup at Junkyard Social in Boulder by Let’s Vibe",
+      "start": "2026-12-01T16:00:00-07:00",
+      "end": "2026-12-01T18:00:00-07:00",
+      "allDay": false,
+      "location": "Junkyard Social Club, 2525 Frontier Ave Suite A, Boulder, CO 80301, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-12-02T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-12-02T08:30:00-07:00",
+      "end": "2026-12-02T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "55qtrs57nta0ol3ecrbb56b39t@google.com#2026-12-02T15:30:00-07:00",
+      "title": "Beck Venture Center Startup Forum: Founder Flounders",
+      "start": "2026-12-02T15:30:00-07:00",
+      "end": "2026-12-02T19:30:00-07:00",
+      "allDay": false,
+      "location": "Beck Venture Center, 1700 Washington Ave, Golden, CO 80401, USA",
+      "url": "https://bit.ly/4z3D0Vs",
+      "inPerson": true
+    },
+    {
+      "id": "55u7e2pvnanme0s7e0erk603rf_R20260701T214500@google.com#2026-12-02T15:45:00-07:00",
+      "title": "Let's Vibe AI Power Hour",
+      "start": "2026-12-02T15:45:00-07:00",
+      "end": "2026-12-02T17:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "6v985kmbevdffr5slsiri7gc2v_R20251022T230000@google.com#2026-12-02T17:00:00-07:00",
+      "title": "Vibe AI Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-12-02T17:00:00-07:00",
+      "end": "2026-12-02T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-12-03T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-12-03T09:00:00-07:00",
+      "end": "2026-12-03T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "144pv1p50gi9prt5eak6cioo77_R20250207T010000@google.com#2026-12-03T18:00:00-07:00",
+      "title": "Thunderview CEO Dinners",
+      "start": "2026-12-03T18:00:00-07:00",
+      "end": "2026-12-03T21:00:00-07:00",
+      "allDay": false,
+      "location": null,
+      "url": "https://www.thunderviewceodinners.com/",
+      "inPerson": false
+    },
+    {
+      "id": "pe1fs9480pabm6p38m41umgm1v_R20260606T160000@google.com#2026-12-05T10:00:00-07:00",
+      "title": "Baby Rave at id345",
+      "start": "2026-12-05T10:00:00-07:00",
+      "end": "2026-12-05T11:30:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://babyrave.club/",
+      "inPerson": true
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-12-09T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-12-09T08:30:00-07:00",
+      "end": "2026-12-09T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "fm60o2g4sqi248bjidstsnv4dv@google.com#2026-12-09T09:00:00-07:00",
+      "title": "Golden Startup Coffee",
+      "start": "2026-12-09T09:00:00-07:00",
+      "end": "2026-12-09T11:00:00-07:00",
+      "allDay": false,
+      "location": "Morris & Mae Food Hall, 18475 W Colfax Ave Suite 132, Golden, CO 80401, USA",
+      "url": "https://www.connectsworkspace.com/golden-startup-coffee",
+      "inPerson": true
+    },
+    {
+      "id": "pbd25lql1dkosgdn23u35a53rl@google.com#2026-12-09T16:30:00-07:00",
+      "title": "Boulder Meetup for entrepreneurs and startups",
+      "start": "2026-12-09T16:30:00-07:00",
+      "end": "2026-12-09T19:00:00-07:00",
+      "allDay": false,
+      "location": "1515 Walnut St #200, Boulder, CO 80302, USA",
+      "url": "https://meetup.com/entrepreneur-startups",
+      "inPerson": true
+    },
+    {
+      "id": "3686t31g8j400hpc5ffpi3b8t8@google.com#2026-12-09T17:00:00-07:00",
+      "title": "GenAI Media Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-12-09T17:00:00-07:00",
+      "end": "2026-12-09T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": null,
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-12-10T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-12-10T09:00:00-07:00",
+      "end": "2026-12-10T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "5bl96bqkhp85jgofuaag5vej99@google.com#2026-12-10T17:00:00-07:00",
+      "title": "Let's Vibe AI Meetup at Exponential Impact in Colorado Springs",
+      "start": "2026-12-10T17:00:00-07:00",
+      "end": "2026-12-10T19:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "1qs2b0s87920t94ibs3so9g9gd@google.com#2026-12-10T17:00:00-07:00",
+      "title": "Welcome to Boulder",
+      "start": "2026-12-10T17:00:00-07:00",
+      "end": "2026-12-10T18:00:00-07:00",
+      "allDay": false,
+      "location": "Wild Provisions by 4 Noses Brewing Company, 2209 Central Ave, Boulder, CO 80301, USA",
+      "url": "https://lu.ma/coloradostartups",
+      "inPerson": true
+    },
+    {
+      "id": "663que6kb769ke6vvsr3k9trcf_R20251212T010000@google.com#2026-12-10T18:00:00-07:00",
+      "title": "Boulder New Tech",
+      "start": "2026-12-10T18:00:00-07:00",
+      "end": "2026-12-10T20:00:00-07:00",
+      "allDay": false,
+      "location": "Founder Central by Sweater, 2000 Central Ave #100, Boulder, CO 80301, USA",
+      "url": "https://www.meetup.com/bdnewtech/",
+      "inPerson": true
+    },
+    {
+      "id": "cl8esiids09oktpdk9soim1e7k@google.com#2026-12-11T08:00:00-07:00",
+      "title": "Colorado Startup Ski Day - Eldora",
+      "start": "2026-12-11T08:00:00-07:00",
+      "end": "2026-12-11T16:00:00-07:00",
+      "allDay": false,
+      "location": "Eldora Mountain, 2861 Eldora Ski Rd, Nederland, CO 80466, USA",
+      "url": "https://luma.com/ty57jfqa",
+      "inPerson": true
+    },
+    {
+      "id": "60mj6390i3mgo6fa42g51mtkli@google.com#2026-12-15T08:00:00-07:00",
+      "title": "Boulder Open Coffee Club (BOCC)",
+      "start": "2026-12-15T08:00:00-07:00",
+      "end": "2026-12-15T09:00:00-07:00",
+      "allDay": false,
+      "location": "Virtual and in person (check registration)",
+      "url": "https://www.meetup.com/boulder-open-coffee/",
+      "inPerson": false
+    },
+    {
+      "id": "21qrbac2luc3n5t0t7hcm9tbvo@google.com#2026-12-15T17:30:00-07:00",
+      "title": "Business Growth Society | Your Local Connect & Collaborate Event",
+      "start": "2026-12-15T17:30:00-07:00",
+      "end": "2026-12-15T19:30:00-07:00",
+      "allDay": false,
+      "location": null,
+      "url": "https://www.eventbrite.com/e/business-growth-society-your-local-connect-collaborate-event-tickets-1353767357609?aff=oddtdtcreator",
+      "inPerson": false
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-12-16T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-12-16T08:30:00-07:00",
+      "end": "2026-12-16T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "55u7e2pvnanme0s7e0erk603rf_R20260701T214500@google.com#2026-12-16T15:45:00-07:00",
+      "title": "Let's Vibe AI Power Hour",
+      "start": "2026-12-16T15:45:00-07:00",
+      "end": "2026-12-16T17:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "6v985kmbevdffr5slsiri7gc2v_R20251022T230000@google.com#2026-12-16T17:00:00-07:00",
+      "title": "Vibe AI Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-12-16T17:00:00-07:00",
+      "end": "2026-12-16T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-12-17T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-12-17T09:00:00-07:00",
+      "end": "2026-12-17T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "5sdjgs5gjh9o91ust9536qrpe2@google.com#2026-12-22T18:00:00-07:00",
+      "title": "Let's Vibe AI Meetup at The Guild in South Denver by Let’s Vibe",
+      "start": "2026-12-22T18:00:00-07:00",
+      "end": "2026-12-22T20:30:00-07:00",
+      "allDay": false,
+      "location": "The Guild, 3435 S Inca St Apt C, Englewood, CO 80110, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-12-23T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-12-23T08:30:00-07:00",
+      "end": "2026-12-23T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "3686t31g8j400hpc5ffpi3b8t8@google.com#2026-12-23T17:00:00-07:00",
+      "title": "GenAI Media Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-12-23T17:00:00-07:00",
+      "end": "2026-12-23T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": null,
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-12-24T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-12-24T09:00:00-07:00",
+      "end": "2026-12-24T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    },
+    {
+      "id": "60mj6390i3mgo6fa42g51mtkli@google.com#2026-12-29T08:00:00-07:00",
+      "title": "Boulder Open Coffee Club (BOCC)",
+      "start": "2026-12-29T08:00:00-07:00",
+      "end": "2026-12-29T09:00:00-07:00",
+      "allDay": false,
+      "location": "Virtual and in person (check registration)",
+      "url": "https://www.meetup.com/boulder-open-coffee/",
+      "inPerson": false
+    },
+    {
+      "id": "b20qmful007sjcrnts99p76mqt_R20260107T153000@google.com#2026-12-30T08:30:00-07:00",
+      "title": "1 Million Cups Denver",
+      "start": "2026-12-30T08:30:00-07:00",
+      "end": "2026-12-30T10:30:00-07:00",
+      "allDay": false,
+      "location": "Enterprise Coworking RiNo, 3000 Lawrence St, Denver, CO 80205, USA",
+      "url": "https://www.luma.com/1mcden/",
+      "inPerson": true
+    },
+    {
+      "id": "55u7e2pvnanme0s7e0erk603rf_R20260701T214500@google.com#2026-12-30T15:45:00-07:00",
+      "title": "Let's Vibe AI Power Hour",
+      "start": "2026-12-30T15:45:00-07:00",
+      "end": "2026-12-30T17:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "6v985kmbevdffr5slsiri7gc2v_R20251022T230000@google.com#2026-12-30T17:00:00-07:00",
+      "title": "Vibe AI Meetup at ID345 Hosted by Let’s Vibe",
+      "start": "2026-12-30T17:00:00-07:00",
+      "end": "2026-12-30T19:00:00-07:00",
+      "allDay": false,
+      "location": "ID345, 3960 High St, Denver, CO 80205, USA",
+      "url": "https://letsvibe.org/",
+      "inPerson": true
+    },
+    {
+      "id": "0eudae7nvh5b6b3lvfstgvfjs9@google.com#2026-12-31T09:00:00-07:00",
+      "title": "Tech Connect: Coffee & Community",
+      "start": "2026-12-31T09:00:00-07:00",
+      "end": "2026-12-31T10:00:00-07:00",
+      "allDay": false,
+      "location": "Exponential Impact, 3650 N Nevada Ave, Colorado Springs, CO 80907, USA",
+      "url": "https://luma.com/ekryvoqm",
+      "inPerson": true
+    }
+  ]
+}

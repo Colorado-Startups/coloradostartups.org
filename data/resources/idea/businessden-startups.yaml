@@ -1,0 +1,13 @@
+id: businessden-startups
+name: BusinessDen Startups
+url: https://businessden.com/category/startups/
+stage: idea
+substage: educate
+city: online
+type: media
+description: A business news site. It has a startups section that covers local companies.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

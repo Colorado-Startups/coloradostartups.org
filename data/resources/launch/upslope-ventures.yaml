@@ -1,0 +1,14 @@
+id: upslope-ventures
+name: Upslope Ventures
+url: https://www.upslope.vc/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: An early-stage venture fund. It invests in startups nationwide in AI, SaaS, hardware, fintech, aerospace and robotics.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

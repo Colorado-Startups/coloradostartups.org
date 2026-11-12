@@ -1,0 +1,10 @@
+id: hapware
+name: "HapWare"
+website: "https://hapware.com/"
+hq_city: "Golden"
+founded_year: 2025
+sector: "Hardware and robotics"
+description: "Makes a wearable that turns facial expressions and gestures into touch feedback. It is for blind, low-vision and neurodiverse users."
+sources:
+  - "https://www.denvergazette.com/2025/10/24/coolest-thing-made-in-colorado-this-year-a-shipping-container-farm/"
+  - "https://abilitycentral.org/article/hapware-wins-ces-2026-health-innovation-challenge-with-aleye"

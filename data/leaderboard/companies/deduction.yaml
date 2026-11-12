@@ -1,0 +1,9 @@
+id: deduction
+name: "Deduction"
+website: "https://deduction.com"
+hq_city: "Denver"
+sector: "Fintech and insurance"
+description: "Runs a tax preparation firm for individuals. An AI assistant and licensed CPAs prepare and file the returns."
+sources:
+  - "https://deduction.com"
+  - "https://deduction.com/legal-pages/terms"

@@ -1,0 +1,13 @@
+id: startup-ip-law
+name: Startup IP Law
+url: https://startupiplaw.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Law firm in Denver.
+tags:
+  - legal
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

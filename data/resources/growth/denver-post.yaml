@@ -1,0 +1,13 @@
+id: denver-post
+name: Denver Post
+url: https://www.denverpost.com/business/
+stage: growth
+substage: service-providers
+city: Denver
+type: media
+description: Regional news outlet in Denver.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

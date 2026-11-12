@@ -1,0 +1,8 @@
+id: great-sky
+name: "Great Sky"
+website: "https://greatsky.ai"
+hq_city: "Boulder"
+sector: "Quantum and photonics"
+description: "Develops hardware for AI computing. It pairs superconducting circuits with optical links to run models."
+sources:
+  - "https://greatsky.ai"

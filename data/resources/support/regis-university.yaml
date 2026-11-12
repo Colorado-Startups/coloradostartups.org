@@ -1,0 +1,13 @@
+id: regis-university
+name: Regis University
+url: https://www.regis.edu/
+stage: support
+substage: organizations
+city: Denver
+type: university
+description: A Jesuit Catholic university in Denver. It offers degrees and programs across its colleges and schools.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

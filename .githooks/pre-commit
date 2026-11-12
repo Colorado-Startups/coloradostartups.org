@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# coloradostartups-site pre-commit. Routes to 04_tools/ via .githooks/cs-site-route.sh.
+# Fires on every commit once core.hooksPath is .githooks. The SessionStart
+# hook sets that in Claude Code sessions; elsewhere run once per clone:
+#   git config core.hooksPath .githooks
+set -uo pipefail
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+export REPO_ROOT
+# shellcheck source=.githooks/cs-site-route.sh
+. "$REPO_ROOT/.githooks/cs-site-route.sh"
+trap cleanup_snapshot EXIT
+
+files="$(git diff --cached --name-only --diff-filter=ACMR)"
+snapshot_files "" "$files"
+route_all "pre-commit" "$files"
+route_verdict "pre-commit"

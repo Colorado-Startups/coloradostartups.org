@@ -1,0 +1,13 @@
+id: louisville-chamber-of-commerce
+name: Louisville Chamber of Commerce
+url: https://www.louisvillechamber.com/
+stage: support
+substage: organizations
+city: Louisville
+type: government
+description: The Louisville chamber of commerce. It connects, advocates for and promotes local businesses through membership, sponsored programs and events.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

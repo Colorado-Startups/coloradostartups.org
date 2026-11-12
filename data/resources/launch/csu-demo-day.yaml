@@ -1,0 +1,14 @@
+id: csu-demo-day
+name: CSU Demo Day
+url: https://www.csudemoday.org/
+stage: launch
+substage: develop
+city: Fort Collins
+type: event
+description: A yearly Colorado State University showcase. Graduate students and postdocs present posters, and entrepreneurs meet local emerging companies.
+tags:
+  - pitch
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

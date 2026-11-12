@@ -1,0 +1,13 @@
+id: buink-web-development
+name: Buink Web Development
+url: https://www.buink.com/
+stage: launch
+substage: service-providers
+city: Lafayette
+type: service-provider
+description: A firm that builds custom web software. It offers UI/UX design and product management. It serves businesses that need to scale.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

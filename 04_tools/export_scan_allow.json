@@ -1,0 +1,58 @@
+{
+  "_README": [
+    "Allowances for 04_tools/export_scan.py: a finding its check, glob and (for",
+    "private-terms) rule id cover is not reported. Each says why, from the",
+    "2026-11-12 triage of the full scan (205 findings). Narrow: a path, never a",
+    "whole check. A match regex narrows an allowance to the excerpts it names. Add one only with its evidence in the PR.",
+    "Private-terms allowances name private rules, so they live in export_scan_allow.private.json, which never leaves the archive repo."
+  ],
+  "allow": [
+    {
+      "check": "emails",
+      "glob": "data/events/upcoming.json",
+      "reason": "Calendar event UIDs (an id, an at sign and google.com), not mailboxes",
+      "match": "^[0-9a-z]{20,}(?:_R\\d{8}T\\d{6})?@google\\.com$"
+    },
+    {
+      "check": "emails",
+      "glob": "04_tools/export_scan.py",
+      "reason": "The scanner's own fake self-test samples",
+      "match": "^(someone\\.private|nested\\.person)@gmail\\.com$"
+    },
+    {
+      "check": "phones",
+      "glob": "04_tools/export_scan.py",
+      "reason": "The scanner's own fake self-test samples",
+      "match": "(555-2742|303 555 12[3]4)$"
+    },
+    {
+      "check": "profiles",
+      "glob": "04_tools/export_scan.py",
+      "reason": "The scanner's own fake self-test samples",
+      "match": "/jane-sampleperson-123$"
+    },
+    {
+      "check": "private-links",
+      "glob": "04_tools/export_scan.py",
+      "reason": "The scanner's own fake self-test samples (a fake home path and session id)",
+      "match": "(/User[s]/alice|/hom[e]/alice|local_1234abc[d]-12ab-)$"
+    },
+    {
+      "check": "private-links",
+      "glob": "site/public/_redirects",
+      "reason": "The /slack and /join short links go to the public Google Form; the live /slack/ returns a 302 to it",
+      "match": "^google-doc docs\\.google\\.com/forms/d/$"
+    },
+    {
+      "check": "private-links",
+      "glob": "ops/redirects/map.csv",
+      "reason": "The same public Google Form as site/public/_redirects",
+      "match": "^google-doc docs\\.google\\.com/forms/d/$"
+    },
+    {
+      "check": "private-terms",
+      "glob": "*/worker-configuration.d.ts",
+      "reason": "Types Cloudflare generates for Workers, not the site's prose"
+    }
+  ]
+}

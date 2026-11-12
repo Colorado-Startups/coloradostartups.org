@@ -1,0 +1,13 @@
+id: startup-colorado
+name: Startup Colorado
+url: https://startupcolorado.org/
+stage: idea
+substage: validate
+city: statewide
+type: community
+description: A group for rural Colorado founders and ecosystem builders. It offers accelerator programs, a pitch series and a funding database. It also runs West Slope Startup Week in Durango and Rural Startup Days.
+tags:
+  - team
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

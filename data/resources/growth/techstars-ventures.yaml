@@ -1,0 +1,13 @@
+id: techstars-ventures
+name: Techstars Ventures
+url: https://www.techstars.com/venture-capital-fund/
+stage: growth
+substage: investors
+city: statewide
+type: investor
+description: The pre-seed and early-stage investing platform of Techstars. Techstars began in Boulder. It funds companies in Techstars accelerator programs. It also funds their follow-on rounds.
+tags:
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

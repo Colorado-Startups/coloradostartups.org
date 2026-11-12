@@ -1,0 +1,13 @@
+id: hewlett-packard-enterprise
+name: Hewlett Packard Enterprise
+url: https://www.hpe.com/us/en/home.html
+stage: support
+substage: organizations
+city: Fort Collins
+type: other
+description: Large company with an office in Fort Collins.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

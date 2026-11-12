@@ -1,0 +1,14 @@
+id: angel-investment-network
+name: Angel Investment Network
+url: https://www.angelinvestmentnetwork.us/angel-investors-colorado
+stage: launch
+substage: develop
+city: statewide
+type: event
+description: An online platform where Colorado entrepreneurs pitch business ideas. Angel investors hear the pitches. Founders seek capital, advice and contacts.
+tags:
+  - investors
+  - networking
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

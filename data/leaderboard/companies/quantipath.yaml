@@ -1,0 +1,9 @@
+id: quantipath
+name: "QuantiPath"
+website: "https://www.quantipath.bio"
+hq_city: "Denver"
+sector: "Life sciences"
+description: "Makes genetic tests that identify and measure Salmonella strains. Food producers use them to track safety in their plants."
+sources:
+  - "https://quantipath.bio"
+  - "https://www.prnewswire.com/news-releases/food-supply-security-becomes-quantipath-under-bold-rebrand-302504957.html"

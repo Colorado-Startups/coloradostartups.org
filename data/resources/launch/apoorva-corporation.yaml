@@ -1,0 +1,13 @@
+id: apoorva-corporation
+name: Apoorva Corporation
+url: http://www.apoorva.com/
+stage: launch
+substage: service-providers
+city: Broomfield
+type: service-provider
+description: A software firm. It sells products for facility operations. It has others for invoicing and real estate deals. It has more for self-storage revenue and insurance administration.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

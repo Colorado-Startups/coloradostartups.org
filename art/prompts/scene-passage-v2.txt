@@ -1,0 +1,37 @@
+title: The Passage That Leads Nowhere, with Pikes Peak
+use: the 404 page, beside the text from 64rem and after it on a phone
+
+{
+  "short_description": "A warm, lantern-lit passage carved through cream and red sandstone inside a dwarven hall runs straight ahead and ends at a smooth, blank stone wall. It is bright and friendly, a quiet dead end rather than a dungeon.",
+  "objects": [
+    {
+      "description": "a smooth, blank wall of pale cream sandstone with no door, carving or marks, softly lit",
+      "location": "center, at the far end of the passage",
+      "relationship": "where the passage ends and the lantern light gathers"
+    },
+    {
+      "description": "a row of brass lanterns with glowing amber glass hung on iron hooks",
+      "location": "along the left and right walls, getting smaller toward the far end",
+      "relationship": "they light the way to the blank wall"
+    },
+    {
+      "description": "a shallow channel of glowing molten gold set into the floor behind a low brass rail",
+      "location": "along the right side of the floor",
+      "relationship": "runs the length of the passage beside the rug"
+    },
+    {
+      "description": "a long woven runner rug in ember orange and gold",
+      "location": "center of the floor, from the foreground to the far wall",
+      "relationship": "leads the eye down the passage"
+    },
+    {
+      "description": "golden autumn aspen branches in a hammered copper pot",
+      "location": "lower left foreground",
+      "relationship": "a bright note of Colorado at the start of the passage"
+    }
+  ],
+  "background_setting": "an arched passage with chisel-cut red and cream sandstone walls and thick timber beams overhead, inside a grand dwarven hall carved into the Colorado Front Range. A round window high on the left frames the snowy summit of Pikes Peak under clear blue sky.",
+  "lighting_direction": "warm lantern light from both walls, brightest on the blank wall at the far end",
+  "composition": "centered one-point perspective down the passage from eye level, with the blank wall in the middle third and calm stone on both sides",
+  "context": "an illustration for a website's page-not-found screen: a friendly passage that leads nowhere"
+}

@@ -1,0 +1,13 @@
+id: metropolitan-state-university-of-denver
+name: Metropolitan State University of Denver
+url: https://www.msudenver.edu/
+stage: support
+substage: organizations
+city: Denver
+type: university
+description: A Denver university and Hispanic-Serving Institution with lifelong learning. Its colleges cover aerospace, computing, engineering and design. More colleges cover health and human sciences, and letters, arts and sciences.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

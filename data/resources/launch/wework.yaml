@@ -1,0 +1,15 @@
+id: wework
+name: WeWork
+url: https://www.wework.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: coworking
+description: A global workspace company with Denver and Boulder locations. It offers private offices, coworking memberships, desks for the day and meeting rooms by the hour.
+tags:
+  - coworking
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

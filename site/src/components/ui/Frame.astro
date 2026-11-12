@@ -1,0 +1,42 @@
+---
+// Frame: a gilded frame for art and portraits. A gold bevel with brass rivets
+// at the corners and a dark line around the picture. Styles: .hall-frame in
+// src/styles/hall.css (L12).
+//
+// Props
+//   tone     "gold" (default) or "bronze", for a quieter frame beside a gold one
+//   shape    "rect" (default) or "arch", the Hall's arched window, for portraits
+//   ratio    CSS aspect-ratio for the picture, such as "4 / 5"; without it the
+//            picture keeps its own proportions
+//   plaque   a short name cast on a bronze plate at the frame's foot (a keeper)
+//   caption  a line under the frame: what the art shows, or its credit
+//   class    extra classes, appended
+//   ...rest  any other attribute, on the <figure>
+//
+// Slot: default, the picture: an Astro <Image>, an <img> or a <picture>. Its
+// alt text carries the meaning; the frame itself is decoration.
+interface Props {
+  tone?: "gold" | "bronze";
+  shape?: "rect" | "arch";
+  ratio?: string;
+  plaque?: string;
+  caption?: string;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { tone = "gold", shape = "rect", ratio, plaque, caption, class: extra, ...rest } = Astro.props;
+const classes = ["hall-frame", tone === "bronze" && "hall-frame--bronze", shape === "arch" && "hall-frame--arch", extra];
+---
+
+<figure class:list={classes} style={ratio ? `--frame-ratio: ${ratio}` : undefined} {...rest}>
+  <div class="hall-frame__mount"><slot /></div>
+  {
+    (plaque || caption) && (
+      <figcaption class="hall-frame__caption">
+        {plaque && <span class="hall-frame__plaque">{plaque}</span>}
+        {caption && <span>{caption}</span>}
+      </figcaption>
+    )
+  }
+</figure>

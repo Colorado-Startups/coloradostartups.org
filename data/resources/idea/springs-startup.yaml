@@ -1,0 +1,14 @@
+id: springs-startup
+name: Springs Startup
+url: https://www.meetup.com/peakstartup/
+stage: idea
+substage: validate
+city: Colorado Springs
+type: community
+description: A Colorado Springs startup community. It holds pitch nights on the third Thursday of each month. Teams pitch for community feedback and connections, from early idea to venture-ready.
+tags:
+  - team
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

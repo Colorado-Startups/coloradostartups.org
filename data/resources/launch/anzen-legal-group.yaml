@@ -1,0 +1,13 @@
+id: anzen-legal-group
+name: Anzen Legal Group
+url: https://anzenlegal.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: A Fort Collins law firm. It helps founders with business formation, contracts, trademarks and buy/sell agreements, plus estate planning.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

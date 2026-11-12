@@ -1,0 +1,13 @@
+id: bowtie
+name: Bowtie
+url: https://bowtie.co/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver software agency. It builds custom apps. It helps teams with AI engineering. It also audits AI-written code.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

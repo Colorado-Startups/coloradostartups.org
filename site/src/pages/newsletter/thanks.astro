@@ -1,0 +1,29 @@
+---
+// /newsletter/thanks/: where /api/subscribe sends a successful sign-up
+// (worker/routes/subscribe.ts). The words are the L13 lane contract, verbatim.
+// Out of the sitemap (astro.config.mjs SITEMAP_EXCLUDE) and noindex. Owner: L13.
+import HallSeal from "../../components/hall/HallSeal.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Check your inbox"
+  description="Confirm your email to start getting Startupers, the Colorado Startups newsletter."
+  noindex
+>
+  <section class="section section--lit" aria-labelledby="thanks-title">
+    <div class="wrap">
+      <p class="kicker">News from the Hall</p>
+      <h1 id="thanks-title">Check your inbox</h1>
+      <p class="lede">
+        We sent a confirmation link to your email. Click it to start getting Startupers, the Colorado Startups
+        newsletter, every other Tuesday from Nov 17, 2026. Already subscribed? You are all set, and no second email is
+        coming.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn--gold" href="/">Back to the Hall</a>
+      </div>
+      <HallSeal />
+    </div>
+  </section>
+</BaseLayout>

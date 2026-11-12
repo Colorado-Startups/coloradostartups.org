@@ -1,0 +1,121 @@
+---
+// /contribute/: how anyone can improve the site (open-source plan, #552).
+// The words live in components/info/contribute.ts. While CONTRIBUTE_LIVE is
+// false this route builds no page, so the URL does not exist until phase 6.
+import type { GetStaticPaths } from "astro";
+
+import {
+  CONTRIBUTE_INTRO,
+  CONTRIBUTE_LIVE,
+  contributePaths,
+  CONTRIBUTING_URL,
+  DISCUSSIONS_URL,
+  FLOW,
+  GOOD_FIRST_ISSUES_URL,
+  REPO_URL,
+  REVIEW_ROWS,
+  RUN_COMMANDS,
+} from "../../components/info/contribute";
+import InfoHeader from "../../components/info/InfoHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export const getStaticPaths = (() => contributePaths(CONTRIBUTE_LIVE)) satisfies GetStaticPaths;
+---
+
+<BaseLayout title="Contribute" description="Improve coloradostartups.org: share an idea, pick an issue or open a pull request.">
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <InfoHeader kicker="Build the Hall with us" title="Contribute">
+        <p class="lede">{CONTRIBUTE_INTRO}</p>
+      </InfoHeader>
+
+      <section class="group" aria-labelledby="flow">
+        <h2 id="flow">From idea to live site</h2>
+        <ol class="flow">
+          {
+            FLOW.map((step) => (
+              <li>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="group" aria-labelledby="start">
+        <h2 id="start">Start here</h2>
+        <ul class="links">
+          <li><a class="tap-target" href={DISCUSSIONS_URL}>Share an idea in Discussions</a></li>
+          <li><a class="tap-target" href={GOOD_FIRST_ISSUES_URL}>Pick a good first issue</a></li>
+          <li><a class="tap-target" href={REPO_URL}>Read the code on GitHub</a></li>
+        </ul>
+      </section>
+
+      <section class="group" aria-labelledby="run">
+        <h2 id="run">Run the site on your computer</h2>
+        <pre><code>{RUN_COMMANDS.join("\n")}</code></pre>
+        <p>
+          The Team page shows made-up people on your computer. The real team data stays private. The full guide is in{" "}
+          <a href={CONTRIBUTING_URL}>CONTRIBUTING.md</a>.
+        </p>
+      </section>
+
+      <section class="group" aria-labelledby="review">
+        <h2 id="review">Who reviews and merges</h2>
+        <table>
+          <thead>
+            <tr><th scope="col">Your change</th><th scope="col">Who merges it</th></tr>
+          </thead>
+          <tbody>
+            {
+              REVIEW_ROWS.map((row) => (
+                <tr>
+                  <td>{row.change}</td>
+                  <td>{row.merges}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <p>AI agents review and merge, but never approve a pull request. People set every rule they follow.</p>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .group {
+    margin-top: var(--s-7);
+  }
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--s-5);
+    padding-left: var(--s-5);
+  }
+  .flow h3 {
+    font-size: var(--t-step-1);
+    margin-bottom: var(--s-2);
+  }
+  .links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+  }
+  pre {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: var(--s-2) var(--s-3);
+    border-bottom: var(--line-edge) solid var(--c-accent);
+  }
+</style>

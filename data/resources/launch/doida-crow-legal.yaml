@@ -1,0 +1,13 @@
+id: doida-crow-legal
+name: Doida Crow Legal
+url: https://www.doidacrow.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver business law firm. It helps Colorado companies and founders with formation, capital raising, contracts and acquisitions.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,15 @@
+id: cooley
+name: Cooley
+url: https://www.cooley.com/about/offices/colorado
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A law firm. It offers corporate and intellectual property services. It also has Cooley Go for founders starting and building a business.
+tags:
+  - legal
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

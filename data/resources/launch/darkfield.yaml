@@ -1,0 +1,13 @@
+id: darkfield
+name: Darkfield
+url: https://www.darkfield.co/
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: A program for cybersecurity companies. Applicants join through a short intake form. A conversation about fit and goals follows.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

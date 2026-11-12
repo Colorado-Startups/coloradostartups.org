@@ -1,0 +1,13 @@
+id: boulder-startup-meetup
+name: Boulder StartUp Meetup
+url: https://www.meetup.com/NoCoStartUp/
+stage: idea
+substage: educate
+city: Boulder
+type: community
+description: A Boulder entrepreneur meetup. It meets the second Wednesday evening of each month at RegenHub. It has open networking, introductions and requests. It also has a mastermind session or guest speaker.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: facebook
+name: Facebook
+url: https://www.facebook.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Social platform with business tools for creating pages and ads, with an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

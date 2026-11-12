@@ -1,0 +1,148 @@
+---
+// The style guide's rooms: a night band, forms and small pieces, the section
+// tones, and focus and motion. Rendered by pages/styleguide.astro; its look
+// is styleguide.css.
+import Badge from "../ui/Badge.astro";
+import Button from "../ui/Button.astro";
+import Callout from "../ui/Callout.astro";
+import Card from "../ui/Card.astro";
+import Panel from "../ui/Panel.astro";
+---
+
+<section class="section section--night" aria-labelledby="night">
+  <div class="wrap stack">
+    <h2 id="night">On a night band</h2>
+    <p>
+      Night is an accent band, for the footer and city-lights rows. Links and the focus ring turn gold here: press
+      Tab to see it. <a href="/styleguide/">A link on night.</a>
+    </p>
+    <div class="btn-row">
+      <Button href="/styleguide/">Join the Slack</Button>
+      <Button variant="secondary" href="/styleguide/">Get the newsletter</Button>
+      <Button variant="quiet" href="/styleguide/">See all events</Button>
+    </div>
+    <p class="sg-badges"><Badge tone="night">Denver</Badge> <Badge tone="gold">New</Badge></p>
+    <div class="sg-row">
+      <Callout tone="slate" title="Slack invites go out by hand">
+        <p>Sample slate callout. A person reviews each request, so allow a day or two.</p>
+      </Callout>
+      <Card title="City lights" tone="night" href="/styleguide/">
+        <p>Sample night card, for a row of evening events.</p>
+        <span slot="meta">Thursdays</span>
+      </Card>
+      <Panel>
+        <h3>A lit panel on night</h3>
+        <p>Light materials keep bronze text and copper <a href="/styleguide/">links</a> on any band.</p>
+      </Panel>
+    </div>
+  </div>
+</section>
+
+<section class="section section--lit">
+  <div class="wrap stack">
+    <h2 id="forms">Forms</h2>
+    <Panel as="form" action="/styleguide/" method="get">
+      <div class="field">
+        <label for="sg-email">Email</label>
+        <input id="sg-email" type="email" autocomplete="email" />
+        <span class="hint">We send the newsletter every other week.</span>
+      </div>
+      <div class="field">
+        <label for="sg-stage">Stage</label>
+        <select id="sg-stage"><option>Idea</option><option>Launch</option><option>Growth</option></select>
+      </div>
+      <p class="form-error">Enter an email address that includes an @.</p>
+      <Button type="submit">Subscribe</Button>
+    </Panel>
+
+    <h2>Small pieces</h2>
+    <p><Badge>Boulder</Badge> <Badge>Launch</Badge></p>
+    <p class="ai-note">Resourcus is an AI agent run by Colorado Startups. It can make mistakes.</p>
+
+    <h2 id="sections">Sections</h2>
+    <p>
+      Five rooms of the Hall, as classes on a full-width section: <code>section section--lit</code> and so on. Pick
+      by what the content needs, and let night stay rare.
+    </p>
+  </div>
+</section>
+
+{
+  [
+    ["lit", "Lantern light on the daylight ground. The default room."],
+    ["band", "A warmer room, lit from a lantern overhead. Alternate it with lit."],
+    ["stone", "A carved stone wall, for a quieter run of content such as a directory."],
+    ["hearth", "Forge glow rising from below, for the closing call to action on a page."],
+    ["night", "The Front Range after dark: the footer and city-lights rows only."],
+  ].map(([tone, use]) => (
+    <section class:list={["section", `section--${tone}`, "sg-room"]} aria-label={`section--${tone} sample`}>
+      <div class="wrap sg-room__inner">
+        <p class="sg-room__name">section--{tone}</p>
+        <p>
+          {use} <a href="/styleguide/">A link in this room.</a>
+        </p>
+        <Button href="/styleguide/" variant="secondary">Get the newsletter</Button>
+      </div>
+    </section>
+  ))
+}
+
+<section class="section section--lit">
+  <div class="wrap stack">
+    <h2 id="focus">Focus and motion</h2>
+    <p>
+      Press Tab through this row. Every control shows a 3px ring: sky blue on light rooms, gold on night. A field
+      takes the ring close in and lights its border. A card takes the ring around the whole tablet.
+    </p>
+    <div class="sg-focus">
+      <a href="/styleguide/">A link</a>
+      <Button variant="stone">A button</Button>
+      <label class="sg-focus__field" for="sg-focus-input">A field <input id="sg-focus-input" type="text" /></label>
+      <label class="sg-focus__check"><input type="checkbox" /> A checkbox</label>
+    </div>
+    <Callout title="Reduced motion">
+      <p>
+        With reduced motion on, nothing animates or transitions. Each element shows its resting style.
+      </p>
+      <p>
+        Gate movement you own, such as a press or a slide, behind <code>prefers-reduced-motion: no-preference</code>,
+        as the buttons do.
+      </p>
+    </Callout>
+  </div>
+</section>
+
+<style>
+  .sg-room {
+    padding-block: var(--s-6);
+  }
+  .sg-room__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-5);
+  }
+  .sg-room__inner p {
+    margin: 0;
+  }
+  .sg-room__name {
+    min-width: 10rem;
+    font-weight: 700;
+  }
+  .sg-focus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-4) var(--s-6);
+  }
+  .sg-focus__field {
+    display: grid;
+    gap: var(--s-1);
+    font-weight: 700;
+  }
+  .sg-focus__check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+</style>

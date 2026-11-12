@@ -1,0 +1,54 @@
+# Colorado Startups
+
+> Colorado Startups is a community of entrepreneurs building companies in Colorado. Founders come first. People who join startups, back them or serve them are welcome too.
+
+Colorado Startups, Ltd. runs the community and this website from Denver. Paul Foley founded it in 2014 and leads it as Founder & President. The community meets in a Slack workspace and a LinkedIn Group. Its newsletter is called Startupers.
+
+AI agents help on this site, and each one is disclosed as an AI agent wherever it appears. Communitas, an AI agent, welcomes newcomers. Resourcus, an AI agent, answers questions about Colorado startup resources. Publicus, an AI agent, drafts news, and a person reviews and publishes it. Only people moderate the groups or hold Connector and organizer seats. The AI agents never do.
+
+## For founders
+
+- [Home](https://coloradostartups.org/): The ways into the community, and a welcome desk that points each visitor to the right place.
+- [Startup Resources](https://coloradostartups.org/ecosystem-canvas/): A directory of Colorado programs, events, investors and services for founders, sorted by company stage. Resourcus, an AI agent, answers questions about it.
+- [Community](https://coloradostartups.org/community/): The Slack, the LinkedIn Group and the LinkedIn Page, and what happens in each.
+- [Join the Slack](https://coloradostartups.org/slack/): The one public way to ask for an invite to the Colorado Startups Slack. It opens a Google Form.
+- [Leaderboard](https://coloradostartups.org/leaderboard/): Colorado companies that Colorado Startups recognizes, and the form to nominate one.
+- [How the Leaderboard works](https://coloradostartups.org/leaderboard/#method): How each edition is chosen and checked. The first verified edition will rank companies by revenue growth.
+- [Founders forum](https://coloradostartups.org/founders/): A forum for founders only. It opens later.
+
+## Guides
+
+- [Guides for Colorado founders](https://coloradostartups.org/guides/): Short answers to common founder questions, each with a list from Startup Resources.
+- [How to start a company in Colorado](https://coloradostartups.org/guides/start-a-company-in-colorado/): The steps, with the classes, meetups, business support offices, lawyers, accountants and banks that help.
+- [Accelerators and incubators in Colorado](https://coloradostartups.org/guides/colorado-accelerators-and-incubators/): Every accelerator and incubator in Startup Resources, with its city.
+- [Where founders meet in Colorado](https://coloradostartups.org/guides/where-founders-meet/): Meetups, events and coworking spaces, by region.
+- [Funding programs for Colorado startups](https://coloradostartups.org/guides/funding-programs/): Angel groups, pitch events, investors and banks listed in Startup Resources.
+- [Startup credits for founders](https://coloradostartups.org/guides/startup-credits/): Cloud, GPU and AI credit programs a founder can claim, grouped by what each one asks. Amounts come from each provider's own page, and computed totals are labeled. Colorado Startups is not affiliated with these programs.
+
+## Regions
+
+- [Regions](https://coloradostartups.org/regions/): The founder communities of Photon Mountain, Space Peak and Fusion Canyon.
+- [Photon Mountain](https://coloradostartups.org/regions/photon-mountain/): Boulder, Golden, Arvada and Denver.
+- [Space Peak](https://coloradostartups.org/regions/space-peak/): Colorado Springs and the Pikes Peak region.
+- [Fusion Canyon](https://coloradostartups.org/regions/fusion-canyon/): Fort Collins, Loveland, Windsor and Greeley.
+
+## Stay in touch
+
+- [Startupers newsletter](https://coloradostartups.org/newsletter/): Colorado wins, a builder lesson and upcoming events, every other Tuesday from Nov 17, 2026.
+- [Event calendar](https://coloradostartups.org/event-calendar/): Startup events across Colorado in one Google Calendar, plus Colorado Startups events on Luma.
+- [Get involved](https://coloradostartups.org/get-involved/): Open moderator, organizer and project roles for people in the community.
+- [Team](https://coloradostartups.org/team/): The people who run Colorado Startups, and the AI agents that help them.
+- [Code of Conduct](https://coloradostartups.org/code-of-conduct/): How we post and treat each other in the Slack and the LinkedIn Group.
+- [Contact](https://coloradostartups.org/contact/): Email info@coloradostartups.org, or write to the mailing address in Denver.
+
+## Data and feeds
+
+- [Startup Resources data](https://coloradostartups.org/data/resources.json): Every active Startup Resources listing as JSON, with its stage, type, city, website and a short description. Free to reuse under CC BY 4.0, with credit to Colorado Startups.
+- [Data license](https://coloradostartups.org/data/): The CC BY 4.0 license on Startup Resources data, its fields and a credit line to copy.
+- [Dispatches JSON Feed](https://coloradostartups.org/feed.json): News from Colorado Startups as a JSON Feed.
+- [Dispatches RSS](https://coloradostartups.org/rss.xml): The same news as an RSS feed.
+
+## Optional
+
+- [Dispatches](https://coloradostartups.org/dispatches/): News from Colorado Startups, newest first.
+- [Privacy Policy](https://coloradostartups.org/privacy/): What the site collects, who helps run it, and how to ask us to delete your information.

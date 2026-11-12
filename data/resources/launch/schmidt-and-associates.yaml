@@ -1,0 +1,13 @@
+id: schmidt-and-associates
+name: Schmidt & Associates
+url: https://schmidtcpa.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver-area CPA firm. It offers business tax, accounting, audit and bookkeeping. Its clients are businesses and people.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

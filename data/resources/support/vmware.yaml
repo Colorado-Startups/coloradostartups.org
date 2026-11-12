@@ -1,0 +1,13 @@
+id: vmware
+name: VMware
+url: https://www.vmware.com/
+stage: support
+substage: organizations
+city: Broomfield
+type: other
+description: Cloud infrastructure software for enterprises. It is now branded VMware by Broadcom. It has an office in Broomfield.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

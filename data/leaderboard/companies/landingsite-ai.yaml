@@ -1,0 +1,9 @@
+id: landingsite-ai
+name: "Landingsite.ai"
+website: "https://www.landingsite.ai/"
+hq_city: "Boulder"
+sector: "Software"
+description: "Offers an AI website builder. It creates and edits small-business sites from a chat prompt."
+sources:
+  - "https://www.landingsite.ai/terms-of-service"
+  - "https://www.landingsite.ai/"

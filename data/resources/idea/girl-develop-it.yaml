@@ -1,0 +1,16 @@
+id: girl-develop-it
+name: Girl Develop It
+url: https://www.meetup.com/Girl-Develop-It-Boulder-Denver/
+stage: idea
+substage: validate
+city: statewide
+type: community
+description: The Boulder and Denver chapter of Girl Develop It. It helps women and nonbinary adults learn software development. It offers classes, projects and events. Its classes are currently virtual.
+tags:
+  - product
+  - meetup
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

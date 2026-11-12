@@ -1,0 +1,13 @@
+id: industry
+name: INDUSTRY
+url: https://www.industryoffice.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: coworking
+description: A workspace at RiNo Station in Denver. It has private offices behind closed doors for small and large teams. It also has shared kitchens, event spaces and outdoor areas.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

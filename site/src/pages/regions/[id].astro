@@ -1,0 +1,194 @@
+---
+// /regions/<id>/: one region for a local founder. Art, summary and cities;
+// the Connector seat; Startup Resources in the region's cities; Leaderboard
+// honorees headquartered there; and the Slack and events (decision 45). Every
+// city goes through regionForCity(), so a city added to the YAML shows up in
+// both lists. Owner: L8.
+import { WAYS_IN } from "@cs/shared";
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+
+import { activeCards } from "../../components/canvas/canvas-data";
+import OrganizerCard from "../../components/regions/OrganizerCard.astro";
+import RegionArt from "../../components/regions/RegionArt.astro";
+import RegionCard from "../../components/regions/RegionCard.astro";
+import RegionHonorees from "../../components/regions/RegionHonorees.astro";
+import RegionResources from "../../components/regions/RegionResources.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
+import { REGION_COLORS } from "../../lib/regions/map";
+import { REGIONS } from "../../lib/regions/match";
+import { andList, honoreesIn, inRegion, organizerFor } from "../../lib/regions/page";
+
+export const getStaticPaths = (async () => {
+  const regions = [...REGIONS];
+  return regions.map((region) => ({ params: { id: region.id }, props: { region, regions } }));
+}) satisfies GetStaticPaths;
+
+const { region, regions } = Astro.props;
+
+const positions = (await getCollection("positions")).map((e) => e.data);
+const people = (await getCollection("people")).map((e) => e.data);
+const organizer = organizerFor(region.id, positions, people);
+
+const cards = await activeCards();
+const regionCards = inRegion(region.id, cards, (c) => c.city, regions);
+const statewide = cards.filter((c) => c.city === "statewide").length;
+
+const companies = (await getCollection("companies")).map((e) => e.data);
+const edition = latestEdition((await getCollection("editions")).map((e) => e.data));
+if (!edition) throw new Error("no Leaderboard edition in data/leaderboard/editions/");
+const honorees = honoreesIn(
+  region.id,
+  buildBoard(edition, companies).map((row) => row.company),
+  regions,
+);
+
+const others = regions.filter((r) => r.id !== region.id);
+---
+
+<BaseLayout title={region.name} description={`${region.tagline} Core cities: ${andList(region.cities)}.`} ogImage={region.id}>
+  <section class="section section--lit" aria-labelledby="region-title" style={`--region-color: ${REGION_COLORS[region.id]}`}>
+    <div class="wrap">
+      <nav aria-label="Breadcrumb" class="crumbs">
+        <ol>
+          <li><a href="/regions/">Regions</a></li>
+          <li aria-current="page">{region.name}</li>
+        </ol>
+      </nav>
+      <h1 id="region-title">{region.name}</h1>
+      <p class="lede">{region.tagline}</p>
+      {/* The page's main action, in the first screen at 375 and 1280 px (#218).
+          "Meet founders here" below says more and repeats it. Each Slack
+          button says where it goes (#128). */}
+      <div class="first-actions">
+        <div class="btn-row">
+          <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note-top">Join the Slack</a>
+          <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
+        </div>
+        <p class="meta" id="slack-note-top">Join the Slack opens a Google Form.</p>
+      </div>
+      <RegionArt region={region} size="hero" />
+      <div class="intro">
+        <p>{region.summary}</p>
+        <dl class="cities">
+          <div>
+            <dt>Core cities</dt>
+            <dd>{andList(region.cities)}</dd>
+          </div>
+          {
+            region.nearby.length > 0 && (
+              <div>
+                <dt>Nearby towns in the region</dt>
+                <dd>{andList(region.nearby)}</dd>
+              </div>
+            )
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="organizer">
+    <div class="wrap">
+      <h2 id="organizer">{organizer.holder ? `Your ${organizer.position.title}` : `The ${organizer.position.title} seat`}</h2>
+      <OrganizerCard organizer={organizer} />
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="resources">
+    <div class="wrap">
+      <h2 id="resources">Startup Resources in {region.name}</h2>
+      <RegionResources region={region} cards={regionCards} statewide={statewide} />
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="honorees">
+    <div class="wrap">
+      <h2 id="honorees">Leaderboard honorees building here</h2>
+      <RegionHonorees region={region} edition={edition} companies={honorees} />
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="meet">
+    <div class="wrap">
+      <h2 id="meet">Meet founders here</h2>
+      <p>
+        The Colorado Startups Slack is where founders across the state meet, ask and help.
+        {region.slack_channel && <> {region.name} founders gather in #{region.slack_channel}.</>}
+      </p>
+      <p>Startup events in {region.name} and across Colorado go on the event calendar.</p>
+      <div class="btn-row">
+        <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note">Join the Slack</a>
+        <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
+      </div>
+      <p class="meta" id="slack-note">Join the Slack opens a Google Form.</p>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="other-regions">
+    <div class="wrap">
+      <h2 id="other-regions">The other regions</h2>
+      {/* The same cards /regions/ shows, painted scene included (#204). */}
+      <ul class="hall-grid others">
+        {others.map((r) => <RegionCard region={r} organizer={organizerFor(r.id, positions, people)} />)}
+      </ul>
+      <p>
+        Building somewhere else in Colorado? <a href="/regions/#elsewhere">You belong here too</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The breadcrumb's look, and its 44 px phone targets, are global.css's
+     .crumbs (#682); only the space above the title is this page's. */
+  .crumbs ol {
+    margin: 0 0 var(--s-3);
+  }
+  h1 {
+    border-bottom: 4px solid var(--region-color);
+    display: inline-block;
+    padding-bottom: var(--s-1);
+  }
+  .first-actions {
+    margin: var(--s-4) 0 var(--s-6);
+  }
+  .first-actions .meta,
+  #slack-note {
+    margin: var(--s-3) 0 0;
+  }
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--s-6);
+    margin-top: var(--s-6);
+  }
+  .cities {
+    margin: 0;
+  }
+  .cities div + div {
+    margin-top: var(--s-4);
+  }
+  .cities dt {
+    font-weight: 700;
+  }
+  .cities dd {
+    margin: 0;
+  }
+  .others {
+    margin-bottom: var(--s-5);
+  }
+  /* Three tracks from 912 px, as on /regions/, so the two cards keep the
+     width their art's `sizes` expects instead of stretching to half the row. */
+  @media (min-width: 57rem) {
+    .others {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 760px) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

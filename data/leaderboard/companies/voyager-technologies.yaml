@@ -1,0 +1,10 @@
+id: voyager-technologies
+name: "Voyager Technologies"
+website: "https://voyagertechnologies.com/"
+hq_city: "Denver"
+founded_year: 2019
+sector: "Space and aerospace"
+description: "Provides space systems and defense technology. It also develops space stations. Government and commercial customers use its work."
+sources:
+  - "https://www.sec.gov/Archives/edgar/data/1788060/000162828026016543/voyg-20251231.htm"
+  - "https://voyagertechnologies.com/"

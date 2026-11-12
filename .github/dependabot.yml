@@ -1,0 +1,86 @@
+# Dependabot keeps dependencies current and opens PRs when a package has a known
+# vulnerability. Low-risk updates are grouped into one PR to keep review light.
+#
+# Cooldowns hold brand-new releases back (14 days, decision 12), so a compromised fresh version is
+# usually flagged or yanked before Dependabot proposes it. Security updates
+# bypass the cooldown. GitHub's Dependabot options reference (read 2026-10-08)
+# lists github-actions as supporting default-days but not the semver-*-days
+# options, so actions get a flat cooldown and npm gets the graded one.
+#
+# Security updates are grouped too (applies-to: security-updates, same reference),
+# so each ecosystem and directory gets one security PR instead of one per package.
+# Lockfile PRs conflict with one another, so fewer PRs means fewer rebases.
+#
+# Every PR is merged by hand. Nothing here auto-merges.
+version: 2
+updates:
+  # npm workspaces: the root package.json and package-lock.json cover site/,
+  # workers/ and packages/.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14        # patch and minor: decision 12, releases at least two weeks old
+      semver-major-days: 30   # majors wait a month, then get adopted deliberately
+    # TypeScript 7 waits for astro check (2026-11-04). @astrojs/check declares
+    # typescript ^5 or ^6, and astro check refuses 7.0: "install TypeScript 6
+    # instead" (trial PR #805, site-tests run 41778882658; upstream
+    # withastro/astro#17336). Astro points TypeScript 7.1+ users to
+    # @astrojs/ts-content-mapper. Remove this when @astrojs/check accepts 7, or
+    # when the site moves its type check off astro check.
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # The Modal render image's hash-locked requirements.lock.txt. Every change needs a
+  # rebuilt image and a fresh freeze (decision 65; ops/gpu/modal/README.md, Updating
+  # the lock), so version updates stay off: a limit of 0 turns them off and leaves
+  # security updates on (Dependabot options reference). Security fixes arrive as one
+  # grouped PR, so one rebuild covers them all. The cooldown matches the other
+  # feeds (decision 12): security updates skip it, so it matters only if version
+  # updates are ever turned on.
+  - package-ecosystem: "pip"
+    directory: "/ops/gpu/modal"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    cooldown:
+      default-days: 14
+    groups:
+      modal-image-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # The SHA-pinned actions in .github/workflows/. Code-OS's own (the pages
+  # action) is the org's code, so it skips the cooldown and comes as a PR of
+  # its own; cooldown exclude takes dependency names with * (Dependabot
+  # options reference, read 2026-11-03).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14
+      exclude:
+        - "SoulCraft-Org/git-crafter*"
+    groups:
+      git-crafter:
+        patterns:
+          - "SoulCraft-Org/git-crafter*"
+      actions:
+        update-types:
+          - "minor"
+          - "patch"

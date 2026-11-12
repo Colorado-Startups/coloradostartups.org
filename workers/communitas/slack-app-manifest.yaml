@@ -1,0 +1,65 @@
+# Communitas Slack app manifest. Paul creates the app from this file:
+# api.slack.com/apps, then Create New App, then From a manifest, then YAML.
+# Steps, including what to put in place of WORKER_HOST:
+# ops/runbooks/communitas-slack.md.
+#
+# Scopes are the minimum the Worker uses. Each one, and why:
+#   app_mentions:read  receive app_mention when a member mentions @Communitas
+#   chat:write         post answers in threads, the welcome DM and the openers
+#   commands           the /communitas help card
+#   im:write           open the DM for the one welcome message
+#   users:read         Slack requires it for the team_join event
+# site/test/unit/l5/communitas-manifest.test.ts holds the scopes, events and
+# commands to what workers/communitas/src/app.ts handles.
+
+display_information:
+  name: Communitas
+  description: AI agent run by Colorado Startups. Welcomes new members and answers questions about Colorado startup resources.
+  long_description: >-
+    Communitas is an AI agent run by Colorado Startups. It sends each new member one
+    welcome message, opens the Monday, Wednesday and Friday community threads, and
+    answers questions about Colorado startup resources when you mention it. Answers
+    come from Resourcus, which searches the Ecosystem Canvas with an open-source model
+    hosted on Cloudflare.
+
+    Communitas is its own Slack app with its own bot token, running on Cloudflare
+    Workers. It is not connected to any Claude account. It never moderates, and it
+    never messages you unprompted after the welcome. It can make mistakes, and a
+    person reviews its work.
+  background_color: "#12182B"
+
+features:
+  app_home:
+    home_tab_enabled: false
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: true
+  bot_user:
+    display_name: Communitas
+    always_online: false
+  slash_commands:
+    - command: /communitas
+      url: https://WORKER_HOST/slack/commands
+      description: Show what Communitas does and how to ask it a question
+      usage_hint: help
+      should_escape: false
+
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+      - commands
+      - im:write
+      - users:read
+
+settings:
+  event_subscriptions:
+    request_url: https://WORKER_HOST/slack/events
+    bot_events:
+      - app_mention
+      - team_join
+  interactivity:
+    is_enabled: false
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

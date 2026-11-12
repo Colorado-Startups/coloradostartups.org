@@ -1,0 +1,14 @@
+id: code-for-boulder
+name: Code for Boulder
+url: https://www.meetup.com/CodeForBoulder/
+stage: idea
+substage: validate
+city: Boulder
+type: community
+description: Meetup for people who build products in Boulder.
+tags:
+  - product
+  - meetup
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

@@ -1,0 +1,15 @@
+id: publicis-sapient
+name: Publicis Sapient
+url: https://www.publicissapient.com/
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: An enterprise AI company. It offers services and platforms for legacy modernization and AI agents. It serves large companies in retail, finance and health.
+tags:
+  - consulting
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

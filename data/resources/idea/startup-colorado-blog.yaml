@@ -1,0 +1,13 @@
+id: startup-colorado-blog
+name: Startup Colorado Blog
+url: https://startupcolorado.org/news
+stage: idea
+substage: educate
+city: online
+type: media
+description: A blog with founder stories and news from rural Colorado. It is written for rural founders and the people who support them.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: startup-colorado-funding-database
+name: Startup Colorado Funding Database
+url: https://startupcolorado.org/resource-center/funding-database/
+stage: launch
+substage: investors
+city: statewide
+type: tool
+description: Startup Colorado's database of funding options. It is for founders and small business owners in rural Colorado. It lists Colorado-based investors and small business lenders. It lists grants and crowdfunding too.
+tags:
+  - funding
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

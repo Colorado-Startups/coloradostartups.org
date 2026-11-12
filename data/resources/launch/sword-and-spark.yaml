@@ -1,0 +1,13 @@
+id: sword-and-spark
+name: Sword and Spark
+url: http://www.swordandspark.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver marketing firm. It offers fractional CMO services, strategy sessions and audits. It serves startups and founders. It works mainly in advanced technology.
+tags:
+  - marketing
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

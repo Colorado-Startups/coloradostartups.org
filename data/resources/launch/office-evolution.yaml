@@ -1,0 +1,17 @@
+id: office-evolution
+name: Office Evolution
+url: https://www.officeevolution.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: coworking
+description: A suburban coworking and office company. Its Colorado sites include Boulder, Broomfield and Denver. More sites are in Fort Collins, Golden, Longmont and Louisville. It offers private offices, coworking and meeting rooms.
+tags:
+  - coworking
+  - denver
+  - boulder
+  - golden
+  - longmont
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

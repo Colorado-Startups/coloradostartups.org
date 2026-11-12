@@ -1,0 +1,13 @@
+id: amazon
+name: Amazon
+url: https://www.amazon.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: An online retailer. It sells fashion, home goods, electronics, beauty products and groceries to shoppers. It has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

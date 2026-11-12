@@ -1,0 +1,8 @@
+id: kestrel-labs
+name: "Kestrel Labs"
+website: "https://kestrellabs.com"
+hq_city: "Denver"
+sector: "Real estate and construction"
+description: "Builds software that checks building designs in BIM models against code requirements. Architects and engineers use it to catch violations early."
+sources:
+  - "https://kestrellabs.com"

@@ -1,0 +1,14 @@
+id: rockies-venture-fund
+name: Rockies Venture Fund
+url: http://rockiesventurefund.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: An early-stage venture investor rooted in the Rocky Mountain startup community. It backs fast-growing companies in emerging technology, healthcare and life sciences. It also invests in consumer goods and cleantech.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

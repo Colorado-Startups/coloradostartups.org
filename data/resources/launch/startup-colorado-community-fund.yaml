@@ -1,0 +1,13 @@
+id: startup-colorado-community-fund
+name: Startup Colorado Community Fund
+url: https://www.f6s.com/startupcommunityinnovationfund
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: A Startup Colorado initiative that gives grants. The grants go to groups that support the Colorado startup ecosystem. It focuses on Front Range communities such as Denver, Boulder, Colorado Springs and Fort Collins.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

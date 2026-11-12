@@ -1,0 +1,58 @@
+{
+  "_README": "Render sizes per kind. Anima's template sets size through node 91 (ResolutionSelector), which is wired into the subgraph's width and height, so a 90.width or 90.height override never takes effect. 'expect' is the node's arithmetic: sqrt(megapixels x 1024 x 1024 x ratio), rounded to the nearest multiple. See art/DIRECTION.md, Settings. A 'tile' renders square; art/tools/make-tiles.mjs removes the wrap seam, maps it into the texture floors from brand_tokens.yaml and writes 512 x 512 WebP.",
+  "hero": {
+    "aspect_ratio": "21:9 (Ultrawide)",
+    "megapixels": 1.0,
+    "multiple": 16,
+    "expect": [
+      1568,
+      672
+    ],
+    "tail": "Full-bleed image from edge to edge, with no border or frame."
+  },
+  "region": {
+    "aspect_ratio": "16:9 (Widescreen)",
+    "megapixels": 1.0,
+    "multiple": 16,
+    "expect": [
+      1360,
+      768
+    ],
+    "tail": "Full-bleed image from edge to edge, with no border or frame."
+  },
+  "keeper": {
+    "aspect_ratio": "3:4 (Portrait Standard)",
+    "megapixels": 1.0,
+    "multiple": 16,
+    "expect": [
+      880,
+      1184
+    ],
+    "tail": ""
+  },
+  "tile": {
+    "aspect_ratio": "1:1 (Square)",
+    "megapixels": 1.0,
+    "multiple": 16,
+    "expect": [
+      1024,
+      1024
+    ],
+    "tail": "A repeating surface with no border, frame or visible edge."
+  },
+  "fibo": {
+    "_README": "FIBO 2.0 sizes, on the Bria node's own aspect_ratio and resolution inputs (get_node BriaImageGenerate, 2026-11-03). The node picks the pixels; record the real size after the run.",
+    "scene": {
+      "aspect_ratio": "16:9",
+      "resolution": "4MP"
+    }
+  },
+  "fibo_space": {
+    "_README": "FIBO 2.0 Dev sizes on Bria's Space briaai/Fibo-2.0-T2I: width 832 to 1344 in steps of 64, height 768 to 1248 in steps of 32, steps up to 50 (its app.py, read 2026-11-03). 1344 x 768 is the widest it takes; make-finals crops it to 16:9. The model card recommends 50 steps.",
+    "scene": {
+      "width": 1344,
+      "height": 768,
+      "steps": 50
+    }
+  }
+}

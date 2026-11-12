@@ -1,0 +1,9 @@
+id: wyecliff
+name: "Wyecliff"
+website: "https://wyecliff.ai"
+hq_city: "Denver"
+sector: "Software"
+description: "Advises businesses on AI strategy and builds custom AI tools for them. It also trains their staff to use the tools."
+sources:
+  - "https://wyecliff.ai/privacy/"
+  - "https://wyecliff.ai/about/"

@@ -1,0 +1,56 @@
+# Bug report form. The work-tracking rule (CLAUDE.md, "Work tracking") wins over this file: every bug, error or needed
+# fix is an issue labeled bug plus one area label, fixed right away by a PR that says "Fixes #N". Paul, 2026-11-03:
+# cards and issues are visual first, tables and numbers over prose. The area options below match the repo's area
+# labels. A new area label changes, in the same PR, this list, enhancement.yml, and the Work tracking tables in
+# CLAUDE.md and CONTRIBUTING.md.
+name: Bug
+description: Something is broken, wrong or out of date. It gets a fix PR right away.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Fill the table. Numbers and paths, not sentences.
+  - type: textarea
+    id: table
+    attributes:
+      label: Table
+      description: One row per fact. Add rows for counts, dates or versions.
+      value: |
+        | Item | Value |
+        | --- | --- |
+        | Broke | |
+        | Expected | |
+        | Where | URL, or path:line |
+        | Seen on | date, commit |
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Pick one, and add the matching area label.
+      options:
+        - code
+        - documentation
+        - design
+        - usability
+        - security
+        - ci
+    validations:
+      required: true
+  - type: input
+    id: cause
+    attributes:
+      label: Caused by
+      description: If a merged PR caused it, add its number after the #. The Quality page's revert breaker counts only bugs that name a cause this way.
+      value: "Regressed-by: #"
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: The command that shows it, or a screenshot. Output as a table or a chart where you can.
+      render: shell
+    validations:
+      required: false

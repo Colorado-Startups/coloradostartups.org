@@ -1,0 +1,169 @@
+---
+// The upcoming events on /event-calendar/, as plain HTML above the Google
+// Calendar iframe, so crawlers and AI assistants can read them. Dates are in
+// Mountain Time. The list is built from what had not ended at build time; a
+// small script (prune.ts) hides what has ended since. Owner: L24. The next
+// SOON_DAYS days show open; later events fold into a <details>, so the page
+// stays short on phones (#228).
+import { byMonth, type CalendarEvent, endsAt, shownLocation, splitSoon, whenText } from "./events";
+
+interface Props {
+  events: CalendarEvent[];
+}
+
+const { events } = Astro.props;
+const months = byMonth(events);
+const { soon, later } = splitSoon(events, Date.now());
+// A month that spans the cut appears in both parts, so each part's heading
+// ids carry their own prefix.
+const parts = [
+  { later: false, idPrefix: "events", months: byMonth(soon) },
+  { later: true, idPrefix: "events-later", months: byMonth(later) },
+].filter((part) => part.months.length > 0);
+const lastDay = later.length > 0 ? whenText(later[later.length - 1]).day : "";
+---
+
+<div class="upcoming" data-upcoming>
+  <h2 id="upcoming-events">Upcoming events</h2>
+  {
+    months.length > 0 && (
+      <>
+        <p class="meta" data-events-intro>
+          Startup events coming up across Colorado. Times are Mountain Time. Hosts run their own events, so check
+          the event page before you go.{" "}<a href="#full-calendar">Jump to the full calendar</a>.
+        </p>
+        {parts.map((part) => {
+          const Part = part.later ? "details" : "div";
+          return (
+            <Part class:list={["part", { later: part.later }]} data-events-later={part.later ? "" : undefined}>
+              {part.later && (
+                <summary>
+                  <span class="later-name">Later events</span> <span class="count">({later.length})</span>{" "}
+                  <span class="meta">through {lastDay}</span>
+                </summary>
+              )}
+              {part.months.map((month) => (
+                <section aria-labelledby={`${part.idPrefix}-${month.key}`} data-month>
+                  <h3 id={`${part.idPrefix}-${month.key}`}>{month.label}</h3>
+                  <ol class="events">
+                    {month.events.map((event) => {
+                      const when = whenText(event);
+                      const where = shownLocation(event);
+                      return (
+                        <li class="event" data-ends={new Date(endsAt(event)).toISOString()}>
+                          <p class="when">
+                            <time datetime={event.start}>{when.day}</time>{" "}
+                            <span class="time">{when.time}</span>
+                          </p>
+                          <p class="name">
+                            {event.url ? (
+                              <a href={event.url} rel="nofollow noopener">
+                                {event.title}
+                              </a>
+                            ) : (
+                              event.title
+                            )}
+                          </p>
+                          {where && <p class="where meta">{where}</p>}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </section>
+              ))}
+            </Part>
+          );
+        })}
+      </>
+    )
+  }
+  <p data-events-empty hidden={months.length > 0}>
+    No events are listed here right now. The full calendar below shows everything on it.
+  </p>
+</div>
+
+<script>
+  import { hideEnded } from "./prune";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-upcoming]")) hideEnded(root, Date.now());
+</script>
+
+<style>
+  .upcoming {
+    margin-block: var(--s-6);
+  }
+  /* A compact agenda: the global ol measure would hold it to one column. */
+  .events {
+    list-style: none;
+    max-width: none;
+    margin: 0 0 var(--s-6);
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: 0 var(--s-5);
+  }
+  .event {
+    padding-block: var(--s-3);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .event p {
+    margin: 0;
+  }
+  .when {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-2);
+    font-weight: 600;
+  }
+  .time {
+    font-weight: 400;
+    color: var(--c-text-dim);
+  }
+  .name {
+    margin-top: var(--s-1) !important;
+    line-height: 1.3;
+  }
+  .where {
+    margin-top: var(--s-1) !important;
+  }
+  /* Later events: one summary line, as in RegionResources. */
+  .later {
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .later summary {
+    cursor: pointer;
+    min-height: var(--size-tap);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s-2);
+    padding-block: var(--s-3);
+    list-style: none;
+  }
+  .later summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A flex summary drops the native triangle, so draw a chevron that turns. */
+  .later summary::before {
+    content: "";
+    align-self: center;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: var(--s-1);
+    border-right: var(--line-edge) solid currentColor;
+    border-bottom: var(--line-edge) solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+  }
+  .later[open] summary::before {
+    transform: rotate(45deg);
+  }
+  .later summary:hover .later-name {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .later-name {
+    font-weight: 700;
+    font-size: var(--t-step-1);
+  }
+</style>

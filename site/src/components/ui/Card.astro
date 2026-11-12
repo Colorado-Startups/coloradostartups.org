@@ -1,0 +1,91 @@
+---
+// Card: a carved stone tablet for one resource, position, keeper or region.
+// With href, the title link covers the whole card, and links or buttons in
+// the badges, text and actions slots stay clickable above it.
+// Styles: .hall-card in src/styles/hall.css (L12). Lay cards out in a
+// <ul class="hall-grid"> with element="li".
+//
+// Props
+//   title       the card's name (required)
+//   href        makes the whole card a link through its title
+//   as          the title's heading level: "h2", "h3" (default) or "h4"
+//   tone        "stone" (default), "gilded" (a keeper, or one featured item in
+//               a set) or "night" (a dark accent card)
+//   layout      "stack": media on top (default)
+//               "row": media beside the text; it stacks again when narrow
+//   mediaInset  pads the media instead of running it edge to edge; use it for
+//               a <Frame> portrait
+//   element     the outer element: "article" (default), "li" or "div"
+//   class       extra classes, appended
+//   ...rest     any other attribute, on the outer element
+//
+// Slots
+//   media    an image (full bleed, 16:9 unless --card-ratio is set) or a <Frame>
+//   badges   one to three <Badge> tags
+//   default  the description: one or two short sentences
+//   meta     small text at the foot, such as a city or a date
+//   actions  buttons or links at the foot
+interface Props {
+  title: string;
+  href?: string;
+  as?: "h2" | "h3" | "h4";
+  tone?: "stone" | "gilded" | "night";
+  layout?: "stack" | "row";
+  mediaInset?: boolean;
+  element?: "article" | "li" | "div";
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const {
+  title,
+  href,
+  as: Heading = "h3",
+  tone = "stone",
+  layout = "stack",
+  mediaInset = false,
+  element: Tag = "article",
+  class: extra,
+  ...rest
+} = Astro.props;
+
+const classes = ["hall-card", tone !== "stone" && `hall-card--${tone}`, layout === "row" && "hall-card--row", extra];
+const hasFoot = Astro.slots.has("meta") || Astro.slots.has("actions");
+---
+
+<Tag class:list={classes} {...rest}>
+  {
+    Astro.slots.has("media") && (
+      <div class:list={["hall-card__media", mediaInset && "hall-card__media--inset"]}>
+        <slot name="media" />
+      </div>
+    )
+  }
+  <div class="hall-card__body">
+    <Heading class="hall-card__title">{href ? <a href={href}>{title}</a> : title}</Heading>
+    {
+      Astro.slots.has("badges") && (
+        <div class="hall-card__badges">
+          <slot name="badges" />
+        </div>
+      )
+    }
+    <div class="hall-card__text"><slot /></div>
+    {
+      hasFoot && (
+        <div class="hall-card__foot">
+          {Astro.slots.has("meta") && (
+            <span class="hall-card__meta">
+              <slot name="meta" />
+            </span>
+          )}
+          {Astro.slots.has("actions") && (
+            <span class="btn-row">
+              <slot name="actions" />
+            </span>
+          )}
+        </div>
+      )
+    }
+  </div>
+</Tag>

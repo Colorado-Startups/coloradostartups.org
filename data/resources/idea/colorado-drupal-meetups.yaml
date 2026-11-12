@@ -1,0 +1,13 @@
+id: colorado-drupal-meetups
+name: Colorado Drupal Meetups
+url: https://www.meetup.com/drupal-colorado/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: A Denver Drupal user group. It meets at the denhac hackerspace. It holds talks and show-and-tell sessions on Drupal. It also covers related web topics such as AI tools and vector search.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

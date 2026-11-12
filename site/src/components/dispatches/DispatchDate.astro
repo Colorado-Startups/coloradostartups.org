@@ -1,0 +1,15 @@
+---
+// A dispatch's calendar date as a <time> element, e.g. "October 6, 2026".
+// Dates are calendar days, read in UTC so a build in any time zone prints the
+// same day.
+import { calendarDate } from "./feed";
+
+interface Props {
+  date: Date;
+}
+
+const { date } = Astro.props;
+const label = date.toLocaleDateString("en-US", { timeZone: "UTC", year: "numeric", month: "long", day: "numeric" });
+---
+
+<time datetime={calendarDate(date)}>{label}</time>

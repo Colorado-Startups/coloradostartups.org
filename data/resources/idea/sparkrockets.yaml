@@ -1,0 +1,13 @@
+id: sparkrockets
+name: SparkRockets
+url: https://sparkrockets.com/
+stage: idea
+substage: educate
+city: statewide
+type: education
+description: An AI platform for universities, ecosystems and other entrepreneurship programs. It turns a one-line business idea into a business plan. It also makes a lean canvas and market analysis.
+tags:
+  - entrepreneurship
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

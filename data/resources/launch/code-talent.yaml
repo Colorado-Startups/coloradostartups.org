@@ -1,0 +1,13 @@
+id: code-talent
+name: Code Talent
+url: http://www.code-talent.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A tech recruiting firm that helps companies hire engineers. Its clients include startups at their earliest stages.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

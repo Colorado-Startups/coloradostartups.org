@@ -1,0 +1,13 @@
+id: idea-forge
+name: Idea Forge
+url: https://www.colorado.edu/ideaforge/facilities/makerspace
+stage: idea
+substage: validate
+city: Boulder
+type: event
+description: An engineering makerspace at the University of Colorado Boulder, with fabrication tools, workshops and tours.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

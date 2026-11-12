@@ -1,0 +1,14 @@
+id: batshit-crazy-ventures
+name: Batshit Crazy Ventures
+url: http://www.batshitcrazy.is/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: An early-stage venture capital firm in Boulder. It works with pre-revenue and pre-seed startups. It has no set sector or region.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

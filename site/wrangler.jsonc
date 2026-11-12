@@ -1,0 +1,105 @@
+{
+  // coloradostartups.org: static Astro build served from Workers static assets,
+  // plus one small Worker for /api/* and the ResourcusRPC entrypoint.
+  // Orchestrator-owned. Lanes request binding changes.
+  //
+  // Environments (bindings do not inherit, so each block declares its own):
+  //   top level  = production. Gets the custom domain at the DNS cutover.
+  //   env.staging = the private staging site on workers.dev behind Cloudflare
+  //                 Access, with its own D1 database and AI Search instance.
+  // Workers Builds deploys main with `npx wrangler deploy --env staging` until
+  // Gate B, then production.
+  //
+  // Resource IDs were filled in at Wave 0 step 8 (Cloudflare setup, 2026-10-08).
+  // Secrets are never here: TURNSTILE_SECRET_KEY, KIT_API_KEY and KIT_FORM_ID
+  // are set with `wrangler secret put`. Build var: PUBLIC_TURNSTILE_SITE_KEY,
+  // the public site key of the "Colorado Startups site" Turnstile widget.
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "coloradostartups-site",
+  // The Colorado Startups account. Set here because the same login also sees
+  // Paul's personal account, and Wrangler must never pick that one.
+  "account_id": "437b80fdd39fee1c4daab6da32fa5aeb",
+  "main": "worker/index.ts",
+  // ai_search needs 2026-03-27 or later.
+  "compatibility_date": "2026-08-15",
+  // No Worker code imports a Node builtin: worker/lib/notify.ts writes its own
+  // MIME message. The flag stays while worker-configuration.d.ts is generated
+  // with it (wrangler types).
+  "compatibility_flags": ["nodejs_compat"],
+  // Minified: zod's classic schemas keep their methods whole, so the gzipped
+  // Worker is smaller minified (the Code tab's code.worker_bundle_kb).
+  "minify": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": { "enabled": true },
+  // Weekly retention, Mondays 09:17 UTC (worker/index.ts scheduled): the Resourcus
+  // purge, the applications sweep, the nominations sweep and the csp_reports purge.
+  "triggers": { "crons": ["17 9 * * 1"] },
+  "workers_dev": false,
+  "preview_urls": false,
+  "ai": { "binding": "AI" },
+  "ai_search": [{ "binding": "RESOURCUS_SEARCH", "instance_name": "resourcus" }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "coloradostartups",
+      "database_id": "7aa9f992-c819-49db-9fc1-341fbb6b0e33",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "ratelimits": [
+    // Forms: 10 posts per 60 s per IP per route. Fails open (worker/lib/ratelimit.ts).
+    { "name": "FORM_RATE_LIMIT", "namespace_id": "3101", "simple": { "limit": 10, "period": 60 } },
+    // Resourcus web: 20 questions per 60 s per IP. The budget guard is the spending stop.
+    { "name": "ASK_RATE_LIMIT", "namespace_id": "3102", "simple": { "limit": 20, "period": 60 } }
+  ],
+  "send_email": [
+    {
+      // Notifications to Paul. Works once the domain is on Cloudflare DNS and
+      // email.coloradostartups.org is onboarded (plan, Domain cutover step 6).
+      "name": "FORM_EMAIL",
+      "allowed_sender_addresses": ["forms@email.coloradostartups.org"]
+    }
+  ],
+  "vars": {
+    // Budget guard caps per calendar month (L4 enforces). Goals, not measurements
+    // (decision 38): search stays under the 1,000 included AI Search queries
+    // PLAN.md cites; each answer spends two model calls per search. Paul sets the final values.
+    "RESOURCUS_MONTHLY_MODEL_CAP": "1800",
+    "RESOURCUS_MONTHLY_SEARCH_CAP": "900"
+  },
+  "env": {
+    "staging": {
+      "name": "coloradostartups-site-staging",
+      "workers_dev": true,
+      "preview_urls": true,
+      "triggers": { "crons": ["17 9 * * 1"] },
+      "ai": { "binding": "AI" },
+      "ai_search": [{ "binding": "RESOURCUS_SEARCH", "instance_name": "resourcus-staging" }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "coloradostartups-staging",
+          "database_id": "8f32e27e-e1a2-4bf3-8704-d3e48096d9cb",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "ratelimits": [
+        { "name": "FORM_RATE_LIMIT", "namespace_id": "3201", "simple": { "limit": 10, "period": 60 } },
+        { "name": "ASK_RATE_LIMIT", "namespace_id": "3202", "simple": { "limit": 20, "period": 60 } }
+      ],
+      "send_email": [
+        { "name": "FORM_EMAIL", "allowed_sender_addresses": ["forms@email.coloradostartups.org"] }
+      ],
+      "vars": {
+        "RESOURCUS_MONTHLY_MODEL_CAP": "300",
+        "RESOURCUS_MONTHLY_SEARCH_CAP": "300"
+      }
+    }
+  }
+}

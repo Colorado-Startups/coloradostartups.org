@@ -1,0 +1,13 @@
+id: ripzie
+name: Ripzie
+url: https://www.ripzie.com/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A Boulder branding agency. It offers brand strategy, identity and campaign design. It also gives ongoing support for new brands.
+tags:
+  - marketing
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

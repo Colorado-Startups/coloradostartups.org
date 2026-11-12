@@ -1,0 +1,77 @@
+---
+// One build-time chart with its text alternative and its data. The SVG carries
+// an aria-label and description; the figcaption says the same in words; the
+// table below holds every number the chart draws. A chart with a phone version
+// (`narrowSvg`) shows it below 48rem, where the 720-unit chart would draw its
+// text below the type scale (#329). The hidden one is display: none, so
+// assistive tech meets one chart.
+interface Props {
+  id: string;
+  title: string;
+  /** The finding in one or two sentences. Doubles as the SVG's description. */
+  summary: string;
+  svg: string;
+  /** The same chart drawn for phones, shown at its own width below 48rem. */
+  narrowSvg?: string;
+  columns: [string, string];
+  rows: [string | number, string | number][];
+  /** A note under the table, e.g. what the chart leaves out. */
+  note?: string;
+}
+
+const { id, title, summary, svg, narrowSvg, columns, rows, note } = Astro.props;
+---
+
+<figure class="chart" aria-labelledby={`${id}-title`}>
+  <h3 id={`${id}-title`}>{title}</h3>
+  <div class:list={["plot", narrowSvg && "plot--wide"]} set:html={svg} />
+  {narrowSvg && <div class="plot plot--narrow" set:html={narrowSvg} />}
+  <figcaption>{summary}</figcaption>
+  <details>
+    <summary>Show the data for “{title}”</summary>
+    <table>
+      <thead>
+        <tr><th scope="col">{columns[0]}</th><th scope="col">{columns[1]}</th></tr>
+      </thead>
+      <tbody>
+        {rows.map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
+      </tbody>
+    </table>
+    {note && <p class="meta">{note}</p>}
+  </details>
+</figure>
+
+<style>
+  .chart {
+    margin: 0 0 var(--s-7);
+  }
+  .plot {
+    max-width: 720px;
+  }
+  .plot--narrow {
+    display: none;
+  }
+  @media (max-width: 48rem) {
+    .plot--wide {
+      display: none;
+    }
+    .plot--narrow {
+      display: block;
+    }
+  }
+  figcaption {
+    margin-block: var(--s-3);
+    max-width: var(--t-measure);
+  }
+  details table {
+    border-collapse: collapse;
+    margin-top: var(--s-3);
+    font-size: var(--t-step--1);
+  }
+  details th,
+  details td {
+    text-align: left;
+    padding: var(--s-1) var(--s-4) var(--s-1) 0;
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+</style>

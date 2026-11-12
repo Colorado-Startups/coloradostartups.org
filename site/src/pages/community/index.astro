@@ -1,0 +1,250 @@
+---
+// /community/: who the community is for, where it meets and its norms.
+// Owner: L1. 301 target for /overview and /social-groups (ops/redirects).
+//
+// Founders first, then the startup community that backs them (decision 46).
+// Each channel says what to expect and its norms (channels.ts). The Code of
+// Conduct page belongs to L13. People fill every moderator and organizer seat;
+// the open ones come from data/team/positions.yaml (L9 renders them in full on
+// /get-involved/).
+import { comparePositions, WAYS_IN } from "@cs/shared";
+import { getCollection, getEntry } from "astro:content";
+
+import WelcomeDesk from "../../components/communitas/WelcomeDesk.astro";
+import { CHANNELS } from "../../components/hall/channels";
+import NewsletterSignup from "../../components/newsletter/NewsletterSignup.astro";
+import Badge from "../../components/ui/Badge.astro";
+import Banner from "../../components/ui/Banner.astro";
+import Button from "../../components/ui/Button.astro";
+import Card from "../../components/ui/Card.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { REGIONS } from "../../lib/regions/match";
+
+const communitas = await getEntry("dwarves", "communitas");
+if (!communitas) throw new Error("data/team/dwarves.yaml has no communitas entry");
+const disclosures = { communitas: communitas.data.disclosure };
+
+// getCollection returns positions sorted by id, not in file order. The shared
+// comparePositions() puts the community-wide seats first, then each region's
+// seat in region order, the same order /get-involved/ uses (L15).
+const regions = [...REGIONS];
+const openSeats = (await getCollection("positions"))
+  .map((p) => p.data)
+  .filter((p) => p.status === "open" && (p.area === "community" || p.area === "region"))
+  .sort(comparePositions(regions));
+
+const BACKERS = [
+  {
+    name: "Talent",
+    what: "People who want to join a startup, or already work at one. Meet founders before they post the role.",
+  },
+  {
+    name: "Investors and lenders",
+    what: "Angels, VCs and banks who back Colorado companies. Come to listen and to help.",
+  },
+  {
+    name: "Service providers",
+    what: "Lawyers, accountants, agencies and others who serve startups. Share your offers in the Wednesday Asks and Offers thread.",
+  },
+];
+---
+
+<BaseLayout
+  title="Community"
+  description="Who Colorado Startups is for, where the community meets and the norms in each place. Founders building companies in Colorado come first."
+  ogImage="community"
+>
+  <section class="section section--lit hero" aria-labelledby="community-title">
+    <div class="wrap">
+      <h1 id="community-title">Community</h1>
+      <p class="lede">
+        Colorado Startups is a community of entrepreneurs building companies in Colorado. Founders come first, and the
+        people who back them are welcome too.
+      </p>
+      <div class="btn-row">
+        <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
+        <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
+      </div>
+      <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="who">
+    <div class="wrap">
+      <h2 id="who">Who it is for</h2>
+      <div class="who">
+        <Card element="div" title="Founders" tone="gilded" data-audience="founders">
+          <Badge slot="badges" tone="gold">Comes first</Badge>
+          <p>
+            If you are building a company in Colorado, this community is for you. That covers an idea you are testing,
+            a company you are launching and one you are growing.
+          </p>
+          <p>Ask for help, share what you learn and celebrate your wins with people who know the work.</p>
+        </Card>
+        <Card element="div" title="The startup community that backs them" data-audience="backers">
+          <Badge slot="badges">Also welcome</Badge>
+          <dl>
+            {
+              BACKERS.map((b) => (
+                <div>
+                  <dt>{b.name}</dt>
+                  <dd>{b.what}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="where">
+    <div class="wrap">
+      <Banner tone="sky" id="where">Where we meet</Banner>
+      <p class="intro">Each place has its own rhythm. Here is what to expect, and the norms that keep it useful.</p>
+      <ul class="hall-grid channels" role="list">
+        {
+          CHANNELS.map((c) => (
+            <Card element="li" title={c.name} id={c.id} data-channel={c.id} class="channel">
+              {c.badge && <Badge slot="badges">{c.badge}</Badge>}
+              <p>{c.expect}</p>
+              <h4>Norms</h4>
+              <ul class="norms">
+                {c.norms.map((n) => (
+                  <li>{n}</li>
+                ))}
+              </ul>
+              {c.keeper && <p class="ai-note">{disclosures[c.keeper]}</p>}
+              {c.aside && (
+                <p class="aside">
+                  {c.aside.text} <a href={c.aside.href}>{c.aside.label}</a>
+                </p>
+              )}
+              <a slot="actions" class="community action" href={c.action.href}>
+                {c.action.label}
+              </a>
+            </Card>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="conduct">
+    <div class="wrap">
+      <h2 id="conduct">How we treat each other</h2>
+      <p>The Code of Conduct sets the norms for the Slack and the LinkedIn Group. In short:</p>
+      <ul class="conduct">
+        <li>Promote your company, product, service or open role in one place: the Wednesday Asks and Offers thread.</li>
+        <li>Never pitch an investment, whether a fund or an open round. A closed raise can be shared as a win.</li>
+        <li>No cold sales pitches by direct message. If one reaches you, tell a moderator.</li>
+        <li>Celebrate wins, and any press that gives Colorado positive exposure.</li>
+      </ul>
+      <Button variant="secondary" href="/code-of-conduct/">Read the Code of Conduct</Button>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="people">
+    <div class="wrap">
+      <h2 id="people">People run the community</h2>
+      <p>
+        Every moderator and organizer seat is for a person from the community. The AI keepers never moderate. These
+        seats are open now:
+      </p>
+      <ul class="seats" data-seats>
+        {
+          openSeats.map((seat) => (
+            <li>
+              <strong>{seat.title}.</strong> {seat.summary}
+            </li>
+          ))
+        }
+      </ul>
+      <Button href="/get-involved/">See every open position</Button>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="start">
+    <div class="wrap">
+      <h2 id="start">Find your way in</h2>
+      <div class="pair">
+        <WelcomeDesk />
+        <NewsletterSignup variant="full" returnTo="/community/" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The note under the Slack button says where it goes (#128). */
+  #slack-form-note {
+    margin: var(--s-3) 0 0;
+  }
+  .hero {
+    background:
+      radial-gradient(90% 80% at 50% 0%, color-mix(in oklab, var(--c-accent) 24%, transparent), transparent 70%),
+      var(--c-ground);
+  }
+  .intro {
+    color: var(--c-text-dim);
+    margin-bottom: var(--s-5);
+  }
+  .who {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: var(--s-5);
+    align-items: start;
+  }
+  .who dl {
+    margin: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+  .who dt {
+    font-weight: 700;
+  }
+  .who dd {
+    margin: 0;
+    color: var(--c-text-dim);
+  }
+  .channels {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  }
+  .channels :global([data-channel]) {
+    scroll-margin-top: var(--s-5);
+  }
+  .channels h4 {
+    font-size: var(--t-step-0);
+    margin-bottom: var(--s-2);
+  }
+  .norms {
+    padding-left: var(--s-5);
+  }
+  .norms li + li {
+    margin-top: var(--s-1);
+  }
+  .aside {
+    font-size: var(--t-step--1);
+  }
+  .action {
+    font-weight: 700;
+  }
+  .conduct li + li,
+  .seats li + li {
+    margin-top: var(--s-2);
+  }
+  /* The two panels stretch to one height, so their ledges line up. */
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+  /* minmax(0, 1fr), not 1fr: a bare 1fr track grows to its widest content,
+     and the signup's Turnstile box would push both panels past the gutter. */
+  @media (max-width: 760px) {
+    .who,
+    .pair {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

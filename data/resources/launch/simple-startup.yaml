@@ -1,0 +1,13 @@
+id: simple-startup
+name: Simple Startup
+url: https://simplestartup.com/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A Boulder firm. It offers fractional CFO, accounting and tax services to founders and executives of growing companies.
+tags:
+  - finance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

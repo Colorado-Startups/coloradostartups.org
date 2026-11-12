@@ -1,0 +1,79 @@
+name: export-dry-run
+
+# ADVISORY. Open-source plan, phase 1 (#552). Builds the public tree from
+# 04_tools/export_manifest.json into the runner's temp folder, then runs
+# gitleaks and 04_tools/export_scan.py over it. Nothing is pushed: the tree
+# never leaves the runner, and the job holds no token beyond a read of this
+# repo. The name, private-link and private-term scans need private inputs and
+# run where the archive is (the PR that added this file holds their results).
+#
+# gitleaks is the MIT release binary, pinned by version and SHA-256 exactly as
+# in secret-scan.yml; move the version and the SHA-256 in both together.
+#
+# Runs only when the export's own files change, or on demand.
+on:
+  pull_request:
+    paths:
+      - "04_tools/export_*"
+      - "04_tools/cs_site_lint*"
+      - ".gitleaksignore"
+      - ".github/workflows/export-dry-run.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: export-dry-run-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export-dry-run:
+    name: export-dry-run
+    # ubuntu-slim: seconds of work, at a third of ubuntu-latest's per-minute price (secret-scan.yml).
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install gitleaks (pinned release, SHA-256 checked)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "$RUNNER_TEMP/gitleaks.tgz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/gitleaks.tgz" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" version
+
+      - name: Self-tests (export and scan, known-bad and known-clean samples)
+        run: |
+          python3 04_tools/export_public.py --self-test
+          python3 04_tools/export_scan.py --self-test
+
+      - name: Build the public tree in the runner's temp folder
+        run: python3 04_tools/export_public.py --out "$RUNNER_TEMP/export" --list "$RUNNER_TEMP/export-files.txt"
+
+      # From the tree's root, so findings read file:rule:line and the exported
+      # .gitleaksignore applies (the beacon token, ruled public 2026-11-02).
+      - name: gitleaks over the exported tree
+        working-directory: ${{ runner.temp }}/export
+        run: '"$RUNNER_TEMP/gitleaks" dir --no-banner --redact --verbose .'
+
+      # A report, not a gate, until phase 3: findings (exit 1) warn and pass;
+      # a usage error (2) or could-not-check (3) stays red. CI holds none of
+      # the private inputs (names, private repos, the avoid list), so it runs
+      # the public checks only and says so in the table.
+      - name: export_scan over the exported tree (emails, phones, profiles, keys, links, image metadata)
+        run: |
+          rc=0
+          python3 04_tools/export_scan.py "$RUNNER_TEMP/export" --public-checks-only || rc=$?
+          if [ "$rc" -eq 1 ]; then
+            echo "::warning title=export_scan::findings; the table above lists them"
+          elif [ "$rc" -ne 0 ]; then
+            exit "$rc"
+          fi

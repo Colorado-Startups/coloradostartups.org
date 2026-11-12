@@ -1,0 +1,13 @@
+id: prodigyr
+name: ProdigyR
+url: https://www.prodigyr.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver IT recruiting firm that places contract and permanent technology talent. Its employers range from new startups to large companies.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

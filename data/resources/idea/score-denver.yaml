@@ -1,0 +1,13 @@
+id: score-denver
+name: SCORE Denver
+url: https://denver.score.org/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: A SCORE chapter for Metro Denver, Northern Colorado and southeast Wyoming. It offers free, confidential business mentoring. It also has free or low-cost workshops. Both are for entrepreneurs and small business owners.
+tags:
+  - skills
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

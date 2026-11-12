@@ -1,0 +1,9 @@
+id: stack-infrastructure
+name: "STACK Infrastructure"
+website: "https://www.stackinfra.com"
+hq_city: "Denver"
+sector: "Cloud and infrastructure"
+description: "Builds and runs data centers. Cloud, technology and AI customers use them."
+sources:
+  - "https://www.stackinfra.com/about/contact/"
+  - "https://stackinfra.com"

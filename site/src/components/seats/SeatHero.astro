@@ -1,0 +1,60 @@
+---
+// A seat page's hero (lane L38): the seat's art from the site's own image
+// pipeline, then a plaque with the title, decision 67's unpaid volunteer
+// line, the kit's one-liner and one button. The button jumps to the steps
+// (#how-to-apply), not past them to the form, so a reader sees how to apply
+// before applying.
+import ArtImage from "../art/ArtImage.astro";
+import { UNPAID_VOLUNTEER_LINE } from "../positions/positions";
+import Button from "../ui/Button.astro";
+import { withKeeperDisclosure } from "../../lib/seats/copy";
+import { HOW_TO_APPLY, type SeatLayout } from "../../lib/seats/layouts";
+import type { Seat } from "../../lib/seats/load";
+
+interface Props {
+  seat: Seat;
+  hero: SeatLayout["hero"];
+}
+
+const { seat, hero } = Astro.props;
+---
+
+<section class="section section--lit seat-hero" aria-labelledby="seat-title" data-seat-hero>
+  <div class="wrap">
+    <nav aria-label="Breadcrumb" class="crumbs">
+      <ol>
+        <li><a href="/get-involved/">Get involved</a></li>
+        <li aria-current="page">{seat.title}</li>
+      </ol>
+    </nav>
+    <ArtImage
+      src={hero.art}
+      alt={hero.alt}
+      aspect="21 / 9"
+      widths={[640, 960, 1280, 1920]}
+      sizes="(max-width: 1180px) 100vw, 1180px"
+      loading="eager"
+      motion="glow"
+      label="Illustration in progress"
+      class="seat-hero__art"
+    />
+    <div class="panel panel--raised seat-hero__plaque">
+      <p class="kicker">{hero.kicker}</p>
+      <h1 id="seat-title">{seat.title}</h1>
+      <p class="seat-status" data-unpaid-line>{UNPAID_VOLUNTEER_LINE}</p>
+      <p class="lede">{withKeeperDisclosure(seat.one_liner)}</p>
+      {
+        hero.pills.length > 0 && (
+          <ul class="seat-pills" aria-label="Where the seat works">
+            {hero.pills.map((p) => (
+              <li class="hall-badge">{p}</li>
+            ))}
+          </ul>
+        )
+      }
+      <p class="btn-row">
+        <Button href={`#${HOW_TO_APPLY}`} size="lg" data-hero-cta>{hero.cta}</Button>
+      </p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,50 @@
+---
+// The Hall's three AI keepers as gilded L12 cards, from data/team/dwarves.yaml
+// in that file's order, as on /team/. Owner: L1. Every card carries an "AI
+// agent" badge and the keeper's own disclosure line from that file, because
+// each keeper is disclosed as an AI agent wherever it appears. L7's small
+// portrait heads each card, over the keeper's name (#209); its alt text, from
+// portraitAlt(), says "AI agent" too.
+import { getCollection } from "astro:content";
+
+import { KIND_LABELS, portraitAlt } from "../art/keepers";
+import Portrait from "../art/Portrait.astro";
+import { inFileOrder } from "../team/order";
+import Badge from "../ui/Badge.astro";
+import Card from "../ui/Card.astro";
+
+const keepers = inFileOrder("dwarves", (await getCollection("dwarves")).map((k) => k.data));
+---
+
+<ul class="hall-grid keeper-teasers" role="list">
+  {
+    keepers.map((keeper) => (
+      <Card element="li" title={keeper.name} tone="gilded" mediaInset data-keeper={keeper.id}>
+        <Portrait
+          slot="media"
+          id={keeper.id}
+          size="small"
+          alt={portraitAlt(keeper.id, keeper.name, keeper.title)}
+          sizes="80px"
+          widths={[80, 160, 320]}
+        />
+        <Badge slot="badges">AI agent</Badge>
+        <Badge slot="badges">{KIND_LABELS[keeper.kind]}</Badge>
+        <p>
+          <strong>{keeper.title}.</strong> {keeper.role}
+        </p>
+        <p class="ai-note">{keeper.disclosure}</p>
+      </Card>
+    ))
+  }
+</ul>
+
+<style>
+  .keeper-teasers {
+    --portrait-small: 80px;
+  }
+  /* Line the portrait up with the card's text, which sits at --s-5. */
+  .keeper-teasers :global(.hall-card__media--inset) {
+    padding: var(--s-5) var(--s-5) 0;
+  }
+</style>

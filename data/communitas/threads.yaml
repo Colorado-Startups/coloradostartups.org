@@ -1,0 +1,110 @@
+# Approved Slack thread openers. The Communitas cron posts only entries from
+# this file. Paul approves the library; L10 owns it since 2026-10-18. Each
+# opener asks exactly one question, matching the LinkedIn Group rhythm
+# (LinkedIn project, W2).
+#
+# Founders first (decision 46): every opener speaks to founders before anyone
+# else. Wednesday Asks and Offers is the one thread where service providers,
+# and anyone else, share offers or promote their own work.
+#
+# Rotation: on each Monday, Wednesday and Friday the cron posts one opener for
+# that day, moving to the next one each week and starting over at the end.
+# Openers never mention anyone, because Communitas never pings people.
+# "The future is bright" is Paul's own closing line, so Communitas does not use it.
+#
+# After any edit, run `node workers/communitas/scripts/sync-library.mjs`.
+
+- id: mon-welcome-1
+  day: mon
+  title: Monday Welcome
+  body: >-
+    Hi Startupers, welcome to everyone who joined this week. Founders, tell us what
+    you are building and which part of Colorado you call home. If you work with
+    founders, tell us how you help them. What would help you most this month?
+
+- id: mon-welcome-2
+  day: mon
+  title: Monday Welcome
+  body: >-
+    Hi Startupers, a warm welcome to everyone new this week. Founders, share your
+    name, your company and your corner of Colorado. Who was the first person here
+    who helped you as a founder?
+
+- id: mon-welcome-3
+  day: mon
+  title: Monday Welcome
+  body: >-
+    Hi Startupers, welcome to the newest members of the community. Founders,
+    introduce yourself with what you are building and what you did before it. What
+    could other founders ask you about?
+
+- id: mon-welcome-4
+  day: mon
+  title: Monday Welcome
+  body: >-
+    Hi Startupers, welcome to all of you who joined this week. Founders, say hello
+    with your company and your town. What made you choose Colorado to build your
+    company?
+
+- id: wed-asks-offers-1
+  day: wed
+  title: Asks and Offers
+  body: >-
+    It is Wednesday, so this is the thread for asks and offers. Founders, post what
+    you need, one ask per comment. Service providers and anyone else with an offer,
+    this is the one thread to share it, one comment each. What do you need help
+    with this week?
+
+- id: wed-asks-offers-2
+  day: wed
+  title: Asks and Offers
+  body: >-
+    Asks and Offers is open for the week. Founders, bring the intro, the hire or the
+    advice you need. Offers, open roles and promotion of your own work belong in
+    this thread and nowhere else, one comment each. Who do you want to meet in
+    Colorado this month?
+
+- id: wed-asks-offers-3
+  day: wed
+  title: Asks and Offers
+  body: >-
+    It is Wednesday, and Asks and Offers is open. Founders, post one ask per
+    comment. Service providers, post one offer per comment, and keep promotion in
+    this thread. What technical problem are you stuck on right now?
+
+- id: wed-asks-offers-4
+  day: wed
+  title: Asks and Offers
+  body: >-
+    Asks and Offers, midweek edition. Founders, share an ask or an open role.
+    Service providers, share one offer, here and only here. What would move your
+    company forward this month?
+
+- id: fri-wins-1
+  day: fri
+  title: Colorado Wins
+  body: >-
+    Colorado Wins, Friday edition. Founders, share a launch, a first customer, a new
+    hire or any good news. What went right for you this week?
+
+- id: fri-wins-2
+  day: fri
+  title: Colorado Wins
+  body: >-
+    Colorado Wins is open. Founders, share a customer, a launch, a hire or a solved
+    problem. Small wins count too. Who said yes to you this month?
+
+- id: fri-wins-3
+  day: fri
+  title: Colorado Wins
+  body: >-
+    It is Friday, so it is time for Colorado Wins. Founders, big or small, share the
+    good news from your week. Everyone else, cheer them on. What did you ship this
+    week?
+
+- id: fri-wins-4
+  day: fri
+  title: Colorado Wins
+  body: >-
+    Colorado Wins, end of the week edition. Founders, share a new customer, a first
+    hire or a bug finally fixed. Who on your team deserves a shout-out this week?

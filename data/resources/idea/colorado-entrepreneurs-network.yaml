@@ -1,0 +1,14 @@
+id: colorado-entrepreneurs-network
+name: Colorado Entrepreneurs Network
+url: https://www.meetup.com/ColoradoEntrepreneurs/
+stage: idea
+substage: validate
+city: Colorado Springs
+type: community
+description: Meetup for finding cofounders and teammates in Colorado Springs.
+tags:
+  - team
+  - meetup
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

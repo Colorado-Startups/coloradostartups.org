@@ -1,0 +1,13 @@
+id: greenmont-capital
+name: Greenmont Capital
+url: https://www.greenmontcapital.com/
+stage: growth
+substage: investors
+city: Boulder
+type: investor
+description: Venture capital firm for seed-plus rounds in Boulder.
+tags:
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

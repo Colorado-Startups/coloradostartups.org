@@ -1,0 +1,10 @@
+id: luxonis
+name: "Luxonis"
+website: "https://www.luxonis.com/"
+hq_city: "Denver"
+founded_year: 2019
+sector: "Hardware and robotics"
+description: "Makes AI vision cameras and open-source software. Robots and automated machines use them for depth perception."
+sources:
+  - "https://siliconangle.com/2026/07/03/luxonis-raises-14m-develop-vision-layer-intelligent-automation/"
+  - "https://www.luxonis.com/"

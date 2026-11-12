@@ -1,0 +1,14 @@
+id: mergelane-quickpitch
+name: MergeLane QuickPitch
+url: https://www.mergelane.com/quick-pitch
+stage: launch
+substage: develop
+city: Boulder
+type: event
+description: An online event. Startups with a woman in leadership pitch the MergeLane team and get feedback.
+tags:
+  - pitch
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

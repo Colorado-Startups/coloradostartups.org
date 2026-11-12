@@ -1,0 +1,26 @@
+/* The style guide's shared rules, for the page and the three section
+   components in this folder. Each section's own rules sit in its scoped
+   <style>, so Astro scopes them as it did on the page. These four set
+   properties no global rule competes for, and no shared component draws a
+   <code> or a .stack, so they reach only the style guide's own markup. */
+
+/* A heading that follows content in the same band gets a clear gap, not
+   the stack's 16 px, so each part reads as its own section (#252). */
+.stack > h2:not(:first-child) {
+  margin-top: var(--s-8);
+}
+.sg-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--s-5);
+  align-items: start;
+}
+.sg-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+/* 15 px in 18 px body text, the --t-step--1 size. */
+code {
+  font-size: 0.8333em;
+}

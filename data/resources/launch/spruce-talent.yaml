@@ -1,0 +1,15 @@
+id: spruce-talent
+name: Spruce Talent
+url: https://www.sprucetalent.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A talent advisory and executive search firm. Its clients are early and growth-stage technology companies. It has hiring experience in AI and robotics.
+tags:
+  - hiring
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: brownstein-hyatt-farber-schreck-llp
+name: Brownstein Hyatt Farber Schreck, LLP
+url: https://www.bhfs.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A law firm. It has corporate and securities practices. It has real estate and natural resources practices. It has intellectual property and technology transactions practices.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

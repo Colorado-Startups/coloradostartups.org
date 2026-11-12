@@ -1,0 +1,13 @@
+id: scic
+name: SCIC
+url: https://www.scicteam.com/
+stage: growth
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: A business insurance firm. It is in Colorado Springs.
+tags:
+  - insurance
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

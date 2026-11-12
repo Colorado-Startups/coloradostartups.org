@@ -1,0 +1,13 @@
+id: pitchcamp
+name: PitchCamp
+url: https://www.meetup.com/PitchCampCO/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: Denver group for practicing pitches, speaking and presentations in front of an audience.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

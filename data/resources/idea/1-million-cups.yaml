@@ -1,0 +1,13 @@
+id: 1-million-cups
+name: 1 Million Cups
+url: https://www.1millioncups.com/
+stage: idea
+substage: educate
+city: statewide
+type: event
+description: An open startup gathering.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

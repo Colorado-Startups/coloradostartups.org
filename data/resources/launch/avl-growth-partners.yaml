@@ -1,0 +1,13 @@
+id: avl-growth-partners
+name: AVL Growth Partners
+url: https://avlgrowth.com/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A Boulder finance firm. It offers fractional CFOs, finance teams and financial modeling for growing companies.
+tags:
+  - finance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

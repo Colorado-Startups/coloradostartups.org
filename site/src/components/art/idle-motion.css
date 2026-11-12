@@ -1,0 +1,106 @@
+/* Idle motion for the Hall's art: lantern flicker and ember drift.
+   Motion is opt-in. It runs only inside prefers-reduced-motion: no-preference;
+   otherwise the glow holds still and the embers stay hidden. global.css also
+   stops every animation under reduce, so the two rules agree.
+   Every animation ends within 5 seconds of load and rests on its still frame,
+   so WCAG 2.2.2 (pause, stop, hide) needs no pause control.
+   site/test/unit/l7/motion.test.ts holds that limit.
+   Only opacity and transform animate, so the browser composites them cheaply.
+   Shared by ArtImage.astro and Portrait.astro; every class starts with "art-". */
+
+.art-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* A warm pool of light over the picture's own light source. */
+.art-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    var(--glow-r, 38%) var(--glow-r, 38%) at var(--glow-x, 50%) var(--glow-y, 70%),
+    color-mix(in oklab, var(--c-accent) 32%, transparent),
+    color-mix(in oklab, var(--c-fire) 8%, transparent) 55%,
+    transparent 75%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+
+/* Embers rise from the bottom band of the picture. */
+.art-embers {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.art-embers > i {
+  position: absolute;
+  bottom: var(--ember-y, 10%);
+  left: var(--x, 50%);
+  width: var(--size, 4px);
+  height: var(--size, 4px);
+  border-radius: 50%;
+  background: var(--c-accent);
+  box-shadow: 0 0 6px 2px color-mix(in oklab, var(--c-fire) 55%, transparent);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .art-glow {
+    animation: art-flicker 2.4s ease-in-out 2 forwards;
+  }
+  .art-embers {
+    display: block;
+  }
+  .art-embers > i {
+    animation: art-ember var(--t, 3.4s) ease-out var(--d, 0s) 1 forwards;
+  }
+}
+
+/* Uneven steps, so the flicker never reads as a metronome. It starts and ends
+   on the resting opacity, 0.7, so stopping leaves no jump. */
+@keyframes art-flicker {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  18% {
+    opacity: 0.78;
+  }
+  31% {
+    opacity: 0.66;
+  }
+  47% {
+    opacity: 0.84;
+  }
+  63% {
+    opacity: 0.7;
+  }
+  81% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes art-ember {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  65% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(var(--dx, 12px), calc(var(--rise, 140px) * -1)) scale(0.4);
+    opacity: 0;
+  }
+}

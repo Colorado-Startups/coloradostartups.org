@@ -1,0 +1,13 @@
+id: businessden
+name: BusinessDen
+url: https://businessden.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: media
+description: A Denver business news outlet. It covers real estate, law, startups and banking. It also offers events and a daily newsletter.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

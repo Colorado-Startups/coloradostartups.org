@@ -1,0 +1,104 @@
+---
+// /get-involved/<seat id>/: one page for each unpaid volunteer seat that takes
+// applications (lane L38): the Slack Community Lead and the Photon Mountain,
+// Fusion Canyon and Space Peak Connectors. Decision 75 lifted decision 67's
+// hold, so people may take these seats; they serve Colorado Startups, Ltd.
+//
+// The words come from the volunteer kit, copied into data/positions/ by
+// scripts/positions/sync-volunteers.mjs and read by lib/seats/load.ts. The
+// layout ports the kit's final pages/<seat id>.html (lib/seats/layouts.ts),
+// in the kit README's order: what you get, how it grows your network, how it
+// helps Colorado, who we are looking for, how to apply. The seat's title,
+// area and courses stay in data/team/positions.yaml, and
+// site/test/unit/l38/ fails if the kit's copy disagrees with it.
+//
+// Copy rules (decision 67, the kit owner): the page says
+// UNPAID_VOLUNTEER_LINE once. No "paid", "pay", "salary", "stipend",
+// "hiring", "hire", "job" or "contributor"; costs are "reimbursed". Every
+// figure is a fact marked R and not gated, with its footnote. Communitas is
+// an AI agent wherever it appears, and people moderate. No JobPosting or other
+// JSON-LD: these are not job ads. site/test/dom/l38/ checks each rule.
+import { comparePositions } from "@cs/shared";
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+
+import { applyHref, takesApplications } from "../../components/positions/positions";
+import OtherSeats from "../../components/seats/OtherSeats.astro";
+import SeatBlock from "../../components/seats/SeatBlock.astro";
+import SeatHero from "../../components/seats/SeatHero.astro";
+import SeatSources from "../../components/seats/SeatSources.astro";
+import "../../components/seats/seats.css";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { REGIONS } from "../../lib/regions/match";
+import { HOW_TO_APPLY, SEAT_LAYOUTS, SECTION_KICKERS, SECTION_ORDER, hasLayout, layoutRefs } from "../../lib/seats/layouts";
+import { loadCommon, loadFacts, loadGeo, loadSeats, seatCourses } from "../../lib/seats/load";
+import { seatPageDescription, seatPageTitle, type SeatContext } from "../../lib/seats/page";
+import { numberSources } from "../../lib/seats/sources";
+
+export const getStaticPaths = (async () => {
+  const regions = [...REGIONS];
+  const positions = (await getCollection("positions")).map((e) => e.data).sort(comparePositions(regions));
+  const kit = new Map(loadSeats().map((s) => [s.id, s]));
+  for (const id of kit.keys()) {
+    if (!hasLayout(id)) throw new Error(`data/positions/${id}.yaml has no layout in lib/seats/layouts.ts`);
+    if (!positions.some((p) => p.id === id)) throw new Error(`data/positions/${id}.yaml names no seat in data/team/positions.yaml`);
+  }
+  // Only seats that take applications get a page, in /get-involved/'s order.
+  const seats = positions.filter((p) => takesApplications(p) && kit.has(p.id)).map((p) => ({ position: p, seat: kit.get(p.id)! }));
+  return seats.map(({ position, seat }) => ({
+    params: { seat: seat.id },
+    props: { position, seat, others: seats.filter((s) => s.seat.id !== seat.id).map((s) => s.seat) },
+  }));
+}) satisfies GetStaticPaths;
+
+const { position, seat, others } = Astro.props;
+const layout = SEAT_LAYOUTS[seat.id as keyof typeof SEAT_LAYOUTS];
+const common = loadCommon();
+const facts = loadFacts();
+const courses = seatCourses(seat, common);
+const communitas = (await getCollection("dwarves")).map((e) => e.data).find((d) => d.id === "communitas");
+if (!communitas) throw new Error("data/team/dwarves.yaml has no communitas");
+
+const ctx: SeatContext = {
+  seat,
+  common,
+  facts,
+  geo: loadGeo(),
+  courses,
+  notes: numberSources(layoutRefs(layout), facts, courses, common),
+  keeper: { id: "communitas", name: communitas.name, title: communitas.title, disclosure: communitas.disclosure },
+  applyHref: applyHref(position),
+};
+
+const TONES = { get: "band", network: "stone", colorado: "lit", who: "band", apply: "hearth" } as const;
+---
+
+<BaseLayout title={seatPageTitle(seat)} description={seatPageDescription(seat)} ogImage="get-involved">
+  <SeatHero seat={seat} hero={layout.hero} />
+
+  {
+    SECTION_ORDER.map((key) => {
+      const section = layout.sections[key];
+      const id = key === "apply" ? HOW_TO_APPLY : `seat-${key}`;
+      return (
+        <section
+          class:list={["section", `section--${TONES[key]}`, "seat-section"]}
+          id={id}
+          aria-labelledby={`${id}-title`}
+          data-question={key}
+        >
+          <div class="wrap">
+            <p class="kicker">{SECTION_KICKERS[key]}</p>
+            <h2 id={`${id}-title`}>{section.heading}</h2>
+            {section.blocks.map((block) => (
+              <SeatBlock block={block} ctx={ctx} />
+            ))}
+          </div>
+        </section>
+      );
+    })
+  }
+
+  <OtherSeats seats={others} />
+  <SeatSources entries={ctx.notes.entries} />
+</BaseLayout>

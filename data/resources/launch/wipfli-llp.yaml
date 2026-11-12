@@ -1,0 +1,13 @@
+id: wipfli-llp
+name: Wipfli LLP
+url: https://www.wipfli.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: An accounting and advisory firm. It offers audit, tax, outsourced accounting and CFO services. It serves businesses across many industries.
+tags:
+  - finance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

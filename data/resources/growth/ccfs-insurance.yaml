@@ -1,0 +1,13 @@
+id: ccfs-insurance
+name: CCFS Insurance
+url: https://ccfs.net/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: An insurance and benefits agency. It sells health, dental, vision, disability, life and retirement plans. It serves both people and business groups.
+tags:
+  - insurance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

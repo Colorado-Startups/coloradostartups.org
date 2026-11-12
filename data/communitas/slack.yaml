@@ -1,0 +1,62 @@
+# Communitas's Slack copy. Everything Communitas posts in Slack comes from this
+# file, from threads.yaml (the weekly openers) or from Resourcus's answers.
+# L10 owns it since 2026-10-18; Paul approves it.
+#
+# Founders come first in every message (decision 46). The wider startup
+# community (talent, capital and service providers) comes second, and service
+# providers share offers in the Wednesday Asks and Offers thread. Communitas
+# never moderates; people do (decision 43). "Startup Resources" is the
+# Ecosystem Canvas's new title (decision 46).
+#
+# The Worker reads a generated copy. After any edit here, in threads.yaml or in
+# data/team/dwarves.yaml, run `node workers/communitas/scripts/sync-library.mjs`.
+# The parity test in site/test/unit/l5/ fails until you do.
+#
+# Paths are site paths. The Worker puts SITE_ORIGIN in front, so staging links
+# stay on staging. The AI disclosure lines come from data/team/dwarves.yaml, so
+# there is one source for them.
+
+welcome:
+  id: welcome-2
+  lines:
+    - Welcome to the Colorado Startups Slack, where Colorado founders help each other build. I'm Communitas, the keeper of the doors.
+    - If you are building a company, say hello in this week's Monday Welcome thread and tell us what you are building.
+    - Bring your asks to the Wednesday Asks and Offers thread. It is also the one place for service providers to share offers.
+    - Read the Code of Conduct before you post. People moderate this Slack. I never do.
+    - Have a question about Colorado startup resources? Mention @Communitas in a channel I am in, and I will answer in a thread.
+    - This is the only message I will send you unprompted.
+  links:
+    - label: Code of Conduct
+      path: /code-of-conduct/
+    - label: The Startupers newsletter
+      path: /newsletter/
+    - label: Every way into the community
+      path: /links/
+
+help:
+  lines:
+    - I'm Communitas, the keeper of the doors. I welcome new members, open the weekly threads and answer questions about Colorado startup resources.
+    - To ask, mention @Communitas in a channel I am in. I answer in a thread with matches from Startup Resources, which Resourcus finds for me.
+    - The weekly threads are Monday Welcome, Wednesday Asks and Offers, and Friday Colorado Wins.
+    - Founders bring asks on Wednesday. Service providers share offers in that same thread, the one place for offers.
+    - I send one welcome message to each new member. I never message anyone else unprompted.
+    - I never moderate. People moderate this Slack, under the Code of Conduct.
+  links:
+    - label: Code of Conduct
+      path: /code-of-conduct/
+    - label: Every way into the community
+      path: /links/
+
+answer:
+  resources_heading: From Startup Resources
+  canvas_label: Browse all Startup Resources
+  canvas_path: /ecosystem-canvas/
+  empty_question: Ask me about Colorado startup resources. For example, "Who helps first-time founders in Boulder?"
+  too_long: That question is long for me. Ask one specific thing in a shorter message.
+  rate_limited: You have asked a lot in the last minute. Try again in a minute.
+  fallback:
+    budget: Resourcus has used its question budget for this month, so here are the closest matches from Startup Resources.
+    rate-limit: Resourcus is busy right now, so here are the closest matches from Startup Resources.
+    error: I could not reach Resourcus just now. You can browse Startup Resources yourself.
+    unsafe: I cannot help with that question. You can browse Startup Resources yourself.
+    no-match: Startup Resources has no good match for that. Try other words, or browse it by stage.

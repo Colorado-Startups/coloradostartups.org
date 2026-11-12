@@ -1,0 +1,312 @@
+---
+// The board: a plain semantic table that reads fully without JavaScript, in
+// A to Z order. A small island (honorees-table-client.ts) adds column sorting
+// (buttons in the headers, aria-sort on the active column) and a filter by
+// search, sector and HQ city.
+// Rows are never sorted by any outside rank.
+//
+// Below 600 px each row draws as a card: the company, then each fact with its
+// label, and the sort buttons wrap above the cards (#145). The explicit roles
+// keep the table's semantics where a browser drops them for display: block.
+// There is no Founded column: 84 of 115 rows said "Not stated" (2026-11-02),
+// so the year shows under the description only when a source states it.
+import type { BoardRow } from "../../lib/leaderboard/board";
+import { optionsFrom } from "./honorees-filter";
+
+interface Props {
+  rows: BoardRow[];
+  caption: string;
+  /** Public notes by company id (data/leaderboard/notes.yaml). */
+  notes?: Readonly<Record<string, string>>;
+}
+
+const { rows, caption, notes = {} } = Astro.props;
+
+const columns = [
+  { key: "name", label: "Company", kind: "text" },
+  { key: "sector", label: "Sector", kind: "text" },
+  { key: "city", label: "HQ city", kind: "text" },
+  { key: "boards", label: "Boards", kind: "text" },
+] as const;
+
+const sectors = optionsFrom(rows.map((r) => r.company.sector));
+const cities = optionsFrom(rows.map((r) => r.company.hq_city));
+---
+
+<div class="board" data-sortable-table>
+  <form class="honoree-filters panel" role="search" aria-label="Filter the honorees" data-honoree-filters hidden>
+    <div class="honoree-filters__grid">
+      <div class="field">
+        <label for="honoree-q">Search</label>
+        <input id="honoree-q" name="q" type="search" autocomplete="off" maxlength="100" />
+      </div>
+      <div class="field">
+        <label for="honoree-sector">Sector</label>
+        <select id="honoree-sector" name="sector">
+          <option value="">All sectors</option>
+          {sectors.map((s) => <option value={s}>{s}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="honoree-city">HQ city</label>
+        <select id="honoree-city" name="city">
+          <option value="">All cities</option>
+          {cities.map((c) => <option value={c}>{c}</option>)}
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--stone" type="reset">Clear filters</button>
+    </div>
+  </form>
+  <div class="scroll" role="region" aria-label={caption} tabindex="0">
+    <table role="table">
+      <caption>{caption}</caption>
+      <thead role="rowgroup">
+        <tr role="row">
+          {
+            columns.map((c, i) => (
+              <th scope="col" role="columnheader" data-kind={c.kind} aria-sort={i === 0 ? "ascending" : undefined}>
+                <button type="button" data-col={i}>
+                  {c.label}
+                  <span class="sort-icon" aria-hidden="true" />
+                </button>
+              </th>
+            ))
+          }
+          <th scope="col" role="columnheader">Sources</th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {
+          rows.map(({ company, groups }) => (
+            <tr id={`company-${company.id}`} role="row" data-sector={company.sector} data-city={company.hq_city}>
+              <th scope="row" role="rowheader" data-sort={company.name}>
+                <a href={company.website} rel="noopener">
+                  {company.name}
+                </a>
+                <span class="desc">{company.description}</span>
+                {company.founded_year && <span class="founded">Founded {company.founded_year}</span>}
+                {notes[company.id] && <span class="note">{notes[company.id]}</span>}
+              </th>
+              <td role="cell" data-sort={company.sector}>
+                <span class="cell-label">Sector: </span>
+                {company.sector}
+              </td>
+              <td role="cell" data-sort={company.hq_city}>
+                <span class="cell-label">HQ city: </span>
+                {company.hq_city}
+              </td>
+              <td role="cell" data-sort={groups.join(", ")}>
+                <span class="cell-label">Boards: </span>
+                {groups.join(", ")}
+              </td>
+              <td role="cell">
+                <span class="cell-label">Sources: </span>
+                <ul class="sources">
+                  {company.sources.map((src, n) => (
+                    <li>
+                      <a href={src} rel="noopener nofollow">
+                        Source {n + 1}
+                        <span class="visually-hidden"> for {company.name}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="meta" aria-live="polite" data-sort-status></p>
+</div>
+
+<script>
+  import { initHonoreesTables } from "./honorees-table-client";
+
+  initHonoreesTables(document);
+</script>
+
+<style>
+  .honoree-filters {
+    margin-bottom: var(--s-4);
+  }
+  .honoree-filters__grid {
+    display: grid;
+    gap: 0 var(--s-4);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+  /* position: relative makes this box the containing block for the
+     absolutely positioned .visually-hidden source labels, so they clip
+     here instead of widening the page at 375 px (#242). */
+  .scroll {
+    position: relative;
+    overflow-x: auto;
+    border: var(--line-hair) solid var(--c-rule);
+    border-radius: var(--r-chisel);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--t-step--1);
+  }
+  caption {
+    text-align: left;
+    padding: var(--s-3);
+    font-weight: 700;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: var(--s-2) var(--s-3);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  thead th {
+    background: var(--c-surface);
+    vertical-align: middle;
+  }
+  /* A sortable heading is all button, so the whole cell is the target. The
+     button is at least --size-tap (44 px) tall, the tap target goal; the text
+     alone made a 23 px target at 375 px (#241). */
+  thead th[data-kind] {
+    padding: 0;
+  }
+  thead button {
+    display: flex;
+    align-items: center;
+    gap: var(--s-1);
+    width: 100%;
+    min-height: var(--size-tap);
+    padding: var(--s-2) var(--s-3);
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  thead button:hover {
+    text-decoration: underline;
+  }
+  /* The cell has no padding and .scroll clips its overflow, so the global
+     ring (3 px at a 3 px offset) lost its left side on Company. Inset it by
+     its own width so all four sides draw inside the button. */
+  thead button:focus-visible {
+    outline-offset: calc(-1 * var(--line-bold));
+  }
+  /* The arrow sits in an aria-hidden span, so a screen reader hears only the
+     column name, then the sort state from aria-sort. Every column shows one:
+     the up and down arrow marks a column that sorts but is not sorted (#241). */
+  .sort-icon::after {
+    content: "\2195";
+    color: var(--c-text-dim);
+  }
+  th[aria-sort="ascending"] .sort-icon::after {
+    content: "\25B2";
+    color: inherit;
+  }
+  th[aria-sort="descending"] .sort-icon::after {
+    content: "\25BC";
+    color: inherit;
+  }
+  tbody th {
+    font-weight: 400;
+    min-width: 16rem;
+  }
+  tbody th a {
+    font-weight: 700;
+  }
+  .desc,
+  .founded {
+    display: block;
+    color: var(--c-text-dim);
+  }
+  .note {
+    display: block;
+    margin-top: var(--s-1);
+    font-style: italic;
+    color: var(--c-text-dim);
+  }
+  /* The column heading names each fact in the table; a card names its own. */
+  .cell-label {
+    display: none;
+  }
+  .sources {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+  }
+  /* Each source link is at least 24 px tall, the WCAG 2.2 minimum target
+     (SC 2.5.8). The text alone made an 18 px row (#119). */
+  .sources a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--s-5);
+  }
+
+  /* Below 600 px: a card per row, nothing to scroll sideways. The sort
+     buttons wrap in a row above the cards; Sources does not sort, so its
+     heading goes, and each card labels its own sources. */
+  @media (max-width: 37.4375rem) {
+    .scroll {
+      overflow-x: visible;
+    }
+    table,
+    thead,
+    tbody,
+    tr,
+    th,
+    td,
+    caption {
+      display: block;
+    }
+    thead tr {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+      padding: 0 var(--s-3) var(--s-3);
+      background: var(--c-surface);
+    }
+    thead th {
+      border: var(--line-hair) solid var(--c-rule);
+      border-radius: var(--r-chisel);
+    }
+    thead th:not([data-kind]) {
+      display: none;
+    }
+    caption {
+      background: var(--c-surface);
+    }
+    tbody tr {
+      display: grid;
+      gap: var(--s-1);
+      padding: var(--s-3);
+      border-top: var(--line-hair) solid var(--c-rule);
+    }
+    /* display: grid above would beat the hidden attribute's own rule. */
+    tbody tr[hidden] {
+      display: none;
+    }
+    tbody th,
+    tbody td {
+      min-width: 0;
+      padding: 0;
+      border: 0;
+    }
+    .cell-label {
+      display: inline;
+      font-weight: 700;
+    }
+    .sources {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0 var(--s-3);
+      white-space: normal;
+    }
+  }
+</style>

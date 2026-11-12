@@ -1,0 +1,15 @@
+id: industrious-office
+name: Industrious Office
+url: https://www.industriousoffice.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: coworking
+description: A coworking company with Colorado sites in Denver and Boulder. Locations include Downtown Denver, LoHi and Pearl Street. It offers coworking memberships and private offices for teams. It also has on-demand meeting rooms.
+tags:
+  - coworking
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

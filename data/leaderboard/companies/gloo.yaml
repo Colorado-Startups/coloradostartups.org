@@ -1,0 +1,9 @@
+id: gloo
+name: "Gloo"
+website: "https://gloo.com"
+hq_city: "Boulder"
+founded_year: 2013
+sector: "Software"
+description: "Provides a technology platform to help reach and care for people. Churches, faith-based groups and developers use it."
+sources:
+  - "https://gloo.com/about"

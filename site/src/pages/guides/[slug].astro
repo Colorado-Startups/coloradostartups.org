@@ -1,0 +1,22 @@
+---
+// /guides/<slug>/: one answer page, built from Startup Resources at build
+// time. Owner: L23; L32 added the city and events guides. lib/guides/guides.ts
+// decides what each guide says and lists; this page only renders it and passes
+// its ItemList to BaseLayout.
+import type { GetStaticPaths } from "astro";
+
+import GuidePage from "../../components/guides/GuidePage.astro";
+import { guideInput } from "../../components/guides/guide-data";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { buildGuide, GUIDE_SLUGS, guideJsonLd, otherGuides } from "../../lib/guides/guides";
+
+export const getStaticPaths = (() => GUIDE_SLUGS.map((slug) => ({ params: { slug } }))) satisfies GetStaticPaths;
+
+const { slug } = Astro.params;
+const guide = buildGuide(slug, await guideInput());
+const site = Astro.site!;
+---
+
+<BaseLayout title={guide.title} description={guide.description} jsonLd={guideJsonLd(guide, site)}>
+  <GuidePage guide={guide} others={otherGuides(slug)} />
+</BaseLayout>

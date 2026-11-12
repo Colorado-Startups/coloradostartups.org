@@ -1,0 +1,130 @@
+/* Size-matched fallbacks for the two web fonts, so the swap to a web font
+   moves nothing (e2e/l5a.spec.ts compares each page's first screen with the
+   web fonts blocked and loaded).
+
+   Alegreya Sans: Astro's own fallback is turned off (astro.config.mjs). It
+   measured the italic file (average width 0.353 em) and applied it to upright
+   text, which is 0.387 em at 400 and 0.397 em at 700, so its fallback drew
+   9 to 11 percent narrow: buttons that wrap in Alegreya fitted on one row in
+   the fallback, then moved (/leaderboard/ mobile CLS 0.12 on production,
+   #762). The overrides below come from the upright files themselves
+   (@capsizecss/unpack on production's woff2, 2026-11-04: ascent 0.9 em,
+   descent 0.3 em, average width 0.387, 0.391 and 0.397 em at 400, 500 and
+   700) against Astro's metrics for Arial (average width 913 of 2048) and
+   Arial Bold (983), with Astro's formula. Liberation Sans and Arimo share
+   Arial's metrics, so one face covers Mac, iOS, Windows and Linux. Roboto is
+   Android's sans (Astro's metrics: width 911 of 2048); Roboto Bold has no
+   published metrics here, so bold text synthesizes from the regular face.
+   Italic text has its own Arial faces, sized from Alegreya's italic files
+   (average width 0.353, 0.359 and 0.370 em at 400, 500 and 700) against
+   Arial Italic and Arial Bold Italic, whose average widths equal Arial's and
+   Arial Bold's (913 and 983 of 2048, measured in macOS's Arial files,
+   2026-11-04). Roboto Italic was not measured, so Android italic keeps the
+   upright Roboto face.
+
+   Cinzel: Astro's fallback stays (one variable file, measured as is); the
+   Liberation Serif and Tinos face adds Linux, with Astro's Times New Roman
+   overrides (production CSS, 2026-11-04).
+
+   Each face covers only the web fonts' Latin subset (their unicode-range in
+   the built CSS). A symbol neither web font has, such as the leaderboard's
+   sort arrows or a "→", skips these sized-down faces and draws from the
+   system font at full size. */
+
+@font-face {
+  font-family: "Alegreya Sans Fallback Arial";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo");
+  font-weight: 400;
+  font-style: normal;
+  size-adjust: 86.8101%;
+  ascent-override: 103.6746%;
+  descent-override: 34.5582%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Alegreya Sans Fallback Arial";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo");
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 87.7073%;
+  ascent-override: 102.6140%;
+  descent-override: 34.2047%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Alegreya Sans Fallback Arial";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Arimo Bold");
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 82.7117%;
+  ascent-override: 108.8117%;
+  descent-override: 36.2706%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Alegreya Sans Fallback Arial";
+  src: local("Arial Italic"), local("Arial-ItalicMT"), local("Liberation Sans Italic"), local("Arimo Italic");
+  font-weight: 400;
+  font-style: italic;
+  size-adjust: 79.1834%;
+  ascent-override: 113.6603%;
+  descent-override: 37.8868%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Alegreya Sans Fallback Arial";
+  src: local("Arial Italic"), local("Arial-ItalicMT"), local("Liberation Sans Italic"), local("Arimo Italic");
+  font-weight: 500;
+  font-style: italic;
+  size-adjust: 80.5292%;
+  ascent-override: 111.7606%;
+  descent-override: 37.2535%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Alegreya Sans Fallback Arial";
+  src: local("Arial Bold Italic"), local("Arial-BoldItalicMT"), local("Liberation Sans Bold Italic"), local("Arimo Bold Italic");
+  font-weight: 700;
+  font-style: italic;
+  size-adjust: 77.0865%;
+  ascent-override: 116.7520%;
+  descent-override: 38.9173%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Alegreya Sans Fallback Roboto";
+  src: local("Roboto"), local("Roboto Regular");
+  font-weight: 400;
+  font-style: normal;
+  size-adjust: 87.0007%;
+  ascent-override: 103.4475%;
+  descent-override: 34.4825%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Cinzel Fallback Liberation";
+  src: local("Liberation Serif"), local("Tinos");
+  font-weight: 600;
+  size-adjust: 136.8615%;
+  ascent-override: 71.3129%;
+  descent-override: 27.1808%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Cinzel Fallback Liberation";
+  src: local("Liberation Serif Bold"), local("Tinos Bold");
+  font-weight: 700 800;
+  size-adjust: 128.5201%;
+  ascent-override: 75.9414%;
+  descent-override: 28.9449%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

@@ -1,0 +1,15 @@
+id: infield-capital
+name: Infield Capital
+url: http://www.infieldcapital.com/
+stage: launch
+substage: investors
+city: Boulder
+type: investor
+description: Seed-stage venture capital firm in Boulder.
+tags:
+  - seed
+  - venture-capital
+  - sustainability
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

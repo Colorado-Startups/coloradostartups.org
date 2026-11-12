@@ -1,0 +1,13 @@
+id: colorado-startup-jobs
+name: Colorado Startup Jobs
+url: https://www.paired.co/joblist
+stage: idea
+substage: validate
+city: statewide
+type: community
+description: Organization that helps founders build a team.
+tags:
+  - team
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

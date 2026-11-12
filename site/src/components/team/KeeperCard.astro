@@ -1,0 +1,125 @@
+---
+// One AI keeper on the Team page (decision 43). Owner: L9.
+// Built on L12's primitives: a gilded row Card with the portrait in an arched
+// Frame, as the style guide shows for a keeper. The portrait is L7's Portrait
+// in its framed mode (lane/L7-wiring): one lookup, one placeholder and the
+// idle motion for every keeper image on the site. Every field comes from
+// data/team/dwarves.yaml (L10 owns the copy). The card shows name, title,
+// kind, role, bio, what it can help with, where it works, and the disclosure
+// line in full. Hard constraint 10: a keeper is disclosed as an AI agent
+// wherever it appears, so the disclosure is never trimmed or hidden, and a
+// DOM test checks it on every card.
+//
+// Badges are stone: "AI agent" and the kind are types, and gold is for one
+// featured item per view (Badge.astro), which three keepers side by side are not.
+import type { Dwarf } from "@cs/shared";
+
+import { KIND_LABELS, portraitAlt } from "../art/keepers";
+import Portrait from "../art/Portrait.astro";
+import Badge from "../ui/Badge.astro";
+import Card from "../ui/Card.astro";
+import Frame from "../ui/Frame.astro";
+
+interface Props {
+  keeper: Dwarf;
+  element?: "article" | "li" | "div";
+}
+
+const { keeper, element = "article" } = Astro.props;
+---
+
+<Card
+  title={keeper.name}
+  tone="gilded"
+  layout="row"
+  mediaInset
+  element={element}
+  class="keeper"
+  id={keeper.id}
+  data-keeper={keeper.id}
+  data-kind={keeper.kind}
+>
+  <Frame slot="media" shape="arch" ratio="4 / 5" plaque={keeper.name}>
+    <Portrait
+      id={keeper.id}
+      framed
+      alt={portraitAlt(keeper.id, keeper.name, keeper.title)}
+      widths={[240, 480]}
+      sizes="(max-width: 720px) 60vw, 240px"
+    />
+  </Frame>
+  <Badge slot="badges">AI agent</Badge>
+  <Badge slot="badges" data-kind-label>{KIND_LABELS[keeper.kind]}</Badge>
+  <div class="keeper__text">
+    <div class="keeper__main" data-keeper-main>
+      <p class="keeper__title">{keeper.title}</p>
+      <p class="keeper__role">{keeper.role}</p>
+      <p>{keeper.bio}</p>
+    </div>
+    <div class="keeper__side" data-keeper-side>
+      <div class="keeper__lists">
+        <div>
+          <h4>It can help with</h4>
+          <ul>
+            {keeper.can_help_with.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h4>Where it works</h4>
+          <ul>
+            {keeper.surfaces.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+      <p class="ai-note" data-disclosure>{keeper.disclosure}</p>
+    </div>
+  </div>
+</Card>
+
+<style>
+  .keeper__text > * + *,
+  .keeper__main > * + *,
+  .keeper__side > * + * {
+    margin-top: var(--s-3);
+  }
+  /* Wide screens (#255): role and bio on the left, the lists and the
+     disclosure on the right, so each full-row keeper card uses its width and
+     runs shorter. The source order is unchanged, so the disclosure still
+     closes the card for a screen reader and on a phone. At 60rem the right
+     column was 260 px wide and one list item ran three lines; from 62rem every
+     item fits in two. 64rem keeps a margin for longer copy (285 px measured
+     at 1024 px, #428). */
+  @media (min-width: 64rem) {
+    .keeper__text {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      column-gap: var(--s-6);
+      align-items: start;
+    }
+    .keeper__text > * + * {
+      margin-top: 0;
+    }
+  }
+  .keeper__title {
+    font-weight: 700;
+    color: var(--c-text-dim);
+  }
+  .keeper__role {
+    font-size: var(--t-step-1);
+  }
+  .keeper__lists {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--s-4);
+  }
+  .keeper__lists h4 {
+    font-size: var(--t-step-0);
+    margin: 0 0 var(--s-2);
+  }
+  .keeper__lists ul {
+    margin: 0;
+    padding-left: 1.2em;
+    display: grid;
+    gap: var(--s-1);
+  }
+</style>

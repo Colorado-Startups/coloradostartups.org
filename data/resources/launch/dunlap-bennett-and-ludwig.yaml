@@ -1,0 +1,13 @@
+id: dunlap-bennett-and-ludwig
+name: Dunlap Bennett & Ludwig
+url: https://www.dbllawyers.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: Law firm in Fort Collins.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

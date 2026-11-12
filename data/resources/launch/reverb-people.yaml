@@ -1,0 +1,13 @@
+id: reverb-people
+name: Reverb People
+url: https://reverbpeople.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: An HR consulting firm in Denver. It offers fractional HR, leadership development and coaching. It serves startups and growing companies.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

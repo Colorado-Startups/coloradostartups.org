@@ -1,0 +1,132 @@
+---
+// /guides/: the answer pages, each built from Startup Resources. Owner: L23;
+// L32 grouped them (GUIDE_GROUPS) when the city and events guides came in. The
+// ecosystem-canvas intro links here; the orchestrator adds the llms.txt lines
+// when a guides lane merges. S7 added the startup credits guide as its own
+// group: its programs come from data/credits/, not Startup Resources.
+import snapshotRaw from "../../../../data/credits/startup-programs.json?raw";
+import ArtImage from "../../components/art/ArtImage.astro";
+import { GUIDE_ART_IMAGE, GUIDES_SCENE as art } from "../../components/guides/guide-art";
+import GuideText from "../../components/guides/GuideText.astro";
+import { guideInput } from "../../components/guides/guide-data";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { CREDITS_GUIDE, parseCredits, shownPrograms } from "../../lib/guides/credits";
+import { buildGuide, GUIDE_GROUPS, guideItems, GUIDES_INDEX, guidesIndexJsonLd, type Part } from "../../lib/guides/guides";
+
+const input = await guideInput();
+const groups = GUIDE_GROUPS.map((g, i) => ({
+  ...g,
+  id: `group-${i + 1}`,
+  guides: g.slugs.map((slug) => buildGuide(slug, input)),
+}));
+const creditPrograms = shownPrograms(parseCredits(snapshotRaw));
+const site = Astro.site!;
+
+const answer: Part[] = [
+  "These guides answer the questions founders ask most about building a company in Colorado, by topic and by city. ",
+  "Most open with a short answer, then list the programs from Startup Resources that fit, with a link to each. ",
+  `Startup Resources lists ${input.records.length} active resources as of `,
+  { text: input.date.label, datetime: input.date.iso },
+  ".",
+];
+---
+
+<BaseLayout
+  title={GUIDES_INDEX.title}
+  description={GUIDES_INDEX.description}
+  jsonLd={guidesIndexJsonLd([...groups.flatMap((g) => g.guides), CREDITS_GUIDE], site)}
+>
+  <section class="section section--band" aria-labelledby="guides-title">
+    <div class="wrap stack">
+      <h1 id="guides-title">{GUIDES_INDEX.title}</h1>
+      <p class="lede" data-guide-answer><GuideText parts={answer} /></p>
+      <ArtImage
+        src={art.src}
+        alt={art.alt}
+        {...GUIDE_ART_IMAGE}
+        loading="lazy"
+        motion="none"
+        class="guide-art"
+      />
+    </div>
+  </section>
+
+  {
+    groups.map((group, i) => (
+      <section
+        class:list={["section", i % 2 === 0 ? "section--lit" : "section--band"]}
+        aria-labelledby={`${group.id}-title`}
+      >
+        <div class="wrap stack">
+          <h2 id={`${group.id}-title`}>{group.heading}</h2>
+          <ul class="guides" data-guide-list>
+            {group.guides.map((g) => (
+              <li data-guide-item>
+                <h3>
+                  <a href={g.path}>{g.title}</a>
+                </h3>
+                <p>{g.description}</p>
+                <p class="meta">{`${guideItems(g).length} listings from Startup Resources`}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <section
+    class:list={["section", groups.length % 2 === 0 ? "section--lit" : "section--band"]}
+    aria-labelledby="credits-group-title"
+  >
+    <div class="wrap stack">
+      <h2 id="credits-group-title">Pay for your first servers</h2>
+      <ul class="guides" data-guide-list>
+        <li data-guide-item>
+          <h3>
+            <a href={CREDITS_GUIDE.path}>{CREDITS_GUIDE.title}</a>
+          </h3>
+          <p>{CREDITS_GUIDE.description}</p>
+          <p class="meta">{`${creditPrograms.length} programs from cloud and AI companies, not Startup Resources`}</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section
+    class:list={["section", groups.length % 2 === 0 ? "section--band" : "section--lit"]}
+    aria-labelledby="else-title"
+  >
+    <div class="wrap stack">
+      <h2 id="else-title">Looking for something else?</h2>
+      <p><a href="/ecosystem-canvas/">Browse all of Startup Resources</a>.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The guide's picture under its answer (L6's scenes, 2026-11-04). */
+  :global(.guide-art) {
+    width: min(100%, 40rem);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  .guides {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--s-5);
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+  .guides li {
+    border-top: var(--line-hair) solid var(--c-rule);
+    padding-top: var(--s-3);
+  }
+  .guides h3 {
+    margin: 0 0 var(--s-2);
+  }
+  .guides p {
+    margin: 0 0 var(--s-1);
+  }
+</style>

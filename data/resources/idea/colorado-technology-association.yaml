@@ -1,0 +1,13 @@
+id: colorado-technology-association
+name: Colorado Technology Association
+url: https://coloradotechnology.org/
+stage: idea
+substage: validate
+city: statewide
+type: community
+description: A statewide nonprofit association for Colorado's tech industry. It offers member events, professional development and talent pipeline partnerships. It also runs the Tech Summit and APEX Awards, plus a WIT Conference.
+tags:
+  - team
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,98 @@
+---
+// /code-of-conduct/: the posting guidelines for the Slack and the LinkedIn
+// Group. The words live in components/info/code-of-conduct.ts, which records
+// their source. Owner: L13.
+import { CONDUCT_GROUPS, CONDUCT_INTRO } from "../components/info/code-of-conduct";
+import InfoHeader from "../components/info/InfoHeader.astro";
+import { CONTACT_EMAIL, mailto } from "../components/info/links";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Code of Conduct"
+  description="How we post and treat each other in the Colorado Startups Slack and LinkedIn Group."
+>
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <InfoHeader kicker="The rules of the Hall" title="Code of Conduct">
+        <p class="lede">{CONDUCT_INTRO}</p>
+      </InfoHeader>
+
+      <nav class="toc" aria-label="On this page">
+        <ul>
+          {
+            CONDUCT_GROUPS.map((g) => (
+              <li>
+                <a class="tap-target" href={`#${g.id}`}>{g.heading}</a>
+              </li>
+            ))
+          }
+          <li><a class="tap-target" href="#report">Report a problem</a></li>
+        </ul>
+      </nav>
+
+      {
+        CONDUCT_GROUPS.map((group) => (
+          <section class="group" aria-labelledby={group.id}>
+            <h2 id={group.id}>{group.heading}</h2>
+            <div class="rules">
+              {group.rules.map((rule) => (
+                <article class="rule">
+                  <h3>{rule.title}</h3>
+                  {rule.body.map((p) => (
+                    <p>{p}</p>
+                  ))}
+                </article>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+
+      <section class="group panel report" aria-labelledby="report">
+        <h2 id="report">Report a problem</h2>
+        <p>
+          If someone breaks these guidelines, tell a group admin or moderator, or email{" "}
+          <a href={mailto("Code of Conduct report")}>{CONTACT_EMAIL}</a>. People moderate our groups. Our AI agents
+          never do.
+        </p>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .toc ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+  }
+  .group {
+    margin-top: var(--s-7);
+  }
+  .group h2 {
+    padding-bottom: var(--s-3);
+    border-bottom: var(--line-edge) solid var(--c-accent);
+  }
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--s-5) var(--s-7);
+  }
+  .rule h3 {
+    font-size: var(--t-step-1);
+    margin-bottom: var(--s-2);
+  }
+  .rule p {
+    margin-bottom: var(--s-2);
+  }
+  .report h2 {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .report p {
+    margin-bottom: 0;
+  }
+</style>

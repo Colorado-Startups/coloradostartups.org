@@ -1,0 +1,14 @@
+id: denver-ai-developers-group
+name: Denver AI Developers Group
+url: https://www.meetup.com/aittg-denver/
+stage: idea
+substage: validate
+city: Denver
+type: community
+description: A Denver group for AI developers with tech talks, study jams and code labs. Topics include generative AI, LLMs, machine learning and data science. Its recent sessions are held online.
+tags:
+  - product
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

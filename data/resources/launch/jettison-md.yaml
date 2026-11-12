@@ -1,0 +1,13 @@
+id: jettison-md
+name: Jettison.md
+url: https://www.jettison.md/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: Human resources and hiring services.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

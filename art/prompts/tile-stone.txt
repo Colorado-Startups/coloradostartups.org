@@ -1,0 +1,5 @@
+title: Carved Sandstone Wall
+framing: Flat, straight-on texture that fills the frame edge to edge. Very low detail and low contrast, evenly lit, calm enough to sit behind text.
+negative: people, faces, characters, objects, windows, doors, cracks, deep grooves, hard shadows, vignette, busy detail, high contrast
+
+A smooth wall face of carved warm sandstone fills the whole frame. Faint chisel marks and soft grain run across the stone with gentle, even variation. The light is soft and even from the front, so there are no shadows and no bright spots. There are no objects, no edges and no seams, only calm stone texture.

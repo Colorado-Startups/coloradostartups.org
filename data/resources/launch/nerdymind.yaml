@@ -1,0 +1,13 @@
+id: nerdymind
+name: NerdyMind
+url: https://nerdymind.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: A Fort Collins digital agency. It offers websites and apps. It also offers digital marketing and AI consulting.
+tags:
+  - marketing
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

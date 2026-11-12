@@ -1,0 +1,13 @@
+id: protiviti
+name: Protiviti
+url: https://www.protiviti.com/US-en
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A consulting firm. It covers AI, cybersecurity, risk, audit, finance and technology. It serves groups in many industries.
+tags:
+  - consulting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: skill-distillery
+name: Skill Distillery
+url: https://skilldistillery.com/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: A Denver full-stack Java and JavaScript bootcamp. It has live, instructor-led training in small classes. It also offers career support for people starting a technology career.
+tags:
+  - coding
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

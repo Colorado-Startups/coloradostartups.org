@@ -1,0 +1,134 @@
+---
+// /founders/: the private, founders-only forum (decision 49). Owner: L1.
+// WAYS_IN.discourse points here (L10). The forum does not exist yet, so its
+// copy speaks of it in the future tense.
+//
+// The site is live and the forum opens later. This page explains it and who
+// it is for. It names no date, has no form and collects no data. To hear
+// first, it points to the Slack and the newsletter. The Slack button also
+// sits under the lede, so the page's one action is in the first screen
+// (#218), beside L6's founders scene (#212, #713). No keeper is in it. On a
+// phone the scene draws the width of .wrap, 100vw less two 24 px gutters, so
+// a 412 px screen at 1.75x fetches the 640w file and a 375 px one at 2x the
+// 720w, not the 960w: the scene is the page's LCP there (cloud lab, #758).
+import { WAYS_IN } from "@cs/shared";
+
+import ArtImage from "../../components/art/ArtImage.astro";
+import Button from "../../components/ui/Button.astro";
+import Callout from "../../components/ui/Callout.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Founders forum"
+  description="A private, founders-only forum for people building companies in Colorado. It opens later."
+  ogImage="founders"
+>
+  <section class="section section--lit hero" aria-labelledby="founders-title">
+    <div class="wrap hero__grid">
+      <div>
+        <p class="kicker">Coming later</p>
+        <h1 id="founders-title">The founders forum</h1>
+        <p class="lede">
+          A private forum for founders building companies in Colorado. It opens later.
+        </p>
+        <div class="btn-row">
+          <Button href={WAYS_IN.slack} aria-describedby="slack-form-note-top">Join the Slack</Button>
+        </div>
+        <p class="meta" id="slack-form-note-top">Join the Slack opens a Google Form.</p>
+      </div>
+      <ArtImage
+        src="scenes/founders"
+        alt="Founders build a glowing fusion core in a brass ring at a workbench in a red sandstone workshop, with the Flatirons through the window."
+        aspect="16 / 9"
+        widths={[640, 720, 960, 1280]}
+        sizes="(min-width: 64rem) 560px, calc(100vw - 48px)"
+        loading="eager"
+        class="hero__art"
+      />
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="who">
+    <div class="wrap grid">
+      <div>
+        <h2 id="who">Who it is for</h2>
+        <p>Founders and cofounders building a company in Colorado, at any stage, from first idea to growth.</p>
+        <p>
+          The forum is for founders only. Talent, investors, lenders and service providers are welcome in the Slack
+          and the LinkedIn Group.
+        </p>
+      </div>
+      <div>
+        <h2 id="what">What it is for</h2>
+        <ul class="uses">
+          <li>Ask other founders the questions you would not post in public.</li>
+          <li>Share what worked, and what did not.</li>
+          <li>Find founders a stage ahead of you.</li>
+        </ul>
+        <Callout>
+          <p>
+            It will run on Discourse, open-source forum software. People will moderate it, as they do every Colorado
+            Startups space.
+          </p>
+        </Callout>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="when">
+    <div class="wrap">
+      <h2 id="when">Hear when it opens</h2>
+      <p>We will announce the opening in the Slack and the Startupers newsletter first.</p>
+      <div class="btn-row">
+        <Button href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
+        <Button variant="secondary" href={WAYS_IN.newsletter}>Get the newsletter</Button>
+      </div>
+      <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The note under each Slack button says where it goes (#128). */
+  #slack-form-note,
+  #slack-form-note-top {
+    margin: var(--s-3) 0 0;
+  }
+  .hero {
+    background:
+      radial-gradient(90% 80% at 50% 0%, color-mix(in oklab, var(--c-accent) 26%, transparent), transparent 70%),
+      var(--c-ground);
+  }
+  /* Text, then art; side by side from 64rem, where each column is wide
+     enough for the title in two lines. */
+  .hero__grid {
+    display: grid;
+    gap: var(--s-6);
+    align-items: center;
+  }
+  .hero__grid :global(.hero__art) {
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  @media (min-width: 64rem) {
+    .hero__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s-7);
+    }
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-7);
+  }
+  .uses li + li {
+    margin-top: var(--s-2);
+  }
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-5);
+    }
+  }
+</style>

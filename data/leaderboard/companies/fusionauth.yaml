@@ -1,0 +1,8 @@
+id: fusionauth
+name: "FusionAuth"
+website: "https://fusionauth.io"
+hq_city: "Denver"
+sector: "Cybersecurity"
+description: "Sells an identity and authentication platform. Developers add it to their apps to manage logins, users and access."
+sources:
+  - "https://fusionauth.io/about-us"

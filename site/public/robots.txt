@@ -1,0 +1,12 @@
+# coloradostartups.org. Every crawler may read the public site.
+# Search engines, AI search tools and AI training crawlers are all welcome to read it.
+# The Content-Signal line says yes to each of those uses (Cloudflare's Content Signals Policy).
+# Keep one group: a group named for a bot replaces this one for that bot and drops the disallows.
+# Staging sits behind Cloudflare Access, so this file only matters on production.
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Allow: /
+Disallow: /styleguide/
+Disallow: /api/
+
+Sitemap: https://coloradostartups.org/sitemap-index.xml

@@ -1,0 +1,15 @@
+id: kpmg
+name: KPMG
+url: https://home.kpmg/xx/en/home.html
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: Accounting, audit and tax firm in Boulder and Denver. Listed in the Ecosystem Canvas for founders at the growth stage.
+tags:
+  - accounting
+  - boulder
+  - denver
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

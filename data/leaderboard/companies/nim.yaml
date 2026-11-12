@@ -1,0 +1,10 @@
+id: nim
+name: "Nim"
+website: "https://nim.video/"
+hq_city: "Denver"
+founded_year: 2024
+sector: "Media and entertainment"
+description: "Makes a consumer app. The app turns text and images into edited AI-generated videos."
+sources:
+  - "https://insta.vc/news/43"
+  - "https://techcrunch.com/startup-battlefield/company/nim/"

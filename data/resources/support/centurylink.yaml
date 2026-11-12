@@ -1,0 +1,13 @@
+id: centurylink
+name: CenturyLink
+url: https://www.centurylink.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Internet, phone and TV provider for homes and businesses, with an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: silicon-flatirons
+name: Silicon Flatirons
+url: https://siliconflatirons.org/
+stage: idea
+substage: educate
+city: Boulder
+type: education
+description: A center at the University of Colorado Law School in Boulder. It runs events, publications and student programs. Its work covers law, policy and entrepreneurship in the digital age.
+tags:
+  - skills
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

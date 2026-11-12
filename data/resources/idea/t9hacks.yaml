@@ -1,0 +1,13 @@
+id: t9hacks
+name: T9Hacks
+url: https://t9hacks.org/
+stage: idea
+substage: validate
+city: Boulder
+type: event
+description: A free hackathon for women, non-binary and other underrepresented college students. It is for students in engineering and tech.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

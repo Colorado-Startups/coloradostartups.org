@@ -1,0 +1,13 @@
+id: fortyau-denver-nashville-dallas-paraguay
+name: FortyAU (Denver, Nashville, Dallas, Paraguay)
+url: http://www.fortyau.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Software engineering, data, cloud, product design and QA services. Its clients are mainly in regulated industries, and it also serves startups.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

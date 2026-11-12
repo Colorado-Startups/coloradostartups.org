@@ -1,0 +1,13 @@
+id: startup-grind
+name: Startup Grind
+url: https://www.startupgrind.com/
+stage: idea
+substage: educate
+city: statewide
+type: event
+description: A global entrepreneur community. It runs local chapter events. It also has a content library for founders.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

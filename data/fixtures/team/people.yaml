@@ -1,0 +1,53 @@
+# Fixture people for builds with no access to the private people repo: local
+# dev, fork CI and the public repo. Every name is fake on purpose. The real
+# Team page builds from Colorado-Startups/coloradostartups-people (open-source
+# plan, phase 1). scripts/people/overlay.mjs copies this file to
+# data/team/people.yaml and photos/ to site/src/components/team/photos/ when
+# the real data is not there. Same groups as the real file: one leader, one
+# community helper, two thanked.
+
+- id: ada-example
+  name: Ada Example
+  title: Founder & President
+  group: leadership
+  bio: >-
+    Ada is a fixture. The real Team page shows the people who run Colorado
+    Startups; this card shows where a leader's bio goes.
+  photo: ada-example
+  links:
+    - label: Website
+      href: https://example.org/ada
+
+- id: sam-sample
+  name: Sam Sample
+  title: Community Volunteer
+  group: volunteers
+  bio: >-
+    Sam is a fixture. On the real page this card thanks a person who hosts
+    gatherings for founders.
+  photo: sam-sample
+  links:
+    - label: Website
+      href: https://example.org/sam
+
+- id: pat-placeholder
+  name: Pat Placeholder
+  title: Co-Executive Director, with thanks
+  group: with-thanks
+  bio: >-
+    Pat is a fixture. On the real page this card thanks a past leader.
+  photo: pat-placeholder
+  links:
+    - label: Website
+      href: https://example.org/pat
+
+- id: lee-lorem
+  name: Lee Lorem
+  title: Co-Executive Director, with thanks
+  group: with-thanks
+  bio: >-
+    Lee is a fixture. On the real page this card thanks a past leader.
+  photo: lee-lorem
+  links:
+    - label: Website
+      href: https://example.org/lee

@@ -1,0 +1,73 @@
+---
+// Every page uses this layout. Orchestrator-owned; lanes pass props, and ask
+// for changes. A page that has structured data passes it as `jsonLd`.
+import { Font } from "astro:assets";
+
+import HallTextures from "../components/ui/HallTextures.astro";
+import SiteFooter from "../components/ui/SiteFooter.astro";
+import SiteHeader from "../components/ui/SiteHeader.astro";
+import "../styles/global.css";
+import { jsonLdText } from "./json-ld";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Path under /og/ without extension, e.g. "home". L7 names files by route. */
+  ogImage?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, ogImage = "default", noindex = false, jsonLd } = Astro.props;
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site).toString();
+const ogUrl = new URL(`/og/${ogImage}.png`, site).toString();
+const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado Startups`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {/* A noindex page names no canonical, so no page asks to be indexed and dropped at once (GO-LIVE B5). */}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    {/* Two Search Console properties verify by these tags, copied from the old home page (curl, 2026-10-18); DNS holds neither (GO-LIVE B9). */}
+    <meta name="google-site-verification" content="MasSRxNF93yU-Ejfs2kjL-sEXttLYOLkZV-3CtlkBHY" />
+    <meta name="google-site-verification" content="F7Z7mKLCmYVKSVe98UjyfnvYoTKlnuy8snAhkuMUXfQ" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Colorado Startups" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#FFFBF3" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/brand/cs-logo-240.png" />
+    <link rel="alternate" type="application/feed+json" title="Colorado Startups dispatches" href="/feed.json" />
+    <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="Colorado Startups dispatches" />
+    {/* Cinzel's 600, 700 and 800 faces are one variable file, so this is one preload; a weight filter saves nothing. */}
+    <Font cssVariable="--font-display" preload />
+    {/* Only the two faces the first screen draws. 500 and italic load when a page uses them. */}
+    <Font cssVariable="--font-body" preload={[{ weight: 400, style: "normal" }, { weight: 700, style: "normal" }]} />
+    <HallTextures />
+    {jsonLd && <script type="application/ld+json" set:html={jsonLdText(jsonLd)} />}
+    {/* Cloudflare Web Analytics sets no cookies, as privacy.md promises. The edge's automatic injection did not
+        reach the Worker's static assets on launch night, so the beacon is in the page. The token is public by
+        design, and the CSP allows both hosts (worker/lib/security-headers.ts, public/_headers). The secret scans'
+        allow marker on its line holds wherever the line moves (#767, 04_tools/gitleaks_allow.json); it renders nothing. */}
+    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "58c9c5c3a6b843ec87df6970cbbc0d97"}'></script>{/* gitleaks:allow */}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

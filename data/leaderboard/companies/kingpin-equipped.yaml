@@ -1,0 +1,9 @@
+id: kingpin-equipped
+name: "Kingpin Equipped"
+website: "https://kingpinequipped.com"
+hq_city: "Lakewood"
+sector: "Consumer and retail"
+description: "Sells slim low-voltage LED lights. Its lights are for truck beds, trailers, campers and SUVs."
+sources:
+  - "https://kingpinequipped.com/pages/about"
+  - "https://kingpinequipped.com"

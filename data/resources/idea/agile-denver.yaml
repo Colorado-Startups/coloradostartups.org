@@ -1,0 +1,13 @@
+id: agile-denver
+name: Agile Denver
+url: https://www.meetup.com/Agile-Denver2/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: A Denver nonprofit for agile and lean practice. It holds monthly meetups. It has special interest groups such as Agile Boulder and Human-Centered AI. It also has a member Slack community.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

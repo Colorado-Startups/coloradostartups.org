@@ -1,0 +1,13 @@
+id: keating-and-lyden
+name: Keating and Lyden
+url: https://www.keatingandlyden.com/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A Boulder law firm. It advises founders on business, intellectual property, securities and M&A.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

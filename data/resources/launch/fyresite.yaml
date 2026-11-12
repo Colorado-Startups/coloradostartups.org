@@ -1,0 +1,13 @@
+id: fyresite
+name: Fyresite
+url: https://www.fyresite.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Shopify Plus agency. It offers development, migrations, web design, app development and UI/UX. It serves established brands and merchants.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

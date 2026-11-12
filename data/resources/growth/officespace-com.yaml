@@ -1,0 +1,13 @@
+id: officespace-com
+name: OfficeSpace.com
+url: https://www.officespace.com/co/filter/q=Colorado
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: An online marketplace. It is for leasing Colorado coworking desks, private suites and offices. It serves startups, small teams and larger companies.
+tags:
+  - real-estate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

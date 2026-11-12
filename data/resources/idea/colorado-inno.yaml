@@ -1,0 +1,13 @@
+id: colorado-inno
+name: Colorado Inno
+url: https://www.americaninno.com/colorado/
+stage: idea
+substage: educate
+city: online
+type: media
+description: A news source covering Colorado startups.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

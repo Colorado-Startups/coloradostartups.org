@@ -1,0 +1,46 @@
+---
+// The four ways into the community, as L12 cards. Owner: L1. Used on the home
+// page. The list, its order and its hrefs come from ways.ts (which reads
+// WAYS_IN). Each card's action says exactly what happens, so the title stays
+// plain text rather than a second link to the same place.
+import Card from "../ui/Card.astro";
+import { WAYS } from "./ways";
+---
+
+<ul class="hall-grid ways-in" role="list">
+  {
+    WAYS.map((way) => (
+      <Card element="li" title={way.name} data-way={way.kind}>
+        <p>{way.what}</p>
+        <a slot="actions" class="community way-action" href={way.href}>
+          {way.action}
+        </a>
+      </Card>
+    ))
+  }
+</ul>
+
+<style>
+  /* Four, two or one across: never three over one. */
+  .ways-in {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-4);
+  }
+  @media (max-width: 1040px) {
+    .ways-in {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .ways-in {
+      grid-template-columns: 1fr;
+    }
+  }
+  .way-action {
+    font-weight: 700;
+  }
+  /* The arrow is decoration; the empty alt text keeps screen readers quiet. */
+  .way-action::after {
+    content: " \2192" / "";
+  }
+</style>

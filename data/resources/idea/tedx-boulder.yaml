@@ -1,0 +1,13 @@
+id: tedx-boulder
+name: TEDx Boulder
+url: https://tedxboulder.com/
+stage: idea
+substage: educate
+city: Boulder
+type: event
+description: An annual community talks event in Boulder. Locals can speak, sponsor or volunteer.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

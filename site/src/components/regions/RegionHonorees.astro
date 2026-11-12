@@ -1,0 +1,115 @@
+---
+// Leaderboard honorees headquartered in a region, A to Z, from the latest
+// edition. A listing recognizes founders and their teams; this list carries no
+// investing language (decision 17 and the Leaderboard purpose limit). Public
+// notes come from L2's notes.yaml, so an announced acquisition shows here too.
+// A long list shows its first SHOWN_FIRST names and folds the rest into a
+// native <details> (#250). It needs no script, and every name stays in the
+// HTML. Owner: L8.
+import type { Company, Edition, Region } from "@cs/shared";
+
+import { COMPANY_NOTES } from "../../lib/leaderboard/notes";
+
+interface Props {
+  region: Region;
+  edition: Edition;
+  companies: readonly Company[];
+}
+
+/** 12 fills whole rows at one, two, three and four columns. A list of 12 or fewer shows whole. */
+const SHOWN_FIRST = 12;
+
+const { region, edition, companies } = Astro.props;
+const noun = companies.length === 1 ? "company" : "companies";
+const shown = companies.slice(0, SHOWN_FIRST);
+const folded = companies.slice(SHOWN_FIRST);
+---
+
+<div class="region-honorees" data-region-honorees>
+  {
+    companies.length > 0 ? (
+      <p>
+        As of {edition.published}, the Leaderboard's {edition.title} include {companies.length} {noun} headquartered in{" "}
+        {region.name}, listed A to Z. Congratulations to the founders and teams building them.
+      </p>
+    ) : (
+      <p>The Leaderboard's {edition.title} include no companies headquartered in {region.name} yet.</p>
+    )
+  }
+  {
+    shown.length > 0 && (
+      <ul class="honorees">
+        {shown.map((c) => (
+          <li data-id={c.id} data-hq={c.hq_city}>
+            <a href={c.website}>{c.name}</a>
+            <span class="meta">
+              {c.sector}, {c.hq_city}
+            </span>
+            {COMPANY_NOTES[c.id] && <span class="meta note">{COMPANY_NOTES[c.id]}</span>}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  {
+    folded.length > 0 && (
+      <details class="more" data-honorees-more>
+        <summary class="btn btn--stone">
+          <span class="when-closed">Show all {companies.length} honorees</span>
+          <span class="when-open">Show fewer honorees</span>
+        </summary>
+        <ul class="honorees">
+          {folded.map((c) => (
+            <li data-id={c.id} data-hq={c.hq_city}>
+              <a href={c.website}>{c.name}</a>
+              <span class="meta">
+                {c.sector}, {c.hq_city}
+              </span>
+              {COMPANY_NOTES[c.id] && <span class="meta note">{COMPANY_NOTES[c.id]}</span>}
+            </li>
+          ))}
+        </ul>
+      </details>
+    )
+  }
+  <p>
+    <a href="/leaderboard/">See the full Leaderboard</a> or <a href="/leaderboard/nominate/">nominate a company</a>.
+  </p>
+</div>
+
+<style>
+  .honorees {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--s-2) var(--s-5);
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+  .honorees li {
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--s-2);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .note {
+    font-style: italic;
+  }
+  .more {
+    margin-block: var(--s-4) var(--s-5);
+  }
+  .more > .honorees {
+    margin-top: var(--s-4);
+  }
+  /* .btn is inline-flex, which drops the marker everywhere but Safari. */
+  .more summary {
+    list-style: none;
+  }
+  .more summary::-webkit-details-marker {
+    display: none;
+  }
+  .more:not([open]) .when-open,
+  .more[open] .when-closed {
+    display: none;
+  }
+</style>

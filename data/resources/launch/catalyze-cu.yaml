@@ -1,0 +1,13 @@
+id: catalyze-cu
+name: Catalyze CU
+url: https://www.colorado.edu/catalyzecu/
+stage: launch
+substage: develop
+city: Boulder
+type: accelerator
+description: A summer accelerator in Boulder. It is for ventures started by CU Boulder students, faculty and staff. It has mentoring and equity-free funding. It also has dedicated coworking space.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

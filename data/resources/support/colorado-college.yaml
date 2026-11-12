@@ -1,0 +1,13 @@
+id: colorado-college
+name: Colorado College
+url: https://www.coloradocollege.edu/
+stage: support
+substage: organizations
+city: Colorado Springs
+type: university
+description: A liberal arts college in Colorado Springs. Students take one course at a time on the Block Plan. A short Block Break comes between blocks.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

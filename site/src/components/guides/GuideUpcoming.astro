@@ -1,0 +1,77 @@
+---
+// The calendar's next events on the events guide, in Mountain Time, as plain
+// HTML. Owner: L32. lib/guides/guides.ts picks and formats them; this only
+// renders. The list stays out of the search index like every guide list, and
+// carries no Event JSON-LD: /event-calendar/ owns that markup.
+import type { UpcomingList } from "../../lib/guides/guides";
+import GuideText from "./GuideText.astro";
+
+interface Props {
+  upcoming: UpcomingList;
+}
+
+const { upcoming } = Astro.props;
+---
+
+<h2 id={`${upcoming.id}-title`}>{upcoming.heading}</h2>
+<p><GuideText parts={upcoming.intro} /></p>
+<div data-pagefind-ignore>
+  <ol class="events" data-event-list>
+    {
+      upcoming.events.map((e) => (
+        <li class="event" data-event-item>
+          <p class="when">
+            <time datetime={e.datetime}>{e.day}</time> <span class="time">{e.time}</span>
+          </p>
+          <p class="name">
+            {e.url ? (
+              <a href={e.url} rel="nofollow noopener">
+                {e.title}
+              </a>
+            ) : (
+              e.title
+            )}
+          </p>
+          {e.where && <p class="meta">{e.where}</p>}
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  /* A compact agenda, the same shape as the list on /event-calendar/. */
+  .events {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: 0 var(--s-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+  .event {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    padding-block: var(--s-3);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .event p {
+    margin: 0;
+  }
+  .when {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-2);
+    font-weight: 600;
+  }
+  .time {
+    font-weight: 400;
+    color: var(--c-text-dim);
+  }
+  .name {
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+</style>

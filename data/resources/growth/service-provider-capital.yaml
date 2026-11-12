@@ -1,0 +1,13 @@
+id: service-provider-capital
+name: Service Provider Capital
+url: http://www.serviceprovidercapital.com/
+stage: growth
+substage: investors
+city: Denver
+type: investor
+description: A venture capital firm. It co-invests in seed and Series A rounds. It invests alongside institutional venture firms. It uses regional funds, including one for the Rocky Mountain region.
+tags:
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

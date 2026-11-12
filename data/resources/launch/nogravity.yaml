@@ -1,0 +1,13 @@
+id: nogravity
+name: NoGravity
+url: https://nogravity.io/
+stage: launch
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: A software development firm in Colorado Springs.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

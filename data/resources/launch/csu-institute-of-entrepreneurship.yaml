@@ -1,0 +1,13 @@
+id: csu-institute-of-entrepreneurship
+name: CSU Institute of Entrepreneurship
+url: https://biz.colostate.edu/resources/centers-institutes/entrepreneurship
+stage: launch
+substage: develop
+city: Fort Collins
+type: incubator
+description: A Colorado State University institute in Fort Collins. Its Venture Development Pathway takes founders from an idea to a business. Founders test the idea, then pitch it and build the business.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

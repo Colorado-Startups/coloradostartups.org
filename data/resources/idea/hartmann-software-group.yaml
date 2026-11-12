@@ -1,0 +1,13 @@
+id: hartmann-software-group
+name: Hartmann Software Group
+url: https://www.hartmannsoftware.com/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: A Denver IT training and consulting firm. It runs instructor-led technical courses onsite, online or at its own location. It also offers app development and systems integration.
+tags:
+  - coding
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

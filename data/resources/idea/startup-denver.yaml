@@ -1,0 +1,13 @@
+id: startup-denver
+name: Startup Denver
+url: https://www.meetup.com/StartupDenver/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: A Denver meetup from Colorado Startups. It has monthly networking gatherings. It also has Startup Ski Days for founders.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

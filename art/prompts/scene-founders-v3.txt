@@ -1,0 +1,37 @@
+title: The Founders' Workshop under the Flatirons
+use: the founders forum page; Colorado first, then the Hall carved into it (Paul, 2026-11-03)
+
+{
+  "short_description": "The three great tilted sandstone slabs of the Flatirons rise above Boulder, Colorado, and a bright dwarven forge-hall is carved into their red rock. Inside, in a private workshop room glowing with lantern and hearth light, founders build new technology together.",
+  "objects": [
+    {
+      "description": "a small group of human founders of different ages and backgrounds at a long timber workbench, one adjusting a prototype and two sketching plans",
+      "location": "center, across the middle third",
+      "relationship": "the heart of the scene, building together"
+    },
+    {
+      "description": "a compact fusion energy prototype: a small, bright artificial sun held inside a spinning hammered brass ring",
+      "location": "on the center of the workbench",
+      "relationship": "what the founders are building"
+    },
+    {
+      "description": "a quantum computer shaped like a tall hanging golden chandelier of stacked brass discs and coiled copper tubes, glowing softly",
+      "location": "right side, hanging from the timber ceiling",
+      "relationship": "another machine the founders built"
+    },
+    {
+      "description": "a great carved stone hearth with a warm fire under a hammered bronze hood, with deep leather armchairs around it",
+      "location": "back left",
+      "relationship": "where the founders sit and talk"
+    },
+    {
+      "description": "a tall arched window framing the three tilted red sandstone slabs of the Flatirons and pine-covered slopes at golden hour",
+      "location": "left side",
+      "relationship": "shows the room is carved into the Flatirons above Boulder"
+    }
+  ],
+  "background_setting": "a private workshop room carved into the red and orange sandstone of the Flatirons above Boulder, Colorado. It sits inside a grand dwarven mountain hall, with thick timber beams, brass gears and glowing lanterns.",
+  "lighting_direction": "golden-hour sun through the window at left, with hearth light and the warm glow of the small sun on the workbench",
+  "composition": "wide shot at standing eye level, with the founders and their workbench in the middle third and calm, warm stone across the top",
+  "context": "an illustration for a private, founders-only forum page on a website for Colorado's startup community"
+}

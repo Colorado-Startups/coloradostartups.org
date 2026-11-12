@@ -1,0 +1,80 @@
+---
+// One region on /regions/, on L12's Card: art, name, tagline, core cities and
+// the Connector seat's state. A seat that takes applications adds the apply
+// link and the unpaid line (decision 67). The swatch beside the cities
+// matches the region's color on the Front Range map, so the cards double as
+// its legend. Lay these out in a <ul class="hall-grid">. Owner: L8.
+import type { Region } from "@cs/shared";
+
+import { REGION_COLORS } from "../../lib/regions/map";
+import { andList, type Organizer, seatRole } from "../../lib/regions/page";
+import { applyHref, takesApplications, UNPAID_VOLUNTEER_LINE } from "../positions/positions";
+import Badge from "../ui/Badge.astro";
+import Card from "../ui/Card.astro";
+import RegionArt from "./RegionArt.astro";
+
+interface Props {
+  region: Region;
+  organizer: Organizer;
+  /** The art's loading; lazy unless the card sits in the first screen. */
+  loading?: "eager" | "lazy";
+}
+
+const { region, organizer, loading = "lazy" } = Astro.props;
+const { position, holder } = organizer;
+const role = seatRole(position, region.name);
+---
+
+<Card title={region.name} href={`/regions/${region.id}/`} element="li" data-region={region.id}>
+  <RegionArt slot="media" region={region} loading={loading} />
+  {
+    holder ? (
+      <Badge slot="badges">
+        {role}: {holder.name}
+      </Badge>
+    ) : (
+      <Badge slot="badges" tone="pine">
+        {role} seat open
+      </Badge>
+    )
+  }
+  <p>{region.tagline}</p>
+  <span slot="meta" class="cities">
+    <span class="swatch" style={`--swatch: ${REGION_COLORS[region.id]}`} aria-hidden="true"></span>
+    {andList(region.cities)}
+  </span>
+  {
+    takesApplications(position) && (
+      <p slot="actions" class="apply">
+        <a href={applyHref(position)} data-apply>
+          Apply to be the {position.title}
+        </a>
+        <span class="meta" data-unpaid-line>
+          {UNPAID_VOLUNTEER_LINE}
+        </span>
+      </p>
+    )
+  }
+</Card>
+
+<style>
+  .cities {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .swatch {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--swatch);
+    box-shadow: 0 0 0 2px var(--c-ground);
+  }
+  .apply {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    margin: 0;
+  }
+</style>

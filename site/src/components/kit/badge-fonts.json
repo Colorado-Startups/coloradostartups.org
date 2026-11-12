@@ -1,0 +1,14 @@
+{
+  "title": {
+    "family": "Cinzel",
+    "sha256": "ef95296c778719c3d658a8284d65078100450948851b9114485ada01d9d3d3f8"
+  },
+  "kicker": {
+    "family": "Alegreya Sans",
+    "sha256": "1a2f3006ecc704345bd35be43341c07b2bc33ff25955d70f47980cffb3099c48"
+  },
+  "status": {
+    "family": "Alegreya Sans Medium",
+    "sha256": "dedb7e4dce28b07cdbebb5de4f5e31a0706c7595916c2eb195a08d097e9070d1"
+  }
+}

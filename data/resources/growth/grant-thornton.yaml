@@ -1,0 +1,13 @@
+id: grant-thornton
+name: Grant Thornton
+url: https://www.grantthornton.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A services firm. It offers audit and assurance, tax and advisory services. It serves groups in industries such as healthcare, banking, energy and manufacturing.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,126 @@
+name: content-gates
+
+# ADVISORY. No ruleset requires this check: the org ruleset "Protect default
+# branches" requires a pull request on main and no status check (gh api,
+# 2026-11-02; the org plan is enterprise). So a red run here reports and never
+# blocks a merge. The blocking gates are .githooks/pre-commit and
+# .githooks/pre-push on each contributor's machine.
+#
+# One definition, many call sites: every step shells out to 04_tools/. No
+# check is reimplemented in this file, so the gate cannot drift between a
+# laptop, a web edit and a cloud agent. contract_test.py C9 checks that.
+#
+# The changed-file list goes to cs_site_lint.py whole; the lint itself skips
+# anything outside the scope in cs_site_rules.json. No untrusted event input
+# is used inside a run: step (SHAs arrive through env), so the workflow is
+# not exposed to command injection.
+#
+# Each lint call runs through 04_tools/ci_gate.sh, the one definition of how
+# CI reads an exit code: 3 (could not check) warns and passes, and every
+# other code is kept. contract_test.py C9c checks that. The self-test and
+# contract steps stay bare. Their exit 3 in CI means the commit's own rules
+# file or tools, or the runner, are broken, so the run goes red.
+#
+# Path filter (#577): the run starts only when the change touches what
+# it checks. The lint reads only cs_site_rules.json's content globs (data/,
+# art/); the self-tests and the contract test read 04_tools/, .githooks/,
+# .claude/ and .github/workflows/; the hooks they exercise read scripts/,
+# 01_doctrine/, .secretlintrc.json and the package files. A change elsewhere
+# (site/, quality/, docs) has nothing here to check, so no run starts and no
+# check reports. 04_tools/site_changed.sh's self-test fails if a content glob's
+# folder is missing from this list.
+on:
+  pull_request:
+    paths:
+      - "data/**"
+      - "art/**"
+      - "01_doctrine/**"
+      - "04_tools/**"
+      - "scripts/**"
+      - ".githooks/**"
+      - ".claude/**"
+      - ".github/workflows/**"
+      - ".secretlintrc.json"
+      - "package.json"
+      - "package-lock.json"
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "art/**"
+      - "01_doctrine/**"
+      - "04_tools/**"
+      - "scripts/**"
+      - ".githooks/**"
+      - ".claude/**"
+      - ".github/workflows/**"
+      - ".secretlintrc.json"
+      - "package.json"
+      - "package-lock.json"
+
+permissions:
+  contents: read
+
+# A pull request's newer push cancels its older run. Pushes to main share one
+# group and are never cancelled: a running check finishes, and in a burst of
+# merges only the newest waiting push runs next. A push replaced while it waits
+# is checked only through its own pull request: the next run lints the files
+# changed since github.event.before, the replaced push, so not that push's files.
+# A replaced run never gets a runner, so it bills nothing: Actions bills runner
+# processing time (docs.github.com, "GitHub Actions billing"). Decision in #532;
+# per-SHA push groups reverse it.
+concurrency:
+  group: content-gates-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  content-gates:
+    name: content-gates
+    # ubuntu-slim: this job takes seconds, and GitHub bills every job a whole minute, so the 1-vCPU runner
+    # at a third of ubuntu-latest's per-minute price costs a third as much (ops/ci/compute-plan.md, step 4).
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Rule self-test (every rule's hit and miss samples, every window edge)
+        run: python3 04_tools/cs_site_lint.py --self-test
+
+      - name: Contract test (rules, settings, hooks and the gate table agree)
+        run: python3 04_tools/contract_test.py
+
+      - name: Lint changed files
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          base="${PR_BASE:-$PUSH_BEFORE}"
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] \
+             || ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
+            echo "No usable base commit; linting every in-scope file."
+            bash 04_tools/ci_gate.sh python3 04_tools/cs_site_lint.py
+            exit $?
+          fi
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMR "$base" HEAD)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No changed files."
+            exit 0
+          fi
+          bash 04_tools/ci_gate.sh python3 04_tools/cs_site_lint.py "${files[@]}"
+
+      - name: Hook self-test (pre-commit and pre-push behave in a throwaway repo)
+        run: bash 04_tools/hook_selftest.sh
+
+      # The AI merge policy's samples and its bad-policy fixtures (#552, #626).
+      - name: Merge policy self-test
+        run: python3 04_tools/merge_policy.py --self-test
+
+      # A throwaway export that must leave every private path out (#552).
+      - name: Export self-test
+        run: python3 04_tools/export_public.py --self-test
+
+      # deploy-gate.yml runs it again before it moves production.
+      - name: Deploy gate self-test (fast-forward, outside commits soak, gates)
+        run: bash 04_tools/deploy_gate.sh --self-test

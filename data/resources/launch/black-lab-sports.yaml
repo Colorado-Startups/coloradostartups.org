@@ -1,0 +1,13 @@
+id: black-lab-sports
+name: Black Lab Sports
+url: http://www.blacklabsports.com/
+stage: launch
+substage: develop
+city: Boulder
+type: accelerator
+description: A Boulder center for human performance. It has memberships, classes and events. It also has Black Lab X, its human tech venture ecosystem. Black Lab X invests in deep tech companies.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

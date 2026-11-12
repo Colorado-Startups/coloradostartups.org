@@ -1,0 +1,13 @@
+id: nucamp
+name: Nucamp
+url: https://www.nucamp.co/community/co/colorado-springs
+stage: idea
+substage: educate
+city: Colorado Springs
+type: education
+description: Part-time coding bootcamps for Colorado Springs learners. The bootcamps cover web and mobile development, Python, cybersecurity and AI. Scholarships, financing and career services are also offered.
+tags:
+  - coding
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

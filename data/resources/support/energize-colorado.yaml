@@ -1,0 +1,13 @@
+id: energize-colorado
+name: Energize Colorado
+url: https://energizecolorado.com/
+stage: support
+substage: organizations
+city: statewide
+type: nonprofit
+description: A group that offers lending, resources and advising. It serves small businesses across Colorado, from coffee shops to child care providers. Its work includes the PEAK Program.
+tags:
+  - nonprofit
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

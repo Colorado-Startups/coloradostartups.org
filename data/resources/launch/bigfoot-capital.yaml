@@ -1,0 +1,15 @@
+id: bigfoot-capital
+name: Bigfoot Capital
+url: https://www.bigfootcap.com/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: A Denver lender. It offers non-dilutive growth loans to established B2B software and tech-enabled services businesses in North America. The businesses range from bootstrapped through Series B.
+tags:
+  - seed
+  - venture-capital
+  - b2b
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

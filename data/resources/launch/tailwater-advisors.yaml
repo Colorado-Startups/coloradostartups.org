@@ -1,0 +1,13 @@
+id: tailwater-advisors
+name: Tailwater Advisors
+url: https://www.linkedin.com/company/tailwater-advisors/about/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: CFO and finance services in Denver.
+tags:
+  - finance
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

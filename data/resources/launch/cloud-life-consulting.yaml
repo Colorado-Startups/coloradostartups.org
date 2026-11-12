@@ -1,0 +1,13 @@
+id: cloud-life-consulting
+name: Cloud Life Consulting
+url: http://www.cloudlife.io/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: An AWS consulting firm. It offers cloud migration, architecture, DevOps and managed services. It serves startups, small and mid-sized businesses.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

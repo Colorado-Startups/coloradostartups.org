@@ -1,0 +1,13 @@
+id: kingtide
+name: KingTide
+url: https://kingtide.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A software development firm in Denver.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

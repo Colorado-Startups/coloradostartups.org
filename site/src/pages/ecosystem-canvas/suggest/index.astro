@@ -1,0 +1,24 @@
+---
+// /ecosystem-canvas/suggest/: suggest a resource for the Canvas. Owner: L3.
+import SuggestForm from "../../../components/canvas/SuggestForm.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Suggest a resource"
+  description="Tell Colorado Startups about a Colorado resource for founders that Startup Resources is missing."
+  ogImage="ecosystem-canvas"
+>
+  <section class="section section--lit" aria-labelledby="suggest-title">
+    <div class="wrap stack">
+      <p><a href="/ecosystem-canvas/">Back to Startup Resources</a></p>
+      <h1 id="suggest-title">Suggest a resource</h1>
+      <p class="lede">Know a Colorado program, event, investor or service that helps founders? Tell us about it.</p>
+      <p>
+        A person reviews every suggestion before it goes into Startup Resources. We add resources that serve founders in
+        Colorado, and we list them in alphabetical order, not as a ranking.
+      </p>
+      <SuggestForm />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,13 @@
+id: the-articulate
+name: The Articulate
+url: https://www.thearticulateco.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: coworking
+description: Coworking space in Fort Collins.
+tags:
+  - coworking
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: trinet
+name: TriNet
+url: https://www.trinet.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A professional employer organization. It offers HR and payroll. It offers benefits and compliance services. It serves small and growing businesses.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

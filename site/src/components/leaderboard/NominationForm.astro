@@ -1,0 +1,279 @@
+---
+// The nomination form. A plain HTML form that POSTs to /api/nominate; field
+// names come from lib/leaderboard/nomination.ts, which the Worker parses with,
+// so the two cannot drift. The script stamps the load time into `ts` (the
+// Worker's speed check), shows the message for ?error=, names the fields the
+// Worker rejected (?field=), and keeps a draft of the answers in this tab so a
+// rejection does not clear them (the apply form's helpers, apply/client.ts).
+import { COLORADO_COUNTIES } from "../../lib/leaderboard/counties";
+import {
+  NOMINATE_PATH,
+  NOMINATION_DRAFT,
+  NOMINATION_FIELDS as F,
+  USD_PATTERN,
+  WEBSITE_PATTERN,
+} from "../../lib/leaderboard/nomination";
+import { PLACE_COUNTIES } from "../../lib/leaderboard/place-counties";
+import { SECTORS } from "../../lib/leaderboard/sectors";
+import Turnstile from "../forms/Turnstile.astro";
+
+const thisYear = new Date().getUTCFullYear();
+
+const ERRORS = {
+  invalid: "Some answers need a fix. Check the required fields and the number formats, then send the form again.",
+  verification: "We could not confirm the form came from a person. Wait a few seconds, finish the check, then send it again.",
+  ratelimit: "Too many tries from your connection. Wait a minute, then send the form again.",
+  delivery:
+    "We could not save your nomination, so nothing was sent. Try again later, or write to info@coloradostartups.org.",
+  unavailable:
+    "Nominations are closed for a moment on our side. Nothing was sent. Try again later, or write to info@coloradostartups.org.",
+} as const;
+// Replaces the invalid message when the Worker names the fields to fix.
+const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then send the form again.";
+const USD_TITLE = "Whole US dollars, like 1,200,000";
+// Three years before the most recent full year (#147). Built into the page,
+// and the script below sets it again from the visitor's clock, so a page
+// built before New Year still suggests the right year.
+const BASE_YEAR = thisYear - 4;
+const HQ_CITIES = Object.keys(PLACE_COUNTIES);
+---
+
+<div class="nominate">
+  {
+    Object.entries(ERRORS).map(([code, text]) => (
+      <p
+        class="form-error"
+        role="alert"
+        data-error={code}
+        data-fields-text={code === "invalid" ? INVALID_FIELDS : undefined}
+        hidden
+      >
+        {text}
+      </p>
+    ))
+  }
+
+  <form
+    method="post"
+    action="/api/nominate"
+    data-nomination-form
+    data-draft-key={NOMINATION_DRAFT.key}
+    data-draft-skip={[...NOMINATION_DRAFT.skip].join(" ")}
+  >
+    <input type="hidden" name="return_to" value={NOMINATE_PATH} />
+    <input type="hidden" name="ts" value="" data-load-stamp />
+    <div class="hp" aria-hidden="true">
+      <label for="nm-website-hp">Leave this empty</label>
+      <input id="nm-website-hp" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <fieldset>
+      <legend>The company</legend>
+      <div class="field">
+        <label for="nm-legal-name">Legal name</label>
+        <input id="nm-legal-name" name={F.legalName} required maxlength="160" autocomplete="organization" />
+      </div>
+      <div class="field">
+        <label for="nm-website">Website</label>
+        <input
+          id="nm-website"
+          name={F.website}
+          type="text"
+          inputmode="url"
+          autocomplete="url"
+          required
+          pattern={WEBSITE_PATTERN}
+          title="A web address, like acme.com"
+        />
+      </div>
+      <div class="field">
+        <label for="nm-city">Headquarters city</label>
+        <input
+          id="nm-city"
+          name={F.hqCity}
+          required
+          maxlength="80"
+          autocomplete="address-level2"
+          list="nm-city-list"
+          data-hq-city
+        />
+        <datalist id="nm-city-list">{HQ_CITIES.map((c) => <option value={c} />)}</datalist>
+      </div>
+      <div class="field">
+        <label for="nm-county">Headquarters county</label>
+        <span class="hint" id="nm-county-hint" data-county-hint aria-live="polite">
+          Filled in from the city when the city sits in one county.
+        </span>
+        <select id="nm-county" name={F.hqCounty} required aria-describedby="nm-county-hint" data-hq-county>
+          <option value="">Choose a Colorado county</option>
+          {COLORADO_COUNTIES.map((c) => <option value={c}>{c}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="nm-founded">Year founded</label>
+        <input id="nm-founded" name={F.foundedYear} type="number" required min="1950" max={thisYear} step="1" />
+      </div>
+      <div class="field">
+        <label for="nm-sector">Sector</label>
+        <select id="nm-sector" name={F.sector} required>
+          <option value="">Choose the industry the company serves</option>
+          {SECTORS.map((s) => <option value={s}>{s}</option>)}
+        </select>
+      </div>
+      <div class="check">
+        <input id="nm-status" name={F.privateIndependentForProfit} type="checkbox" required />
+        <label for="nm-status">The company is private, independent and for-profit.</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Growth</legend>
+      <p class="hint">
+        Verified editions rank three-year revenue growth. Give revenue for a base year and for the most recent full year.
+        Whole US dollars; commas are fine.
+      </p>
+      <div class="field">
+        <label for="nm-base-year">Base year</label>
+        <input
+          id="nm-base-year"
+          name={F.baseYear}
+          type="number"
+          required
+          min="2000"
+          max={thisYear}
+          step="1"
+          value={BASE_YEAR}
+          aria-describedby="nm-base-year-hint"
+          data-base-year
+        />
+        <span class="hint" id="nm-base-year-hint">
+          Filled in as three years before your most recent full year. Change it if your books close on another schedule.
+        </span>
+      </div>
+      <div class="field">
+        <label for="nm-base-rev">Revenue in the base year (USD)</label>
+        <input
+          id="nm-base-rev"
+          name={F.baseYearRevenue}
+          inputmode="numeric"
+          required
+          pattern={USD_PATTERN}
+          title={USD_TITLE}
+        />
+      </div>
+      <div class="field">
+        <label for="nm-current-rev">Revenue in the most recent full year (USD)</label>
+        <input
+          id="nm-current-rev"
+          name={F.currentYearRevenue}
+          inputmode="numeric"
+          required
+          pattern={USD_PATTERN}
+          title={USD_TITLE}
+        />
+      </div>
+      <div class="field">
+        <label for="nm-fte">Full-time employees today</label>
+        <input id="nm-fte" name={F.fteHeadcount} type="number" required min="0" step="1" />
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your contact details</legend>
+      <div class="field">
+        <label for="nm-contact-name">Your name</label>
+        <input id="nm-contact-name" name={F.contactName} required maxlength="120" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="nm-contact-email">Your email</label>
+        <input id="nm-contact-email" name={F.contactEmail} type="email" required autocomplete="email" />
+        <span class="hint">We email you when an edition is assembled, to ask for documents that verify these figures.</span>
+      </div>
+      <div class="check">
+        <input id="nm-consent" name={F.consentToPublish} type="checkbox" required />
+        <label for="nm-consent">
+          Colorado Startups may publish the company's name, website, sector, HQ city and a revenue range if it is listed.
+        </label>
+      </div>
+      <div class="check">
+        <input id="nm-attest" name={F.attestation} type="checkbox" required />
+        <label for="nm-attest">I can speak for this company, and the figures above are accurate to the best of my knowledge.</label>
+      </div>
+    </fieldset>
+
+    <Turnstile />
+    <button class="btn btn--gold" type="submit">Nominate your company</button>
+  </form>
+</div>
+
+<script>
+  import { clearDraft, draftFrom, markInvalidFields, readDraft, saveDraft } from "../apply/client";
+  import { showErrorMessage, stampLoadTime } from "../forms/form-status";
+  import { countiesForCity, listedCity } from "../../lib/leaderboard/place-counties";
+
+  stampLoadTime(document);
+
+  const search = window.location.search;
+  const code = new URLSearchParams(search).get("error");
+  const form = document.querySelector<HTMLFormElement>("[data-nomination-form]");
+  let labels: string[] = [];
+  if (form) {
+    // The draft's key and skipped fields come from NOMINATION_DRAFT, rendered
+    // into the form, so this script never bundles the parser or zod.
+    const store = { key: form.dataset.draftKey ?? "", skip: new Set((form.dataset.draftSkip ?? "").split(" ")) };
+    // After a rejected submission (?error=), bring back this tab's draft. Any
+    // other visit starts clean and drops an old draft.
+    const draft = code ? readDraft(store) : null;
+    if (!draft) clearDraft(store);
+    for (const [name, value] of Object.entries(draft ?? {})) {
+      const el = form.elements.namedItem(name);
+      if ((el instanceof HTMLInputElement && el.type !== "checkbox") || el instanceof HTMLSelectElement) {
+        el.value = value;
+      }
+    }
+    // The base year follows the visitor's clock unless a draft brought one back.
+    const baseYear = form.querySelector<HTMLInputElement>("[data-base-year]");
+    if (baseYear && !draft?.[baseYear.name]) baseYear.value = String(new Date().getFullYear() - 4);
+
+    // Fill in the county from the city (#147). A city in several counties
+    // names them and leaves the choice to the nominator.
+    const city = form.querySelector<HTMLInputElement>("[data-hq-city]");
+    const county = form.querySelector("[data-hq-county]");
+    const hint = form.querySelector<HTMLElement>("[data-county-hint]");
+    if (city && county instanceof HTMLSelectElement && hint) {
+      const defaultHint = hint.textContent ?? "";
+      const fill = () => {
+        const counties = countiesForCity(city.value);
+        if (counties.length === 1) county.value = counties[0]!;
+        else if (counties.length > 1 && !counties.includes(county.value)) county.value = "";
+        hint.textContent =
+          counties.length > 1 ? `${listedCity(city.value)} sits in ${andCounties(counties)}. Choose the one the HQ is in.` : defaultHint;
+      };
+      city.addEventListener("input", fill);
+      city.addEventListener("change", fill);
+    }
+
+    if (code === "invalid") labels = markInvalidFields(form, search);
+    form.addEventListener("submit", () => saveDraft(draftFrom(new FormData(form), store), store));
+  }
+
+  function andCounties(counties: readonly string[]): string {
+    const names = counties.length > 2 ? `${counties.slice(0, -1).join(", ")} and ${counties.at(-1)}` : counties.join(" and ");
+    return `${names} counties`;
+  }
+
+  // An invalid nomination names the fields the Worker flagged.
+  showErrorMessage(document, code, (message) => {
+    if (labels.length > 0 && message.dataset.fieldsText) {
+      message.textContent = message.dataset.fieldsText.replace("{fields}", labels.join(", "));
+    }
+  });
+</script>
+
+<style>
+  /* Fieldsets, hints and checks: the Forms section of global.css (#195). */
+  /* A field the Worker named after a rejection (?field=). */
+  :is(input, select)[aria-invalid="true"] {
+    border-color: var(--c-danger);
+  }
+</style>

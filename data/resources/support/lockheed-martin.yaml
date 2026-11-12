@@ -1,0 +1,13 @@
+id: lockheed-martin
+name: Lockheed Martin
+url: https://www.lockheedmartin.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: A security, defense and aerospace contractor. It has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: cognixia
+name: Cognixia
+url: https://www.cognixia.com/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: An enterprise training company. It builds AI-ready engineers and upskills company teams in AI, cloud, data and cybersecurity.
+tags:
+  - coding
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

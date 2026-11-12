@@ -1,0 +1,15 @@
+id: range-ventures
+name: Range Ventures
+url: https://range.vc/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: A Denver seed fund run by founders. It backs pre-seed and seed companies in the real economy.
+tags:
+  - seed
+  - venture-capital
+  - technology
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

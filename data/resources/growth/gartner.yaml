@@ -1,0 +1,13 @@
+id: gartner
+name: Gartner
+url: https://www.gartner.com/en
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A management consulting firm in Denver.
+tags:
+  - consulting
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

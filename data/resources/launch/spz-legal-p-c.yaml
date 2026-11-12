@@ -1,0 +1,13 @@
+id: spz-legal-p-c
+name: SPZ Legal, P.C.
+url: https://www.spzlegal.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A business law firm with a Denver office. It advises startups and founders on formation, funding, employment, IP and M&A.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

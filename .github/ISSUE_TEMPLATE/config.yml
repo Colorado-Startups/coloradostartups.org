@@ -1,0 +1,7 @@
+# Blank issues are off, so every issue opened on the web goes through a form: bug.yml for a bug, error or needed fix,
+# enhancement.yml for an improvement until the org Project board exists (CLAUDE.md, "Work tracking").
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Colorado-Startups/coloradostartups-site/blob/main/SECURITY.md
+    about: Report it privately, as SECURITY.md describes. Do not open a public issue.

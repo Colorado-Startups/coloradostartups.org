@@ -1,0 +1,150 @@
+---
+// /get-involved/: the open positions people fill (decision 44). Owner: L9.
+// Every position in data/team/positions.yaml renders here, grouped community,
+// regions, projects, in the shared comparePositions() order: region seats by
+// region order, the rest by title. A seat with an open `apply` block links to
+// the application form at /get-involved/apply/?role=<id> (L19); every other
+// seat's "Email us about this seat" is an email to info@. No "paid", "hiring" or "job"
+// wording on this page, and "volunteer" only on the four seats that take
+// applications (decisions 44 and 67). A DOM test checks both.
+//
+// The first screen holds one gold button, "See open seats", and the group
+// jumps beside it as quiet buttons (#229). Each is 44 px tall, the tap target
+// floor .tap-target gives other standalone links (#420).
+// test/dom/l9/team.test.ts checks the first screen.
+import { comparePositions } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import PositionCard from "../../components/positions/PositionCard.astro";
+import { groupByArea, holderOf, RAISE_HAND_EMAIL } from "../../components/positions/positions";
+import Button from "../../components/ui/Button.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { REGIONS } from "../../lib/regions/match";
+
+const regions = [...REGIONS];
+const positions = (await getCollection("positions")).map((e) => e.data).sort(comparePositions(regions));
+const people = (await getCollection("people")).map((e) => e.data);
+const groups = groupByArea(positions);
+// "See open seats" lands on the first group, where the seat list starts (#229).
+const firstGroup = groups[0];
+const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I would like to help")}`;
+---
+
+<BaseLayout
+  title="Get involved"
+  description="Open seats at Colorado Startups: a Slack Community Lead, a Connector for each region, the LinkedIn Group moderator, a statewide organizer and project roles. Apply online or raise your hand by email."
+  ogImage="get-involved"
+>
+  <section class="section section--band" aria-labelledby="involved-title">
+    <div class="wrap stack">
+      <h1 id="involved-title">Get involved</h1>
+      <p class="lede">People run this community. Pick a seat that fits you, and raise your hand.</p>
+      <p>
+        Every moderator and organizer seat is for a person. The AI keepers help with the work, and they never
+        moderate.
+      </p>
+      <div class="btn-row lead-actions">
+        {
+          firstGroup && (
+            <Button size="lg" href={`#${firstGroup.anchor}`}>
+              See open seats
+            </Button>
+          )
+        }
+        <nav aria-label="Position groups">
+          <ul class="jump">
+            {
+              groups.map((g) => (
+                <li>
+                  <Button variant="quiet" href={`#${g.anchor}`}>
+                    {g.label}
+                  </Button>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="how-title">
+    <div class="wrap stack">
+      <h2 id="how-title">How to raise your hand</h2>
+      <p>
+        Some seats take an application. Their "Apply for this seat" button opens a short form. First you finish the
+        free Claude Academy courses the seat's card lists, each with its length. <a href="/team/">Paul Foley</a>, our
+        founder, reads every application. If it looks like a fit, Paul sets up an interview.
+      </p>
+      <p>
+        Every other seat's "Email us about this seat" button opens an email to <strong class="email">{RAISE_HAND_EMAIL}</strong>{" "}
+        with the seat in the subject. Tell us a little about yourself, where you are in Colorado and what you are
+        building. A person reads every note.
+      </p>
+    </div>
+  </section>
+
+  {
+    groups.map((g, i) => (
+      <section
+        class:list={["section", i % 2 === 0 ? "section--band" : "section--lit"]}
+        id={g.anchor}
+        aria-labelledby={`${g.anchor}-title`}
+        data-position-group={g.area}
+      >
+        <div class="wrap stack">
+          <h2 id={`${g.anchor}-title`}>{g.label}</h2>
+          <p>{g.intro}</p>
+          <ul class="hall-grid seat-grid" aria-label={`${g.label} positions`}>
+            {g.positions.map((position) => (
+              <PositionCard position={position} holder={holderOf(position, people)} element="li" />
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section section--lit" aria-labelledby="other-title">
+    <div class="wrap stack">
+      <h2 id="other-title">Want to help another way?</h2>
+      <p>
+        Tell us what you would like to do. Write to <strong class="email">{RAISE_HAND_EMAIL}</strong>.
+      </p>
+      <p class="btn-row">
+        <Button variant="stone" href={generalHref}>Email Colorado Startups</Button>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* hall.css makes .btn--lg 56 px tall and .btn--quiet 44 px, so the row
+     centers the gold button and the jumps on one line. */
+  .lead-actions {
+    align-items: center;
+  }
+  .jump {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+  /* L12's .hall-grid, with tracks wide enough for a seat's list. auto-fit
+     drops empty tracks, so a short row spans the width (#207). */
+  .seat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    /* A short card ends at its content, not at the tallest card's foot (#723). */
+    align-items: start;
+  }
+  /* .hall-card fills its grid area with height: 100%, which would undo the
+     start alignment above. */
+  .seat-grid :global(.position) {
+    height: auto;
+  }
+  .email {
+    overflow-wrap: anywhere;
+  }
+</style>

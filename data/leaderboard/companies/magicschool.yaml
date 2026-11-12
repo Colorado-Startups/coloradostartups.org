@@ -1,0 +1,8 @@
+id: magicschool
+name: "MagicSchool"
+website: "https://magicschool.ai"
+hq_city: "Boulder"
+sector: "Education"
+description: "Provides AI tools to plan lessons, create materials and support students. Teachers and school leaders use them."
+sources:
+  - "https://www.magicschool.ai/privacy-security/terms-of-service"

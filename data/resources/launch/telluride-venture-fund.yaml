@@ -1,0 +1,15 @@
+id: telluride-venture-fund
+name: Telluride Venture Fund
+url: http://tellurideventurefund.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: Seed-stage venture capital firm. Listed in the Ecosystem Canvas for founders at the launch stage.
+tags:
+  - seed
+  - venture-capital
+  - sustainability
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

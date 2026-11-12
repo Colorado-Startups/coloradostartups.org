@@ -1,0 +1,13 @@
+id: colorado-enterprise-fund
+name: Colorado Enterprise Fund
+url: https://coloradoenterprisefund.org/
+stage: support
+substage: organizations
+city: statewide
+type: government
+description: A nonprofit CDFI lender for underserved Colorado entrepreneurs. Its clients do not meet the usual rules for financing. It has SBA loans, microloans and startup loans, plus business navigation.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

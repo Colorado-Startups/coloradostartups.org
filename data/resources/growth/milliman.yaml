@@ -1,0 +1,14 @@
+id: milliman
+name: Milliman
+url: https://us.milliman.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: An actuarial and consulting firm. It serves insurers, employers and healthcare groups. It also has a startup accelerator.
+tags:
+  - insurance
+  - consulting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

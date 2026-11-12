@@ -1,0 +1,13 @@
+id: medtronic
+name: Medtronic
+url: https://www.medtronic.com/
+stage: support
+substage: organizations
+city: Louisville
+type: other
+description: Medical tech such as robot-assisted surgery systems. It has implantable devices too. It is for healthcare professionals. It has an office in Louisville.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

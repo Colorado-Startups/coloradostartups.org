@@ -1,0 +1,13 @@
+id: university-of-colorado-boulder
+name: University of Colorado Boulder
+url: https://www.colorado.edu/
+stage: support
+substage: organizations
+city: Boulder
+type: university
+description: A public research university in Boulder. It has undergraduate and graduate programs. It also has research. Its campus is student-centered.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

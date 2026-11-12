@@ -1,0 +1,13 @@
+id: mccarthy-garber-law
+name: McCarthy Garber Law
+url: https://mccarthygarberlaw.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver business law firm. It advises startups and other companies. It covers corporate matters and technology law.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

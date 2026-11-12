@@ -1,0 +1,13 @@
+id: pwc
+name: PwC
+url: https://www.pwc.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: Accounting, audit and tax firm in Denver.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

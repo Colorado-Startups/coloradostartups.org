@@ -1,0 +1,13 @@
+id: bizwest
+name: BizWest
+url: https://bizwest.com/
+stage: growth
+substage: service-providers
+city: Boulder
+type: media
+description: A business news outlet. It covers Boulder Valley and Northern Colorado. It has industry data, events and newsletters.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

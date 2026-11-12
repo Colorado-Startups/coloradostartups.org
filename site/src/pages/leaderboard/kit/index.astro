@@ -1,0 +1,84 @@
+---
+// /leaderboard/kit/: the badge kit. 2026 Leaderboard honorees and
+// organizations listed in Startup Resources copy a badge that links back to
+// the page that lists them. Paul sends the kit to them himself (hard
+// constraint 11); no agent emails anyone. Owner: L26.
+import BadgeCard from "../../../components/kit/BadgeCard.astro";
+import { KIT_BADGES } from "../../../components/kit/badges";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const [leaderboard, resources] = KIT_BADGES;
+if (!leaderboard || !resources) throw new Error("badges.ts must define the Leaderboard and Startup Resources badges");
+---
+
+<BaseLayout
+  title="Badge kit"
+  description="Badges for 2026 Leaderboard honorees and for organizations in Startup Resources, with the HTML to add one to your site and the terms for using it."
+  ogImage="leaderboard"
+>
+  <section class="section section--lit">
+    <div class="wrap">
+      <h1>Badge kit</h1>
+      <p class="lede">
+        Show your listing on your own website. Each badge links to the page on coloradostartups.org that lists you, so
+        your visitors can check it.
+      </p>
+      <p>Copy the HTML for your badge and paste it where you want the badge to appear, such as your footer or press page.</p>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-label="The badges">
+    <div class="wrap kit-grid" data-kit-grid>
+      <BadgeCard badge={leaderboard}>
+        <p>
+          For companies listed in the <a href="/leaderboard/#2026-honorees">2026 Honorees</a> on the Leaderboard. The
+          badge links to the Leaderboard.
+        </p>
+      </BadgeCard>
+      <BadgeCard badge={resources}>
+        <p>
+          For organizations listed in <a href="/ecosystem-canvas/">Startup Resources</a>. The badge links to Startup
+          Resources.
+        </p>
+      </BadgeCard>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="terms">
+    <div class="wrap">
+      <h2 id="terms">How to use the badges</h2>
+      <ul class="kit-terms">
+        <li>
+          Use the Leaderboard badge if your company is listed in the 2026 Honorees. Use the Startup Resources badge if
+          your organization is listed in Startup Resources.
+        </li>
+        <li>Keep the link. It takes people to the page that lists you.</li>
+        <li>
+          Use the badge as it is. Don't change its words, colors or shape. You may make it larger or smaller if you keep
+          its proportions.
+        </li>
+        <li>The 2026 edition is unranked; it lists companies A to Z. Please don't present it as a ranking.</li>
+        <li>A badge shows a listing. It does not mean Colorado Startups recommends your company or partners with it.</li>
+        <li>If your listing comes off the page, take the badge down too.</li>
+      </ul>
+      <p>
+        The HTML loads the badge from coloradostartups.org, so a fix we make to a badge reaches your site on its own.
+        Questions or a correction to your listing: write to{" "}
+        <a href="mailto:info@coloradostartups.org">info@coloradostartups.org</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The two badge panels sit side by side where each gets 26rem, and stack
+     below that (#243). The gap spaces them; the band's padding frames them. */
+  .kit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+    gap: var(--s-6);
+  }
+  .kit-terms li + li {
+    margin-top: var(--s-2);
+  }
+</style>

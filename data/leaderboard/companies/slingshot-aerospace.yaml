@@ -1,0 +1,10 @@
+id: slingshot-aerospace
+name: "Slingshot Aerospace"
+website: "https://www.slingshot.space/"
+hq_city: "Windsor"
+founded_year: 2017
+sector: "Space and aerospace"
+description: "Sells software and training tools for space domain awareness. Government and commercial satellite operators buy them."
+sources:
+  - "https://www.slingshot.space/contact-sales"
+  - "https://www.slingshot.space/about"

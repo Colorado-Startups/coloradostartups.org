@@ -1,0 +1,13 @@
+id: colorado-daily
+name: Colorado Daily
+url: https://www.coloradodaily.com/news/business/
+stage: growth
+substage: service-providers
+city: statewide
+type: media
+description: A regional news outlet.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

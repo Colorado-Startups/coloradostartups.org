@@ -1,0 +1,13 @@
+id: rubicon-law
+name: Rubicon Law
+url: http://www.rubiconlaw.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver law firm. It advises founders and high-growth companies. It covers formation, fundraising, IP and governance. It also offers fractional general counsel.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

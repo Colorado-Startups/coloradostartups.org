@@ -1,0 +1,15 @@
+id: stout-street-capital
+name: Stout Street Capital
+url: https://stoutstreetcapital.com/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: A Denver seed-stage venture firm. It writes the first institutional check for deep tech founders in Colorado and the Rocky Mountain region. It invests across energy, biotech, aerospace and quantum.
+tags:
+  - seed
+  - venture-capital
+  - technology
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

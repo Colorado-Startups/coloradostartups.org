@@ -1,0 +1,13 @@
+id: the-gillespie-law-group
+name: The Gillespie Law Group
+url: https://gillespiegroup.law/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A Boulder law firm. It advises startups and growth-stage companies. It covers equity plans, venture financing, software licensing and contracts.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

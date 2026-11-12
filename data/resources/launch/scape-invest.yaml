@@ -1,0 +1,14 @@
+id: scape-invest
+name: SCAPE Invest
+url: https://www.goscape.org/invest
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: The investment arm of SCAPE, the Southwest Colorado Accelerator Program for Entrepreneurs in Durango. It funds the companies that go through its accelerator.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

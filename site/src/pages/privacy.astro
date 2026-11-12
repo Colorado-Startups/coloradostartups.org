@@ -1,0 +1,133 @@
+---
+// /privacy/: renders data/legal/privacy.md (L10 owns the words). The draft
+// notice shows until that file's frontmatter says `status: approved`
+// (components/info/privacy.ts). /privacy-policy 301s here. Owner: L13.
+import type { MarkdownHeading } from "astro";
+import { getEntry } from "astro:content";
+
+import InfoHeader from "../components/info/InfoHeader.astro";
+import Callout from "../components/ui/Callout.astro";
+import { DRAFT_NOTICE, formatUpdated, isDraftPolicy, stripHtmlComments } from "../components/info/privacy";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const entry = await getEntry("legal", "privacy");
+if (!entry) throw new Error("data/legal/privacy.md is missing; the /privacy/ page cannot build without it.");
+// The content layer has already rendered the Markdown. Our own reviewed file,
+// so set:html is safe; the reviewer comments come out first.
+const html = entry.rendered?.html;
+if (!html) throw new Error("data/legal/privacy.md rendered no HTML.");
+const draft = isDraftPolicy(entry.data.status);
+const updated = entry.data.updated;
+
+// Jump links (#148), right after "The short version". Astro's Markdown gives
+// every heading an id from its words and lists them in metadata.headings, so
+// each link and its heading come from the same list. The policy splits at the
+// second H2; if it has fewer than two, the page renders whole, with no list.
+const body = stripHtmlComments(html);
+const listed = entry.rendered?.metadata?.headings;
+const sections = (Array.isArray(listed) ? (listed as MarkdownHeading[]) : []).filter((h) => h.depth === 2);
+const split = sections[1] ? body.indexOf(`<h2 id="${sections[1].slug}"`) : -1;
+const [intro, rest] = split > 0 ? [body.slice(0, split), body.slice(split)] : [body, ""];
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.summary}>
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <InfoHeader kicker="What the Hall keeps" title={entry.data.title}>
+        <p class="meta">Updated <time datetime={updated.toISOString().slice(0, 10)}>{formatUpdated(updated)}</time></p>
+      </InfoHeader>
+      {
+        draft && (
+          <Callout tone="slate" title={DRAFT_NOTICE.title}>
+            <p>{DRAFT_NOTICE.body}</p>
+          </Callout>
+        )
+      }
+      <div class="prose" set:html={intro} />
+      {
+        rest && (
+          <nav class="jump" aria-labelledby="privacy-jump-label" data-privacy-jump>
+            <p class="jump-label" id="privacy-jump-label">
+              On this page
+            </p>
+            <ul>
+              {sections.map((s) => (
+                <li>
+                  <a href={`#${s.slug}`}>{s.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+      {rest && <div class="prose" set:html={rest} />}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .jump {
+    margin-top: var(--s-6);
+    max-width: var(--t-measure);
+  }
+  .jump-label {
+    margin-bottom: var(--s-2);
+    font-weight: 700;
+  }
+  /* One column on a phone, two where they fit. Each link is a 44 px tap
+     target (WCAG 2.5.5), so a thumb lands on one section, not its neighbor. */
+  .jump ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 0 var(--s-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .jump a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+  }
+  .prose :global(h2) {
+    margin-top: var(--s-7);
+    font-size: var(--t-step-2);
+  }
+  .prose :global(li) {
+    margin-bottom: var(--s-2);
+  }
+  /* The short version, the list under the first H2, is the page's lead, so it
+     sits in a panel with a Callout's look: surface face, gold rule on the
+     left, cut corners (#245). The extra left padding leaves room for bullets. */
+  .prose :global(h2:first-of-type + ul) {
+    padding: var(--s-5) var(--s-5) var(--s-5) calc(var(--s-6) + 1em);
+    background: var(--c-surface);
+    border: var(--line-hair) solid var(--c-rule);
+    border-left: 4px solid var(--c-accent);
+    border-radius: var(--r-bevel);
+  }
+  .prose :global(h2:first-of-type + ul > li:last-child) {
+    margin-bottom: 0;
+  }
+  @supports (corner-shape: bevel) {
+    .prose :global(h2:first-of-type + ul) {
+      corner-shape: bevel;
+    }
+  }
+  .prose :global(table) {
+    width: 100%;
+    max-width: var(--t-measure);
+    border-collapse: collapse;
+    margin-bottom: var(--s-5);
+  }
+  .prose :global(th),
+  .prose :global(td) {
+    text-align: left;
+    vertical-align: top;
+    padding: var(--s-2) var(--s-3);
+    border-bottom: var(--line-hair) solid var(--c-rule);
+  }
+  .prose :global(th) {
+    border-bottom: var(--line-edge) solid var(--c-accent);
+  }
+</style>

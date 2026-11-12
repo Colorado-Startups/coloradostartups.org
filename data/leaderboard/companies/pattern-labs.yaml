@@ -1,0 +1,8 @@
+id: pattern-labs
+name: "Pattern Labs"
+website: "https://patternlabs.ai"
+hq_city: "Erie"
+sector: "Logistics and mobility"
+description: "Builds fleet software and robots that automate ground operations at airports. Baggage and cargo movement is one example."
+sources:
+  - "https://patternlabs.ai"

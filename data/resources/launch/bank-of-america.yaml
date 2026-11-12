@@ -1,0 +1,15 @@
+id: bank-of-america
+name: Bank of America
+url: https://www.bankofamerica.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: Bank offering small businesses checking, credit cards, lines of credit, SBA loans and payment tools.
+tags:
+  - banking
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

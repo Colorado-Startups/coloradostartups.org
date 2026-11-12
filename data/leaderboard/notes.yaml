@@ -1,0 +1,4 @@
+# Short public notes shown under a company on the board, keyed by company id.
+# Facts only, each with its date. The data contract (site/test/unit/l2/data.test.ts)
+# checks every key against data/leaderboard/companies/.
+harvest-hosts: "Acquisition announced 2026-09-30."

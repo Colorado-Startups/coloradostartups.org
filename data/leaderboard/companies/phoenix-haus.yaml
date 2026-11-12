@@ -1,0 +1,9 @@
+id: phoenix-haus
+name: "Phoenix Haus"
+website: "https://www.phoenixhaus.com/"
+hq_city: "Grand Junction"
+sector: "Real estate and construction"
+description: "Builds energy-efficient custom homes and accessory dwellings from parts made off site. They are for homeowners and builders in the West."
+sources:
+  - "https://www.phoenixhaus.com/contact"
+  - "https://www.phoenixhaus.com/"

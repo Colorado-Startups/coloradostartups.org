@@ -1,0 +1,69 @@
+name: deploy-gate
+
+# ADVISORY as a check: no ruleset requires it. It is the one job that writes
+# the production branch, which Workers Builds deploys to the production Worker.
+# Git Crafter's template (templates/ci/deploy-gate.yml at 3d160b9), with this
+# repo's gates and staging check; 04_tools/deploy_gate.sh is the vendored
+# script and holds the rules:
+#   - every gate that ran on the push of main's commit passed, and one ran;
+#   - the move is a fast-forward of production, never forced;
+#   - a range with an outside contributor's commit waits SOAK_MINUTES after
+#     its push and for the staging Worker's build check, then moves
+#     (skills/merging/outside.md in Git Crafter).
+#
+# The schedule re-checks a soaking range every 15 minutes. It acts only where
+# the repo variable DEPLOY_GATE_SCHEDULE is 1, set on the public repo, whose
+# standard runners are free; here the scheduled job is skipped and spends
+# no minutes (~/.claude/rules/compute.md, Money).
+#
+# workflow_run runs this file as main holds it, so no pull request changes
+# what decides; the job runs only for this repository's own push runs, never a
+# fork's. The push uses GITHUB_TOKEN with contents: write on this job only.
+on:
+  workflow_run:
+    workflows: [site-tests, secret-scan]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+
+permissions: {}
+
+env:
+  DEPLOY_GATES: site-tests secret-scan
+  SOURCE_BRANCH: main
+  DEPLOY_BRANCH: production
+  SOAK_MINUTES: "30"
+  STAGING_CHECK: "Workers Builds: coloradostartups-site-staging"
+
+jobs:
+  advance:
+    name: deploy-gate
+    if: >-
+      (github.event_name == 'schedule' && vars.DEPLOY_GATE_SCHEDULE == '1')
+      || (github.event.workflow_run.conclusion == 'success'
+          && github.event.workflow_run.event == 'push'
+          && github.event.workflow_run.head_repository.full_name == github.repository)
+    # ubuntu-slim: git and a few API reads take seconds (ops/ci/compute-plan.md, step 4).
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+      checks: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Deploy gate self-test
+        run: bash 04_tools/deploy_gate.sh --self-test
+
+      - name: Fast-forward production to the commit main's gates passed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ -z "$SHA" ]; then SHA="$(git rev-parse "origin/$SOURCE_BRANCH")"; fi
+          bash 04_tools/deploy_gate.sh "$SHA"

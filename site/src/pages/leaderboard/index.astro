@@ -1,0 +1,211 @@
+---
+// /leaderboard/: three build-time charts with their data, then the latest
+// edition as a sortable table, the method, and the kept "Recruit Series B"
+// section (LinkedIn decision 35). The charts come first so a visitor sees the
+// edition's shape before the long table; the page closes on Recruit in the
+// hearth band, the Hall's room for a closing call to action (#239). Styled
+// with existing tokens only. Owner: L2.
+//
+// The title is carved in a lintel, and the Great Hall picture sits beside the
+// lede from 64rem (#239, #723). On a phone the picture stays a small seal
+// under the actions, smaller than the lede, so the lede stays the largest
+// thing in the first screen and the mobile LCP stays text. Keepers appear in
+// the picture, so its alt is HALL_ART_ALT.
+import { getCollection } from "astro:content";
+
+import ArtImage from "../../components/art/ArtImage.astro";
+import { HALL_ART_ALT } from "../../components/art/keepers";
+import ChartFigure from "../../components/leaderboard/ChartFigure.astro";
+import HonoreesTable from "../../components/leaderboard/HonoreesTable.astro";
+import Banner from "../../components/ui/Banner.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { buildBoard, countBy, foundingYears, latestEdition, topWithTies } from "../../lib/leaderboard/board";
+import {
+  foundingTimeline,
+  foundingTimelineNarrow,
+  hqMap,
+  hqMapNarrow,
+  sectorBars,
+  sectorBarsNarrow,
+} from "../../lib/leaderboard/charts";
+import { COMPANY_NOTES } from "../../lib/leaderboard/notes";
+import { isColoradoCity } from "../../lib/leaderboard/places";
+
+const companies = (await getCollection("companies")).map((e) => e.data);
+const edition = latestEdition((await getCollection("editions")).map((e) => e.data));
+if (!edition) throw new Error("no Leaderboard edition in data/leaderboard/editions/");
+
+const rows = buildBoard(edition, companies);
+const total = rows.length;
+
+const cities = countBy(rows, (r) => r.company.hq_city);
+const coloradoCities = cities.filter((c) => isColoradoCity(c.key));
+const outsideCount = rows.filter((r) => !isColoradoCity(r.company.hq_city)).length;
+const sectors = countBy(rows, (r) => r.company.sector);
+const years = foundingYears(rows);
+const datedCount = years.reduce((n, y) => n + y.count, 0);
+
+const top = topWithTies(coloradoCities, 3).map((c) => `${c.key} (${c.count})`).join(", ");
+const mapSummary =
+  `Each dot is a Colorado city where honorees have their headquarters, sized by the number of companies. ` +
+  `The most are in ${top}.` +
+  (outsideCount === 1
+    ? " One honoree lists a headquarters outside Colorado and is not mapped."
+    : outsideCount > 1
+      ? ` ${outsideCount} honorees list a headquarters outside Colorado and are not mapped.`
+      : "");
+const sectorSummary = `Honorees by the industry they serve. The largest sectors are ${topWithTies(sectors, 3)
+  .map((s) => `${s.key} (${s.count})`)
+  .join(", ")}.`;
+const yearSummary =
+  years.length > 0
+    ? `Honorees by founding year, from ${years[0]!.year} to ${years.at(-1)!.year}. ` +
+      `${datedCount} of ${total} companies state a founding year in a source we could cite.`
+    : "No honoree states a founding year in a source we could cite.";
+
+// The meta description says what this edition is (GO-LIVE C4). The 2026
+// Honorees are unranked and listed A to Z (edition summary), so it makes no
+// ranking claim. test/dom/l2/leaderboard-claims.test.ts fails when the latest
+// edition's kind and this wording disagree.
+const description = `${edition.title}: companies building in Colorado that we verified from public sources. This edition is unranked, lists them A to Z and links every source.`;
+
+const mapText = { label: "Map of Colorado HQ cities", description: mapSummary };
+const sectorText = { label: "Honorees by sector", description: sectorSummary };
+const yearText = { label: "Honorees by founding year", description: yearSummary };
+---
+
+<BaseLayout
+  title="The Leaderboard"
+  description={description}
+  ogImage="leaderboard"
+>
+  <section class="section section--lit">
+    <div class="wrap lb-hero">
+      <div>
+        <Banner as="h1" variant="lintel">The Leaderboard</Banner>
+        <p class="lede">
+          The Leaderboard recognizes companies building in Colorado and their founders. Every listing links to the
+          sources we used.
+        </p>
+        <div class="btn-row">
+          <a class="btn btn--gold" href="/leaderboard/nominate/">Nominate your company</a>
+          <a class="btn btn--stone" href="#method">How it works</a>
+        </div>
+      </div>
+      <ArtImage
+        src="hero/hall"
+        alt={HALL_ART_ALT}
+        aspect="21 / 9"
+        widths={[400, 640, 960]}
+        sizes="(min-width: 64rem) 26rem, 14rem"
+        loading="lazy"
+        motion="none"
+        class="lb-hero__art"
+      />
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="glance">
+    <div class="wrap">
+      <h2 id="glance">The edition at a glance</h2>
+      <ChartFigure
+        id="chart-map"
+        title="Where the honorees are"
+        summary={mapSummary}
+        svg={hqMap(coloradoCities, mapText)}
+        narrowSvg={hqMapNarrow(coloradoCities, mapText)}
+        columns={["HQ city", "Companies"]}
+        rows={cities.map((c) => [c.key, c.count])}
+        note="Cities outside Colorado are written with their state."
+      />
+      <ChartFigure
+        id="chart-sectors"
+        title="What they build"
+        summary={sectorSummary}
+        svg={sectorBars(sectors, sectorText)}
+        narrowSvg={sectorBarsNarrow(sectors, sectorText)}
+        columns={["Sector", "Companies"]}
+        rows={sectors.map((s) => [s.key, s.count])}
+      />
+      <ChartFigure
+        id="chart-years"
+        title="When they started"
+        summary={yearSummary}
+        svg={foundingTimeline(years, yearText)}
+        narrowSvg={foundingTimelineNarrow(years, yearText)}
+        columns={["Year founded", "Companies"]}
+        rows={years.map((y) => [y.year, y.count])}
+        note={`${total - datedCount} companies with no cited founding year are left out.`}
+      />
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby={edition.id}>
+    <div class="wrap">
+      <h2 id={edition.id}>{edition.title}</h2>
+      <p>{edition.summary}</p>
+      <p><a href="/leaderboard/kit/">Listed here? Get the honoree badge for your site.</a></p>
+      <p class="meta">
+        As of {edition.published}, this edition lists {total} companies, A to Z. Select a column heading to sort.
+      </p>
+      <HonoreesTable rows={rows} caption={`${edition.title}, A to Z`} notes={COMPANY_NOTES} />
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="method">
+    <div class="wrap">
+      <h2 id="method">How the Leaderboard works</h2>
+      <h3>This edition</h3>
+      <p>{edition.method}</p>
+      <h3>Verified editions</h3>
+      <p>
+        From the first verified edition on, we rank companies by how fast their revenue grew over three years. A company
+        needs a minimum revenue in its first year to qualify. That keeps a tiny start from showing a false growth rate.
+        Companies compete in two tiers, Startup and Growth, so a young company is judged against its peers.
+      </p>
+      <p>
+        We publish the minimum and the tier limits before nominations close. We ask each company for documents that
+        prove its numbers. The Leaderboard shows revenue as a range, never an exact figure.
+      </p>
+      <p><a href="/leaderboard/nominate/">Nominate your company for the first verified edition.</a></p>
+    </div>
+  </section>
+
+  <section class="section section--hearth" aria-labelledby="recruit">
+    <div class="wrap">
+      <h2 id="recruit">Recruit Series B and bigger VC funds to Colorado</h2>
+      <p>Congratulations to the founders and teams building these companies.</p>
+      <p>
+        As a startup community dedicated to growth, we ask every member to help bring growth-stage venture firms to
+        Colorado, with a main or second office. Show them this Leaderboard. Tell them the next big companies are
+        building here.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lb-hero {
+    display: grid;
+    gap: var(--s-6);
+    align-items: center;
+  }
+  /* A small seal on a phone (14rem); ArtImage renders the figure in its own
+     scope, so this reaches it by class. */
+  .lb-hero :global(.lb-hero__art) {
+    width: min(100%, 14rem);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  /* Text and picture side by side from 64rem, the text wider. */
+  @media (min-width: 64rem) {
+    .lb-hero {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--s-7);
+    }
+    .lb-hero :global(.lb-hero__art) {
+      width: min(100%, 26rem);
+      justify-self: end;
+    }
+  }
+</style>

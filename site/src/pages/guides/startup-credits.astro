@@ -1,0 +1,542 @@
+---
+// /guides/startup-credits/: cloud, GPU and AI credit programs, grouped by what
+// each one asks of a founder (session S7, decisions 78 to 81). lib/guides/
+// credits.ts parses the dated snapshot in data/credits/ and groups it; this
+// page renders it. A static route, so it wins over guides/[slug].astro, which
+// builds only the Startup Resources guides.
+//
+// Every figure shares its sentence with its source, because the built-HTML
+// gate reads each cell as its own line. The amount line names the source page
+// and the date it was checked; attributed() names the provider in any other
+// sentence with a figure. Names only, never logos: each program is a factual
+// reference.
+import snapshotRaw from "../../../../data/credits/startup-programs.json?raw";
+import ArtImage from "../../components/art/ArtImage.astro";
+import { GUIDE_ART_IMAGE, GUIDES_SCENE as art } from "../../components/guides/guide-art";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  amountLine,
+  attributed,
+  byBucket,
+  cardText,
+  COVER_LABELS,
+  CREDITS_GUIDE,
+  creditsJsonLd,
+  OVERAGE_TEXT,
+  parseCredits,
+  programsCovering,
+  shownPrograms,
+  snapshotDate,
+  sourceLabel,
+  trainsText,
+  type Program,
+} from "../../lib/guides/credits";
+import { andList } from "../../lib/regions/page";
+
+const credits = parseCredits(snapshotRaw);
+const programs = shownPrograms(credits);
+const groups = byBucket(programs);
+const date = snapshotDate(credits);
+const total = programs.length;
+const site = Astro.site!;
+
+const count = (cover: "cpu" | "gpu" | "inference" | "other") => programsCovering(programs, cover).length;
+const bills = programs.filter((p) => p.traps.overage === "bills").length;
+const stops = programs.filter((p) => p.traps.overage === "stops").length;
+const trains = programs.filter((p) => p.traps.trains_on_data === true);
+const says = (p: Program, text: string) => attributed(text, p.provider);
+
+// The Gemini API terms, for the trap about training on your data (read
+// 2026-11-02; ai.google.dev/gemini-api/terms redirects here).
+const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
+---
+
+<BaseLayout
+  title={CREDITS_GUIDE.title}
+  description={CREDITS_GUIDE.description}
+  jsonLd={creditsJsonLd(credits, site)}
+>
+  <section class="section section--band" aria-labelledby="credits-title">
+    <div class="wrap stack">
+      <nav aria-label="Breadcrumb" class="crumbs">
+        <ol>
+          <li><a href="/guides/">Guides</a></li>
+          <li aria-current="page">{CREDITS_GUIDE.title}</li>
+        </ol>
+      </nav>
+      <h1 id="credits-title">{CREDITS_GUIDE.title}</h1>
+      <p class="lede" data-guide-answer>
+        Startup credits are free usage that cloud and AI companies give new companies, so you can build before you pay.
+        This guide lists {total} programs in three groups, each checked on the provider's own page as of <time
+          datetime={date.iso}>{date.label}</time
+        >. Start with the group that matches where your company is today.
+      </p>
+      <aside class="hall-callout hall-callout--parchment" aria-labelledby="check-title" data-credits-notice>
+        <p class="hall-callout__title" id="check-title">Check before you apply</p>
+        <p>
+          Amounts and terms change, so read the provider's page before you apply. Colorado Startups is not affiliated
+          with these programs or the companies that run them. Nothing here is legal, tax or financial advice.
+        </p>
+      </aside>
+      <ArtImage
+        src={art.src}
+        alt={art.alt}
+        {...GUIDE_ART_IMAGE}
+        loading="lazy"
+        motion="none"
+        class="guide-art"
+      />
+      <nav aria-label="On this page">
+        <ul class="toc">
+          <li><a href="#what">What startup credits are</a></li>
+          <li><a href="#groups">Which group are you in?</a></li>
+          <li><a href="#order">Apply in this order</a></li>
+          <li><a href="#traps">Watch for these traps</a></li>
+          {
+            groups.map((g) => (
+              <li>
+                <a href={`#${g.id}`}>{g.heading}</a> <span class="meta">({g.programs.length} programs)</span>
+              </li>
+            ))
+          }
+          <li><a href="#partners">Find a partner in Startup Resources</a></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section section--lit" id="what" aria-labelledby="what-title">
+    <div class="wrap stack">
+      <h2 id="what-title">What startup credits are</h2>
+      <p>
+        A startup credit is a balance a cloud or AI company puts on your account. Your usage draws it down until it runs
+        out or expires. After that, you pay the normal price.
+      </p>
+      <p>
+        Companies offer credits so you build on their platform from the start. Pick the platform that fits your product,
+        then claim its credits.
+      </p>
+      <dl class="terms">
+        <dt>CPU</dt>
+        <dd>
+          General computing: the servers that run your website, app and database. {count("cpu")} of the {total} programs
+          here cover it.
+        </dd>
+        <dt>GPU</dt>
+        <dd>The chips that train and run AI models. {count("gpu")} of the {total} programs here cover them.</dd>
+        <dt>AI inference</dt>
+        <dd>
+          Calls to a hosted AI model, paid by the request or by the token. {count("inference")} of the {total} programs here
+          cover it.
+        </dd>
+        <dt>Other services</dt>
+        <dd>
+          Storage, databases, networking and developer tools. {count("other")} of the {total} programs here cover some of
+          them.
+        </dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section section--band" id="groups" aria-labelledby="groups-title">
+    <div class="wrap stack">
+      <h2 id="groups-title">Which group are you in?</h2>
+      <p>Each program fits one of three groups, by the strictest thing it asks of you.</p>
+      <ul class="groups">
+        {
+          groups.map((g) => (
+            <li>
+              <a href={`#${g.id}`}>{g.heading}</a>: {g.short}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--lit" id="order" aria-labelledby="order-title">
+    <div class="wrap stack">
+      <h2 id="order-title">Apply in this order</h2>
+      <ol class="steps">
+        <li>
+          <strong>Start with no company.</strong> Build a prototype on the programs in the first group. Each needs only an
+          account, and many ask for a card.
+        </li>
+        <li>
+          <strong>Form the company before you ask for more.</strong> Company programs check things like a registered name,
+          a live website or a business email address. Set those up first.
+        </li>
+        <li>
+          <strong>Pick one platform and apply there first.</strong> Credits expire, so claim them where you will build, when
+          you are ready to use them.
+        </li>
+        <li>
+          <strong>Ask for a partner code when you raise or join an accelerator.</strong> The largest tiers need one, such as
+          an AWS Activate Organization ID or a Microsoft Investor Network referral code.
+        </li>
+        <li>
+          <strong>Set a budget alert on the first day.</strong> Credits hide your real costs until they run out, so watch
+          your spend from the first week.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--band" id="traps" aria-labelledby="traps-title">
+    <div class="wrap stack">
+      <h2 id="traps-title">Watch for these traps</h2>
+      <ul class="traps">
+        <li>
+          <strong>A card on file.</strong> Many programs ask for a card, even for a free credit. Google places a temporary
+          hold on it, and AWS and Microsoft require one to activate the account.
+        </li>
+        <li>
+          <strong>Expiry.</strong> Google's trial lasts 90 days and Azure's free credit lasts 30 days. Google's Start tier and
+          Cloudflare's credits last one year, and AWS sets an expiry date on each grant.
+        </li>
+        <li>
+          <strong>Billing after the credits end.</strong> Of the {total} programs here, {bills} bill usage past the credits
+          and {stops} stop the service. The rest don't say. Google's trial and Azure's free account stop rather than charge
+          you, while Microsoft for Startups switches to pay-as-you-go on its own.
+        </li>
+        <li>
+          <strong>What a credit leaves out.</strong> Google's trial can't add GPUs. Google's and Microsoft's startup credits
+          don't pay for third-party AI models. Read the coverage list before you plan around a GPU or a model.
+        </li>
+        <li>
+          <strong>Training on your data.</strong> Read an AI provider's data terms before you send it customer data.
+          {
+            trains.length > 0 &&
+              ` On this page, the terms of ${andList(trains.map((p) => p.program))} let the provider train on your data.`
+          } Google's{" "}
+          <a href={GEMINI_TERMS} rel="noopener nofollow">Gemini API terms</a> say Google uses what you send its unpaid services
+          to improve its products, and human reviewers may read it. For paid services, those terms say Google doesn't use
+          your prompts or responses to improve its products.
+        </li>
+      </ul>
+      <p class="meta">Each trap comes from the provider pages linked in the tables below, checked {date.label}.</p>
+    </div>
+  </section>
+
+  {
+    groups.map((g, i) => (
+      <section
+        class:list={["section", i % 2 === 0 ? "section--lit" : "section--band"]}
+        id={g.id}
+        aria-labelledby={`${g.id}-title`}
+        data-credits-group={g.id}
+      >
+        <div class="wrap stack">
+          <h2 id={`${g.id}-title`}>{g.heading}</h2>
+          <p>{g.intro}</p>
+          <div class="scroll" role="region" aria-labelledby={`${g.id}-caption`} tabindex="0">
+            {/* The explicit roles keep the table's meaning for screen readers when
+                narrow screens restyle its rows as cards (display: block). */}
+            <table role="table">
+              <caption id={`${g.id}-caption`}>{`Programs for founders: ${g.heading.toLowerCase()}`}</caption>
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th scope="col" role="columnheader">
+                    Program
+                  </th>
+                  <th scope="col" role="columnheader">
+                    Amount
+                  </th>
+                  <th scope="col" role="columnheader">
+                    Covers
+                  </th>
+                  <th scope="col" role="columnheader">
+                    What you need
+                  </th>
+                  <th scope="col" role="columnheader">
+                    Terms
+                  </th>
+                </tr>
+              </thead>
+              <tbody role="rowgroup">
+                {g.programs.map((p) => (
+                  <tr id={`p-${p.id}`} data-program={p.id} role="row">
+                    <th scope="row" role="rowheader">
+                      <p>
+                        <a href={p.link} rel="noopener nofollow">
+                          {p.program}
+                        </a>
+                      </p>
+                      <p class="meta">{p.provider}</p>
+                    </th>
+                    <td data-amount data-label="Amount" role="cell">
+                      {/* One sentence: the provider's own amount, its source page and the
+                          date it was checked. A computed total gets its own labeled line. */}
+                      <p data-amount-line>
+                        {`${amountLine(p).stated}, per `}
+                        <a href={p.source} rel="noopener nofollow">
+                          {sourceLabel(p.source)}
+                        </a>
+                        {", checked "}
+                        <time datetime={p.checked}>{p.checked}</time>.
+                      </p>
+                      {amountLine(p).computed && <p data-amount-computed>{`${amountLine(p).computed}.`}</p>}
+                      <p>{says(p, p.amount_note)}</p>
+                    </td>
+                    <td data-label="Covers" role="cell">
+                      <ul class="covers" aria-label="Covers">
+                        {p.covers.map((c) => (
+                          <li data-cover={c}>{COVER_LABELS[c]}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td data-label="What you need" role="cell">
+                      <ul class="needs">
+                        {p.requirements.map((r) => (
+                          <li>{says(p, r)}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td data-label="Terms" role="cell">
+                      <p>
+                        <strong>Card:</strong> {cardText(p.traps.card_required)}
+                      </p>
+                      {p.term && (
+                        <p>
+                          <strong>Term:</strong> {says(p, p.term)}
+                        </p>
+                      )}
+                      <p>
+                        <strong>Past the credits:</strong> {OVERAGE_TEXT[p.traps.overage]}
+                      </p>
+                      {trainsText(p) && (
+                        <p>
+                          <strong>Trains on your data:</strong> {trainsText(p)}
+                        </p>
+                      )}
+                      {(p.traps.expiry || p.traps.other.length > 0) && (
+                        <details>
+                          <summary>More terms</summary>
+                          {p.traps.expiry && (
+                            <p>
+                              <strong>Expiry:</strong> {says(p, p.traps.expiry)}
+                            </p>
+                          )}
+                          {p.traps.other.length > 0 && (
+                            <ul>
+                              {p.traps.other.map((o) => (
+                                <li>{says(p, o)}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section
+    class:list={["section", groups.length % 2 === 0 ? "section--lit" : "section--band"]}
+    id="partners"
+    aria-labelledby="partners-title"
+  >
+    <div class="wrap stack">
+      <h2 id="partners-title">Find a partner in Startup Resources</h2>
+      <p>
+        The largest credits come through accelerators and investors. Startup Resources lists the ones that work with
+        Colorado founders.
+      </p>
+      <ul>
+        <li><a href="/guides/colorado-accelerators-and-incubators/">Accelerators and incubators in Colorado</a></li>
+        <li><a href="/guides/funding-programs/">Funding programs for Colorado startups</a></li>
+      </ul>
+      <p>
+        Resourcus, an AI agent run by Colorado Startups, answers questions about Startup Resources. It knows the Colorado
+        programs, not the credit offers on this page, and it can make mistakes.
+      </p>
+      <p class="btn-row">
+        <a class="btn btn--gold" href="/ecosystem-canvas/#find-title">Ask Resourcus</a>
+        <a class="btn btn--stone" href="/ecosystem-canvas/">Browse Startup Resources</a>
+      </p>
+    </div>
+  </section>
+
+  <section
+    class:list={["section", groups.length % 2 === 0 ? "section--band" : "section--lit"]}
+    id="about"
+    aria-labelledby="about-title"
+  >
+    <div class="wrap stack">
+      <h2 id="about-title">About this guide</h2>
+      <p>
+        Colorado Startups is not affiliated with these programs or the companies that run them, and none of them pays to
+        appear here. Each name is used only to identify a program.
+      </p>
+      <p>
+        Nothing here is legal, tax or financial advice. Amounts, terms and eligibility change without notice, so confirm
+        each one on the provider's page before you apply.
+      </p>
+      <p>
+        Each row was read on the provider's own page on the date beside its amount, as of <time datetime={date.iso}
+          >{date.label}</time
+        >. A total marked "computed here" is Colorado Startups' own arithmetic from the provider's figures, not a number
+        the provider states. Spot a change? <a href="/contact/">Tell us</a>, and a person will check it.
+      </p>
+      <p><a href="/guides/">More guides for founders</a></p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The guide's picture under its answer (L6's scenes, 2026-11-04). */
+  :global(.guide-art) {
+    width: min(100%, 40rem);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  /* The breadcrumb's look, and its 44 px phone targets, are global.css's
+     .crumbs (#682). */
+  .toc {
+    display: grid;
+    gap: var(--s-2);
+    padding: 0;
+    list-style: none;
+  }
+  .terms dt {
+    font-weight: 700;
+    margin-top: var(--s-3);
+  }
+  .terms dd {
+    margin: 0;
+  }
+  .steps li,
+  .traps li {
+    margin-bottom: var(--s-3);
+  }
+  .scroll {
+    overflow-x: auto;
+    max-width: 100%;
+    border: var(--line-hair) solid var(--c-rule);
+    border-radius: var(--r-chisel);
+  }
+  table {
+    width: 100%;
+    min-width: 64rem;
+    border-collapse: collapse;
+    font-size: var(--t-step--1);
+  }
+  caption {
+    text-align: left;
+    padding: var(--s-3);
+    font-weight: 700;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: var(--s-2) var(--s-3);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  td a {
+    overflow-wrap: anywhere;
+  }
+  thead th {
+    background: var(--c-surface);
+  }
+  tbody th {
+    font-weight: 400;
+    width: 11rem;
+  }
+  tbody th a {
+    font-weight: 700;
+  }
+  th p,
+  td p {
+    margin: 0 0 var(--s-2);
+  }
+  th p:last-child,
+  td p:last-child {
+    margin-bottom: 0;
+  }
+  .needs,
+  details ul {
+    margin: 0;
+    padding-left: var(--s-4);
+  }
+  .needs li,
+  details li {
+    margin-bottom: var(--s-1);
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+  details[open] summary {
+    margin-bottom: var(--s-2);
+  }
+  .covers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .covers li {
+    padding: 0 var(--s-2);
+    border: var(--line-hair) solid var(--c-rule);
+    border-radius: var(--r-chisel);
+    font-weight: 700;
+    font-size: var(--t-step--1);
+    white-space: nowrap;
+  }
+  /* On a phone each program becomes a card: the name on top, then each cell
+     under its column name. The header row stays for screen readers only. */
+  @media (max-width: 40rem) {
+    .scroll {
+      overflow: visible;
+      border: 0;
+    }
+    table {
+      min-width: 0;
+    }
+    table,
+    tbody,
+    tr,
+    tbody th,
+    td {
+      display: block;
+    }
+    caption {
+      display: block;
+      padding-inline: 0;
+    }
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    tbody tr {
+      margin-bottom: var(--s-4);
+      border: var(--line-hair) solid var(--c-rule);
+      border-radius: var(--r-chisel);
+    }
+    tbody th {
+      width: auto;
+      border-top: 0;
+      background: var(--c-surface);
+    }
+    td::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: var(--s-1);
+      font-weight: 700;
+      color: var(--c-text-dim);
+    }
+  }
+</style>

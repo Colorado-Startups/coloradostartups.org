@@ -1,0 +1,9 @@
+id: koloma
+name: "Koloma"
+website: "https://www.koloma.com/"
+hq_city: "Denver"
+sector: "Energy and climate"
+description: "Explores for geologic hydrogen that forms naturally, a clean fuel source. It uses data-driven methods to find and produce it."
+sources:
+  - "https://www.mhi.com/news/241015.html"
+  - "https://www.koloma.com/what-we-do/about-koloma/"

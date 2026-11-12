@@ -1,0 +1,13 @@
+id: crowdsolve-climate-impact-accelerator
+name: CrowdSolve Climate Impact Accelerator
+url: https://crowdsolve.eco/
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: A subscription platform for first-time founders. It pairs AI with experienced founders to test ideas with customers. It takes no equity. It powers the University of Colorado's New Venture Challenge.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

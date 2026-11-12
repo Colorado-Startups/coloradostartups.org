@@ -1,0 +1,13 @@
+id: loopnet
+name: LoopNet
+url: https://www.loopnet.com/colorado_office-space-for-lease/
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: Office space and commercial real estate.
+tags:
+  - real-estate
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

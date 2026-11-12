@@ -1,0 +1,13 @@
+id: campworks
+name: CAMPWORKS
+url: https://www.campworks.co/
+stage: launch
+substage: service-providers
+city: Boulder
+type: coworking
+description: A locally owned coworking space in South Boulder. It focuses on private offices. It also has team spaces, dedicated desks, conference and phone rooms, events and workshops. It gives access to open space trails.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,9 @@
+id: yeshid
+name: "YeshID"
+website: "https://yeshid.com"
+hq_city: "Denver"
+sector: "Cybersecurity"
+description: "Makes identity and access management software. IT teams use it to automate access requests and approvals for staff."
+sources:
+  - "https://www.yeshid.com/privacy"
+  - "https://www.yeshid.com/about"

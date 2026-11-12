@@ -1,0 +1,44 @@
+---
+// The Sources list that ends every seat page (lane L38). One numbered entry
+// per source, in the order the page first cites it. Each figure leads its own
+// sentence, then the source links to the page it was read on, with the date
+// it was read. Footnote markers link here as #source-<n>.
+import { factSentence, readDate, type SourceEntry } from "../../lib/seats/sources";
+
+interface Props {
+  entries: readonly SourceEntry[];
+}
+
+const { entries } = Astro.props;
+---
+
+<section class="section section--stone" aria-labelledby="sources-title" data-sources>
+  <div class="wrap">
+    <h2 id="sources-title">Sources</h2>
+    <ol class="seat-sources__list">
+      {
+        entries.map((entry) => (
+          <li id={`source-${entry.n}`} data-source={entry.n}>
+            {entry.facts.length > 0 && (
+              <p>
+                {entry.facts.map(({ id, fact }) => (
+                  <span data-source-fact={id}>{factSentence(fact)} </span>
+                ))}
+              </p>
+            )}
+            <p>
+              {entry.lead ?? "Source"}:{" "}
+              {entry.links.map((link, i) => (
+                <>
+                  {i > 0 && ", "}
+                  <a href={link.href}>{link.text}</a>
+                </>
+              ))}
+              . Read {readDate(entry.read)}.
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,13 @@
+id: rocky-mountain-microfinance-institute
+name: Rocky Mountain MicroFinance Institute
+url: http://www.rmmfi.org/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: A Denver nonprofit lender that helps entrepreneurs. It works in the metro area and across Colorado. Its classes, workshops, mentorship and accessible capital help them test, launch or grow a business.
+tags:
+  - entrepreneurship
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

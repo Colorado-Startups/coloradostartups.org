@@ -1,0 +1,13 @@
+id: deeptech-trailhead
+name: DeepTech Trailhead
+url: https://deeptechtrailhead.com/
+stage: support
+substage: organizations
+city: statewide
+type: community
+description: A directory of resources, funding, events and community. It is for deep tech founders in Colorado.
+tags:
+  - community
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

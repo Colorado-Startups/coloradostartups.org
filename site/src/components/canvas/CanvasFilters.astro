@@ -1,0 +1,73 @@
+---
+// The directory's filter form. Owner: L3. Hidden until canvas-filters.ts
+// runs, because without JavaScript it could not do anything; the directory
+// below it is complete without it. role="search" marks it as the page's
+// search landmark.
+import type { ResourceCard } from "@cs/shared";
+import { STAGES } from "@cs/shared";
+
+import { cityLabel, STAGE_LABELS, TYPE_LABELS } from "./labels";
+
+interface Props {
+  cards: readonly ResourceCard[];
+}
+
+const { cards } = Astro.props;
+const types = [...new Set(cards.map((c) => c.type))].sort((a, b) => TYPE_LABELS[a].localeCompare(TYPE_LABELS[b]));
+const SPECIAL = ["statewide", "online"];
+const cities = [...new Set(cards.map((c) => c.city))].sort((a, b) => {
+  const sa = SPECIAL.indexOf(a);
+  const sb = SPECIAL.indexOf(b);
+  if (sa !== -1 || sb !== -1) return (sa === -1 ? 99 : sa) - (sb === -1 ? 99 : sb);
+  return a.localeCompare(b);
+});
+---
+
+<form class="canvas-filters panel" role="search" aria-label="Filter the directory" data-canvas-filters hidden>
+  <div class="canvas-filters__grid">
+    <div class="field">
+      <label for="canvas-q">Search</label>
+      <input id="canvas-q" name="q" type="search" autocomplete="off" maxlength="100" />
+    </div>
+    <div class="field">
+      <label for="canvas-stage">Stage</label>
+      <select id="canvas-stage" name="stage">
+        <option value="">All stages</option>
+        {STAGES.map((s) => <option value={s}>{STAGE_LABELS[s]}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="canvas-type">Type</label>
+      <select id="canvas-type" name="type">
+        <option value="">All types</option>
+        {types.map((t) => <option value={t}>{TYPE_LABELS[t]}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="canvas-city">City</label>
+      <select id="canvas-city" name="city">
+        <option value="">All cities</option>
+        {cities.map((c) => <option value={c}>{cityLabel(c)}</option>)}
+      </select>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn--stone" type="reset">Clear filters</button>
+  </div>
+</form>
+<p class="meta" data-canvas-count role="status" aria-live="polite"></p>
+
+<script>
+  import { initCanvasFilters } from "./canvas-filters";
+
+  const root = document.querySelector<HTMLElement>("[data-canvas-root]");
+  if (root) initCanvasFilters(root);
+</script>
+
+<style>
+  .canvas-filters__grid {
+    display: grid;
+    gap: 0 var(--s-4);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+</style>

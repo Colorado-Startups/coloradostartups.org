@@ -1,0 +1,13 @@
+id: highland-city-club
+name: Highland City Club
+url: https://www.highlandcityclub.com/
+stage: launch
+substage: service-providers
+city: Boulder
+type: coworking
+description: A membership social and business club in downtown Boulder. It has workspaces, private meeting rooms, phone booths, a dining room and social programs.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: creative-density
+name: Creative Density
+url: https://www.creativedensity.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: coworking
+description: A coworking space south of Denver. It has shared desks in Englewood and individual offices in Littleton. It also has day passes, meeting rooms and a podcast studio.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: nsf-i-corps-hub-west-region
+name: "NSF I-Corps Hub: West Region"
+url: https://www.colorado.edu/venturepartners/university-innovators/entrepreneurial-training/nsf-i-corps-hub-west-region
+stage: launch
+substage: develop
+city: statewide
+type: education
+description: NSF I-Corps training run by Venture Partners at CU Boulder. It is for researchers and innovators from any research or community institution. Participants want to turn discoveries into products.
+tags:
+  - customer-discovery
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

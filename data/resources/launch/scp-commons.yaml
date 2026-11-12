@@ -1,0 +1,13 @@
+id: scp-commons
+name: SCP Commons
+url: https://www.scphotel.com/colorado-springs/scp-commons
+stage: launch
+substage: service-providers
+city: Colorado Springs
+type: coworking
+description: A coworking space at the SCP Colorado Springs hotel. It has open work areas, private conference rooms and free wifi. Memberships add fitness, wellness and personal growth programs.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

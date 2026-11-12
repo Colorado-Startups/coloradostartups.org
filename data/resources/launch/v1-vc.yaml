@@ -1,0 +1,15 @@
+id: v1-vc
+name: V1.VC
+url: https://v1.vc/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: An early-stage venture firm that invests at inception. It backs AI software and deep tech. The tech is for energy, aerospace, robotics and manufacturing.
+tags:
+  - seed
+  - venture-capital
+  - b2b
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

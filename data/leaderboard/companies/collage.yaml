@@ -1,0 +1,10 @@
+id: collage
+name: "Collage"
+website: "https://www.collage.inc"
+hq_city: "Denver"
+founded_year: 2024
+sector: "Software"
+description: "Provides a digital asset management platform. Growing brands use it to store, organize and share images, video and other content."
+sources:
+  - "https://collage.inc/about"
+  - "https://collage.inc"

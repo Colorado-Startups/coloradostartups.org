@@ -1,0 +1,13 @@
+id: dynamic-tech-media
+name: Dynamic Tech Media
+url: https://dynamictechmedia.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A B2B marketing agency. It offers content, branding and social media. It serves high-tech companies, including startups, in quantum, space and cleantech.
+tags:
+  - marketing
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

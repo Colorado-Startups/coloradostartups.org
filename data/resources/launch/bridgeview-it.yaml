@@ -1,0 +1,13 @@
+id: bridgeview-it
+name: BridgeView IT
+url: https://www.bridgeviewit.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver IT staffing and consulting firm. It places contract and direct-hire tech talent. It also advises on software modernization.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

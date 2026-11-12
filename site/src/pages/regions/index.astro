@@ -1,0 +1,176 @@
+---
+// /regions/: the three regions in `order`, each with art, tagline, cities and
+// its Connector seat; a build-time Front Range map with a text alternative;
+// and a line for founders elsewhere in Colorado (decision 45). Cards and the
+// panel are L12's primitives. Owner: L8.
+import { WAYS_IN } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import ChartFigure from "../../components/leaderboard/ChartFigure.astro";
+import RegionCard from "../../components/regions/RegionCard.astro";
+import Panel from "../../components/ui/Panel.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { frontRangeMap } from "../../lib/regions/map";
+import { REGIONS } from "../../lib/regions/match";
+import { andList, organizerFor } from "../../lib/regions/page";
+
+const regions = [...REGIONS];
+const positions = (await getCollection("positions")).map((e) => e.data);
+const people = (await getCollection("people")).map((e) => e.data);
+// The statewide seat (decision 44), for the line to founders outside the regions.
+const statewideSeat = positions.find((p) => p.id === "community-organizer");
+// Only the first card is in the first screen at every width, so only its art
+// loads eagerly, which ArtImage pairs with fetchpriority="high" (#258). At
+// 375 px the first screen holds that card alone, and three columns start at
+// 912 px. Eager, cards 2 and 3 would download below a phone's fold at high
+// priority, against card 1. They stay lazy: a lazy image inside the first
+// screen still loads without waiting for a scroll.
+const FIRST_SCREEN = 1;
+
+const byId = Object.fromEntries(regions.map((r) => [r.id, r]));
+const pm = byId["photon-mountain"]!;
+const sp = byId["space-peak"]!;
+const fc = byId["fusion-canyon"]!;
+
+const mapSummary =
+  `Fusion Canyon is the northern region: ${andList(fc.cities)}. ` +
+  `Photon Mountain runs along the foothills in the middle: ${andList(pm.cities)}. ` +
+  `Space Peak is the southern region: ${andList(sp.cities)}, under Pikes Peak.`;
+const mapSvg = frontRangeMap(regions, { label: "Map of the three Colorado Startups regions", description: mapSummary });
+---
+
+<BaseLayout
+  title="Regions"
+  description="Colorado Startups gathers founders in three regions along the Front Range: Photon Mountain, Space Peak and Fusion Canyon."
+  ogImage="regions"
+>
+  <section class="section section--lit" aria-labelledby="regions-title">
+    <div class="wrap">
+      <p class="kicker">The Hall's three outposts</p>
+      <h1 id="regions-title">Regions</h1>
+      <p class="lede">
+        Colorado Startups gathers founders in three regions along the Front Range. Find yours, and meet the founders
+        building near you.
+      </p>
+      <h2 class="visually-hidden">The three regions</h2>
+      <ul class="hall-grid region-grid">
+        {
+          regions.map((r, i) => (
+            <RegionCard
+              region={r}
+              organizer={organizerFor(r.id, positions, people)}
+              loading={i < FIRST_SCREEN ? "eager" : "lazy"}
+            />
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="map-title">
+    <h2 id="map-title" class="wrap">On the Front Range</h2>
+    <div class="wrap map-layout">
+      <div>
+        <ChartFigure
+          id="regions-map"
+          title="North to south: Fusion Canyon, Photon Mountain, Space Peak"
+          summary={mapSummary}
+          svg={mapSvg}
+          columns={["Region", "Core cities"]}
+          rows={regions.map((r) => [r.name, andList(r.cities)])}
+          note="Each region page also lists the nearby towns that belong to it."
+        />
+      </div>
+      <div class="side">
+        <Panel as="aside" class="how" aria-labelledby="how-title">
+          <h2 id="how-title">How the regions work</h2>
+          <ul>
+            <li>Each region has one Connector seat, for a person. The Hall's AI keepers never take it.</li>
+            <li>The Connector goes to local startup events and introduces founders to the people they need.</li>
+            <li>Every region page gathers its Startup Resources and its Leaderboard honorees.</li>
+            <li>The Slack and the event calendar are shared by the whole state.</li>
+          </ul>
+          <div class="btn-row">
+            <a class="btn btn--gold" href={WAYS_IN.slack}>Join the Slack</a>
+            <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
+          </div>
+        </Panel>
+
+        <div class="elsewhere">
+          <h2 id="elsewhere">Elsewhere in Colorado</h2>
+          <p>
+            Building in Durango, Grand Junction, Pueblo or anywhere else in Colorado? You are part of this community
+            too. Join the Slack to meet founders across the state, and use{" "}
+            <a href="/ecosystem-canvas/">Startup Resources</a> to find help near you.
+          </p>
+          {
+            statewideSeat?.status === "open" && (
+              <p>
+                Want to connect founders statewide? The statewide community organizer seat is open.{" "}
+                <a href="/get-involved/">See every open seat</a>.
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .region-grid {
+    margin-top: var(--s-6);
+  }
+  .map-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 28rem) minmax(0, 1fr);
+    gap: var(--s-7);
+    align-items: start;
+  }
+  .map-layout :global(.plot) {
+    max-width: 420px;
+  }
+  .map-layout :global(.plot svg) {
+    width: 100%;
+    height: auto;
+  }
+  .side {
+    display: grid;
+    gap: var(--s-7);
+  }
+  .how ul {
+    padding-left: var(--s-5);
+  }
+  .how li + li {
+    margin-top: var(--s-2);
+  }
+  @media (max-width: 860px) {
+    .map-layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* The side column is 461 px shorter than the map column at 1280 px
+     (measured 2026-11-02), so it rides down with the map instead of leaving
+     an empty block beside the map's lower half (#246). Two columns only: on a
+     phone the side column stacks under the map. 53.8125rem is 861 px, the
+     first two-column width. */
+  @media (min-width: 53.8125rem) {
+    .side {
+      position: sticky;
+      top: var(--s-6);
+    }
+  }
+  /* Below 468 px the 420-unit map draws narrower than 420 px: 327 px on a
+     375 px phone and 312 px on a 360 px one. Its labels step up the scale so
+     they draw at 16.4 and 15.6 px, and the region names at 18.7 and 17.8 px
+     (#248, #329). A region name carries its own font-size, so it needs the
+     second rule. */
+  @media (max-width: 30rem) {
+    .map-layout :global(.plot text) {
+      font-size: var(--t-step-1);
+    }
+    .map-layout :global(.plot text[font-size]) {
+      font-size: var(--t-step-2);
+    }
+  }
+</style>

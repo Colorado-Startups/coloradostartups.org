@@ -1,0 +1,110 @@
+---
+// /dispatches/<id>/: one dispatch. Owner: L9. The id is the Markdown file
+// name in data/dispatches/ without .md, so a dispatch's URL never changes
+// after it publishes (feed.json uses the URL as the item id).
+import { getCollection, render, type CollectionEntry } from "astro:content";
+
+import ArtImage from "../../components/art/ArtImage.astro";
+import { HALL_ART_ALT } from "../../components/art/keepers";
+import { dispatchPath } from "../../components/dispatches/collect";
+import DispatchDate from "../../components/dispatches/DispatchDate.astro";
+import { calendarDate, denverMidnight } from "../../components/dispatches/feed";
+import { organizationRef } from "../../components/hall/org";
+import Badge from "../../components/ui/Badge.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const dispatches = await getCollection("dispatches");
+  return dispatches.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<"dispatches">;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const site = Astro.site!;
+const url = new URL(dispatchPath(entry), site).toString();
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: entry.data.title,
+  description: entry.data.summary,
+  datePublished: denverMidnight(calendarDate(entry.data.date)),
+  url,
+  mainEntityOfPage: url,
+  // The home page's Organization by @id (GO-LIVE C3), not a second one.
+  author: organizationRef(site),
+  publisher: organizationRef(site),
+};
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.summary} ogImage="dispatches" jsonLd={jsonLd}>
+  <article class="section section--lit" aria-labelledby="dispatch-title">
+    <div class="wrap">
+      <div class="dispatch">
+        <p class="kicker"><a class="tap-target" href="/dispatches/">Dispatches</a></p>
+        <h1 id="dispatch-title">{entry.data.title}</h1>
+        <p class="meta"><DispatchDate date={entry.data.date} /></p>
+        <div class="dispatch__body">
+          <Content />
+        </div>
+        <ArtImage
+          src="hero/hall"
+          alt={HALL_ART_ALT}
+          aspect="21 / 9"
+          widths={[400, 800]}
+          sizes="24rem"
+          motion="none"
+          class="dispatch__seal"
+        />
+        {
+          entry.data.tags.length > 0 && (
+            <ul class="dispatch__tags" role="list" aria-label="Tags">
+              {entry.data.tags.map((tag) => (
+                <Badge as="li">{tag}</Badge>
+              ))}
+            </ul>
+          )
+        }
+        <p><a class="tap-target" href="/dispatches/">All dispatches</a></p>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  /* The measure sits on an inner column, not on .wrap, so the column keeps
+     the header's left gutter instead of centering (#260). */
+  .dispatch {
+    max-width: var(--t-measure);
+  }
+  /* A small picture of the Great Hall closes every dispatch, the way an
+     ornament ends a chapter (#261). Keepers appear in it, so its alt says they
+     are AI agents (#714). */
+  .dispatch > :global(.dispatch__seal) {
+    width: min(100%, 24rem);
+    margin-top: var(--s-6);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  /* ArtImage's figure carries its own scope, so the stack rule above does
+     not reach the block after it. */
+  .dispatch > :global(.dispatch__seal + *) {
+    margin-top: var(--s-5);
+  }
+  .dispatch > * + * {
+    margin-top: var(--s-4);
+  }
+  .dispatch__body > :global(* + *) {
+    margin-top: var(--s-4);
+  }
+  .dispatch__tags {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+</style>
