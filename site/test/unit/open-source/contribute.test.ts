@@ -1,6 +1,5 @@
-// Open-source plan (#552): the /contribute/ page's words and its off switch.
-// The page builds nothing until phase 6 flips CONTRIBUTE_LIVE, so these tests
-// read the data and the route file instead of a built page.
+// The /contribute/ page's words and its switch. These tests read the data and
+// the route file; the dom tests read the built page.
 import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
@@ -20,9 +19,9 @@ import {
 const ROUTE = readFileSync(new URL("../../../src/pages/contribute/[...path].astro", import.meta.url), "utf8");
 const copy = [CONTRIBUTE_INTRO, ...FLOW.flatMap((s) => [s.title, s.body]), ...REVIEW_ROWS.flatMap((r) => [r.change, r.merges]), ROUTE].join(" ");
 
-describe("/contribute/ off switch", () => {
-  it("stays off until the public repo exists (phase 6 flips it)", () => {
-    expect(CONTRIBUTE_LIVE).toBe(false);
+describe("/contribute/ switch", () => {
+  it("is on: the public repo takes contributions since 2026-11-12", () => {
+    expect(CONTRIBUTE_LIVE).toBe(true);
   });
 
   it("builds no page while off, and the one /contribute/ page when on", () => {
