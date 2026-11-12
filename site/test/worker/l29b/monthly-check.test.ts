@@ -6,8 +6,13 @@
 import { env } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 
-import runbook from "../../../../ops/runbooks/promote-submissions/sweeps.md?raw";
 import { CSP_REPORT_PURGE_SQL } from "../../../worker/routes/csp-report";
+
+// ops/ is private: the public export leaves the runbook out, so the glob finds
+// nothing there and the tests that read it skip. (The workerd pool has no
+// real file system, so this checks the glob, not the archive marker.)
+const runbook = Object.values(import.meta.glob<string>("../../../../ops/runbooks/promote-submissions/sweeps.md", { query: "?raw", import: "default", eager: true }))[0] ?? "";
+const HAVE_RUNBOOK = runbook !== "";
 
 const sectionOf = (heading: string) => {
   const start = runbook.indexOf(heading);
@@ -16,7 +21,7 @@ const sectionOf = (heading: string) => {
 const commandsIn = (text: string) => [...text.matchAll(/--command "([^"]+)"/g)].map((m) => m[1]!);
 const DAY = 86_400_000;
 
-describe("the runbook's monthly check", () => {
+describe.skipIf(!HAVE_RUNBOOK)("the runbook's monthly check", () => {
   it("has no D1 command left: the only monthly step is the info@ mailbox", () => {
     const monthly = sectionOf("## Monthly check (the 1st)");
     expect(monthly).not.toBe("");
@@ -24,7 +29,7 @@ describe("the runbook's monthly check", () => {
   });
 });
 
-describe("the runbook's weekly job", () => {
+describe.skipIf(!HAVE_RUNBOOK)("the runbook's weekly job", () => {
   const commands = commandsIn(sectionOf("## Weekly job (Mondays)"));
 
   it("has exactly one command, the csp_reports purge the Worker runs", () => {

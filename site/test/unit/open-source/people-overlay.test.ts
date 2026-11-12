@@ -282,7 +282,8 @@ describe("people overlay: known-clean", () => {
 });
 
 describe("fixtures", () => {
-  it("name nobody from the real people.yaml", () => {
+  // The public export has no real people.yaml, so there is nobody to compare.
+  it.skipIf(!existsSync(path.join(REPO, PATHS.people)))("name nobody from the real people.yaml", () => {
     const real = readFileSync(path.join(REPO, PATHS.people), "utf8");
     const fixtures = readFileSync(path.join(REPO, PATHS.fixtures, "people.yaml"), "utf8");
     for (const [, name] of fixtures.matchAll(/^\s+name: (.+)$/gm)) expect(real).not.toContain(name);

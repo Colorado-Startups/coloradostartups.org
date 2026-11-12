@@ -1,16 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  allowedUrl,
-  assetFileName,
-  extractAssetUrls,
-  fetchAllowed,
-  MAX_REDIRECTS,
-  originalImageUrl,
-  pageFileName,
-  parseSitemap,
-  // @ts-expect-error plain .mjs ops module without type declarations
-} from "../../../../ops/squarespace/backup-lib.mjs";
+import { IN_ARCHIVE } from "../../archive";
+
+// ops/ is private: the public export leaves out the library under test, so
+// the glob finds nothing there and every suite below skips.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lib: any = Object.values(import.meta.glob("../../../../ops/squarespace/backup-lib.mjs", { eager: true }))[0] ?? {};
+const { allowedUrl, assetFileName, extractAssetUrls, fetchAllowed, MAX_REDIRECTS, originalImageUrl, pageFileName, parseSitemap } = lib;
 
 const HOST = "coloradostartups.org";
 
@@ -21,7 +17,7 @@ const SITEMAP = `<?xml version="1.0"?><urlset>
 <url><loc>https://coloradostartups.org/links</loc></url>
 </urlset>`;
 
-describe("parseSitemap", () => {
+describe.skipIf(!IN_ARCHIVE)("parseSitemap", () => {
   it("reads pages, lastmod and images with decoded titles", () => {
     expect(parseSitemap(SITEMAP)).toEqual([
       {
@@ -34,7 +30,7 @@ describe("parseSitemap", () => {
   });
 });
 
-describe("allowedUrl", () => {
+describe.skipIf(!IN_ARCHIVE)("allowedUrl", () => {
   it("allows the site and Squarespace image hosts over https only", () => {
     expect(allowedUrl("https://coloradostartups.org/x", HOST)).not.toBeNull();
     expect(allowedUrl("https://images.squarespace-cdn.com/a.jpg", HOST)).not.toBeNull();
@@ -45,7 +41,7 @@ describe("allowedUrl", () => {
   });
 });
 
-describe("extractAssetUrls", () => {
+describe.skipIf(!IN_ARCHIVE)("extractAssetUrls", () => {
   it("finds src, data-src, srcset and /s/ file links, and skips plain page links", () => {
     const html = `
       <img src="https://images.squarespace-cdn.com/content/v1/abc/one.png?format=500w">
@@ -63,7 +59,7 @@ describe("extractAssetUrls", () => {
   });
 });
 
-describe("file naming", () => {
+describe.skipIf(!IN_ARCHIVE)("file naming", () => {
   it("asks the CDN for the original once per image", () => {
     expect(originalImageUrl("https://images.squarespace-cdn.com/content/v1/abc/one.png?format=500w")).toBe(
       "https://images.squarespace-cdn.com/content/v1/abc/one.png?format=original",
@@ -79,7 +75,7 @@ describe("file naming", () => {
   });
 });
 
-describe("fetchAllowed (redirects followed by hand)", () => {
+describe.skipIf(!IN_ARCHIVE)("fetchAllowed (redirects followed by hand)", () => {
   // A fake fetch: each URL maps to [status, Location?]. Records every request.
   function fakeFetch(routes: Record<string, [number, string?]>) {
     const seen: { url: string; redirect: unknown }[] = [];

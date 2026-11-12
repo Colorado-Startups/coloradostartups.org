@@ -5,6 +5,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { IN_ARCHIVE } from "../../archive";
 import { tempDirs } from "../temp-dirs";
 import { artStatusHtml, countArt, textureNoteHtml, texturesCss } from "../../../../scripts/artifacts/inline-page.mjs";
 
@@ -95,8 +96,9 @@ describe("texturesCss", () => {
   });
 });
 
-describe("ops/artifacts/brand.html", () => {
-  const guide = readFileSync(path.join(ROOT, "ops/artifacts/brand.html"), "utf8");
+// ops/ is private: the public export leaves the guide out.
+describe.skipIf(!IN_ARCHIVE)("ops/artifacts/brand.html", () => {
+  const guide = IN_ARCHIVE ? readFileSync(path.join(ROOT, "ops/artifacts/brand.html"), "utf8") : "";
   const globalCss = readFileSync(path.join(ROOT, "site/src/styles/global.css"), "utf8");
 
   // A declaration's value in the first rule whose selector list names `selector`,

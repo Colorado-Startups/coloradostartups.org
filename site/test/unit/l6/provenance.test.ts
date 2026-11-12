@@ -8,6 +8,7 @@ import path from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
+import { IN_ARCHIVE } from "../../archive";
 import { tempDirs } from "../temp-dirs";
 import { provenancePackets, shippedFiles, sourcePath, sourcesWithProvenance, stampShipped } from "../../../../art/tools/make-finals.mjs";
 import {
@@ -53,7 +54,8 @@ describe("records", () => {
     expect(PROMPT_READERS.api_bria_fibo2_t2i(node({ structured_prompt: "", prompt: "a passage", seed: 9 }))).toEqual({ prompt: "a passage", seed: 9 });
   });
 
-  it("builds a record for every file art/finals.json ships, finals and tiles", () => {
+  // provenancePackets reads art/runs, which the public export leaves out.
+  it.skipIf(!IN_ARCHIVE)("builds a record for every file art/finals.json ships, finals and tiles", () => {
     const { packets, problems } = provenancePackets(plan);
     expect(problems).toEqual([]);
     expect(Object.keys(packets).sort()).toEqual(shippedFiles(plan).map((s: { out: string }) => s.out).sort());
@@ -144,7 +146,8 @@ describe("source provenance", () => {
 describe("delivered art", () => {
   const { packets } = provenancePackets(plan);
   for (const s of shippedFiles(plan)) {
-    it.skipIf(!existsSync(s.file))(`${s.out}.webp carries its own provenance record`, () => {
+    // The packets come from art/runs, which the public export leaves out.
+    it.skipIf(!IN_ARCHIVE || !existsSync(s.file))(`${s.out}.webp carries its own provenance record`, () => {
       expect(readWebpXmp(readFileSync(s.file))).toBe(packets[s.out]);
     });
   }

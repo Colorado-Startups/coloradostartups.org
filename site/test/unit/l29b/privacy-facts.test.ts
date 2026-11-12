@@ -8,6 +8,8 @@ import { fileURLToPath } from "node:url";
 import { CompanySchema } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
+import { IN_ARCHIVE } from "../../archive";
+
 // @ts-expect-error plain .mjs ops module without type declarations
 import { readMap } from "../../../../ops/redirects/map.mjs";
 
@@ -133,8 +135,9 @@ describe("Request logs", () => {
   });
 });
 
-describe("the monthly check", () => {
-  const runbook = read("../ops/runbooks/promote-submissions/sweeps.md");
+// The runbooks are under ops/, which the public export leaves out.
+describe.skipIf(!IN_ARCHIVE)("the monthly check", () => {
+  const runbook = IN_ARCHIVE ? read("../ops/runbooks/promote-submissions/sweeps.md") : "";
   const runbookSection = (heading: string) => {
     const start = runbook.indexOf(heading);
     expect(start, heading).toBeGreaterThan(-1);

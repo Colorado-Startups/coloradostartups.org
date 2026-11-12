@@ -312,7 +312,10 @@ STUB
     for d in $dirs; do grep -q "^      - \"$d/\*\*\"$" "$root/.github/workflows/content-gates.yml" 2>/dev/null || missing="$missing $d/"; done
     if [ -z "$missing" ]; then echo "  OK   content-gates.yml's path filter names every content folder"; else echo "  FAIL content-gates.yml's path filter is missing:$missing"; wrong=$((wrong + 1)); fi
   fi
-  if grep -q "bash 04_tools/site_changed.sh process-page " "$root/.github/workflows/quality-pages.yml" 2>/dev/null; then echo "  OK   quality-pages.yml calls the detector for process-page"; else echo "  FAIL quality-pages.yml does not call bash 04_tools/site_changed.sh process-page"; wrong=$((wrong + 1)); fi
+  # quality-pages.yml is private (04_tools/export_manifest.json): the public repo has no Process page step to check.
+  # Keyed on the archive marker, so a quality-pages.yml deleted by mistake in the archive still fails here.
+  if [ ! -f "$root/04_tools/.private-overlay-required" ]; then echo "  SKIP quality-pages.yml stays in the archive repo; this is the public one"
+  elif grep -q "bash 04_tools/site_changed.sh process-page " "$root/.github/workflows/quality-pages.yml"; then echo "  OK   quality-pages.yml calls the detector for process-page"; else echo "  FAIL quality-pages.yml does not call bash 04_tools/site_changed.sh process-page"; wrong=$((wrong + 1)); fi
 
   if [ "$wrong" -eq 0 ]; then echo "site_changed.sh self-test: PASS"; return 0; fi
   echo "site_changed.sh self-test: FAIL ($wrong)"

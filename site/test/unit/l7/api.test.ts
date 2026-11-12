@@ -5,19 +5,23 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { IN_ARCHIVE } from "../../archive";
+
 import { buildApi } from "../../../../art/tools/build-api.mjs";
 import { build } from "../../../../art/tools/build-batch.mjs";
 import { buildWorkflow } from "../../../../art/tools/build-workflow.mjs";
 
 const ROOT = path.join(__dirname, "../../../..");
-const base = JSON.parse(readFileSync(path.join(ROOT, "art/workflows/base/image_anima_base_v1.json"), "utf8"));
+// art/workflows and art/runs are private: the public export leaves them out,
+// so both suites below skip there and these reads wait for the archive.
 type Node = { id: number; type: string; widgets_values: unknown[] };
+const base = IN_ARCHIVE ? JSON.parse(readFileSync(path.join(ROOT, "art/workflows/base/image_anima_base_v1.json"), "utf8")) : { definitions: { subgraphs: [{ nodes: [] }] } };
 const inner = new Map<number, Node>(base.definitions.subgraphs[0].nodes.map((n: Node) => [n.id, n]));
-const api = buildApi("1");
-const req = build("1");
+const api = (IN_ARCHIVE ? buildApi("1") : {}) as ReturnType<typeof buildApi>;
+const req = (IN_ARCHIVE ? build("1") : {}) as ReturnType<typeof build>;
 
 // Generated files are pinned: what is on disk must be what the builders write.
-describe("generated files", () => {
+describe.skipIf(!IN_ARCHIVE)("generated files", () => {
   it("batch-1.json equals build('1')", () => {
     const onDisk = readFileSync(path.join(ROOT, "art/runs/batch-1.json"), "utf8");
     expect(JSON.parse(onDisk)).toEqual(req);
@@ -29,7 +33,7 @@ describe("generated files", () => {
   });
 });
 
-describe("batch-1.api.json", () => {
+describe.skipIf(!IN_ARCHIVE)("batch-1.api.json", () => {
   it("is current with its sources", () => {
     const onDisk = JSON.parse(readFileSync(path.join(ROOT, "art/runs/batch-1.api.json"), "utf8"));
     expect(onDisk).toEqual(api);

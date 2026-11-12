@@ -8,6 +8,7 @@ import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import YAML from "yaml";
 
+import { IN_ARCHIVE } from "../../archive";
 import { tempDirs } from "../temp-dirs";
 import { buildApi } from "../../../../art/tools/build-api.mjs";
 import { build } from "../../../../art/tools/build-batch.mjs";
@@ -266,7 +267,8 @@ describe("make-finals preflight", () => {
     expect(shipped()).toEqual(before);
   });
 
-  it("make-finals exits 3 when --previews names a batch folder that is not there", () => {
+  // Reads art/runs, which the public export leaves out.
+  it.skipIf(!IN_ARCHIVE)("make-finals exits 3 when --previews names a batch folder that is not there", () => {
     const before = shipped();
     const r = run(MAKE_FINALS, ["--from", dummyInbox(), "--previews", "9"]);
     expect(r.status).toBe(3);
@@ -284,14 +286,16 @@ describe("delivered finals", () => {
   const { packets } = provenancePackets(plan);
   for (const e of plan.finals) {
     const file = path.join(ROOT, `site/src/assets/art/${e.out}.webp`);
-    it.skipIf(!existsSync(file))(`${e.out}.webp has its size and its provenance record, and no other metadata`, async () => {
+    // The packets come from art/runs, which the public export leaves out.
+    it.skipIf(!IN_ARCHIVE || !existsSync(file))(`${e.out}.webp has its size and its provenance record, and no other metadata`, async () => {
       expect((await checkFinal(file, e.kind, packets[e.out])).problems).toEqual([]);
     });
   }
 });
 
 // Generated files are pinned: what is on disk must be what the builders write.
-describe("batch 2", () => {
+// They read art/runs, which the public export leaves out.
+describe.skipIf(!IN_ARCHIVE)("batch 2", () => {
   it("batch-2.json equals build('2')", () => {
     const onDisk = JSON.parse(readFileSync(path.join(ROOT, "art/runs/batch-2.json"), "utf8"));
     expect(onDisk).toEqual(build("2"));

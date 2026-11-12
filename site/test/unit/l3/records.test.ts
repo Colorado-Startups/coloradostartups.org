@@ -7,12 +7,14 @@ import { ResourceSchema } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
+import { IN_ARCHIVE } from "../../archive";
 import { dedupeKey } from "../../../../scripts/canvas/lib/url.mjs";
 import { FIELD_ORDER, recordYaml } from "../../../../scripts/canvas/lib/yaml.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../../../..");
 const DATA = path.join(ROOT, "data/resources");
-const REPORT = readFileSync(path.join(ROOT, "ops/canvas-review.md"), "utf8");
+// ops/ is private: the public export leaves the review report out.
+const REPORT = IN_ARCHIVE ? readFileSync(path.join(ROOT, "ops/canvas-review.md"), "utf8") : "";
 
 const files = readdirSync(DATA, { withFileTypes: true })
   .filter((d) => d.isDirectory())
@@ -83,7 +85,7 @@ describe("data/resources records", () => {
   });
 });
 
-describe("ops/canvas-review.md", () => {
+describe.skipIf(!IN_ARCHIVE)("ops/canvas-review.md", () => {
   const count = (label: string) => {
     const m = new RegExp(`^\\| ${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\| (\\d+) \\|$`, "m").exec(REPORT);
     return m ? Number(m[1]) : NaN;

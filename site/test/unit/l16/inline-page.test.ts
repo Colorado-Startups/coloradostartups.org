@@ -9,6 +9,8 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 import { afterAll, describe, expect, it } from "vitest";
 
+import { IN_ARCHIVE } from "../../archive";
+
 import {
   bundle,
   contrastHtml,
@@ -46,7 +48,8 @@ interface Entry {
   slug: string;
   url: string | null;
 }
-const manifest = JSON.parse(readFileSync(MANIFEST, "utf8")) as { pages: Entry[]; docs: Entry[] };
+// The manifest and the guides are under ops/, which the public export leaves out.
+const manifest = (IN_ARCHIVE ? JSON.parse(readFileSync(MANIFEST, "utf8")) : { pages: [], docs: [] }) as { pages: Entry[]; docs: Entry[] };
 
 describe("routes", () => {
   it("maps built files to the paths visitors use", () => {
@@ -289,7 +292,7 @@ describe("brand guide fills from art/DIRECTION.md", () => {
   });
 });
 
-describe("manifest", () => {
+describe.skipIf(!IN_ARCHIVE)("manifest", () => {
   const all = [...manifest.pages, ...manifest.docs];
 
   it("gives every page and guide a unique slug and file", () => {
@@ -314,7 +317,7 @@ describe("manifest", () => {
 
 // #551: a build stamp says when the page was built, not that a hand-written
 // fact was checked. Hand-written facts carry the commit that last changed them.
-describe("guide stamps", () => {
+describe.skipIf(!IN_ARCHIVE)("guide stamps", () => {
   it("never pairs a claim of checking with the build stamp", () => {
     for (const doc of manifest.docs) {
       const html = readFileSync(path.join(ROOT, doc.file), "utf8");

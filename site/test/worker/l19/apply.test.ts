@@ -7,7 +7,6 @@ import { env } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 
-import runbook from "../../../../ops/runbooks/promote-submissions/applications.md?raw";
 import worker from "../../../worker/index";
 import { APPLICATION_SWEEP_SQL, handle } from "../../../worker/routes/apply";
 import { turnstileAccepting, turnstileDown } from "../l3/turnstile-handlers";
@@ -57,6 +56,12 @@ async function post(fields: Record<string, string>, ip = `203.0.113.${(n % 250) 
 
 type Row = Record<string, string | number | null>;
 const rowFor = (name: string) => env.DB.prepare("SELECT * FROM applications WHERE name = ?").bind(name).first<Row>();
+
+// ops/ is private: the public export leaves the runbook out, so the glob finds
+// nothing there and the tests that read it skip. (The workerd pool has no
+// real file system, so this checks the glob, not the archive marker.)
+const runbook = Object.values(import.meta.glob<string>("../../../../ops/runbooks/promote-submissions/applications.md", { query: "?raw", import: "default", eager: true }))[0] ?? "";
+const HAVE_RUNBOOK = runbook !== "";
 
 describe("POST /api/apply", () => {
   it("stores a valid application and redirects to the thanks page", async () => {
@@ -318,7 +323,7 @@ describe("the weekly applications sweep", () => {
     expect(await rowFor("Sweep Recent Applicant")).toMatchObject({ status: "new", email: "sweep@example.org" });
   });
 
-  it("shows Paul the exact statement the Worker runs", () => {
+  it.skipIf(!HAVE_RUNBOOK)("shows Paul the exact statement the Worker runs", () => {
     const section = runbook.slice(runbook.indexOf("## Applications (L19)"));
     const manual = [...section.matchAll(/--command "([^"]+)"/g)]
       .map((m) => m[1]!)
@@ -330,7 +335,7 @@ describe("the weekly applications sweep", () => {
 // The commands in ops/runbooks/promote-submissions/applications.md, read from
 // the runbook itself. The privacy policy promises the deletion, so the exact
 // statements Paul copies are proven here against D1.
-describe("the runbook's Applications commands", () => {
+describe.skipIf(!HAVE_RUNBOOK)("the runbook's Applications commands", () => {
   const section = runbook.slice(runbook.indexOf("## Applications (L19)"));
   const commands = [...section.matchAll(/--command "([^"]+)"/g)].map((m) => m[1]!);
   const find = (start: string) => {

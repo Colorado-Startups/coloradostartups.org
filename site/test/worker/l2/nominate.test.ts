@@ -2,12 +2,17 @@ import { createExecutionContext, SELF, waitOnExecutionContext } from "cloudflare
 import { env } from "cloudflare:workers";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import runbook from "../../../../ops/runbooks/promote-submissions/nominations.md?raw";
 import { handle, NOMINATION_SWEEP_SQL } from "../../../worker/routes/nominate";
 import { expectLimitedBeforeRead, sendBrokenUploads } from "../broken-upload";
 import { burstOver, FORM_LIMIT } from "../rate-limit";
 import { server } from "../server";
 import { turnstileFails, turnstilePasses } from "./handlers";
+
+// ops/ is private: the public export leaves the runbook out, so the glob finds
+// nothing there and the tests that read it skip. (The workerd pool has no
+// real file system, so this checks the glob, not the archive marker.)
+const runbook = Object.values(import.meta.glob<string>("../../../../ops/runbooks/promote-submissions/nominations.md", { query: "?raw", import: "default", eager: true }))[0] ?? "";
+const HAVE_RUNBOOK = runbook !== "";
 
 // The Nominations commands Paul copies from ops/runbooks/promote-submissions/nominations.md,
 // read from the runbook itself so the tests below prove the exact statements.
@@ -18,6 +23,7 @@ const NOMINATION_COMMANDS = [
 ].map((m) => m[1]!);
 function runbookSql(start: string, contains: string): string {
   const sql = NOMINATION_COMMANDS.find((c) => c.startsWith(start) && c.includes(contains));
+  if (!sql && !HAVE_RUNBOOK) return "";
   if (!sql) throw new Error(`runbook has no Nominations command starting ${start} with ${contains}`);
   return sql;
 }
@@ -278,7 +284,7 @@ describe("POST /api/nominate", () => {
   // The decline statement in ops/runbooks/promote-submissions/nominations.md, step 2, read
   // from the runbook. The privacy policy promises that declining deletes the
   // figures and the nominator's contact when we decide, so step 7 never has to.
-  it("the runbook's decline deletes revenue, headcount and the nominator's contact at once, for that row only", async () => {
+  it.skipIf(!HAVE_RUNBOOK)("the runbook's decline deletes revenue, headcount and the nominator's contact at once, for that row only", async () => {
     server.use(turnstilePasses());
     await post(validFields());
     await env.DB.prepare("UPDATE nominations SET id = 42").run();
@@ -308,7 +314,7 @@ describe("POST /api/nominate", () => {
   // The SQL in ops/runbooks/promote-submissions/nominations.md, step 6, read from the
   // runbook. The privacy policy promises this deletion, so the statement is
   // proven here against D1.
-  it("the runbook's 90-day deletion removes revenue, headcount and the nominator's contact, and keeps the rest", async () => {
+  it.skipIf(!HAVE_RUNBOOK)("the runbook's 90-day deletion removes revenue, headcount and the nominator's contact, and keeps the rest", async () => {
     server.use(turnstilePasses());
     await post(validFields());
     await env.DB.prepare("UPDATE nominations SET status = 'verified', edition_id = '2027-verified'").run();
@@ -333,11 +339,11 @@ describe("POST /api/nominate", () => {
   // Runbook steps 3 and 7: no row keeps its revenue or its nominator's
   // contact forever, reviewed or not. Step 7 is the statement the weekly job
   // runs (sweepNominations), so the manual copy must match it exactly.
-  it("step 7 in the runbook is the statement the weekly job runs", () => {
+  it.skipIf(!HAVE_RUNBOOK)("step 7 in the runbook is the statement the weekly job runs", () => {
     expect(STEP_7_SQL).toBe(NOMINATION_SWEEP_SQL);
   });
 
-  it("step 3 assigns unreviewed rows before the cutoff, and step 7 sweeps old unassigned rows", async () => {
+  it.skipIf(!HAVE_RUNBOOK)("step 3 assigns unreviewed rows before the cutoff, and step 7 sweeps old unassigned rows", async () => {
     const payload = JSON.stringify({
       legal_name: "X",
       base_year_revenue_usd: 1,

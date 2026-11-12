@@ -8,6 +8,8 @@ import path from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
+import { IN_ARCHIVE } from "../../archive";
+
 import { buildApi } from "../../../../art/tools/build-api.mjs";
 import { BRIA, SPACE, VGL_OWN, briaModeration, build, parseVglFile, spaceModeration, vglCaption } from "../../../../art/tools/build-batch.mjs";
 import { batchPlan, checkFinal } from "../../../../art/tools/make-finals.mjs";
@@ -52,8 +54,9 @@ describe("VGL prompt files", () => {
   });
 });
 
-describe("batch 3", () => {
-  const req = build("3");
+// The batch files and plans live in art/runs, which the public export leaves out.
+describe.skipIf(!IN_ARCHIVE)("batch 3", () => {
+  const req = IN_ARCHIVE ? build("3") : ({} as ReturnType<typeof build>);
 
   it("batch-3.json equals build('3'), and batch-3.api.json equals buildApi('3')", () => {
     expect(JSON.parse(readFileSync(path.join(ROOT, "art/runs/batch-3.json"), "utf8"))).toEqual(req);
@@ -83,14 +86,14 @@ describe("batch 3", () => {
 });
 
 describe("batch 4, on Bria's Hugging Face Space", () => {
-  const req = build("4");
+  const req = IN_ARCHIVE ? build("4") : ({} as ReturnType<typeof build>);
 
-  it("batch-4.json equals build('4'), and it has no ComfyUI graph", () => {
+  it.skipIf(!IN_ARCHIVE)("batch-4.json equals build('4'), and it has no ComfyUI graph", () => {
     expect(JSON.parse(readFileSync(path.join(ROOT, "art/runs/batch-4.json"), "utf8"))).toEqual(req);
     expect(() => buildApi("4")).toThrow(/run-space.py/);
   });
 
-  it("sends each still to the Space's endpoint with its caption, its own seed and the widest size", () => {
+  it.skipIf(!IN_ARCHIVE)("sends each still to the Space's endpoint with its caption, its own seed and the widest size", () => {
     for (const item of req.items) {
       expect([item.tool, item.space, item.api_name]).toEqual(["gradio", SPACE.space, SPACE.api]);
       expect(JSON.parse(item.inputs.json_prompt).style_medium).toBe(fixed.style_medium);
@@ -99,13 +102,13 @@ describe("batch 4, on Bria's Hugging Face Space", () => {
     }
   });
 
-  it("batch-5.json equals build('5'), with the same unfiltered record", () => {
+  it.skipIf(!IN_ARCHIVE)("batch-5.json equals build('5'), with the same unfiltered record", () => {
     const five = build("5");
     expect(JSON.parse(readFileSync(path.join(ROOT, "art/runs/batch-5.json"), "utf8"))).toEqual(five);
     expect(five).toMatchObject({ template: SPACE.template, moderation: "none", inbox: "art/inbox/batch-5/" });
   });
 
-  it("records that the Space runs unfiltered, and why, and lands its renders in the ignored art/inbox", () => {
+  it.skipIf(!IN_ARCHIVE)("records that the Space runs unfiltered, and why, and lands its renders in the ignored art/inbox", () => {
     expect(req).toMatchObject({ moderation: "none", inbox: "art/inbox/batch-4/" });
     expect(req.moderation_why).toMatch(/no moderation input/);
   });
@@ -117,7 +120,7 @@ describe("batch 4, on Bria's Hugging Face Space", () => {
   });
 });
 
-describe("run-space.py refuses before it loads a client", () => {
+describe.skipIf(!IN_ARCHIVE)("run-space.py refuses before it loads a client", () => {
   const INBOX = path.join(ROOT, "art/inbox");
   const py = (args: string[]) => spawnSync("python3", ["-I", RUN_SPACE, ...args], { encoding: "utf8" });
   // A request file with one item changed, for the refusals that need a bad batch.

@@ -1,7 +1,7 @@
 // L19: the application contract in packages/shared/src/apply.ts, and its
 // agreement with data/team/positions.yaml. Fixtures use example.org and
 // invented names only; no real person's contact data belongs in a test.
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -133,7 +133,8 @@ describe("positions.yaml agrees with REQUIRED_COURSES", () => {
         else files.push(full);
       }
     };
-    for (const root of roots) walk(fileURLToPath(new URL(root, REPO)));
+    // The public export leaves ops/ out, so scan only the roots that exist.
+    for (const root of roots) if (existsSync(new URL(root, REPO))) walk(fileURLToPath(new URL(root, REPO)));
     expect(files.length).toBeGreaterThan(50);
     for (const file of files) {
       const text = readFileSync(file, "utf8");

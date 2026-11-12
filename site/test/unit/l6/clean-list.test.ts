@@ -5,24 +5,20 @@ import path from "node:path";
 
 import { afterAll, describe, expect, it } from "vitest";
 
-import {
-  cleanLists,
-  consentMapFrom,
-  hashEmail,
-  insideGitCheckout,
-  optOutHashesFrom,
-  parseCsv,
-  toCsv,
-  UsageError,
-  // @ts-expect-error plain .mjs ops module without type declarations
-} from "../../../../ops/email/clean-lib.mjs";
+import { IN_ARCHIVE } from "../../archive";
+
+// ops/ is private: the public export leaves out the library under test, so
+// the glob finds nothing there and every suite below skips.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lib: any = Object.values(import.meta.glob("../../../../ops/email/clean-lib.mjs", { eager: true }))[0] ?? {};
+const { cleanLists, consentMapFrom, hashEmail, insideGitCheckout, optOutHashesFrom, parseCsv, toCsv, UsageError } = lib;
 
 // Synthetic fixtures only (example.org is reserved, RFC 2606). Real exports
 // never enter this repository.
 const HEADER = ["Email", "First Name", "Accepts Marketing"];
 const input = (tag: string, rows: string[][]) => ({ name: `${tag}.csv`, tag, rows: [HEADER, ...rows] });
 
-describe("cleanLists", () => {
+describe.skipIf(!IN_ARCHIVE)("cleanLists", () => {
   it("imports only valid, consenting, unsuppressed addresses, tagged by list", () => {
     const suppression = new Set([hashEmail("gone@example.org")]);
     const { files, counts, newSuppression } = cleanLists(
@@ -60,7 +56,7 @@ describe("cleanLists", () => {
   });
 });
 
-describe("consent from a Profiles export", () => {
+describe.skipIf(!IN_ARCHIVE)("consent from a Profiles export", () => {
   const consent = consentMapFrom([
     HEADER,
     ["k@example.org", "", "true"],
@@ -79,7 +75,7 @@ describe("consent from a Profiles export", () => {
   });
 });
 
-describe("review fixes: every opt-out source wins", () => {
+describe.skipIf(!IN_ARCHIVE)("review fixes: every opt-out source wins", () => {
   it("Profiles false + list true is not written", () => {
     const consent = consentMapFrom([HEADER, ["p@example.org", "", "false"]]);
     const { files, counts, newSuppression } = cleanLists([input("list", [["p@example.org", "Pat", "true"]])], new Set(), consent);
@@ -109,7 +105,7 @@ describe("review fixes: every opt-out source wins", () => {
   });
 });
 
-describe("CSV handling", () => {
+describe.skipIf(!IN_ARCHIVE)("CSV handling", () => {
   it("parses quotes, embedded commas and newlines, and a BOM", () => {
     expect(parseCsv('﻿Email,Note\r\n"e@example.org","a, ""b""\nc"\n')).toEqual([
       ["Email", "Note"],
@@ -125,7 +121,7 @@ describe("CSV handling", () => {
   });
 });
 
-describe("clean-list.mjs CLI", () => {
+describe.skipIf(!IN_ARCHIVE)("clean-list.mjs CLI", () => {
   const repoRoot = path.resolve(__dirname, "../../../..");
   const cli = path.join(repoRoot, "ops/email/clean-list.mjs");
   const drive = mkdtempSync(path.join(tmpdir(), "l6-drive-"));

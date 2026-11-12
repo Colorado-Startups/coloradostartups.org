@@ -5,8 +5,6 @@
 import { env } from "cloudflare:workers";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import nominationsRunbook from "../../../../ops/runbooks/promote-submissions/nominations.md?raw";
-import sweepsRunbook from "../../../../ops/runbooks/promote-submissions/sweeps.md?raw";
 import {
   CSP_REPORT_PURGE_SQL,
   CSP_REPORT_RETENTION_DAYS,
@@ -19,7 +17,13 @@ import {
 } from "../../../worker/routes/nominate";
 
 // The Nominations and Weekly job sections, each read up to the next "## ".
-const runbook = `${nominationsRunbook}\n${sweepsRunbook}`;
+// ops/ is private: the public export leaves the runbooks out, so the glob finds
+// nothing there and the two tests that read them skip. (The workerd pool has no
+// real file system, so this checks the glob, not the archive marker.)
+const runbook = Object.values(
+  import.meta.glob<string>("../../../../ops/runbooks/promote-submissions/{nominations,sweeps}.md", { query: "?raw", import: "default", eager: true }),
+).join("\n");
+const HAVE_RUNBOOK = runbook.trim() !== "";
 const DAY = 86_400_000;
 const daysAgo = (n: number) => new Date(Date.now() - n * DAY).toISOString();
 const CLEARED = ["base_year_revenue_usd", "current_year_revenue_usd", "fte_headcount", "contact_name", "contact_email"];
@@ -95,7 +99,7 @@ describe("sweepNominations", () => {
     expect((await row("Recent Unclaimed"))!.financials_deleted_at).toBeNull();
   });
 
-  it("runs the statement the runbook's Nominations step 7 shows for a manual run", () => {
+  it.skipIf(!HAVE_RUNBOOK)("runs the statement the runbook's Nominations step 7 shows for a manual run", () => {
     const manual = runbookCommands("## Nominations (L2)").filter(
       (c) => c.startsWith("UPDATE nominations SET payload = json_remove") && c.includes("edition_id IS NULL"),
     );
@@ -139,7 +143,7 @@ describe("purgeCspReports", () => {
     expect(await signatures()).toEqual(["recent"]);
   });
 
-  it("runs the statement the runbook's weekly job shows for a manual run", () => {
+  it.skipIf(!HAVE_RUNBOOK)("runs the statement the runbook's weekly job shows for a manual run", () => {
     expect(runbookCommands("## Weekly job (Mondays)")).toEqual([CSP_REPORT_PURGE_SQL]);
   });
 });

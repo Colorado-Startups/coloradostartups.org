@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
+import { IN_ARCHIVE } from "../../archive";
+
 const SITE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const read = (rel: string) => readFileSync(path.join(SITE, rel), "utf8");
 const POLICY = read("../data/legal/privacy.md");
@@ -106,7 +108,8 @@ describe("the weekly job", () => {
     );
   });
 
-  it("the runbook's purpose limit says the weekly limit, not the old monthly one", () => {
+  // The runbook is under ops/, which the public export leaves out.
+  it.skipIf(!IN_ARCHIVE)("the runbook's purpose limit says the weekly limit, not the old monthly one", () => {
     const runbook = read("../ops/runbooks/promote-submissions/nominations.md");
     expect(runbook).toContain("That keeps every row no edition claimed within 187 days");
     expect(runbook).not.toContain("211 days");
