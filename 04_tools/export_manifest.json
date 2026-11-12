@@ -52,7 +52,7 @@
     {"glob": "LICENSE", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
     {"glob": "MAINTAINERS.md", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
     {"glob": "ROADMAP.md", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
-    {"glob": "TRADEMARKS.md", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
+    {"glob": "LICENSES/**", "public": true, "reason": "License texts beside the root LICENSE; in the archive they live only in the overlay, so this rule matches in the public repo"},
     {"glob": "README.md", "public": false, "reason": "Internal; the overlay's README.md replaces it"},
     {"glob": "CONTRIBUTING.md", "public": false, "reason": "Internal lane process; the overlay's CONTRIBUTING.md replaces it"},
     {"glob": "SECURITY.md", "public": false, "reason": "Internal; the overlay's SECURITY.md replaces it"},
