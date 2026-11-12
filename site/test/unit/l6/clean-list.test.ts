@@ -125,8 +125,9 @@ describe.skipIf(!IN_ARCHIVE)("CSV handling", () => {
 describe.skipIf(!IN_ARCHIVE)("clean-list.mjs CLI", () => {
   const repoRoot = path.resolve(__dirname, "../../../..");
   const cli = path.join(repoRoot, "ops/email/clean-list.mjs");
-  const drive = mkdtempSync(path.join(tmpdir(), "l6-drive-"));
-  afterAll(() => rmSync(drive, { recursive: true, force: true }));
+  // A skipped describe still runs its body: make the folder only where the tests run, or it leaks.
+  const drive = IN_ARCHIVE ? mkdtempSync(path.join(tmpdir(), "l6-drive-")) : "";
+  afterAll(() => drive && rmSync(drive, { recursive: true, force: true }));
 
   const run = (...args: string[]) => spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
 
