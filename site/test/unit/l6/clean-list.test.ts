@@ -57,7 +57,8 @@ describe.skipIf(!IN_ARCHIVE)("cleanLists", () => {
 });
 
 describe.skipIf(!IN_ARCHIVE)("consent from a Profiles export", () => {
-  const consent = consentMapFrom([
+  // A describe's body runs even when it is skipped, so the private lib's helper is called only in the archive.
+  const consent = !IN_ARCHIVE ? new Map() : consentMapFrom([
     HEADER,
     ["k@example.org", "", "true"],
     ["l@example.org", "", "false"],

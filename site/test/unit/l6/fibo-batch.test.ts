@@ -196,7 +196,8 @@ describe("make-finals one batch", () => {
     expect(Object.keys(two.tiles).filter((k) => !k.startsWith("_")).sort()).toEqual(["parchment", "stone"]);
   });
 
-  it("exits 2 on a batch that ships nothing, a bad number, or --batch with --stamp", () => {
+  // Outside the archive make-finals has no art/runs inputs, so it exits 3 first.
+  it.skipIf(!IN_ARCHIVE)("exits 2 on a batch that ships nothing, a bad number, or --batch with --stamp", () => {
     const run = (args: string[]) => spawnSync(process.execPath, [MAKE_FINALS, ...args], { encoding: "utf8" });
     expect(run(["--from", ROOT, "--batch", "99"]).status).toBe(2);
     expect(run(["--from", ROOT, "--batch", "x"]).status).toBe(2);
