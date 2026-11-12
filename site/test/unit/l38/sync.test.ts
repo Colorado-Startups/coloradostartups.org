@@ -1,0 +1,214 @@
+// L38: scripts/positions/sync-volunteers.mjs, the hand-run copy of the
+// volunteer kit into data/positions/. The kit lives on one Mac, so every test
+// here seeds its own small kit, and CI never needs the real one.
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { afterEach, describe, expect, it } from "vitest";
+import { parse } from "yaml";
+
+import {
+  FACT_FIELDS,
+  isPublicFact,
+  KitError,
+  main,
+  publicFacts,
+  render,
+} from "../../../../scripts/positions/sync-volunteers.mjs";
+
+const REPO = fileURLToPath(new URL("../../../../", import.meta.url));
+
+const fact = (over: Record<string, unknown> = {}) => ({
+  value: "82%",
+  label: "of a seeded sample (Example survey, 2016)",
+  source: "Example survey of 100 people",
+  url: "https://example.org/survey",
+  read: "2026-10-18",
+  mark: "R",
+  short: "Example survey, 2016",
+  note: "internal: checked against the PDF",
+  ...over,
+});
+
+const seededFacts = {
+  "kept-r": fact({ bar: "Seeded bar label" }),
+  "dropped-gated": fact({ value: "4,321", status: "gated" }),
+  "dropped-s": fact({ value: "27%", mark: "S" }),
+};
+
+const seededRoles = {
+  _about: "Seeded. Course facts: academy.claude.com course pages, read 2026-10-18.",
+  org: { name: "Colorado Startups", tagline: "A community.", lead: "Paul Foley, Founder & President" },
+  apply: { email: "info@example.org", subject_prefix: "Volunteer application", form_url: "https://example.org/apply/", _form_note: "internal" },
+  courses: { "claude-101": { title: "Claude 101", url: "https://academy.claude.com/courses/claude-101", length: "2.5 hours" } },
+  core_courses: ["claude-101"],
+  perks: ["A perk."],
+  linkedin_rule: "List it under Volunteer experience.",
+  steps: [
+    { title: "One", body: "First." },
+    { title: "Two", body: "Second." },
+    { title: "Three", body: "Third." },
+  ],
+  look_for: ["You follow through."],
+  rules_common: ["Everyone is welcome."],
+  roles: [
+    {
+      id: "test-seat",
+      title: "Test Seat",
+      kind: "community",
+      eyebrow: "Online",
+      where: "Online",
+      one_liner: "A seeded seat.",
+      do: ["Welcome people."],
+      bring: ["You like people."],
+      rules_extra: [],
+      extra_courses: [],
+    },
+  ],
+};
+
+const seededGeo = {
+  _about: "Seeded.",
+  sources: { gnis: "A long provenance note that stays in the kit." },
+  state_bounds: { north: 41, south: 37, west: -109, east: -102, source: "gnis", verified: true },
+  cities: [{ name: "Boulder", lat: 40, lon: -105.27, region: "photon-mountain", core: true, gnis_id: 1, geoid: "08", census_intpt: [40, -105], verified: true }],
+  peaks: [{ name: "Longs Peak", lat: 40.25, lon: -105.6, gnis_id: 2, source: "gnis" }],
+};
+
+const kit = () => ({ roles: seededRoles, facts: { facts: seededFacts }, geo: seededGeo, hashes: { roles: "r", facts: "f", geo: "g" } });
+
+let dirs: string[] = [];
+afterEach(() => {
+  for (const d of dirs) rmSync(d, { recursive: true, force: true });
+  dirs = [];
+});
+function tempDir() {
+  const d = mkdtempSync(path.join(tmpdir(), "l38-sync-"));
+  dirs.push(d);
+  return d;
+}
+function writeKit(dir: string) {
+  mkdirSync(path.join(dir, "data"), { recursive: true });
+  writeFileSync(path.join(dir, "roles.json"), JSON.stringify(seededRoles));
+  writeFileSync(path.join(dir, "data", "facts.json"), JSON.stringify({ _about: "Seeded.", facts: seededFacts }));
+  writeFileSync(path.join(dir, "data", "geo.json"), JSON.stringify(seededGeo));
+}
+const quiet = { log: () => {}, warn: () => {} };
+
+describe("the fact filter", () => {
+  it("keeps an R fact and drops a gated fact and an S-marked fact (seeded)", () => {
+    const kept = publicFacts(seededFacts);
+    expect(Object.keys(kept)).toEqual(["kept-r"]);
+    expect(isPublicFact(seededFacts["dropped-gated"])).toBe(false);
+    expect(isPublicFact(seededFacts["dropped-s"])).toBe(false);
+    expect(isPublicFact(seededFacts["kept-r"])).toBe(true);
+  });
+
+  it("drops every note and keeps only the fields a page may show, bar included", () => {
+    const kept = publicFacts(seededFacts)["kept-r"];
+    expect(Object.keys(kept)).toEqual(FACT_FIELDS);
+    expect(kept).not.toHaveProperty("note");
+    expect(kept).not.toHaveProperty("mark");
+    expect(kept.bar).toBe("Seeded bar label");
+  });
+
+  it("stops on a kept fact that lacks its source, rather than dropping it quietly", () => {
+    expect(() => publicFacts({ bare: fact({ source: "" }) })).toThrow(KitError);
+  });
+});
+
+describe("render", () => {
+  const files = render(kit());
+
+  it("writes one file per seat, plus common, facts and geo", () => {
+    expect(Object.keys(files).sort()).toEqual(["common.yaml", "facts.yaml", "geo.yaml", "test-seat.yaml"]);
+    for (const text of Object.values(files)) expect(text).toMatch(/^# Generated by scripts\/positions\/sync-volunteers\.mjs/);
+  });
+
+  it("leaves the gated and S-marked facts and every note out of facts.yaml", () => {
+    const facts = parse(files["facts.yaml"]!);
+    expect(Object.keys(facts)).toEqual(["kept-r"]);
+    expect(files["facts.yaml"]).not.toContain("4,321");
+    expect(files["facts.yaml"]).not.toContain("internal");
+  });
+
+  it("strips the kit's _notes and reads the course date from roles.json's _about", () => {
+    const common = parse(files["common.yaml"]!);
+    expect(common.apply).toEqual({ email: "info@example.org", subject_prefix: "Volunteer application", form_url: "https://example.org/apply/" });
+    expect(common.course_lengths_read).toBe("2026-10-18");
+    expect(files["common.yaml"]).toContain('course_lengths_read: "2026-10-18"');
+  });
+
+  it("keeps a figure such as 3 a string, and quotes every date", () => {
+    const out = render({ ...kit(), facts: { facts: { three: fact({ value: "3" }) } } });
+    expect(parse(out["facts.yaml"]!).three.value).toBe("3");
+    expect(out["facts.yaml"]).toContain('read: "2026-10-18"');
+  });
+
+  it("copies map coordinates without the cross-checks or the provenance notes", () => {
+    const geo = parse(files["geo.yaml"]!);
+    expect(Object.keys(geo)).toEqual(["state_bounds", "cities", "peaks", "landmarks"]);
+    expect(geo.cities[0]).toEqual({ name: "Boulder", lat: 40, lon: -105.27, region: "photon-mountain", core: true, gnis_id: 1 });
+    expect(files["geo.yaml"]).not.toContain("provenance");
+  });
+
+  it("stops when roles.json no longer says when the course pages were read", () => {
+    expect(() => render({ ...kit(), roles: { ...seededRoles, _about: "Reworded." } })).toThrow(/Course facts/);
+  });
+});
+
+describe("main", () => {
+  it("exits 3 when the kit folder is missing", () => {
+    expect(main(["--from", path.join(tempDir(), "absent")], { outDir: tempDir(), ...quiet })).toBe(3);
+  });
+
+  it("exits 3 when a kit file does not parse", () => {
+    const dir = tempDir();
+    writeKit(dir);
+    writeFileSync(path.join(dir, "data", "geo.json"), "{ not json");
+    expect(main(["--from", dir], { outDir: tempDir(), ...quiet })).toBe(3);
+  });
+
+  it("exits 2 on an unknown argument", () => {
+    expect(main(["--bogus"], { outDir: tempDir(), ...quiet })).toBe(2);
+  });
+
+  it("writes the files, then --check passes, and a hand edit makes --check exit 1", () => {
+    const dir = tempDir();
+    const out = tempDir();
+    writeKit(dir);
+    expect(main(["--from", dir], { outDir: out, ...quiet })).toBe(0);
+    expect(readdirSync(out).sort()).toEqual(["common.yaml", "facts.yaml", "geo.yaml", "test-seat.yaml"]);
+    expect(main(["--from", dir, "--check"], { outDir: out, ...quiet })).toBe(0);
+    writeFileSync(path.join(out, "facts.yaml"), "# edited by hand\n");
+    expect(main(["--from", dir, "--check"], { outDir: out, ...quiet })).toBe(1);
+  });
+
+  it("removes a seat file the kit no longer lists, and never a hand-written file", () => {
+    const dir = tempDir();
+    const out = tempDir();
+    writeKit(dir);
+    main(["--from", dir], { outDir: out, ...quiet });
+    writeFileSync(path.join(out, "old-seat.yaml"), readFileSync(path.join(out, "test-seat.yaml"), "utf8"));
+    writeFileSync(path.join(out, "notes.yaml"), "# a person wrote this\n");
+    expect(main(["--from", dir], { outDir: out, ...quiet })).toBe(0);
+    expect(existsSync(path.join(out, "old-seat.yaml"))).toBe(false);
+    expect(existsSync(path.join(out, "notes.yaml"))).toBe(true);
+  });
+});
+
+describe("the committed data/positions/facts.yaml", () => {
+  const facts = parse(readFileSync(path.join(REPO, "data", "positions", "facts.yaml"), "utf8")) as Record<string, Record<string, string>>;
+
+  it("holds only the fields a page may show, so no note, mark or status reached the repo", () => {
+    for (const [id, f] of Object.entries(facts)) {
+      for (const key of Object.keys(f)) expect(FACT_FIELDS, `${id}.${key}`).toContain(key);
+    }
+  });
+
+  it("leaves out newsletter-reach, the fact the kit gates", () => {
+    expect(facts).not.toHaveProperty("newsletter-reach");
+  });
+});

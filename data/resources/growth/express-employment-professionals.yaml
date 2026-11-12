@@ -1,0 +1,13 @@
+id: express-employment-professionals
+name: Express Employment Professionals
+url: https://www.expresspros.com/ColoradoSpringsCO/Job-Seekers/Types-of-Jobs/Default.aspx
+stage: growth
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: A staffing agency in Colorado Springs. It places job seekers in temporary and full-time office, light industrial and skilled trade roles.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

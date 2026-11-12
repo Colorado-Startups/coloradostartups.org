@@ -1,0 +1,13 @@
+id: launch-finance
+name: Launch Finance
+url: https://www.launchfinance.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: An accounting firm. It works with venture-backed startups. It offers fractional CFO, payroll and fund administration services.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,205 @@
+---
+// The body of one guide: the answer first, then the lists built from
+// Startup Resources, then the other guides. Owner: L23. L32 added the
+// calendar's next events (events guide only) and grouped the other guides.
+// Each listing section ends with a link back to the contents list (#238).
+//
+// The lists are left out of the Pagefind index, so a search finds each
+// resource once, on the directory (the same choice RegionResources makes).
+// The answer and the headings stay in the index.
+import { guideItems, guidePath, type Guide, type GuideMeta } from "../../lib/guides/guides";
+import ArtImage from "../art/ArtImage.astro";
+import { GUIDE_ART_IMAGE, guideArt } from "./guide-art";
+import GuideItem from "./GuideItem.astro";
+import GuideText from "./GuideText.astro";
+import GuideUpcoming from "./GuideUpcoming.astro";
+
+interface Props {
+  guide: Guide;
+  /** The other guides by group, for the links at the foot of the page. */
+  others: readonly { heading: string; guides: readonly GuideMeta[] }[];
+}
+
+const { guide, others } = Astro.props;
+// The count beside each section in the table of contents, with its unit.
+const size = (n: number) => `(${n} ${n === 1 ? "listing" : "listings"})`;
+// The bands alternate down the page; the next events, when shown, take the first.
+const offset = guide.upcoming ? 1 : 0;
+// The contents list's anchor. It has no heading of its own, and the h1
+// (#guide-title) sits above the answer, so the back links target the list.
+const CONTENTS = "guide-contents";
+const art = guideArt(guide.slug);
+---
+
+<section class="section section--band" aria-labelledby="guide-title">
+  <div class="wrap stack">
+    <nav aria-label="Breadcrumb" class="crumbs">
+      <ol>
+        <li><a href="/guides/">Guides</a></li>
+        <li aria-current="page">{guide.title}</li>
+      </ol>
+    </nav>
+    <h1 id="guide-title">{guide.title}</h1>
+    <p class="lede" data-guide-answer><GuideText parts={guide.answer} /></p>
+    <ArtImage src={art.src} alt={art.alt} {...GUIDE_ART_IMAGE} loading="lazy" motion="none" class="guide-art" />
+    {/* The table of contents names the sections of Startup Resources listings
+        only. The calendar's next events, when shown, follow this band
+        directly, and they are events rather than listings. Each section's
+        "Back to contents" link lands here. */}
+    <nav aria-label="On this page" id={CONTENTS}>
+      <ul class="toc">
+        {
+          guide.sections.map((s) => (
+            <li>
+              <a class="tap-target" href={`#${s.id}`}>{s.heading}</a> <span class="meta">{size(guideItems({ sections: [s] }).length)}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</section>
+
+{
+  guide.upcoming && (
+    <section
+      class="section section--lit"
+      id={guide.upcoming.id}
+      aria-labelledby={`${guide.upcoming.id}-title`}
+      data-guide-upcoming
+    >
+      <div class="wrap stack">
+        <GuideUpcoming upcoming={guide.upcoming} />
+      </div>
+    </section>
+  )
+}
+
+{
+  guide.sections.map((s, i) => (
+    <section
+      class:list={["section", (i + offset) % 2 === 0 ? "section--lit" : "section--band"]}
+      id={s.id}
+      aria-labelledby={`${s.id}-title`}
+      data-guide-section
+    >
+      <div class="wrap stack">
+        <h2 id={`${s.id}-title`}>{s.heading}</h2>
+        <p>
+          <GuideText parts={s.intro} />
+        </p>
+        <div data-pagefind-ignore>
+          {s.groups.map((g) => (
+            <>
+              {g.heading && <h3>{g.heading}</h3>}
+              <ul class="guide-list" data-guide-list>
+                {g.items.map((item) => (
+                  <GuideItem item={item} />
+                ))}
+              </ul>
+            </>
+          ))}
+        </div>
+        <p class="back" data-guide-back data-pagefind-ignore>
+          <a class="tap-target" href={`#${CONTENTS}`}>Back to contents</a>
+        </p>
+      </div>
+    </section>
+  ))
+}
+
+<section class="section section--band" aria-labelledby="more-title">
+  <div class="wrap stack">
+    <h2 id="more-title">More guides for founders</h2>
+    <div class="more">
+      {
+        others.map((group) => (
+          <div>
+            <h3>{group.heading}</h3>
+            <ul>
+              {group.guides.map((g) => (
+                <li>
+                  <a class="tap-target" href={guidePath(g.slug)}>{g.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+    <p>
+      Every list here comes from Startup Resources, which the community keeps current. If a Colorado resource for
+      founders is missing, tell us. A person reviews every suggestion before it goes in.
+    </p>
+    <p class="btn-row">
+      <a class="btn btn--gold" href="/ecosystem-canvas/suggest/">Suggest a resource</a>
+      <a class="btn btn--stone" href="/ecosystem-canvas/">Browse Startup Resources</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  /* The guide's picture under its answer (L6's scenes, 2026-11-04). */
+  :global(.guide-art) {
+    width: min(100%, 40rem);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  /* The breadcrumb's look is the global .crumbs in global.css (#195). */
+  .toc,
+  .more ul {
+    display: grid;
+    gap: var(--s-2);
+    padding: 0;
+    list-style: none;
+  }
+  /* A listing count wraps whole: beside a 44 px phone link, a split count
+     would leave half of it alone on a tall line. */
+  .toc .meta {
+    white-space: nowrap;
+  }
+  /* Nine guides read as three short columns, one per group, on a wide screen. */
+  .more {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--s-4) var(--s-5);
+  }
+  .more h3 {
+    margin: 0 0 var(--s-2);
+    font-size: var(--t-step-1);
+  }
+  .more ul {
+    margin: 0;
+  }
+  .guide-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: 0 var(--s-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+  h3 {
+    margin-top: var(--s-5);
+  }
+  /* A back link leaves room above the list it lands on. */
+  #guide-contents {
+    scroll-margin-top: var(--s-5);
+  }
+  /* A guide's lists run long on a phone, so each one ends with a link back
+     to the contents, tall enough to tap. */
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+  }
+  /* Where the two closing buttons cannot share a line, each takes the full
+     width, so they stack as a pair and not at their label widths. Side by
+     side they need a window 483 px wide (Chrome, measured 2026-11-02). */
+  @media (max-width: 32rem) {
+    .btn-row .btn {
+      flex: 1 1 100%;
+    }
+  }
+</style>

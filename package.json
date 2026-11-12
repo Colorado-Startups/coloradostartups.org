@@ -1,0 +1,49 @@
+{
+  "name": "coloradostartups-site-root",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=26.3.0"
+  },
+  "workspaces": [
+    "packages/shared",
+    "site",
+    "workers/communitas"
+  ],
+  "scripts": {
+    "dev": "npm run -w @cs/site dev",
+    "build": "npm run -w @cs/site build",
+    "test": "npm run -w @cs/site test && npm run -w @cs/communitas test && npm run test:ai-visibility",
+    "check": "npm run -w @cs/site check",
+    "check:push": "node scripts/tmp-leak-check.mjs --self-test && node scripts/tmp-leak-check.mjs npm run check:push:steps",
+    "check:push:steps": "npm run -w @cs/site check && npm run -w @cs/site test && npm run -w @cs/communitas test && npm run test:ai-visibility",
+    "eval:resourcus": "node evals/resourcus/run.mjs",
+    "eval:ai-visibility": "node evals/ai-visibility/run.ts",
+    "test:ai-visibility": "node --test evals/ai-visibility/test/",
+    "test:unit": "node scripts/tmp-leak-check.mjs npm run -w @cs/site test:unit --",
+    "test:worker": "node scripts/tmp-leak-check.mjs npm run -w @cs/site test:worker --",
+    "test:dom": "npm run -w @cs/site test:dom --",
+    "test:communitas": "node scripts/tmp-leak-check.mjs npm run -w @cs/communitas test --",
+    "test:e2e": "npm run -w @cs/site test:e2e --",
+    "lint:content": "python3 04_tools/cs_site_lint.py",
+    "lint:built": "python3 04_tools/cs_site_lint.py --built site/dist",
+    "lint:selftest": "python3 04_tools/cs_site_lint.py --self-test && python3 04_tools/contract_test.py && bash 04_tools/hook_selftest.sh && node scripts/tmp-leak-check.mjs --self-test",
+    "secrets": "secretlint \"**/*\""
+  },
+  "devDependencies": {
+    "@secretlint/secretlint-rule-preset-recommend": "13.0.7",
+    "@vitest/coverage-v8": "5.0.5",
+    "knip": "6.42.1",
+    "secretlint": "13.0.7",
+    "typescript": "6.0.3"
+  },
+  "overrides": {
+    "zod": "^4.6.7"
+  },
+  "allowScripts": {
+    "msw": false,
+    "fsevents": false,
+    "esbuild@0.28.2": true,
+    "workerd@1.20261023.1": true
+  }
+}

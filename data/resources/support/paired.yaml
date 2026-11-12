@@ -1,0 +1,13 @@
+id: paired
+name: Paired
+url: https://www.paired.co/
+stage: support
+substage: organizations
+city: statewide
+type: community
+description: A community or network of founders.
+tags:
+  - community
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

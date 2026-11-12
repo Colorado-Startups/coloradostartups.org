@@ -1,0 +1,13 @@
+id: denver-business-journal
+name: Denver Business Journal
+url: https://www.bizjournals.com/denver
+stage: growth
+substage: service-providers
+city: Denver
+type: media
+description: Regional news outlet in Denver.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

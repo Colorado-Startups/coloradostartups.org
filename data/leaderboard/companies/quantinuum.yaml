@@ -1,0 +1,9 @@
+id: quantinuum
+name: "Quantinuum"
+website: "https://www.quantinuum.com"
+hq_city: "Broomfield"
+founded_year: 2021
+sector: "Quantum and photonics"
+description: "Builds trapped-ion quantum computers and the software to program them. Research and commercial customers use them."
+sources:
+  - "https://www.quantinuum.com/press-releases/introducing-quantinuum"

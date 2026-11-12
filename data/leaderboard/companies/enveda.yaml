@@ -1,0 +1,9 @@
+id: enveda
+name: "Enveda"
+website: "https://enveda.com/"
+hq_city: "Boulder"
+founded_year: 2019
+sector: "Life sciences"
+description: "Finds new medicines in natural compounds with machine learning and mass spectrometry. The goal is to treat inflammatory and immune diseases."
+sources:
+  - "https://enveda.com/"

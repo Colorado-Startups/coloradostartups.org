@@ -1,0 +1,2391 @@
+{
+  "_README": [
+    "Startup credit programs for /guides/startup-credits/: a dated copy of the Colorado Startups Compute repo's public export. site/src/lib/guides/credits.ts parses it with zod, and a bad file fails the build.",
+    "'export' is the export file verbatim. Never edit it by hand: fix the source in the Compute repo (free-compute/startup-programs.json, built by free-compute/build_public.py) and copy again.",
+    "Refresh: replace 'export' with the contents of the Compute repo's free-compute/public/startup-programs.public.json, set 'from.commit' to the Compute commit it came from, then run the site tests. A test fails when an 'omit' id is gone or a new provider has not been checked against the China rule.",
+    "'omit' lists rows the guide leaves out, each with its reason. The page shows every other row."
+  ],
+  "from": {
+    "repo": "Colorado-Startups/compute",
+    "path": "free-compute/public/startup-programs.public.json",
+    "commit": "66df7e6",
+    "pr": null
+  },
+  "omit": [
+    {
+      "id": "hyperstack-inception",
+      "why": "a GPU vendor's program, which the guide leaves out (decision 80)"
+    },
+    {
+      "id": "inception",
+      "why": "a GPU vendor's program, which the guide leaves out (decision 80)"
+    },
+    {
+      "id": "lambda",
+      "why": "a GPU vendor's program, which the guide leaves out (decision 80)"
+    },
+    {
+      "id": "scaleway-inception",
+      "why": "a GPU vendor's program, which the guide leaves out (decision 80)"
+    },
+    {
+      "id": "fal-startup",
+      "why": "open only to teams in Europe or Asia, per fal's page; this guide is for founders in Colorado"
+    }
+  ],
+  "export": {
+    "version": 1,
+    "about": "Startup credit programs for founders, public fields only. Built by free-compute/build_public.py from free-compute/startup-programs.json; edit that file, never this one. Programs change: each row carries the first-party page it was read on and the date.",
+    "checked": "2026-11-02",
+    "buckets": [
+      "no_incorporation",
+      "incorporated",
+      "funded_or_partner"
+    ],
+    "rows": [
+      {
+        "id": "aws-free-plan",
+        "program": "AWS Free Tier credits (Free plan)",
+        "provider": "Amazon Web Services",
+        "bucket": "no_incorporation",
+        "credit_first": 100,
+        "credit_first_computed": false,
+        "credit_max": 200,
+        "credit_max_computed": false,
+        "amount_note": "New accounts get $100 in credits at sign-up. Completing activities in the console earns up to $100 more. New customers who pick the Paid plan get the same credits.",
+        "covers": [
+          "cpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "New AWS customer who has never had an AWS account",
+          "Free Tier credits for one account per person",
+          "Complete the Explore AWS activities within 6 months to earn the second $100"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "6 months on the Free plan, or until the credits run out",
+        "traps": {
+          "card_required": false,
+          "expiry": "The Free plan ends 6 months after sign-up or when credits run out. After an upgrade, leftover credits apply to bills until they expire; AWS pages give both 6 and 12 months from account creation.",
+          "overage": "stops",
+          "trains_on_data": null,
+          "other": [
+            "A Free plan account cannot receive other promotional credits, AWS Activate included. Upgrading to the Paid plan lifts that block.",
+            "The Free plan excludes services that would use the whole credit at once or need hardware purchases.",
+            "GPU use on the Free plan is not stated. None of the six Free tier eligible EC2 instance types is a GPU type.",
+            "When the Free plan expires, AWS suspends the account and deletes it after 90 days unless you upgrade.",
+            "AWS may ask some new customers for a payment method to verify identity.",
+            "Joining AWS Organizations or setting up Control Tower, among other actions, moves the account to the Paid plan."
+          ]
+        },
+        "link": "https://aws.amazon.com/free/",
+        "source": "https://aws.amazon.com/free/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "amd-dev-cloud",
+        "program": "AMD Developer Cloud complimentary credit",
+        "provider": "AMD (runs on DigitalOcean)",
+        "bucket": "no_incorporation",
+        "credit_first": 100,
+        "credit_first_computed": false,
+        "credit_max": 100,
+        "credit_max_computed": false,
+        "amount_note": "A $100 credit for AMD Instinct MI300X GPU Droplets. At DigitalOcean's listed $2.59 per GPU hour, that buys about 38 hours on one MI300X (computed here).",
+        "covers": [
+          "gpu"
+        ],
+        "requirements": [
+          "Join the free AMD AI Developer Program",
+          "Describe the intended use case and planned GPU use; AMD decides allocation at its discretion",
+          "Valid payment method on the DigitalOcean-run account",
+          "A new AMD Developer Cloud account; the credit cannot be used on an existing DigitalOcean account",
+          "Testing or development only; no production workloads or crypto mining"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "30 days from deposit, unless the credit confirmation email says otherwise",
+        "traps": {
+          "card_required": true,
+          "expiry": "The credit expires 30 days from its deposit in the developer cloud account.",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "A powered-off GPU VM still bills or burns credit until it is destroyed.",
+            "With no payment method on file, the GPU VM and its data are destroyed when the credit expires or runs out.",
+            "The credit covers MI300X GPUs only. Volumes, object storage and backups are not covered.",
+            "The credit can be used one time per account.",
+            "The credit allows up to eight single-GPU MI300X Droplets or one 8x Droplet."
+          ]
+        },
+        "link": "https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html",
+        "source": "https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "baseten-250",
+        "program": "Baseten new-customer credit (credit referral)",
+        "provider": "Baseten",
+        "bucket": "no_incorporation",
+        "credit_first": 250,
+        "credit_first_computed": false,
+        "credit_max": 250,
+        "credit_max_computed": false,
+        "amount_note": "$250 of Dedicated Inference or $100 of Model API credits, expiring in 1 month. The page does not say you get both.",
+        "covers": [
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "New Baseten customer",
+          "A valid business email and a business use case"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "1 month",
+        "traps": {
+          "card_required": null,
+          "expiry": "credits expire 1 month after issue",
+          "overage": "unknown",
+          "trains_on_data": false,
+          "other": [
+            "Taking this credit blocks the Baseten AI Startup Program, which only enrolls companies that never received Baseten credits.",
+            "A personal email address does not qualify."
+          ]
+        },
+        "link": "https://www.baseten.co/talk-to-us/credit-referral/",
+        "source": "https://www.baseten.co/talk-to-us/credit-referral/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "new-cerebras-signup-credit",
+        "program": "Cerebras Inference promotional credit",
+        "provider": "Cerebras",
+        "bucket": "no_incorporation",
+        "credit_first": 5,
+        "credit_first_computed": false,
+        "credit_max": 5,
+        "credit_max_computed": false,
+        "amount_note": "A one-time $5 promotional credit after adding a valid payment method.",
+        "covers": [
+          "inference"
+        ],
+        "requirements": [
+          "Cerebras Cloud account",
+          "Add a valid payment method"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "30 days after activation",
+        "traps": {
+          "card_required": true,
+          "expiry": "The credit expires 30 days after activation.",
+          "overage": "stops",
+          "trains_on_data": null,
+          "other": [
+            "API and Playground access pause when the credit expires or runs out, unless you buy PayGo credits.",
+            "Cerebras can withhold or revoke credits for fraud, abuse or duplicate accounts."
+          ]
+        },
+        "link": "https://cloud.cerebras.ai/",
+        "source": "https://www.cerebras.ai/pricing",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "deepgram",
+        "program": "Deepgram Startup Program",
+        "provider": "Deepgram",
+        "bucket": "no_incorporation",
+        "credit_first": 1000,
+        "credit_first_computed": false,
+        "credit_max": 100000,
+        "credit_max_computed": false,
+        "amount_note": "Direct applicants start at $1,000 in credits and can move to tiers worth up to $100,000 as usage grows. Partner-referred startups get the offer on their partner's perks page.",
+        "covers": [
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "An AI builder or early-stage startup",
+          "In production or launching within 6 months",
+          "An active Deepgram account",
+          "Building its own voice AI product (agencies and consultants are excluded)",
+          "Committed to building and engaging with the Deepgram community"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "12 months per credit grant",
+        "traps": {
+          "card_required": null,
+          "expiry": "each credit grant expires 12 months after issue",
+          "overage": "unknown",
+          "trains_on_data": true,
+          "other": [
+            "Credits work only on the Pay As You Go plan.",
+            "Credits start only after the standard sign-up credits are used up.",
+            "Requests join Deepgram's Model Improvement Program unless each one sets mip_opt_out=true.",
+            "The terms let Deepgram use your company name and logo in its marketing."
+          ]
+        },
+        "link": "https://deepgram.com/startup-program",
+        "source": "https://deepgram.com/startup-program",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "google-cloud-trial",
+        "program": "Google Cloud Free Trial",
+        "provider": "Google",
+        "bucket": "no_incorporation",
+        "credit_first": 300,
+        "credit_first_computed": false,
+        "credit_max": 300,
+        "credit_max_computed": false,
+        "amount_note": "A Free Trial billing account comes with $300 in Welcome credit. The credit is valid for 90 days from sign-up.",
+        "covers": [
+          "cpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Never a paying user of Google Cloud, Google Maps Platform or Firebase",
+          "Never signed up for the Free Trial before",
+          "Credit card or other payment method valid for the trial period",
+          "Bank account verification in some countries"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "90 days",
+        "traps": {
+          "card_required": true,
+          "expiry": "Credit expires 90 days after sign-up, also after an upgrade to a Paid billing account.",
+          "overage": "stops",
+          "trains_on_data": null,
+          "other": [
+            "A Free Trial billing account cannot add GPUs to VMs. Upgrading unlocks GPUs and the remaining credit still applies.",
+            "No quota increases, no Cloud Marketplace and no Windows Server VMs during the trial.",
+            "The credit cannot pay for the Gemini API in AI Studio or for managed third-party models.",
+            "Without an upgrade, the billing account closes and its resources stop when the credit or the 90 days run out.",
+            "Crypto mining is prohibited during the trial."
+          ]
+        },
+        "link": "https://cloud.google.com/free",
+        "source": "https://docs.cloud.google.com/free/docs/free-cloud-features",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "google-build-prototype",
+        "program": "Google for Startups Cloud Program: Build your prototype",
+        "provider": "Google",
+        "bucket": "no_incorporation",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "No cash credit. The offer is free access to the Gemini API and Google models in Google AI Studio.",
+        "covers": [
+          "inference"
+        ],
+        "requirements": [
+          "A Google account to use Google AI Studio",
+          "Aimed at developers and builders on small businesses, bootstrapped startups and self-funded ideas"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": true,
+          "other": [
+            "AI Studio terms say content sent to the unpaid tier is used to improve Google products and machine learning.",
+            "AI Studio terms say human reviewers may read unpaid-tier API input and output."
+          ]
+        },
+        "link": "https://aistudio.google.com/",
+        "source": "https://startup.google.com/cloud/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "azure-free",
+        "program": "Azure free account",
+        "provider": "Microsoft",
+        "bucket": "no_incorporation",
+        "credit_first": 200,
+        "credit_first_computed": false,
+        "credit_max": 200,
+        "credit_max_computed": false,
+        "amount_note": "A $200 credit to use within 30 days. New customers also get free monthly amounts of 20+ services for 12 months and 65+ always-free services.",
+        "covers": [
+          "cpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "New Azure customers only, one free account per new customer",
+          "Phone number for identity verification",
+          "Credit or debit card that is not prepaid",
+          "A Microsoft account or a GitHub account"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "30 days for the credit, 12 months for the free service amounts",
+        "traps": {
+          "card_required": true,
+          "expiry": "The credit expires 30 days after sign-up.",
+          "overage": "stops",
+          "trains_on_data": null,
+          "other": [
+            "After 30 days or when the credit is used, the account and services are disabled unless you move to pay as you go.",
+            "The credit cannot be spent on Spot VMs or Azure Marketplace offers.",
+            "Free Trial subscriptions cannot get quota increases. GPU access is not stated.",
+            "A Microsoft account used for the Azure Free Trial cannot get Microsoft for Startups credits. The startup program needs a new Microsoft account.",
+            "Azure Hybrid Benefit cannot be combined with the free account credit.",
+            "A temporary $1 authorization may appear on the card at sign-up."
+          ]
+        },
+        "link": "https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account",
+        "source": "https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "modal-free",
+        "program": "Modal Starter plan monthly credit",
+        "provider": "Modal",
+        "bucket": "no_incorporation",
+        "credit_first": 30,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "$30 of compute credit every month on the $0 Starter plan, with no stated end date. That is $360 a year (computed here). At Modal's listed RTX PRO 6000 rate of $0.000842 a second, $30 buys about 9.9 GPU hours (computed here).",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "A Modal account",
+          "A payment method on file"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "monthly, recurring",
+        "traps": {
+          "card_required": true,
+          "expiry": "monthly allotment; the pages do not say whether unused credit rolls over",
+          "overage": "bills",
+          "trains_on_data": false,
+          "other": [
+            "Starter includes 3 workspace seats, 100 containers and 10 GPU concurrency.",
+            "Usage past the free credit is auto-charged, with extra charges the first time usage crosses set thresholds."
+          ]
+        },
+        "link": "https://modal.com/pricing",
+        "source": "https://modal.com/pricing",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "oracle-trial",
+        "program": "Oracle Cloud Free Tier (Free Trial credit)",
+        "provider": "Oracle",
+        "bucket": "no_incorporation",
+        "credit_first": 300,
+        "credit_first_computed": false,
+        "credit_max": 300,
+        "credit_max_computed": false,
+        "amount_note": "US$300 of credit for eligible OCI services, usable for up to 30 days. Always Free services continue with no time limit.",
+        "covers": [
+          "cpu",
+          "other"
+        ],
+        "requirements": [
+          "One Free Trial or Always Free account per person",
+          "Credit card, or a debit card that works like a credit card",
+          "Accurate contact and billing information"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "30 days",
+        "traps": {
+          "card_required": true,
+          "expiry": "Unused credit expires 30 days after sign-up.",
+          "overage": "stops",
+          "trains_on_data": null,
+          "other": [
+            "PIN debit, virtual, single-use and prepaid cards are not accepted.",
+            "Paid resources created on the trial are reclaimed after a 30-day grace period unless you upgrade. Always Free resources stay.",
+            "Some special trial offers suspend the account when the trial ends and delete it 30 days later.",
+            "OCI's limits table lists GPU limits for Pay As You Go or Trial accounts as Contact Us, so a GPU needs a limit request.",
+            "The US$300 credit is offered in select countries only."
+          ]
+        },
+        "link": "https://www.oracle.com/cloud/free/",
+        "source": "https://www.oracle.com/cloud/free/faq/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "akamai-rise",
+        "program": "Rise (Akamai Cloud start-up program)",
+        "provider": "Akamai (Linode)",
+        "bucket": "incorporated",
+        "credit_first": 500,
+        "credit_first_computed": false,
+        "credit_max": 120000,
+        "credit_max_computed": false,
+        "amount_note": "Between $500 and $120,000 in cloud credits during the first year, with discounted services in years two and three. Credits apply against a monthly limit for virtual machines, storage and other cloud services.",
+        "covers": [
+          "cpu",
+          "other"
+        ],
+        "requirements": [
+          "Early-stage, for-profit company fewer than seven years old",
+          "At least one of: paid employees beyond founders, active non-friends users, initial revenue, or VC funding",
+          "Plan to scale infrastructure with Akamai Cloud as one of the primary providers",
+          "New account with a corporate email on the company domain, a valid credit card and a working website",
+          "Corporate entity in the account's Company field",
+          "Not an existing Akamai Cloud customer, MSP, systems integrator or reseller"
+        ],
+        "max_age_years": 7,
+        "funding_rule": "none",
+        "term": "3 years (credits in year one, discounts in years two and three)",
+        "traps": {
+          "card_required": true,
+          "expiry": "first-year and unused credits do not roll over month to month or into later years",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Usage above the monthly credit limit is charged for that month.",
+            "The page does not state the discount rate for years two and three.",
+            "GPU and inference are not named among the services credits apply to."
+          ]
+        },
+        "link": "https://www.akamai.com/cloud/start-ups/rise",
+        "source": "https://www.akamai.com/cloud/start-ups/rise",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "aws-activate",
+        "program": "AWS Activate Founders",
+        "provider": "Amazon Web Services",
+        "bucket": "incorporated",
+        "credit_first": 1000,
+        "credit_first_computed": false,
+        "credit_max": 5000,
+        "credit_max_computed": false,
+        "amount_note": "AWS Activate Credits start at $1,000. AWS says select participants may get more, up to $5,000 in total.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "AWS account on a Paid Tier Plan (free account plans are not eligible)",
+          "Pre-Series B: bootstrapped, self-funded or funded up to and including Series A",
+          "Founded within the last 10 years",
+          "A functioning website or public profile",
+          "New to Activate Credits, or asking for more than previously received",
+          "AWS account email must use the same domain as the application; free email providers are rejected",
+          "Founders is the tier for startups with no Activate Provider Org ID"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "pre-Series B",
+        "term": "expiry set per grant",
+        "traps": {
+          "card_required": true,
+          "expiry": "each grant has its own expiry date, shown in the Billing console; AWS will not extend it",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Upfront fees for Savings Plans and Reserved Instances are not covered",
+            "AWS Marketplace is not covered, except third-party models on Amazon Bedrock",
+            "Credits only offset charges from the billing cycle they arrive in onward, not past bills",
+            "Startups on AWS China Regions are not eligible",
+            "Kiro startup credits exclude startups with active Activate Credits, so apply for Kiro first if you want both"
+          ]
+        },
+        "link": "https://aws.amazon.com/startups/credits",
+        "source": "https://aws.amazon.com/startups/credits",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "kiro-startup",
+        "program": "Kiro startup credits",
+        "provider": "Amazon Web Services (Kiro)",
+        "bucket": "incorporated",
+        "credit_first": 960,
+        "credit_first_computed": true,
+        "credit_max": 14400,
+        "credit_max_computed": true,
+        "amount_note": "Up to one year of Kiro Pro+ for 2, 10 or 30 users (Starter, Growth or Scale tier). At the $40 per user per month Pro+ list price (kiro.dev/pricing, read 2026-11-02), that is $960, $4,800 or $14,400 (computed here); Kiro states seats, not dollars.",
+        "covers": [
+          "other"
+        ],
+        "requirements": [
+          "Early stage to Series A startup",
+          "Official business email matching the startup's domain",
+          "An AWS account ID using a matching email",
+          "No active AWS Activate Credits",
+          "Not in an excluded country (the list includes Argentina, Brazil, China, France, Germany, Italy, Spain, UAE)",
+          "Sign in to Kiro with AWS IAM Identity Center, not Builder ID or GitHub or Google logins"
+        ],
+        "max_age_years": null,
+        "funding_rule": "pre-Series B",
+        "term": "12 months",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits expire one year after issue to your AWS account",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Offered for a limited time only",
+            "Kiro can charge extra for users beyond your tier, or for a plan above Pro+",
+            "After the credits, billing moves to standard Pro+",
+            "AWS suggests Kiro credits first, then Activate Credits"
+          ]
+        },
+        "link": "https://kiro.dev/startups/",
+        "source": "https://kiro.dev/startups/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "aws-activate-mercury",
+        "program": "AWS Activate credits through Mercury perks",
+        "provider": "Amazon Web Services (via Mercury)",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 5000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $5,000 in AWS Activate Credits for Mercury customers. If you already redeemed less than $5,000 in AWS credits, you get only the difference up to $5,000.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "A Mercury business banking account (Mercury lists business banking at $0 per month)",
+          "Business name and email on the AWS application must match the Mercury account",
+          "No more than $5,000 in AWS credits already redeemed through another third party",
+          "AWS Activate rules: pre-Series B, founded within 10 years, Paid Tier Plan"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "pre-Series B",
+        "term": "expiry set per grant",
+        "traps": {
+          "card_required": true,
+          "expiry": "each grant has its own expiry date, shown in the AWS Billing console",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Credits are not added on top of earlier AWS credits",
+            "A mismatch between the AWS application and the Mercury account gets the application rejected"
+          ]
+        },
+        "link": "https://mercury.com/perks/aws",
+        "source": "https://mercury.com/perks/aws",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "assemblyai",
+        "program": "AssemblyAI Startup Program",
+        "provider": "AssemblyAI",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "A fixed credit amount, recurring for 12 months, plus discounted startup pricing that continues after the credits. AssemblyAI does not state the dollar amount.",
+        "covers": [
+          "other"
+        ],
+        "requirements": [
+          "Early-stage startup, pre-seed to Series A; bootstrapped teams welcome",
+          "Building a product with voice or audio at its core",
+          "Launching within 6 months, or already in production",
+          "Short application covering what you build, your stage and your backers; reviewed within a week"
+        ],
+        "max_age_years": null,
+        "funding_rule": "pre-Series B",
+        "term": "12 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "credits recur for 12 months",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Discounted pricing does not apply to LLM Gateway",
+            "Standard pricing phases in after the program"
+          ]
+        },
+        "link": "https://www.assemblyai.com/contact/startup-program/apply",
+        "source": "https://www.assemblyai.com/contact/startup-program",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "cloudflare-tier3",
+        "program": "Cloudflare for Startups, Tier 3",
+        "provider": "Cloudflare",
+        "bucket": "incorporated",
+        "credit_first": 10000,
+        "credit_first_computed": false,
+        "credit_max": 10000,
+        "credit_max_computed": false,
+        "amount_note": "$10,000 in Cloudflare credits for usage-based services, with no minimum funding. Inside that, Workers AI is capped at $2,500 and R2 at $10,000, and core security and networking features are free.",
+        "covers": [
+          "cpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Company incorporated no more than 10 years ago",
+          "Bootstrapped or self-funded, under $1M raised",
+          "For-profit business with a business email on the company domain (no personal email)",
+          "Live, publicly accessible website Cloudflare can verify",
+          "Public presence on LinkedIn, X or GitHub",
+          "Actively developing a technology product",
+          "First-time applicant (never approved into the program before)",
+          "Cloudflare account with a valid payment method on file",
+          "Not an educational institution, personal blog, consultancy, agency, MSP or reseller"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "none",
+        "term": "12 months",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits last one year or until used up, and Cloudflare grants no extensions",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "The FAQ caps Workers AI at $2,500 for Tier 3, while the terms say $50,000 for Workers AI and add that the actual amount depends on tier.",
+            "The covered-products list shows Workers AI as up to $50,000, which is the Tier 1 cap.",
+            "The general eligibility list also says funded up to Series B and funded within the last 12 months, which conflicts with the Tier 3 bootstrapped criterion.",
+            "AI Gateway and Registrar fees are not covered by credits.",
+            "Existing Cloudflare enterprise customers cannot use the Startup Plan.",
+            "After the credits expire, Cloudflare bills the card on file."
+          ]
+        },
+        "link": "https://www.cloudflare.com/startups/",
+        "source": "https://www.cloudflare.com/startups/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "denvr-ascend",
+        "program": "Denvr AI Ascend",
+        "provider": "Denvr Dataworks",
+        "bucket": "incorporated",
+        "credit_first": 1000,
+        "credit_first_computed": false,
+        "credit_max": 500000,
+        "credit_max_computed": false,
+        "amount_note": "An initial $1,000 of start-up credits for Denvr AI Compute Services. Eligible teams can receive up to $500,000 in production credits based on needs and potential.",
+        "covers": [
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "AI startup, research team, enterprise or other qualified team building AI applications",
+          "Denvr evaluates fit with program goals, AI development focus and resource requirements",
+          "Application form asks for company name, position, phone and email; incorporation is not stated",
+          "Agree to Denvr's Terms of Service and Privacy Policy"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "Varies by program fit, with tiered transitions to paid services",
+        "traps": {
+          "card_required": null,
+          "expiry": "length of access varies by program fit; no fixed date stated",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "The $500,000 figure is a ceiling for production credits, granted by need and potential.",
+            "Existing customers earn credits through referrals, co-marketing and feedback rather than the start-up grant."
+          ]
+        },
+        "link": "https://www.denvr.com/ai-ascend",
+        "source": "https://www.denvr.com/ai-ascend",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "elevenlabs",
+        "program": "ElevenLabs Grants Program (Startup Grants)",
+        "provider": "ElevenLabs",
+        "bucket": "incorporated",
+        "credit_first": 5500,
+        "credit_first_computed": false,
+        "credit_max": 5500,
+        "credit_max_computed": false,
+        "amount_note": "12 months of the Scale plan with 33,000,000 characters. The $5,500 figure is ElevenLabs' own valuation (\"More than $5,500+ in value\"), not a cash credit.",
+        "covers": [
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Startup or company with fewer than 25 employees when it applies",
+          "A valid business email",
+          "A business or monetization strategy for a long-term product, not a one-off project",
+          "No agencies, consulting firms or SMBs",
+          "No products for children aged 18 or under",
+          "Not an existing enterprise customer",
+          "One application per company"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "12 months, or until the 33M characters are used",
+        "traps": {
+          "card_required": null,
+          "expiry": "the plan converts to Free after 12 months, or once 10,000 credits are left",
+          "overage": "unknown",
+          "trains_on_data": true,
+          "other": [
+            "The terms license your content to improve the services; opt out in the Data use menu of account settings.",
+            "Characters cannot be resold or exchanged."
+          ]
+        },
+        "link": "https://elevenlabs.io/startup-grants",
+        "source": "https://elevenlabs.io/startup-grants",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "fal-startup",
+        "program": "fal Startup Program",
+        "provider": "fal (Features & Labels, Inc.)",
+        "bucket": "incorporated",
+        "credit_first": 1000,
+        "credit_first_computed": false,
+        "credit_max": 5000,
+        "credit_max_computed": false,
+        "amount_note": "Every approved team starts with a $1,000 Startup pack. The $2,500 Scale pack unlocks at $1,000 a month of fal spend and the $5,000 Growth pack at $2,500 a month, each added on request.",
+        "covers": [
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "Team based in Europe or Asia",
+          "Real users, meaningful traction or revenue, or backing from an institutional investor",
+          "Generative media is core to the product",
+          "A fal account",
+          "A short intro call is usually part of approval",
+          "One application per company every 3 months"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Teams outside Europe and Asia cannot use this program. fal points them to its YC, a16z or Entrepreneur's First deals, or to pay-as-you-go.",
+            "The higher packs need $1,000 or $2,500 a month of fal spend.",
+            "The terms let fal use anonymized or aggregated data derived from your inputs to develop AI models."
+          ]
+        },
+        "link": "https://fal.ai/startup-program",
+        "source": "https://fal.ai/startup-program",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "founderpass-aws",
+        "program": "AWS credits through FounderPass",
+        "provider": "FounderPass (unnamed AWS partner)",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 100000,
+        "credit_max_computed": false,
+        "amount_note": "FounderPass says free members get $25,000 to $100,000 in AWS credits, set by an unnamed partner. Its own FAQ says a company just starting out should expect much lower.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Free FounderPass membership",
+          "Company under 10 years old",
+          "Less than $25,000 in earlier AWS Activate credits",
+          "Active website and up-to-date LinkedIn company page; website domain matches the business domain",
+          "An active 12-digit AWS account",
+          "Short form, then a meeting with the partner, who sets the amount from stage, existing credits and spend"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "none",
+        "term": "expiry set by AWS, given on approval",
+        "traps": {
+          "card_required": true,
+          "expiry": "set by AWS; terms given on approval",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "The partner is not named on the page",
+            "Approval takes 10 to 40 days",
+            "FounderPass may earn a commission on this offer",
+            "The 20% to 60% savings depend on partner agreements and approval"
+          ]
+        },
+        "link": "https://www.founderpass.com/partners/aws",
+        "source": "https://www.founderpass.com/partners/aws",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "google-start",
+        "program": "Google for Startups Cloud Program: Start tier",
+        "provider": "Google",
+        "bucket": "incorporated",
+        "credit_first": 2000,
+        "credit_first_computed": false,
+        "credit_max": 2000,
+        "credit_max_computed": false,
+        "amount_note": "$2,000 of Google Cloud credits, valid for 12 months. Extras listed on the same page: $200 of Google Skills credits and 12 months of Google Workspace Business Plus.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "Digital-native technology startup with a working MVP, a clear business model and plans to seek venture funding soon",
+          "Founded within the last 24 months",
+          "No Google Cloud credits received beyond the free trial",
+          "Business email on the same domain as the public company website",
+          "Google Cloud billing account (18-character ID) owned and administered by a user on the company domain",
+          "Active website that describes the company, team and product; empty or placeholder sites are rejected",
+          "Located where Google Cloud is sold through self-service purchasing",
+          "Not a nonprofit, educational institution, government entity, dev shop, consultancy, agency or traditional small business"
+        ],
+        "max_age_years": 2,
+        "funding_rule": "none",
+        "term": "12 months",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits are valid for 12 months",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "A Cloud Billing account with a payment method is needed before applying; the program terms make the company pay all usage beyond the credits.",
+            "Google says it will not notify you when the credit is exhausted.",
+            "Third-party models (Anthropic included) are billed directly and are not covered by the credits.",
+            "Google screens applicant websites for AI-generated content and may reject on that basis.",
+            "The free Workspace benefit requires that the domain had no paid Workspace plan within 31 days of applying; this rule limits the Workspace benefit, not the credits."
+          ]
+        },
+        "link": "https://cloud.google.com/startup/apply",
+        "source": "https://cloud.google.com/startup/pre-funded",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "hyperstack-inception",
+        "program": "Hyperstack lifetime discount for NVIDIA Inception members",
+        "provider": "Hyperstack (NexGen Cloud)",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "No credits. Inception members get a lifetime 20% discount on on-demand accelerated compute.",
+        "covers": [
+          "gpu"
+        ],
+        "requirements": [
+          "Accepted into NVIDIA Inception (so incorporated, under 10 years old, with a working website)"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "none",
+        "term": "Lifetime discount",
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "It is a discount on paid usage, not free credit.",
+            "The page's member price tables disagree with each other, so per-hour rates are left out."
+          ]
+        },
+        "link": "https://www.hyperstack.cloud/inception-program",
+        "source": "https://www.hyperstack.cloud/inception-program",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "jetbrains-startups",
+        "program": "JetBrains Startup Program",
+        "provider": "JetBrains",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "A 50% discount, not a credit: up to 10 IDE subscriptions, 10 team or learning tool subscriptions and 10 JetBrains AI subscriptions, for five years. Startups in a JetBrains partner's network get six months free (up to 10 licenses in total) and then the 50% discount.",
+        "covers": [
+          "other"
+        ],
+        "requirements": [
+          "Privately owned company",
+          "Evidence the company was established within the last five years",
+          "Company website or other discoverable online presence",
+          "Commercial licenses only (no personal licenses)",
+          "One discount per organization, subsidiaries included"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "none",
+        "term": "5 years",
+        "traps": {
+          "card_required": null,
+          "expiry": "the discount ends five years after approval or when the 10-per-category limits are used",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "An order that pushes a category past 10 licenses is charged at the regular rate.",
+            "You still pay half of list price."
+          ]
+        },
+        "link": "https://www.jetbrains.com/startups/",
+        "source": "https://www.jetbrains.com/startups/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "lambda",
+        "program": "Lambda offer for NVIDIA Inception members",
+        "provider": "Lambda",
+        "bucket": "incorporated",
+        "credit_first": 1000,
+        "credit_first_computed": false,
+        "credit_max": 1000,
+        "credit_max_computed": false,
+        "amount_note": "$1,000 in Lambda Cloud credits for on-demand GPU instances. Credits also cover persistent storage.",
+        "covers": [
+          "gpu",
+          "other"
+        ],
+        "requirements": [
+          "NVIDIA Inception member (so incorporated, under 10 years old, with a working website)",
+          "Lambda reviews and approves each application",
+          "One grant per company",
+          "Valid credit card",
+          "Located in, and paying with a card from, a listed country (the list includes the United States)"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "none",
+        "term": "12 months from the date credits are applied",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits are valid for 12 months from the date they are applied to an account",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Submitting an application does not guarantee credits.",
+            "The age limit comes from Inception membership, not from Lambda's page."
+          ]
+        },
+        "link": "https://lambda.ai/nvidia-inception",
+        "source": "https://lambda.ai/nvidia-inception",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "mercury-perks",
+        "program": "Mercury perks (non-AWS compute)",
+        "provider": "Mercury",
+        "bucket": "incorporated",
+        "credit_first": 300,
+        "credit_first_computed": false,
+        "credit_max": 300,
+        "credit_max_computed": false,
+        "amount_note": "$300 in Supabase credits over one year for new Supabase customers. Mercury also lists an ElevenLabs grant of 12 months and 33 million characters, with no USD value stated. Microsoft for Startups (up to $5,000 Azure) and GitHub ($10,000, VC-funded only) are each partner's own program and are not counted here.",
+        "covers": [
+          "other"
+        ],
+        "requirements": [
+          "A Mercury business banking account (Mercury lists business banking at $0 per month)",
+          "Supabase: new customers only",
+          "ElevenLabs: one grant per company, full-time founders, under 25 employees",
+          "GitHub: outside equity funding up to Series B"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "varies by perk; Supabase credits run one year",
+        "traps": {
+          "card_required": null,
+          "expiry": "Supabase credits run over one year",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Google Cloud perk is temporarily unavailable",
+            "Each partner applies its own terms"
+          ]
+        },
+        "link": "https://mercury.com/perks",
+        "source": "https://mercury.com/perks",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "microsoft",
+        "program": "Microsoft for Startups (standard path, no referral code)",
+        "provider": "Microsoft",
+        "bucket": "incorporated",
+        "credit_first": 200,
+        "credit_first_computed": false,
+        "credit_max": 150000,
+        "credit_max_computed": false,
+        "amount_note": "$200 of Azure credit at sign-up, usable for up to 90 days. Business verification raises the total to $5,000 (another $4,800) for up to 180 days. Usage milestones then raise it to $25,000, $50,000 and $150,000, based on the number of Azure workloads and sustained spend.",
+        "covers": [
+          "cpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Develop a software-based product or service the company owns",
+          "Privately held and for-profit",
+          "Headquartered in a country where Azure is available",
+          "No more than $350,000 of lifetime free Azure credits",
+          "Not raised Series C or later",
+          "Not an educational institution, government organization, consultancy or agency; no cryptocurrency mining",
+          "A new personal Microsoft account with no prior Azure offer; work, school and company-domain accounts are refused",
+          "Identity check with a personal LinkedIn account",
+          "Business verification that the startup is a registered legal entity, for the $5,000 milestone",
+          "$25,000 milestone: 5 or more Azure workloads for 60 days; $50,000: 7 or more; $150,000: 10 or more and about $3,000 a month of usage for 60 days"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "$200 for up to 90 days; $5,000 for up to 180 days after business verification; 2 years from the $25,000 milestone",
+        "traps": {
+          "card_required": true,
+          "expiry": "The $200 stage lasts up to 90 days from sign-up. After business verification, the $5,000 stage lasts up to 180 days. If a stage's requirements are not met in time, the sponsorship ends and the subscription converts to pay as you go.",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Credits must be activated within 90 days of accepting the program agreement, and extensions are not available.",
+            "GPU-enabled infrastructure is listed as an Investor Network benefit, not a standard one.",
+            "Third-party Foundry models (Anthropic included) and Marketplace purchases are not covered.",
+            "GitHub usage draws on the credits only after the Azure subscription is linked as GitHub's payment method.",
+            "Each milestone workload must stay above $1 of spend for all 60 days."
+          ]
+        },
+        "link": "https://www.microsoft.com/en-us/startups",
+        "source": "https://learn.microsoft.com/en-us/startups/standard-benefits/unlock-more-benefits",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "mongodb-startups",
+        "program": "MongoDB for Startups",
+        "provider": "MongoDB",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "MongoDB Atlas credits and Voyage AI embedding and reranker tokens, in four tiers: Inspire (bootstrapped), Grow (early-funded), Innovate (VC-backed) and Scale. MongoDB does not publish the amounts.",
+        "covers": [
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Less than 7 years old",
+          "Series A or earlier",
+          "Focused on a single software product or service (no development shops or agencies)",
+          "Not previously accepted into the program",
+          "Active company website and LinkedIn profile",
+          "Apply through a VC or accelerator partner, or directly if you have none"
+        ],
+        "max_age_years": 7,
+        "funding_rule": "pre-Series B",
+        "term": "Activate within 12 months, then use within 12 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "the promo code must be activated within 12 months, and credits expire 12 months after activation (extensions case by case)",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Developer Support is free for the first 30 days, then starts at $49 a month (payable with the credits).",
+            "Promo codes apply only to future charges, not past usage."
+          ]
+        },
+        "link": "https://www.mongodb.com/solutions/startups",
+        "source": "https://www.mongodb.com/solutions/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "notion-startups",
+        "program": "Notion for Startups",
+        "provider": "Notion",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 12000,
+        "credit_max_computed": false,
+        "amount_note": "Free months of the Business plan with Notion AI: 6 with a select partner and 3 with a business website and domain email. Companies under 10 employees get 1. Business costs $20 per member, billed annually. Notion values the offer at up to $12,000 for 100 employees.",
+        "covers": [
+          "other"
+        ],
+        "requirements": [
+          "Not a paying Notion customer",
+          "Work email on the company domain (no Gmail or Outlook)",
+          "Fewer than 100 employees",
+          "No previous Notion promotion",
+          "Valid business website for the 3-month offer",
+          "Affiliation with a select Notion startup partner for the 6-month offer"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "1, 3 or 6 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "the free period ends after 1, 3 or 6 months",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Companies under 10 employees get the 1-month trial, so most early startups get 1 month unless a partner refers them.",
+            "Solo applicants, parked websites and personal-only social profiles also drop to the 1-month trial."
+          ]
+        },
+        "link": "https://www.notion.com/startups-apply",
+        "source": "https://www.notion.com/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "inception",
+        "program": "NVIDIA Inception",
+        "provider": "NVIDIA",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "No cash grant. The page promises free cloud credits from the GPU vendor and cloud partners but names no partner and no amount; members request benefits in the member portal.",
+        "covers": [
+          "gpu",
+          "other"
+        ],
+        "requirements": [
+          "Officially incorporated, with the incorporation date given in the application",
+          "Less than 10 years old",
+          "Working website",
+          "Clear use case for NVIDIA technology",
+          "Actively operated by at least one founder",
+          "Company pitch deck in the application",
+          "Not a consulting or outsourced development firm, crypto company, cloud service provider, reseller or public company"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "none",
+        "term": "Free membership with no stated end",
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Members must keep product and company details updated in the portal to remain eligible for benefits.",
+            "The public page lists no partner credit amounts; Lambda, Scaleway and Hyperstack state their Inception offers on their own pages.",
+            "Scaleway's NVIDIA page still says Inception requires at least one developer; NVIDIA's own page now says at least one founder."
+          ]
+        },
+        "link": "https://www.nvidia.com/en-us/startups/",
+        "source": "https://www.nvidia.com/en-us/startups/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "ovhcloud",
+        "program": "OVHcloud Startup Program, START level",
+        "provider": "OVHcloud",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 12000,
+        "credit_max_computed": false,
+        "amount_note": "The US program gives up to $12,000 of public cloud credits for 12 months, plus 6 hours with an engineer. The EU program states EUR 10,000 for the same level. The SCALE level, for Series A and later, gives up to $120,000 (EUR 100,000 on the EU site).",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Selected pre-seed or seed startup",
+          "At least a proof of concept or MVP that can run on OVHcloud",
+          "Needs cloud infrastructure soon",
+          "Not an NGO or association, and not a past Startup Program member",
+          "Apply by form, then answer a follow-up email",
+          "Incorporation is not stated"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "12 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "vouchers must be used within the 12-month program or they are lost",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "GPU credits cover only RTX5000, V100 and V100S instances; all other GPUs are excluded.",
+            "Dedicated servers and VPS are not covered.",
+            "Non-eligible products are debited to the payment method on the account.",
+            "Invoices above the remaining voucher balance are not paid by vouchers automatically."
+          ]
+        },
+        "link": "https://us.ovhcloud.com/startup-program/",
+        "source": "https://us.ovhcloud.com/startup-program/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "ramp-perks",
+        "program": "Ramp partner rewards",
+        "provider": "Ramp",
+        "bucket": "incorporated",
+        "credit_first": 350,
+        "credit_first_computed": false,
+        "credit_max": 350,
+        "credit_max_computed": false,
+        "amount_note": "$350 in Google Cloud credits at sign-up. Ramp also lists AWS Activate and OpenAI API credits with no amount, and non-compute credits such as Datadog up to $100,000 and Retool $25,000.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "A Ramp account; rewards are redeemed in the Ramp dashboard",
+          "Registered in the US as a corporation, LLC or LP (nonprofits welcome); no sole proprietors",
+          "At least $25,000 in cash in a linked US business bank account",
+          "Most operations and corporate spending in the US"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "varies by perk",
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "The $25,000 cash minimum blocks very early startups",
+            "AWS and OpenAI rewards state no amount"
+          ]
+        },
+        "link": "https://ramp.com/rewards",
+        "source": "https://ramp.com/rewards/google-cloud-platform",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "runpod-startup",
+        "program": "Runpod Startup Program, Starter Tier",
+        "provider": "RunPod",
+        "bucket": "incorporated",
+        "credit_first": 1000,
+        "credit_first_computed": false,
+        "credit_max": 1000,
+        "credit_max_computed": false,
+        "amount_note": "The Starter Tier gives $1,000 in credits usable across Pods, Serverless, Clusters, Public Endpoints and Storage. The Growth Tier is a spend match: commit $50,000 and Runpod adds $25,000 in bonus credits under a 12-month agreement.",
+        "covers": [
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Startup with a working product and near-term GPU needs (best fit: pre-Series A)",
+          "Venture backing strongly preferred but not required",
+          "New to Runpod (existing customers are reviewed case by case)",
+          "Selective: Runpod cannot accept every applicant",
+          "Incorporation is not stated"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "Starter: not stated. Growth: 12-month agreement",
+        "traps": {
+          "card_required": null,
+          "expiry": "Starter credit expiry is not stated",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "The page headline calls it a program for venture-backed AI startups, and most accepted startups have raised Seed or later.",
+            "The Growth bonus requires a $50,000 upfront commitment and has no reload."
+          ]
+        },
+        "link": "https://www.runpod.io/startup-program",
+        "source": "https://www.runpod.io/startup-program",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "new-scaleway-early-stage",
+        "program": "Scaleway Early Stage Program",
+        "provider": "Scaleway",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "EUR 9,000 in cloud credits over 6 months, not renewable, with on-demand access to a customer success manager. USD fields are null because the page states EUR only.",
+        "covers": [
+          "cpu",
+          "gpu"
+        ],
+        "requirements": [
+          "Entity under 5 years old",
+          "Fewer than 50 employees",
+          "Not an existing Scaleway customer, unless moving up from the Founders stage",
+          "Minimum cloud consumption of EUR 500 a month",
+          "Startup that has validated its proof of concept (pre-seed to seed)"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "none",
+        "term": "6 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "credits are valid 6 months and are not renewable",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "The EUR 500 monthly minimum consumption is a spend commitment.",
+            "Applications are reviewed within 21 business days."
+          ]
+        },
+        "link": "https://www.scaleway.com/en/startup-program/early-stage-program/",
+        "source": "https://www.scaleway.com/en/startup-program/early-stage-program/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "scaleway-founders",
+        "program": "Scaleway Founders Program",
+        "provider": "Scaleway",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "EUR 1,000 in cloud credits, valid 12 months and not renewable, usable on Scaleway's cloud products. USD fields are null because the page states EUR only.",
+        "covers": [
+          "cpu",
+          "gpu"
+        ],
+        "requirements": [
+          "Entity under 5 years old",
+          "Fewer than 50 employees",
+          "Not an existing Scaleway customer"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "none",
+        "term": "12 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "credits are valid 12 months and are not renewable",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Support is self-serve only, with no customer success manager.",
+            "Applications are reviewed within 21 business days.",
+            "Consumption above the voucher amount is billed to the startup."
+          ]
+        },
+        "link": "https://www.scaleway.com/en/startup-program/founders-program/",
+        "source": "https://www.scaleway.com/en/startup-program/founders-program/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "scaleway-inception",
+        "program": "Scaleway Startup Program for NVIDIA Inception Members",
+        "provider": "Scaleway",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "Up to EUR 42,000 in cloud credits for Inception members, against EUR 36,000 for regular members. The page also gives 12 months of Advanced Support (about EUR 700 a year), one certification and one social media mention. USD fields are null because the page states EUR only.",
+        "covers": [
+          "cpu",
+          "gpu"
+        ],
+        "requirements": [
+          "NVIDIA Inception member",
+          "Meets the Scaleway Startup Program requirements (the Founders and Early Stage pages list: entity under 5 years old, fewer than 50 employees, not an existing Scaleway customer)",
+          "New members of the Scaleway Startup Program only"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "none",
+        "term": "Not stated on this page; Advanced Support runs 12 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "time-limited program; this page states no credit end date",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Benefits do not apply to existing members of Scaleway for Startups.",
+            "Consumption above the voucher amount is billed to the startup.",
+            "The page does not say which Scaleway tier's conditions apply to the 42k track."
+          ]
+        },
+        "link": "https://www.scaleway.com/en/scaleway-startup-program-for-nvidia-inception-members/",
+        "source": "https://www.scaleway.com/en/scaleway-startup-program-for-nvidia-inception-members/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "secret-aws",
+        "program": "AWS credits through Secret",
+        "provider": "Secret (unnamed AWS partner)",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 100000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $100,000 in AWS credits, or 20% to 50% off monthly AWS spend, through an unnamed AWS partner. The partner sets the amount after a manual review.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "A Secret account (the deal button reads \"Get deal for free\")",
+          "Already spending at least $100 per month on AWS",
+          "Live website and a company LinkedIn or Crunchbase profile",
+          "Manual approval by Secret's team"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": null,
+        "traps": {
+          "card_required": true,
+          "expiry": null,
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "The page also carries a Go Premium dialog ($149 per year or $399 one time); the deal itself is not tagged Premium",
+            "The partner is not named and uses group buying",
+            "Needs existing AWS spend, so a new account does not qualify"
+          ]
+        },
+        "link": "https://www.joinsecret.com/aws-activate",
+        "source": "https://www.joinsecret.com/aws-activate",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "stripe-atlas",
+        "program": "Stripe Atlas perks",
+        "provider": "Stripe",
+        "bucket": "incorporated",
+        "credit_first": 5000,
+        "credit_first_computed": false,
+        "credit_max": 100000,
+        "credit_max_computed": false,
+        "amount_note": "The Atlas perk list names $5,000 of AWS Activate Credits, for new users only. It also names $5,000 or more of Azure credits through Microsoft for Startups. It names $100,000 of Cloudflare product credits through the Cloudflare Startup Program. Atlas also gives $2,500 in Stripe product credits for the first year. Those cover Stripe fees, not compute.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Form the company with Stripe Atlas: $500 one-time setup fee, then $100 per year",
+          "Perks open in the Atlas Dashboard after the Atlas application is approved",
+          "Each partner may apply its own eligibility rules"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": "Stripe credits run one year after incorporation; partner perks vary",
+        "traps": {
+          "card_required": true,
+          "expiry": "Stripe product credits end one year after incorporation",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Atlas cannot guarantee every partner will accept every Atlas company",
+            "The AWS perk is for new AWS users only",
+            "The Treasury bonus is $500 for opening a Treasury account within 7 days, not a fee refund"
+          ]
+        },
+        "link": "https://stripe.com/atlas",
+        "source": "https://support.stripe.com/questions/stripe-atlas-perks-partners",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "tenki",
+        "program": "Tenki for Startups",
+        "provider": "Tenki (Tenki Cloud, LLC, owned by Luxor Technology)",
+        "bucket": "incorporated",
+        "credit_first": 10000,
+        "credit_first_computed": false,
+        "credit_max": 10000,
+        "credit_max_computed": false,
+        "amount_note": "$10,000 in free credits on approval, for Tenki Sandboxes, GitHub Actions runners and the AI Code Reviewer. Tenki also matches purchased credit 1:1 up to $40,000, which needs your own spend.",
+        "covers": [
+          "cpu",
+          "other"
+        ],
+        "requirements": [
+          "Sign up and upgrade the workspace from Starter to Team before applying",
+          "Has not raised beyond Series B",
+          "Tenki also weighs team size, money raised and company age"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": null,
+        "traps": {
+          "card_required": true,
+          "expiry": "not published; Tenki confirms terms in the acceptance email",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "The Team plan is a paid subscription at $250 a month, or $200 a month billed yearly.",
+            "The $40,000 match is only paid out against credit you buy."
+          ]
+        },
+        "link": "https://tenki.cloud/startups",
+        "source": "https://tenki.cloud/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "vast",
+        "program": "Vast.ai Startup Credit Matching Program",
+        "provider": "Vast.ai",
+        "bucket": "incorporated",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "A spend match, not free credit. Vast matches verified compute spend dollar for dollar in credits, up to a cap set per startup at approval.",
+        "covers": [
+          "gpu"
+        ],
+        "requirements": [
+          "Actively training models, running inference or scaling a production workload",
+          "Committed paid spend on Vast",
+          "Vast reviews every application and sets the offer by company stage and use case",
+          "Incorporation is not stated"
+        ],
+        "max_age_years": null,
+        "funding_rule": "none",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "No upfront credits and no free trial: you must pay for compute to earn matching credits.",
+            "Matching credits wait on verification of the spend.",
+            "The match cap is not published."
+          ]
+        },
+        "link": "https://vast.ai/startup",
+        "source": "https://vast.ai/startup",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "aws-activate-portfolio",
+        "program": "AWS Activate Portfolio",
+        "provider": "Amazon Web Services",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 200000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $200,000 in AWS Activate Credits. The amount depends on the offer your Activate Provider holds, and a later, larger offer pays only the difference.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "An Org ID from an Activate Provider (accelerator, angel investor or venture capital firm)",
+          "The provider must confirm your affiliation within 30 days",
+          "Your application email must match the one on file with your provider",
+          "Pre-Series B, founded within the last 10 years",
+          "AWS account on a Paid Tier Plan",
+          "Each Org ID works once"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "partner or accelerator code",
+        "term": "expiry set per grant",
+        "traps": {
+          "card_required": true,
+          "expiry": "each grant has its own expiry date, shown in the Billing console; AWS will not extend it",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "AWS lists a rejection reason for a most recent funding round older than 12 months",
+            "Earlier Activate Credits are subtracted: you receive the difference, not a second grant",
+            "Upfront fees for Savings Plans and Reserved Instances are not covered"
+          ]
+        },
+        "link": "https://aws.amazon.com/startups/credits",
+        "source": "https://aws.amazon.com/startups/credits",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "new-aws-ai-startups",
+        "program": "AWS Credits for AI Startups",
+        "provider": "Amazon Web Services",
+        "bucket": "funded_or_partner",
+        "credit_first": 200000,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "$200,000 or more in AWS credits for AI startups that have outgrown Activate Portfolio. AWS gives no upper limit.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Invite only",
+          "For startups ready to scale after Activate Portfolio",
+          "Reached through your AWS account manager"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": null,
+        "traps": {
+          "card_required": true,
+          "expiry": null,
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "No public application"
+          ]
+        },
+        "link": "https://aws.amazon.com/startups/credits",
+        "source": "https://aws.amazon.com/startups/credits",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "amd-instinct-eval",
+        "program": "AMD Instinct GPU Evaluation Program",
+        "provider": "AMD (through partner cloud providers)",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "Evaluation access to AMD Instinct GPUs through partner clouds. The page states no price. Duration and capacity vary by partner.",
+        "covers": [
+          "gpu"
+        ],
+        "requirements": [
+          "Aimed at start-ups and companies testing AMD Instinct GPUs and ROCm for AI workloads",
+          "Request an evaluation from a partner card on AMD's page",
+          "AMD's program team reviews and replies within two weeks",
+          "Accept AMD's evaluation program terms"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": "Varies by partner",
+        "traps": {
+          "card_required": null,
+          "expiry": "Either party can end the agreement at any time. Data on the platform can be deleted after that.",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "The partner list loads only with JavaScript and could not be read today.",
+            "Educators, researchers and students are pointed to the AMD University Program instead."
+          ]
+        },
+        "link": "https://www.amd.com/en/products/accelerators/instinct/eval-request.html",
+        "source": "https://www.amd.com/en/products/accelerators/instinct/eval-request.html",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "new-anthropic-vc-credits",
+        "program": "Claude Startups API credits through partner VCs",
+        "provider": "Anthropic",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 100000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $100K in additional Claude API credits for startups funded by a VC in Anthropic's partner network, claimed through the VC.",
+        "covers": [
+          "inference"
+        ],
+        "requirements": [
+          "Funded by a VC in Anthropic's partner network",
+          "Claim the credits through that VC"
+        ],
+        "max_age_years": null,
+        "funding_rule": "VC from a partner network",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": false,
+          "other": [
+            "The page does not list the partner VCs.",
+            "The page does not say whether Claude Startups membership is also needed.",
+            "Credits apply only to the first-party Claude API through Claude Console."
+          ]
+        },
+        "link": "https://claude.com/programs/startups",
+        "source": "https://claude.com/programs/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "baseten-startup",
+        "program": "Baseten AI Startup Program",
+        "provider": "Baseten",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 27500,
+        "credit_max_computed": true,
+        "amount_note": "Up to $25,000 for Dedicated Inference or Training plus up to $2,500 for Model APIs. The $27,500 total is the sum of the two caps (computed here); the page gives no combined figure.",
+        "covers": [
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "AI is core to the primary product",
+          "Funding stage Seed to Series A (the program targets VC-funded startups)",
+          "Company started less than 5 years ago",
+          "Net new customer that never received Baseten credits",
+          "Admission by application"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "pre-Series B",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": false,
+          "other": [
+            "Any earlier Baseten credit, including the $250 referral credit, makes a company ineligible."
+          ]
+        },
+        "link": "https://www.baseten.co/startup-program/",
+        "source": "https://www.baseten.co/startup-program/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "cerebras-early-access",
+        "program": "Cerebras Early Access Program",
+        "provider": "Cerebras",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "Free credits of an unpublished amount, plus private-preview access to new open-source models on Cerebras Inference.",
+        "covers": [
+          "inference"
+        ],
+        "requirements": [
+          "Apply; Cerebras invites a select group of builders",
+          "Selection criteria are not listed"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": "Not stated",
+        "traps": {
+          "card_required": null,
+          "expiry": "Not stated.",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "cerebras.ai/startups now redirects to a general landing page that offers a free trial. No startup program page was found."
+          ]
+        },
+        "link": "https://www.cerebras.ai/early-access",
+        "source": "https://www.cerebras.ai/early-access",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "cloudflare-tier2-1",
+        "program": "Cloudflare for Startups, Tiers 2 and 1",
+        "provider": "Cloudflare",
+        "bucket": "funded_or_partner",
+        "credit_first": 100000,
+        "credit_first_computed": false,
+        "credit_max": 350000,
+        "credit_max_computed": false,
+        "amount_note": "Tier 2 gives $100,000 in credits and Tier 1 gives $350,000. Workers AI is capped at $10,000 (Tier 2) or $50,000 (Tier 1), and R2 at $10,000.",
+        "covers": [
+          "cpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Funded by a Cloudflare affiliated partner (Cloudflare publishes no partner list)",
+          "Tier 2: under $5M raised",
+          "Tier 1: $5M or more raised",
+          "Funded up to Series B and funded within the last 12 months",
+          "Company incorporated no more than 10 years ago",
+          "For-profit business with a business email on the company domain",
+          "Live website and a public LinkedIn, X or GitHub presence",
+          "First-time applicant",
+          "Cloudflare account with a valid payment method on file"
+        ],
+        "max_age_years": 10,
+        "funding_rule": "VC from a partner network",
+        "term": "12 months",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits last one year or until used up, and Cloudflare grants no extensions",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "AI Gateway and Registrar fees are not covered by credits.",
+            "An approved upgrade between tiers does not reset the one-year expiry date.",
+            "After the credits expire, Cloudflare bills the card on file."
+          ]
+        },
+        "link": "https://www.cloudflare.com/startups/",
+        "source": "https://www.cloudflare.com/startups/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "github-startups",
+        "program": "GitHub for Startups",
+        "provider": "GitHub",
+        "bucket": "funded_or_partner",
+        "credit_first": 10000,
+        "credit_first_computed": false,
+        "credit_max": 10000,
+        "credit_max_computed": false,
+        "amount_note": "$10,000 in GitHub credits on a GitHub Enterprise Cloud account. The credits pay Enterprise license (seat) costs and add-ons: Copilot (licenses, premium models, agentic features), Advanced Security and other metered offerings such as Actions.",
+        "covers": [
+          "cpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Affiliated with a GitHub for Startups partner (investor, incubator or accelerator)",
+          "Received outside funding, up to Series B or earlier (non-equity credits do not count)",
+          "New to GitHub Enterprise: not on an Enterprise plan in the past six months",
+          "Never received GitHub credits or GitHub Enterprise licenses before",
+          "Enterprise Cloud on GitHub.com only (no Enterprise Server, no data residency)",
+          "Valid payment method on file"
+        ],
+        "max_age_years": null,
+        "funding_rule": "VC from a partner network",
+        "term": "12 months",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits expire 12 months after approval or when used up",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "GitHub places an authorization charge on the card within a few weeks of onboarding, and a failed charge locks the account.",
+            "Downgrading from Enterprise before the credits run out forfeits the rest and bars reapplying.",
+            "With an Azure subscription attached, usage bills to Azure once the credits are gone.",
+            "The 50k Actions minutes come with GitHub Enterprise itself."
+          ]
+        },
+        "link": "https://github.com/enterprise/startups/partners?locale=en-US",
+        "source": "https://github.com/enterprise/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "google-ai",
+        "program": "Google for Startups Cloud Program: AI tier (Scale AI)",
+        "provider": "Google",
+        "bucket": "funded_or_partner",
+        "credit_first": 250000,
+        "credit_first_computed": false,
+        "credit_max": 350000,
+        "credit_max_computed": false,
+        "amount_note": "Year 1: credits cover 100% of usage up to $250,000. Year 2: a 20% credit on year-2 spend, up to another $100,000. Under Google's 20% rule, the full $100,000 year-2 credit takes $500,000 of year-2 spend (computed here).",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "AI-first startup: AI is built into the company's foundation, not added as a productivity layer",
+          "Pre-Seed or Seed round raised within the last 5 years, or a Series A raised within the last 12 months",
+          "Funding from institutional investors or venture capital firms (SAFEs count); angel, friends and family, crowdfunding, grants, prize money and private equity do not qualify",
+          "Founded within the last five years",
+          "No more than $5,000 of Google Cloud credits received before",
+          "Business email on the website's domain; billing account administered by a user on that domain",
+          "Not a nonprofit, educational institution, government entity, dev shop, consultancy or agency"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "pre-Series B",
+        "term": "2 years",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits expire on the date Google sets when it issues them",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Year 2 is a 20% match on spend, not a grant.",
+            "Third-party models (Anthropic included) are billed directly and are not covered by the credits.",
+            "Google decides AI-first status case by case."
+          ]
+        },
+        "link": "https://cloud.google.com/startup/apply",
+        "source": "https://startup.google.com/cloud/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "google-scale",
+        "program": "Google for Startups Cloud Program: Scale tier",
+        "provider": "Google",
+        "bucket": "funded_or_partner",
+        "credit_first": 100000,
+        "credit_first_computed": false,
+        "credit_max": 200000,
+        "credit_max_computed": false,
+        "amount_note": "Year 1: credits cover 100% of usage up to $100,000. Year 2: a 20% credit on year-2 spend, up to another $100,000. Under Google's 20% rule, the full $100,000 year-2 credit takes $500,000 of year-2 spend (computed here). The benefits page also lists up to $12,000 of Enhanced Support credits and $600 a month of Maps credits (separate application). It also lists 12 months of Workspace Business Plus.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "Pre-Seed or Seed round raised within the last 5 years, or a Series A raised within the last 12 months",
+          "Funding from institutional investors or venture capital firms (SAFEs count); angel, friends and family, crowdfunding, grants, prize money and private equity do not qualify",
+          "Links to public sources that show the equity investment",
+          "Founded within the last five years",
+          "No more than $5,000 of Google Cloud credits received before",
+          "Working MVP, clear roadmap and a verified company domain",
+          "Business email on the website's domain; billing account administered by a user on that domain",
+          "Not a nonprofit, educational institution, government entity, dev shop, consultancy or agency"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "pre-Series B",
+        "term": "2 years",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits expire on the date Google sets when it issues them",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Year 2 is a 20% match on spend, not a grant.",
+            "The landing pages give the age limit as 3 to 5 years depending on program tier, without naming the tier that uses 3 years.",
+            "Third-party models (Anthropic included) are billed directly and are not covered by the credits.",
+            "Subscription, prepay, annual-license and Marketplace products are excluded."
+          ]
+        },
+        "link": "https://cloud.google.com/startup/apply",
+        "source": "https://cloud.google.com/startup/benefits",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "new-google-web3-scale",
+        "program": "Google for Startups Cloud Program: Web3 Scale tier",
+        "provider": "Google",
+        "bucket": "funded_or_partner",
+        "credit_first": 100000,
+        "credit_first_computed": false,
+        "credit_max": 200000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $200,000 over 2 years for Google Cloud and Firebase. Year 1 covers 100% of usage up to $100,000. Year 2 gives a 20% credit on year-2 spend, up to another $100,000. The page also lists $12,000 of Enhanced Support credits for one year.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "other"
+        ],
+        "requirements": [
+          "Web3 project or startup",
+          "Pre-Seed or Seed round within the last 5 years, or Series A within the last 12 months",
+          "Qualifying funding includes VC, accelerator, incubator and accredited angel equity, SAFEs, convertible notes, verifiable token raises and blockchain foundation grants",
+          "Founded within the last five years",
+          "No more than $4,000 of Google Cloud credits received before",
+          "Business email on the website's domain",
+          "Not a nonprofit, cryptocurrency mining company or token distributor acting contrary to local regulatory guidance"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "pre-Series B",
+        "term": "2 years",
+        "traps": {
+          "card_required": true,
+          "expiry": "credits expire on the date Google sets when it issues them",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Year 2 is a 20% match on spend, not a grant.",
+            "The prior-credit cap is $4,000 here, lower than the $5,000 on the general Scale tier."
+          ]
+        },
+        "link": "https://cloud.google.com/startup/apply",
+        "source": "https://cloud.google.com/startup/web3",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "intel",
+        "program": "Intel Cloud Services (hardware evaluation)",
+        "provider": "Intel",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "No credit. Registered users request evaluation instances of Intel hardware, including Intel GPU and AI PC instances. The docs state no price.",
+        "covers": [
+          "cpu",
+          "gpu"
+        ],
+        "requirements": [
+          "Register with a corporate email address",
+          "Request an instance with intended use, use case and duration",
+          "Intel approves, rejects or waitlists each request within 2 to 3 business days"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": "Up to 30 days per reservation, extensions included",
+        "traps": {
+          "card_required": null,
+          "expiry": "Each reservation has a hard end date. Data left on the instance can be lost after it.",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "ai.cloud.intel.com (the old Intel Tiber AI Cloud host) no longer resolves in DNS.",
+            "The Intel Liftoff page now redirects to Intel's 404 handler.",
+            "Additional users on an instance must share the requester's email domain.",
+            "The 2026-09-04 release notes add regional availability in India, China and Poland."
+          ]
+        },
+        "link": "https://cloud.intel.com/",
+        "source": "https://cloud.intel.com/docs/how_to_request.html",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "koyeb-startup",
+        "program": "Koyeb Startup Program",
+        "provider": "Koyeb (joining Mistral AI)",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 30000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $30k of compute credits for Standard and GPU instances.",
+        "covers": [
+          "cpu",
+          "gpu"
+        ],
+        "requirements": [
+          "Seed-stage company",
+          "In a Koyeb partner accelerator, or raised $1M to $5M from VCs",
+          "Bootstrapped and very early startups are reviewed case by case",
+          "A Koyeb account on a paid plan"
+        ],
+        "max_age_years": null,
+        "funding_rule": "raised over $1M",
+        "term": null,
+        "traps": {
+          "card_required": true,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "New users need a valid payment method and a paid plan (Pro is $29 a month) because the Starter plan is being removed.",
+            "Koyeb is moving into Mistral Compute. The February 17, 2026 post does not mention the startup program.",
+            "The application form is hosted on tally.so, linked from the 2024 announcement post."
+          ]
+        },
+        "link": "https://www.koyeb.com/blog/koyeb-for-startups-accelerate-with-credits-for-high-performance-infrastructure",
+        "source": "https://www.koyeb.com/blog/koyeb-for-startups-accelerate-with-credits-for-high-performance-infrastructure",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "microsoft-investor-network",
+        "program": "Microsoft for Startups Investor Network offer",
+        "provider": "Microsoft",
+        "bucket": "funded_or_partner",
+        "credit_first": 1000,
+        "credit_first_computed": false,
+        "credit_max": 150000,
+        "credit_max_computed": false,
+        "amount_note": "$1,000 of starter credits right after applying with a referral code. After approval, up to $150,000 of total credits, depending on eligibility and prior usage. Listed extras: Azure Standard Support (24/7), GitHub Enterprise (up to 20 users), Microsoft 365 Business Premium (up to 50 seats), Dynamics 365, Power Platform and LinkedIn Premium.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "10-character referral code from a VC, accelerator, incubator, angel network or university in Microsoft's Investor Network",
+          "Registered startup name and address that match the company's legal documents",
+          "Same base eligibility as the standard path: a software product the company owns, for-profit, not Series C or later, no more than $350,000 of lifetime free Azure credits",
+          "A new personal Microsoft account with no prior Azure offer",
+          "A credit card"
+        ],
+        "max_age_years": null,
+        "funding_rule": "partner or accelerator code",
+        "term": "2 years from application approval",
+        "traps": {
+          "card_required": true,
+          "expiry": "unused credits lapse at the end of the 2-year benefit period, with no extensions",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Microsoft does not publish the list of participating investors; the code must come from the investor.",
+            "GPU-enabled infrastructure is offered subject to availability.",
+            "Third-party Foundry models (Anthropic included) are not covered."
+          ]
+        },
+        "link": "https://www.microsoft.com/en-us/startups",
+        "source": "https://learn.microsoft.com/en-us/startups/standard-benefits/unlock-more-benefits",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "modal-startup",
+        "program": "Modal for Startups",
+        "provider": "Modal",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "The page promises thousands of free GPU credits without a number. The Seed to Series A tier gets free credits; the Scaling and Series B+ tier gets custom credits.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "New to Modal",
+          "Seed to Series A tier: any VC funding from a Modal partner fund, or more than $1M of VC from any fund",
+          "Scaling and Series B+ tier: more than $30M raised or post-Series B, and a VC in Modal's partner network"
+        ],
+        "max_age_years": null,
+        "funding_rule": "VC from a partner network",
+        "term": null,
+        "traps": {
+          "card_required": true,
+          "expiry": null,
+          "overage": "bills",
+          "trains_on_data": false,
+          "other": [
+            "Credits are a one-time grant per tier, with no reapplying.",
+            "The FAQ has a question on how long credits last, but its answer did not load in a static fetch.",
+            "The FAQ asks why Modal requires a payment method, and the billing docs require one."
+          ]
+        },
+        "link": "https://modal.com/startups",
+        "source": "https://modal.com/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "nebius",
+        "program": "Nebius for Startups",
+        "provider": "Nebius",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "Credit amounts are not published. The page offers introductory credits, compute savings and engineering support through Nebius VC partners.",
+        "covers": [
+          "gpu"
+        ],
+        "requirements": [
+          "VC or accelerator-backed",
+          "Raised at least $5M from an approved Nebius VC partner, applying through that partner",
+          "Building or scaling an AI-enabled product or model",
+          "Working company website",
+          "Company email address",
+          "Officially incorporated fewer than 5 years ago",
+          "Not a consulting firm, reseller, cloud provider, crypto-only business or public company"
+        ],
+        "max_age_years": 5,
+        "funding_rule": "VC from a partner network",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Applicants go to a waitlist, and Nebius does not guarantee response times.",
+            "The free founder community is open to all AI startups but carries no credits.",
+            "The page does not say whether credits cover Token Factory inference."
+          ]
+        },
+        "link": "https://nebius.com/startups",
+        "source": "https://nebius.com/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "oracle-growth-engine",
+        "program": "Oracle Startup Growth Engine",
+        "provider": "Oracle",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 60000,
+        "credit_max_computed": false,
+        "amount_note": "Oracle Universal Credits for OCI services, from $5,000 to $60,000 per the UK terms; Oracle picks the amount. The Latin America rules give a range of $5,000 to $100,000. Selected companies may also get one year of Level 1 Oracle PartnerNetwork membership and Oracle Marketplace access.",
+        "covers": [
+          "cpu",
+          "gpu",
+          "inference",
+          "other"
+        ],
+        "requirements": [
+          "Legally registered technology company building software, data, cloud native or AI products",
+          "Proprietary product validated with customers or active pilots",
+          "A defined workload to build on or move to OCI",
+          "Business entity in a country or territory Oracle has designated",
+          "Pass due diligence on identity, ownership, sanctions and politically exposed persons",
+          "Not a public entity; existing OCI customers need a growth case Oracle accepts (the Latin America page bars an active OCI relationship)"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": "12 months",
+        "traps": {
+          "card_required": null,
+          "expiry": "credits last 12 months from the date they are made available; unused credits expire with no cash value",
+          "overage": "bills",
+          "trains_on_data": null,
+          "other": [
+            "Selection or a funding-band indication does not bind Oracle to give any credits.",
+            "The US-English program page returns 404; live pages are the UK, Europe and Latin America sites, so US availability is not shown.",
+            "Usage after credits run out is charged at OCI list prices."
+          ]
+        },
+        "link": "https://www.oracle.com/uk/artificial-intelligence/startup-growth-engine/",
+        "source": "https://www.oracle.com/uk/artificial-intelligence/startup-growth-engine/terms/",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "tensorwave-trial",
+        "program": "AMD Instinct MI300X Accelerator Trial on TensorWave",
+        "provider": "TensorWave (application form on amd.com)",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": null,
+        "credit_max_computed": false,
+        "amount_note": "A free 72-hour MI300X trial. No dollar value is stated.",
+        "covers": [
+          "gpu"
+        ],
+        "requirements": [
+          "Apply through AMD's sign-up form",
+          "TensorWave decides allocation from the form answers"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": "72 hours",
+        "traps": {
+          "card_required": null,
+          "expiry": "The trial lasts 72 hours.",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "The form fields load only with JavaScript, so eligibility rules could not be read.",
+            "TensorWave's own homepage lists no free trial or credits. It offers a Request POC button instead."
+          ]
+        },
+        "link": "https://www.amd.com/en/forms/sign-up/mi-300x-trial-on-tensorwave.html",
+        "source": "https://www.amd.com/en/forms/sign-up/mi-300x-trial-on-tensorwave.html",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "together",
+        "program": "Together AI Startup Accelerator (Build tier)",
+        "provider": "Together AI",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 15000,
+        "credit_max_computed": false,
+        "amount_note": "Build tier: up to $15K in platform credits plus 3 hours of forward-deployed engineering. The Scale tier ($5M to $10M raised) gives up to $30K and the Grow tier (over $10M raised) up to $50K.",
+        "covers": [
+          "gpu",
+          "inference"
+        ],
+        "requirements": [
+          "Selected by Together AI (the page calls it a selection-based program)",
+          "Build tier: up to $5M raised",
+          "Apply through the form on the accelerator page"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Credits do not apply to Reserved GPU Clusters.",
+            "Credits cover serverless inference, dedicated endpoints, fine-tuning and instant clusters.",
+            "The terms let you turn on Zero Data Retention by answering No to storing prompts and training. They do not state the default."
+          ]
+        },
+        "link": "https://www.together.ai/startup-accelerator",
+        "source": "https://www.together.ai/startup-accelerator",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "vercel-startups",
+        "program": "Vercel for Startups",
+        "provider": "Vercel",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 30000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $30,000 in Flexible Commitment Amount, a prepaid Vercel balance where each unit is worth $1.00, plus Enterprise-tier access and startup support.",
+        "covers": [
+          "cpu",
+          "other"
+        ],
+        "requirements": [
+          "Submit the interest form on the Vercel for Startups page",
+          "Vercel publishes no eligibility criteria on the page",
+          "Vercel routes startup benefits through venture capital and accelerator partners to their portfolio companies"
+        ],
+        "max_age_years": null,
+        "funding_rule": "invite or selection",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": "not stated",
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "The amount is a Flexible Commitment Amount, not a plain credit.",
+            "The page does not say whether AI Gateway or v0 usage draws from it.",
+            "The separate Vercel AI Accelerator closed applications on February 16 for its 2026 cohort, so it is not added here."
+          ]
+        },
+        "link": "https://vercel.com/startups",
+        "source": "https://vercel.com/startups",
+        "checked": "2026-11-02"
+      },
+      {
+        "id": "vultr-startup",
+        "program": "Vultr Digital Start-up Program",
+        "provider": "Vultr",
+        "bucket": "funded_or_partner",
+        "credit_first": null,
+        "credit_first_computed": false,
+        "credit_max": 100000,
+        "credit_max_computed": false,
+        "amount_note": "Up to $100,000 in cloud credits plus long-term discounts of 35%. The page does not say which Vultr products the credits cover.",
+        "covers": [
+          "cpu"
+        ],
+        "requirements": [
+          "Recent Series A, B, C, D or E financing",
+          "Name and contact details of the senior-most technical executive",
+          "Name and contact details of the senior-most cloud infrastructure lead",
+          "Share the last 6 months of cloud compute invoices",
+          "Agree to be publicly referenceable as a program member"
+        ],
+        "max_age_years": null,
+        "funding_rule": "recent Series A to E round",
+        "term": null,
+        "traps": {
+          "card_required": null,
+          "expiry": null,
+          "overage": "unknown",
+          "trains_on_data": null,
+          "other": [
+            "Built for migrations: you hand over six months of another cloud's invoices.",
+            "GPU coverage is not stated on the page."
+          ]
+        },
+        "link": "https://discover.vultr.com/startup-program",
+        "source": "https://discover.vultr.com/startup-program",
+        "checked": "2026-11-02"
+      }
+    ]
+  }
+}

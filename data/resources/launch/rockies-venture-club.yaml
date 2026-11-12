@@ -1,0 +1,14 @@
+id: rockies-venture-club
+name: Rockies Venture Club
+url: https://www.rockiesventureclub.org/
+stage: launch
+substage: develop
+city: statewide
+type: event
+description: A Colorado angel investor network. Its monthly Investor Forums let startups pitch for seed to Series A funding.
+tags:
+  - pitch
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

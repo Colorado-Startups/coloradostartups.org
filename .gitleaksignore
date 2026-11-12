@@ -1,0 +1,12 @@
+# gitleaks findings ruled safe. One fingerprint per line (commit:file:rule:line),
+# never a value. secret-scan.yml reads this file.
+#
+# Cloudflare Web Analytics beacon token, public by design (served to every
+# visitor); ruled 2026-11-02 by the orchestrator.
+852cad86d6c005ccdd465096cfddd61e121fabe4:site/src/layouts/BaseLayout.astro:generic-api-key:60
+852cad86d6c005ccdd465096cfddd61e121fabe4:site/test/dom/analytics-beacon.test.ts:generic-api-key:13
+# Today's copies of that token carry gitleaks' inline allow marker, so no
+# line-pinned fingerprint breaks when the line moves (#767); the two above
+# cover the commit that added them, for the full-history scan. Where the
+# marker may appear: 04_tools/gitleaks_allow.json (#774).
+# Metric-id lists in the Quality collector tests: .gitleaks.toml.

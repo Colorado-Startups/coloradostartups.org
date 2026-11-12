@@ -1,0 +1,15 @@
+id: moody-insurance-agency
+name: Moody Insurance Agency
+url: https://moodyins.com/
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: A family-owned insurance firm that works across Colorado. It sells commercial and small business coverage. It also sells employee benefits and surety bonds.
+tags:
+  - insurance
+  - colorado-springs
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

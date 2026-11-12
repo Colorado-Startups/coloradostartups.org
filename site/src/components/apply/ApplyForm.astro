@@ -1,0 +1,260 @@
+---
+// The seat application form. Owner: L19. A plain HTML form that POSTs to
+// /api/apply; field names come from ./fields.ts, which the Worker parses with,
+// so the two cannot drift.
+//
+// Props:
+//   seats: Position[]   the open seats that take applications, in page order
+//
+// Every course field renders, tagged with the seats that need it
+// (data-roles). The page script preselects the seat from ?role=, then shows
+// and requires only that seat's courses; hidden fields are disabled, so they
+// never post. With scripts off every course shows, and the Worker reads only
+// the chosen seat's badges.
+//
+// A rejected submission comes back with ?error=, and the page script restores
+// the answers from this tab's sessionStorage (client.ts, draft helpers).
+//
+// multipart/form-data, not the default urlencoded: percent-encoding turns one
+// non-ASCII character into as many as nine bytes, which could push a full
+// answer past the 16 KiB form cap (MAX_FORM_BYTES). Multipart sends raw UTF-8.
+import { APPLY_LIMITS, COURSE_IDS, COURSE_TITLES, courseUrl, LINK_HOSTS, type Position } from "@cs/shared";
+
+import { andList } from "../../lib/regions/page";
+import Turnstile from "../forms/Turnstile.astro";
+import { UNPAID_VOLUNTEER_LINE } from "../positions/positions";
+import Button from "../ui/Button.astro";
+import { APPLY_ENDPOINT, APPLY_FIELDS as F, BADGE_PATTERN, badgeField, LINKEDIN_PATTERN } from "./fields";
+
+interface Props {
+  seats: Position[];
+}
+
+const { seats } = Astro.props;
+const badgeHost = LINK_HOSTS.badge.join(" or ");
+const badgeStart = LINK_HOSTS.badge.map((h) => `https://${h}/`).join(" or ");
+
+const courses = COURSE_IDS.map((id) => {
+  const needs = seats.filter((s) => s.apply?.courses.includes(id));
+  return {
+    id,
+    title: COURSE_TITLES[id],
+    href: courseUrl(id),
+    roles: needs.map((s) => s.id),
+    everySeat: needs.length === seats.length,
+    neededBy: needs.length === seats.length ? "every seat" : andList(needs.map((s) => s.title)),
+  };
+}).filter((c) => c.roles.length > 0);
+
+const ERRORS = {
+  invalid:
+    "Some answers need a fix. Check the required fields. Each badge link must come from academy.claude.com, and a LinkedIn link from linkedin.com. Then send the form again.",
+  verification: "We could not confirm the form came from a person. Wait a few seconds, finish the check, then send it again.",
+  ratelimit: "Too many tries from your connection. Wait a minute, then send the form again.",
+  delivery:
+    "We could not save your application, so nothing was sent. Try again later, or write to info@coloradostartups.org.",
+  unavailable:
+    "Applications are closed for a moment on our side. Nothing was sent. Try again later, or write to info@coloradostartups.org.",
+} as const;
+---
+
+<div class="apply">
+  {
+    Object.entries(ERRORS).map(([code, text]) => (
+      <p class="form-error" role="alert" data-error={code} hidden>
+        {text}
+      </p>
+    ))
+  }
+
+  <noscript>
+    <p class="noscript-note">
+      This form needs JavaScript to check that you are a person. Without it, apply by email to
+      info@coloradostartups.org. Name the seat, tell us why it excites you, and paste your badge links.
+    </p>
+  </noscript>
+
+  <form method="post" action={APPLY_ENDPOINT} enctype="multipart/form-data" data-apply-form>
+    <input type="hidden" name="ts" value="" data-load-stamp />
+    <div class="hp" aria-hidden="true">
+      <label for="ap-website-hp">Leave this empty</label>
+      <input id="ap-website-hp" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <fieldset>
+      <legend>The seat</legend>
+      <div class="field">
+        <label for="ap-role">Seat</label>
+        <select id="ap-role" name={F.role} required aria-describedby="ap-role-hint" data-role-select>
+          <option value="">Choose a seat</option>
+          {seats.map((s) => <option value={s.id}>{s.title}</option>)}
+        </select>
+        <span class="hint" id="ap-role-hint" data-unpaid-line>{UNPAID_VOLUNTEER_LINE}</span>
+      </div>
+      <div class="field">
+        <label for="ap-why">Why are you excited about this seat?</label>
+        <textarea
+          id="ap-why"
+          name={F.why}
+          required
+          rows="7"
+          maxlength={APPLY_LIMITS.why}
+          aria-describedby="ap-why-hint"></textarea>
+        <span class="hint" id="ap-why-hint">
+          A few honest sentences is plenty. The box stops at {APPLY_LIMITS.why} characters.
+        </span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>About you</legend>
+      <div class="field">
+        <label for="ap-name">Your name</label>
+        <input id="ap-name" name={F.name} required maxlength={APPLY_LIMITS.name} autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="ap-email">Your email</label>
+        <input id="ap-email" name={F.email} type="email" required maxlength={APPLY_LIMITS.email} autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="ap-based-in">Where you are based</label>
+        <input
+          id="ap-based-in"
+          name={F.basedIn}
+          required
+          maxlength={APPLY_LIMITS.basedIn}
+          autocomplete="address-level2"
+          aria-describedby="ap-based-in-hint"
+        />
+        <span class="hint" id="ap-based-in-hint">Your city or town.</span>
+      </div>
+      <div class="field">
+        <label for="ap-linkedin">LinkedIn profile (optional)</label>
+        <input
+          id="ap-linkedin"
+          name={F.linkedin}
+          type="text"
+          inputmode="url"
+          autocomplete="url"
+          maxlength={APPLY_LIMITS.link}
+          pattern={LINKEDIN_PATTERN}
+          placeholder="linkedin.com/in/"
+          title="Use your profile link on linkedin.com"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset data-courses>
+      <legend>Your Claude Academy badges</legend>
+      <p class="hint">
+        Finish each course, then open its completion badge on your Claude Academy dashboard and copy the verification
+        link. The link starts with <code>{badgeStart}</code>. We open the links ourselves when we read your
+        application. The site never visits them.
+      </p>
+      <p class="hint" data-courses-empty hidden>Choose a seat above to see the courses it needs.</p>
+      {
+        courses.map((c) => (
+          <div class="field" data-course={c.id} data-roles={c.roles.join(" ")}>
+            <label for={`ap-${badgeField(c.id)}`}>Badge link for {c.title}</label>
+            <input
+              id={`ap-${badgeField(c.id)}`}
+              name={badgeField(c.id)}
+              type="url"
+              inputmode="url"
+              maxlength={APPLY_LIMITS.link}
+              pattern={BADGE_PATTERN}
+              placeholder={`https://${LINK_HOSTS.badge[0]}/`}
+              title={`Use the verification link from ${badgeHost}`}
+              required={c.everySeat}
+              aria-describedby={`ap-${badgeField(c.id)}-hint`}
+            />
+            <span class="hint" id={`ap-${badgeField(c.id)}-hint`}>
+              Needed for {c.neededBy}.{" "}
+              <a href={c.href} target="_blank" rel="noopener">
+                Open {c.title} on Claude Academy<span class="visually-hidden"> (opens in a new tab)</span>
+              </a>
+            </span>
+          </div>
+        ))
+      }
+    </fieldset>
+
+    <fieldset>
+      <legend>Last details</legend>
+      <div class="field">
+        <label for="ap-anything-else">Anything else we should know? (optional)</label>
+        <textarea id="ap-anything-else" name={F.anythingElse} rows="4" maxlength={APPLY_LIMITS.anythingElse}></textarea>
+      </div>
+      <div class="check">
+        <input id="ap-consent" name={F.consent} type="checkbox" required />
+        <label for="ap-consent">Colorado Startups will contact me about this seat only.</label>
+      </div>
+    </fieldset>
+
+    <Turnstile />
+    <Button type="submit">Send my application</Button>
+  </form>
+</div>
+
+<script>
+  import { showErrorMessage, stampLoadTime } from "../forms/form-status";
+  import { clearDraft, courseShownFor, draftFrom, readDraft, roleFromSearch, saveDraft } from "./client";
+
+  stampLoadTime(document);
+
+  const form = document.querySelector<HTMLFormElement>("[data-apply-form]");
+  // instanceof, not querySelector<HTMLSelectElement>: TypeScript 6's DOM types
+  // reject that type argument (HTMLSelectElement.remove() overloads Element's).
+  const select = form?.querySelector("[data-role-select]");
+  if (form && select instanceof HTMLSelectElement) {
+    const allowed = [...select.options].map((o) => o.value).filter(Boolean);
+    const fromUrl = roleFromSearch(window.location.search, allowed);
+    if (fromUrl) select.value = fromUrl;
+
+    // After a rejected submission (?error=), bring back this tab's draft. Any
+    // other visit starts clean and drops an old draft.
+    const draft = new URLSearchParams(window.location.search).has("error") ? readDraft() : null;
+    if (!draft) clearDraft();
+    if (draft?.role && allowed.includes(draft.role)) select.value = draft.role;
+
+    // Show, enable and require only the chosen seat's courses. A disabled
+    // input never posts, so a course from another seat cannot be sent.
+    const empty = form.querySelector<HTMLElement>("[data-courses-empty]");
+    const sync = () => {
+      const role = select.value || null;
+      for (const field of form.querySelectorAll<HTMLElement>("[data-course]")) {
+        const shown = courseShownFor(role, field.dataset.roles ?? "");
+        field.hidden = !shown;
+        const input = field.querySelector("input");
+        if (input) {
+          input.disabled = !shown;
+          input.required = shown;
+        }
+      }
+      if (empty) empty.hidden = role !== null;
+    };
+    select.addEventListener("change", sync);
+    sync();
+
+    if (draft) {
+      for (const [name, value] of Object.entries(draft)) {
+        const el = form.elements.namedItem(name);
+        if ((el instanceof HTMLInputElement && el.type !== "checkbox") || el instanceof HTMLTextAreaElement) {
+          el.value = value;
+        }
+      }
+    }
+    form.addEventListener("submit", () => saveDraft(draftFrom(new FormData(form))));
+  }
+
+  showErrorMessage(document, new URLSearchParams(window.location.search).get("error"));
+</script>
+
+<style>
+  /* Fieldsets, hints, checks and hidden fields: the Forms section of
+     global.css (#195). The page script hides other seats' courses. */
+  .noscript-note {
+    max-width: 42rem;
+    font-weight: 700;
+  }
+</style>

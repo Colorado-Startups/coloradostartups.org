@@ -1,0 +1,13 @@
+id: ernst-and-young
+name: Ernst & Young
+url: https://www.ey.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A firm that helps businesses. It sells assurance, tax, consulting and strategy services. Its work includes entrepreneurship services.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

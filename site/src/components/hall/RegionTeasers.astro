@@ -1,0 +1,19 @@
+---
+// The three regions on the home page, from data/regions/*.yaml in `order`.
+// Owner: L1. Each is L8's RegionCard, the same card /regions/ shows: the
+// region's art, its cities, and its Connector seat, open or filled. A person
+// holds each region's seat; the keepers never do (decision 43).
+import { getCollection } from "astro:content";
+
+import { REGIONS } from "../../lib/regions/match";
+import { organizerFor } from "../../lib/regions/page";
+import RegionCard from "../regions/RegionCard.astro";
+
+const regions = [...REGIONS];
+const positions = (await getCollection("positions")).map((p) => p.data);
+const people = (await getCollection("people")).map((p) => p.data);
+---
+
+<ul class="hall-grid" role="list">
+  {regions.map((region) => <RegionCard region={region} organizer={organizerFor(region.id, positions, people)} />)}
+</ul>

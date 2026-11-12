@@ -1,0 +1,106 @@
+---
+// /contact/: the community inbox and the mailing address from the site
+// footer, plus the right page for the common asks. No form, so this page
+// collects nothing. Owner: L13.
+import { WAYS_IN } from "@cs/shared";
+
+import InfoHeader from "../components/info/InfoHeader.astro";
+import { CONTACT_EMAIL, mailto, POSTAL_ADDRESS } from "../components/info/links";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const DOORS = [
+  { href: WAYS_IN.slack, label: "Join the Slack", what: "Request an invite to the Colorado Startups Slack." },
+  {
+    href: "/ecosystem-canvas/suggest/",
+    label: "Suggest a resource",
+    what: "Tell us about a Colorado program, event or service for founders.",
+  },
+  {
+    href: "/leaderboard/nominate/",
+    label: "Nominate your company",
+    what: "Put your Colorado company forward for the Leaderboard. The form asks for revenue and headcount, so it is for people inside the company.",
+  },
+  { href: "/get-involved/", label: "Get involved", what: "See the open moderator, organizer and project roles." },
+  { href: "/event-calendar/#add-your-event", label: "Add an event", what: "Send us a startup event for the calendar." },
+  { href: "/privacy/", label: "Privacy requests", what: "Ask what we hold about you, or ask us to delete it." },
+];
+---
+
+<BaseLayout
+  title="Contact"
+  description={`Email Colorado Startups at ${CONTACT_EMAIL}, or write to our mailing address in Denver.`}
+>
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <InfoHeader kicker="Send word to the Hall" title="Contact us">
+        <p class="lede">Email is the best way to reach Colorado Startups.</p>
+      </InfoHeader>
+
+      <div class="ways">
+        <section class="panel panel--raised" aria-labelledby="email-title">
+          <h2 id="email-title">Email</h2>
+          <p class="email"><a href={mailto()}>{CONTACT_EMAIL}</a></p>
+        </section>
+        <section class="panel" aria-labelledby="mail-title">
+          <h2 id="mail-title">Mail</h2>
+          <address>
+            {POSTAL_ADDRESS.map((line, i) => (i === 0 ? line : [<br />, line]))}
+          </address>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="doors-title">
+    <div class="wrap">
+      <h2 id="doors-title">Find the right door</h2>
+      <p>Some asks have their own page, which gets them to the right person faster.</p>
+      <ul class="doors">
+        {
+          DOORS.map((d) => (
+            <li>
+              <a class="tap-target" href={d.href}>{d.label}</a>
+              <span class="meta">{d.what}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--s-5);
+  }
+  .ways h2 {
+    font-size: var(--t-step-2);
+    margin-bottom: var(--s-3);
+  }
+  .email {
+    font-size: var(--t-step-1);
+    font-weight: 700;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  address {
+    font-style: normal;
+  }
+  .doors {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--s-4) var(--s-6);
+    max-width: none;
+  }
+  .doors li {
+    display: grid;
+    gap: var(--s-1);
+  }
+  .doors a {
+    font-weight: 700;
+  }
+</style>

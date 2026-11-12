@@ -1,0 +1,15 @@
+id: talent-to-team
+name: Talent to Team
+url: https://www.talenttoteam.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: An outsourced HR firm in Boulder. It offers people strategy, recruiting and HR operations. It serves startups and growing businesses.
+tags:
+  - hiring
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

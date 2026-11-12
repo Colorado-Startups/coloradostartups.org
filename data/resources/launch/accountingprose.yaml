@@ -1,0 +1,13 @@
+id: accountingprose
+name: Accountingprose
+url: https://www.accountingprose.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: An accounting firm. It offers outsourced accounting, payroll and HR support to startups and small businesses.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

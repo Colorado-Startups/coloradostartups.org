@@ -1,0 +1,9 @@
+id: venu-holding
+name: "Venu Holding"
+website: "https://venu.live"
+hq_city: "Colorado Springs"
+founded_year: 2017
+sector: "Travel, hospitality and events"
+description: "Owns and runs music venues, amphitheaters, restaurants and bars. They are for live entertainment audiences."
+sources:
+  - "https://www.sec.gov/Archives/edgar/data/1770501/000149315226014137/form10-k.htm"

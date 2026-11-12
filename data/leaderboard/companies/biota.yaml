@@ -1,0 +1,9 @@
+id: biota
+name: "Biota"
+website: "https://biota-labs.com"
+hq_city: "Longmont"
+sector: "Energy and climate"
+description: "Makes rapid PFAS testing tools and sample prep. They are for testing labs and water treatment companies."
+sources:
+  - "https://biota-labs.com"
+  - "https://www.prnewswire.com/news-releases/biota-closes-3-million-seed-round-led-by-burnt-island-ventures-to-scale-commercial-deployment-of-pfas-testing-technologies-302837115.html"

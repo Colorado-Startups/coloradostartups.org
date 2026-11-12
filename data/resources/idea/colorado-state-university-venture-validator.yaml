@@ -1,0 +1,13 @@
+id: colorado-state-university-venture-validator
+name: Colorado State University Venture Validator
+url: https://biz.colostate.edu/resources/centers-institutes/entrepreneurship/venture-validator
+stage: idea
+substage: validate
+city: Fort Collins
+type: event
+description: A free virtual cohort at Colorado State University. New founders test their idea there. Customer interviews and competitor research are the tools.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

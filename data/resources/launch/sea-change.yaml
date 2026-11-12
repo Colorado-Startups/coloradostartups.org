@@ -1,0 +1,13 @@
+id: sea-change
+name: SEA Change
+url: http://seachng.org/
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: A social enterprise accelerator. It trains founders to launch mission-driven businesses. It has free cohorts for entrepreneurs in Colorado. It has self-paced online courses too.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

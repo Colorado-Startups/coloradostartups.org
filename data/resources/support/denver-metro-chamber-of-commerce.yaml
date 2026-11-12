@@ -1,0 +1,13 @@
+id: denver-metro-chamber-of-commerce
+name: Denver Metro Chamber of Commerce
+url: https://denverchamber.org/
+stage: support
+substage: organizations
+city: Denver
+type: government
+description: A Denver metro chamber of commerce. It has networking groups for its members. Its leadership programs are for emerging and senior executives. It also holds events on regional economic issues.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

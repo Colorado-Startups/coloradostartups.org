@@ -1,0 +1,224 @@
+---
+// The style guide's primitives: Button, Banner, Panel, Card, Frame, Badge
+// and Callout. Each one's props come from the header comment in its own
+// component file, read at build time, so this list and the code cannot drift
+// apart. Rendered by pages/styleguide.astro; its look is styleguide.css.
+import { parse } from "yaml";
+
+import dwarvesYaml from "../../../../data/team/dwarves.yaml?raw";
+import Badge from "../ui/Badge.astro";
+import Banner from "../ui/Banner.astro";
+import Button from "../ui/Button.astro";
+import Callout from "../ui/Callout.astro";
+import Card from "../ui/Card.astro";
+import Frame from "../ui/Frame.astro";
+import Panel from "../ui/Panel.astro";
+
+const docs = import.meta.glob<string>("../ui/*.astro", { query: "?raw", import: "default", eager: true });
+// One list item per comment line: the content gate reads each block as its
+// own line, so a wrapped props list is not read as one long sentence.
+function propsDoc(name: string): string[] {
+  const source = docs[`../ui/${name}.astro`] ?? "";
+  const comment: string[] = [];
+  for (const line of source.split("\n").slice(1)) {
+    if (!line.startsWith("//")) break;
+    comment.push(line.replace(/^\/\/ ?/, "") || "\u00a0");
+  }
+  return comment;
+}
+
+const keepers = parse(dwarvesYaml) as { id: string; name: string; title: string; role: string; disclosure: string }[];
+const communitas = keepers.find((k) => k.id === "communitas") ?? keepers[0];
+---
+
+<section class="section section--band">
+  <div class="wrap stack">
+    <h2 id="button">Button</h2>
+    <div class="btn-row">
+      <Button href="/styleguide/">Join the Slack</Button>
+      <Button variant="secondary" href="/styleguide/">Get the newsletter</Button>
+      <Button variant="stone">Show filters</Button>
+      <Button variant="quiet" href="/styleguide/">See all events</Button>
+    </div>
+    <div class="btn-row">
+      <Button size="lg" href="/styleguide/">Join the Slack</Button>
+      <Button disabled>Sending</Button>
+    </div>
+    <p class="meta">Classes for script-built DOM: btn btn--gold, btn--bronze, btn--stone, btn--quiet, btn--lg.</p>
+    <ul class="sg-doc" aria-label="Button props">{propsDoc("Button").map((line) => <li>{line}</li>)}</ul>
+  </div>
+</section>
+
+<section class="section section--lit">
+  <div class="wrap stack">
+    <h2 id="banner">Banner</h2>
+    <Banner>Find your people</Banner>
+    <Banner tone="sky" align="center">Join the Slack</Banner>
+    <Banner tone="copper">The Leaderboard</Banner>
+    <Banner variant="lintel" align="center">The Hall</Banner>
+    <ul class="sg-doc" aria-label="Banner props">{propsDoc("Banner").map((line) => <li>{line}</li>)}</ul>
+
+    <h2 id="panel">Panel</h2>
+    <div class="sg-row">
+      <Panel>
+        <h3>Lit</h3>
+        <p>The default slab, for a form or a feature. <a href="/styleguide/">A link inside it.</a></p>
+      </Panel>
+      <Panel tone="stone">
+        <h3>Stone</h3>
+        <p>A quieter face, beside a lit panel. <span class="meta">Meta text.</span></p>
+      </Panel>
+      <Panel raised>
+        <h3>Raised</h3>
+        <p>Lantern glow, for the one panel in a view that matters most.</p>
+      </Panel>
+    </div>
+    <ul class="sg-doc" aria-label="Panel props">{propsDoc("Panel").map((line) => <li>{line}</li>)}</ul>
+  </div>
+</section>
+
+<section class="section section--band">
+  <div class="wrap stack">
+    <h2 id="card">Card</h2>
+    <ul class="hall-grid">
+      <Card element="li" title="Founder office hours" href="/styleguide/">
+        <Badge slot="badges" tone="copper">Launch</Badge>
+        <Badge slot="badges">Denver</Badge>
+        <p>Sample resource card. One hour with an operator who has built a company here.</p>
+        <span slot="meta">Monthly, in person</span>
+      </Card>
+      <Card element="li" title="Event host, Boulder" href="/styleguide/">
+        <Badge slot="badges" tone="pine">Open</Badge>
+        <p>Sample position card. Help run one evening meetup a month.</p>
+        <Button slot="actions" variant="quiet" href="/styleguide/">Read the role</Button>
+      </Card>
+      <Card element="li" title="Northern Colorado" href="/styleguide/">
+        <Badge slot="badges">Region</Badge>
+        <p>Sample region card. Fort Collins, Loveland, Greeley and the towns between.</p>
+        <span slot="meta">Front Range, north</span>
+      </Card>
+    </ul>
+    <Card title={communitas.name} tone="gilded" layout="row" mediaInset>
+      <Frame slot="media" shape="arch" ratio="4 / 5" plaque={communitas.name}>
+        <svg
+          class="hall-frame__art sg-art"
+          viewBox="0 0 120 150"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-label="Sample art: a warm sky over the Front Range"
+        >
+          <rect class="a-sky" width="120" height="150" />
+          <circle class="a-sun" cx="60" cy="78" r="26" />
+          <path class="a-far" d="M0 104 26 80l14 10 22-24 18 18 14-10 26 22v54H0z" />
+          <path class="a-near" d="M0 122 30 104l20 8 24-14 22 12 24-6v46H0z" />
+          <path class="a-door" d="M50 150v-22a10 10 0 0 1 20 0v22z" />
+        </svg>
+      </Frame>
+      <Badge slot="badges" tone="gold">AI agent</Badge>
+      <p><strong>{communitas.title}.</strong> {communitas.role}</p>
+      <p class="meta">{communitas.disclosure}</p>
+    </Card>
+    <ul class="sg-doc" aria-label="Card props">{propsDoc("Card").map((line) => <li>{line}</li>)}</ul>
+  </div>
+</section>
+
+<section class="section section--lit">
+  <div class="wrap stack">
+    <h2 id="frame">Frame</h2>
+    <div class="sg-row sg-row--frames">
+      <Frame ratio="16 / 9" caption="Sample art. The Hall art is AI-generated.">
+        <svg
+          class="hall-frame__art sg-art"
+          viewBox="0 0 160 90"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-label="Sample art: the Front Range at golden hour"
+        >
+          <rect class="a-sky" width="160" height="90" />
+          <circle class="a-sun" cx="96" cy="52" r="20" />
+          <path class="a-far" d="M0 62 30 40l16 10 26-24 22 22 18-12 48 30v24H0z" />
+          <path class="a-near" d="M0 76 40 62l26 6 30-12 28 10 36-4v28H0z" />
+        </svg>
+      </Frame>
+      <Frame tone="bronze" shape="arch" ratio="4 / 5" plaque="Resourcus">
+        <svg
+          class="hall-frame__art sg-art"
+          viewBox="0 0 120 150"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-label="Sample art: a lit doorway in the mountain"
+        >
+          <rect class="a-sky" width="120" height="150" />
+          <circle class="a-sun" cx="60" cy="70" r="22" />
+          <path class="a-near" d="M0 96 34 76l26 10 30-16 30 18v62H0z" />
+          <path class="a-door" d="M46 150v-28a14 14 0 0 1 28 0v28z" />
+        </svg>
+      </Frame>
+    </div>
+    <ul class="sg-doc" aria-label="Frame props">{propsDoc("Frame").map((line) => <li>{line}</li>)}</ul>
+  </div>
+</section>
+
+<section class="section section--band">
+  <div class="wrap stack">
+    <h2 id="badge">Badge</h2>
+    <p class="sg-badges">
+      <Badge>Boulder</Badge>
+      <Badge tone="copper">Growth</Badge>
+      <Badge tone="sky">#introductions</Badge>
+      <Badge tone="pine">Hiring</Badge>
+      <Badge tone="gold">New</Badge>
+    </p>
+    <ul class="sg-doc" aria-label="Badge props">{propsDoc("Badge").map((line) => <li>{line}</li>)}</ul>
+
+    <h2 id="callout">Callout</h2>
+    <Callout title="Bring one question">
+      <p>Sample callout. Office hours go further when you arrive with the one thing you are stuck on.</p>
+    </Callout>
+    <ul class="sg-doc" aria-label="Callout props">{propsDoc("Callout").map((line) => <li>{line}</li>)}</ul>
+  </div>
+</section>
+
+<style>
+  .sg-row--frames {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    max-width: 44rem;
+    align-items: end;
+  }
+  .sg-doc {
+    margin: 0;
+    padding: var(--s-4);
+    list-style: none;
+    max-width: none;
+    background: var(--c-ground);
+    border: var(--line-hair) solid var(--c-rule);
+    border-radius: var(--r-chisel);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: var(--t-step--1);
+    line-height: 1.5;
+  }
+  /* Each comment line keeps its spaces and wraps where the column ends, so
+     no line is cut and nothing scrolls sideways. A wrapped line hangs 4ch in
+     from the line it continues. */
+  .sg-doc li {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    padding-left: 4ch;
+    text-indent: -4ch;
+  }
+  .sg-art .a-sky {
+    fill: var(--c-surface-2);
+  }
+  .sg-art .a-sun {
+    fill: var(--c-molten);
+  }
+  .sg-art .a-far {
+    fill: var(--c-stone-edge);
+  }
+  .sg-art .a-near {
+    fill: var(--c-bronze);
+  }
+  .sg-art .a-door {
+    fill: var(--c-accent);
+  }
+</style>

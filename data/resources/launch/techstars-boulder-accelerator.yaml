@@ -1,0 +1,13 @@
+id: techstars-boulder-accelerator
+name: Techstars Boulder Accelerator
+url: https://www.techstars.com/newsroom/better-for-founders-better-for-colorado
+stage: launch
+substage: develop
+city: Boulder
+type: accelerator
+description: Techstars Colorado is a startup community partnership. It was announced in October 2024. Its goal is to restart the Techstars accelerator in Boulder, where Techstars began. It was built with the local startup community.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,14 @@
+id: novo
+name: Novo
+url: https://www.novo.co/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: Online business checking with invoicing, payments and cards. It is for freelancers and consultants. Independent businesses can use it too.
+tags:
+  - banking
+source: cs
+status: active
+last_checked: "2026-11-02"
+added: "2026-10-08"

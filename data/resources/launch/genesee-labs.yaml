@@ -1,0 +1,13 @@
+id: genesee-labs
+name: Genesee Labs
+url: https://www.geneseelabs.com/
+stage: launch
+substage: service-providers
+city: Golden
+type: coworking
+description: A coworking space in the foothills between Golden and Evergreen. It has open and private offices and phone booths. It also has conference rooms for half-day or full-day rental, and networking events.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,31 @@
+---
+// A region's Connector seat (decisions 44 and 67). Owner: L8. The seat itself is L9's
+// PositionCard, so it looks the same here as on /get-involved/. This wrapper
+// adds only what a region page needs: no link back to the page it sits on,
+// and the line that a person holds the seat. People fill every seat; the
+// keepers never organize (decision 43).
+import type { Organizer } from "../../lib/regions/page";
+import PositionCard from "../positions/PositionCard.astro";
+
+interface Props {
+  organizer: Organizer;
+}
+
+const { position, holder } = Astro.props.organizer;
+---
+
+<div class="organizer" data-seat={position.status}>
+  <PositionCard position={position} holder={holder} showRegionLink={false} />
+  <p class="organizer__people">
+    A person holds every Connector seat. The Hall's keepers are AI agents, and they never take this seat.
+  </p>
+</div>
+
+<style>
+  .organizer {
+    max-width: 44rem;
+  }
+  .organizer__people {
+    margin: var(--s-3) 0 0;
+  }
+</style>

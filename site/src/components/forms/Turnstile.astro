@@ -1,0 +1,41 @@
+---
+// The Turnstile box for an HTML form. Owner: the Worker and forms lane.
+//
+//   action:  string             optional Turnstile action, shown in Cloudflare's analytics
+//   size:    "normal" | "flexible"   "flexible" fills a narrow panel's width
+//
+// Place it inside the <form>, before the submit button. turnstile.ts loads
+// Cloudflare's script only when the visitor starts on the form (#121), and the
+// box takes no room unless a challenge needs the visitor (#203).
+interface Props {
+  action?: string;
+  size?: "normal" | "flexible";
+}
+
+const { action, size = "normal" } = Astro.props;
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
+---
+
+<div
+  class="cf-turnstile"
+  data-turnstile-lazy
+  data-sitekey={siteKey}
+  data-action={action}
+  data-size={size}
+  data-appearance="interaction-only"
+>
+</div>
+
+<script>
+  import { initLazyTurnstile } from "./turnstile";
+  initLazyTurnstile(document);
+</script>
+
+<style>
+  /* Cloudflare's iframe draws no Hall focus ring, so the box draws one while
+     focus is inside it (#203). The same ring as :focus-visible in global.css. */
+  .cf-turnstile:focus-within {
+    outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+    outline-offset: 3px;
+  }
+</style>

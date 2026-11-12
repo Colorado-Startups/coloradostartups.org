@@ -1,0 +1,13 @@
+id: wells-fargo
+name: Wells Fargo
+url: https://www.wellsfargo.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A national bank. It offers small businesses checking, savings, lines of credit, SBA loans, credit cards and merchant services.
+tags:
+  - banking
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

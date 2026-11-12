@@ -1,0 +1,15 @@
+id: rio-chato-investments
+name: Rio Chato Investments
+url: https://www.riochato.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: An investment firm. It offers equity and debt. It also offers purchase order financing and guidance. It serves active lifestyle companies.
+tags:
+  - seed
+  - venture-capital
+  - sustainability
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

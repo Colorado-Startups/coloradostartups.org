@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# coloradostartups-site pre-push. Deliberately redundant with pre-commit.
+#
+# `git commit --no-verify` skips pre-commit entirely. The org ruleset on main
+# ("Protect default branches") requires a pull request but no status check
+# (gh api repos/Colorado-Startups/coloradostartups-site/rulesets, 2026-11-02).
+# So CI cannot block a merge, and a single bypassable hook would be the whole
+# defence. pre-push runs the same per-file gates again on what is about to
+# leave the machine, and:
+#   - refuses any push to refs/heads/main (house rule: never push to main;
+#     changes land through a pull request), and
+#   - refuses a push of any commit other than HEAD (issue #302), so each
+#     worktree pushes the branch it has checked out.
+#
+# It runs no tests. Paul, 2026-11-02: the MacBook Air does no testing, CI or
+# rendering. `npm run check:push` (astro check, unit and Worker tests) runs in
+# CI's site-tests job, and the orchestrator merges only when every check
+# passed (rules/delegation.md, Who merges).
+#
+# Enable once per clone:  git config core.hooksPath .githooks
+set -uo pipefail
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+export REPO_ROOT
+# shellcheck source=.githooks/cs-site-route.sh
+. "$REPO_ROOT/.githooks/cs-site-route.sh"
+trap cleanup_snapshot EXIT
+
+ZERO="0000000000000000000000000000000000000000"
+refs="$(cat)"
+
+# 1. Never push to main. A fixed policy from the house rules, not a content
+# rule, so it is a literal comparison here, not a rules-file entry.
+while read -r _lref _lsha rref _rsha; do
+  if [ "$rref" = "refs/heads/main" ]; then
+    {
+      echo "BLOCKED [main]: this push targets refs/heads/main."
+      echo "Changes reach main through a pull request. Push a branch instead:"
+      echo "  git push origin HEAD:refs/heads/<branch-name>"
+    } >&2
+    exit 1
+  fi
+done <<< "$refs"
+
+# 2. Push only HEAD. Issue #302 added this rule while pre-push ran check:push,
+# which tests the working tree. check:push no longer runs here, and the rule
+# stays (orchestrator, 2026-11-02): it costs nothing and keeps each worktree
+# pushing the branch it has checked out. A delete pushes no code: its local
+# sha is all zeros. An annotated tag counts as the commit it points at.
+head="$(git rev-parse --verify --quiet HEAD 2>/dev/null || true)"
+while read -r lref lsha _rref _rsha; do
+  [ -z "${lsha:-}" ] && continue
+  [ "$lsha" = "$ZERO" ] && continue
+  commit="$(git rev-parse --verify --quiet "$lsha^{commit}" 2>/dev/null || printf '%s' "$lsha")"
+  if [ "$commit" != "$head" ]; then
+    {
+      echo "BLOCKED [not-head]: $lref is not HEAD; check out the branch, or push it from its own worktree."
+      echo "  pushed: $commit"
+      echo "  HEAD:   ${head:-(none)}"
+    } >&2
+    exit 1
+  fi
+done <<< "$refs"
+
+# 3. The files this push adds or changes, snapshotted from the pushed commits.
+changed=""
+while read -r _lref lsha _rref rsha; do
+  [ -z "${lsha:-}" ] && continue
+  [ "$lsha" = "$ZERO" ] && continue
+  if [ "$rsha" = "$ZERO" ] || ! git rev-parse --verify --quiet "$rsha^{commit}" >/dev/null 2>&1; then
+    base="$(git merge-base "$lsha" origin/main 2>/dev/null || true)"
+    if [ -n "$base" ]; then
+      files="$(git diff --name-only --diff-filter=ACMR "$base" "$lsha" 2>/dev/null)"
+    else
+      # No common base: a new branch, or the first push of a new repository.
+      #
+      # NOT `git diff --name-only <sha>`, which compares that commit to the
+      # WORKING TREE. Just after a commit those are identical, so that form
+      # returns an empty list and the hook approves the whole push without
+      # reading a byte of it. Space Peak caught that in testing; list the
+      # whole tree instead.
+      files="$(git ls-tree -r --name-only "$lsha" 2>/dev/null)"
+    fi
+  else
+    files="$(git diff --name-only --diff-filter=ACMR "$rsha" "$lsha" 2>/dev/null)"
+  fi
+  # When several refs push the same path, the last ref's copy is checked.
+  snapshot_files "$lsha" "$files"
+  changed="$changed$files
+"
+done <<< "$refs"
+
+route_all "pre-push" "$(printf '%s\n' "$changed" | sort -u | sed '/^$/d')"
+
+route_verdict "pre-push"

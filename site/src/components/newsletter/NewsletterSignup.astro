@@ -1,0 +1,98 @@
+---
+// Newsletter sign-up for Startupers. Owner of the internals: L6 Comms.
+// Frozen props: L1 places it on the home page, /newsletter/ and /community/.
+//
+//   variant:   "inline" | "full"   inline = email only; full = adds a short why
+//   returnTo:  string              where errors return; must be in RETURN_PATHS
+//                                  in worker/routes/subscribe.ts
+//
+// A plain HTML form that POSTs to /api/subscribe with the honeypot "website",
+// the "ts" load stamp and the Turnstile widget. The Worker answers with a 303
+// to /newsletter/thanks/ or back here with ?error=<code>; signup.ts shows the
+// matching message. Styling uses existing tokens only until Gate A v2.
+import Turnstile from "../forms/Turnstile.astro";
+import { newsletterCopy as copy } from "./copy";
+
+interface Props {
+  variant: "inline" | "full";
+  returnTo: string;
+}
+
+const { variant, returnTo } = Astro.props;
+const uid = `nl-${crypto.randomUUID().slice(0, 8)}`;
+---
+
+<section class="panel newsletter" data-variant={variant} aria-labelledby={`${uid}-title`}>
+  <h3 id={`${uid}-title`}>{copy.title}</h3>
+  <p class="meta">{copy.description}</p>
+  {variant === "full" && copy.why.map((line) => <p>{line}</p>)}
+
+  <form method="post" action="/api/subscribe" data-newsletter data-return-to={returnTo}>
+    <div class="field">
+      <label for={`${uid}-email`}>Email</label>
+      <input
+        id={`${uid}-email`}
+        name="email"
+        type="email"
+        required
+        maxlength="254"
+        autocomplete="email"
+        aria-describedby={`${uid}-hint ${uid}-error`}
+      />
+      <span class="hint" id={`${uid}-hint`}>{copy.hint}</span>
+    </div>
+
+    <div class="visually-hidden" aria-hidden="true">
+      <label for={`${uid}-website`}>Leave this empty</label>
+      <input id={`${uid}-website`} name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+    <input type="hidden" name="ts" value="" />
+    <input type="hidden" name="return_to" value={returnTo} />
+
+    {/* The box takes no room unless a challenge needs the visitor, so a narrow
+        panel is not widened by the widget's minimum width (#211). */}
+    <Turnstile size="flexible" />
+
+    <div class="errors" id={`${uid}-error`}>
+      {
+        Object.entries(copy.errors).map(([code, message]) => (
+          <p class="form-error" data-error={code} role="alert" hidden>
+            {message}
+          </p>
+        ))
+      }
+    </div>
+
+    <button class="btn btn--gold" type="submit">{copy.button}</button>
+    <p class="meta">
+      {copy.privacyLead} <a href="/privacy/">privacy policy</a>.
+    </p>
+  </form>
+</section>
+
+<script>
+  import { initNewsletterForms } from "./signup";
+  initNewsletterForms(document, window.location);
+</script>
+
+<style>
+  form {
+    display: grid;
+    /* The track never grows past the panel, whatever a child's minimum width. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+  form > .btn {
+    justify-self: start;
+  }
+  /* An email address needs no more than this, even in a 1280 px band (#203). */
+  input[type="email"] {
+    max-width: 32rem;
+  }
+  /* With no message shown, the error list adds no gap of its own above
+     Subscribe (#203). */
+  .errors:not(:has(> :not([hidden]))) {
+    display: none;
+  }
+</style>

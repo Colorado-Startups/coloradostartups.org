@@ -1,0 +1,14 @@
+id: mantucket-capital
+name: Mantucket Capital
+url: http://mantucket.com/
+stage: growth
+substage: investors
+city: Denver
+type: investor
+description: Venture capital firm for Series C rounds in Denver.
+tags:
+  - venture-capital
+  - series-c
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

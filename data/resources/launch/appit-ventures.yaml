@@ -1,0 +1,13 @@
+id: appit-ventures
+name: AppIt Ventures
+url: https://www.appitventures.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver firm. It builds custom mobile and web apps. It also offers UI/UX design, outsourced engineers and legacy system upgrades.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

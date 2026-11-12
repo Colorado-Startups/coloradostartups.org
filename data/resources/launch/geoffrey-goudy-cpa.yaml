@@ -1,0 +1,13 @@
+id: geoffrey-goudy-cpa
+name: Geoffrey Goudy CPA
+url: https://www.cspotcount.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: A Fort Collins CPA. It offers accounting and tax services to small businesses. It focuses on startups and new founders.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

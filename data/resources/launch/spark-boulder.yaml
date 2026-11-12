@@ -1,0 +1,13 @@
+id: spark-boulder
+name: Spark Boulder
+url: https://www.builtincolorado.com/company/spark-boulder
+stage: launch
+substage: service-providers
+city: Boulder
+type: coworking
+description: Coworking space in Boulder.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

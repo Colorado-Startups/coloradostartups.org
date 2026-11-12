@@ -1,0 +1,30 @@
+---
+// HallSeal: a small picture of the Great Hall that closes a text-only page,
+// the way an ornament ends a chapter (#261). The thanks pages and the two
+// forms close with it; the dispatch article closes the same way with its own
+// scoped rule. Keepers appear in the picture, so its alt is HALL_ART_ALT,
+// which says they are AI agents. It sits at the end of the page, so it loads
+// lazily. Owner: L5b.
+import ArtImage from "../art/ArtImage.astro";
+import { HALL_ART_ALT } from "../art/keepers";
+---
+
+<ArtImage
+  src="hero/hall"
+  alt={HALL_ART_ALT}
+  aspect="21 / 9"
+  widths={[400, 800]}
+  sizes="24rem"
+  motion="none"
+  class="hall-seal"
+/>
+
+<style>
+  /* ArtImage renders the figure in its own scope, so this reaches it by class. */
+  :global(.hall-seal) {
+    width: min(100%, 24rem);
+    margin-top: var(--s-6);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+</style>

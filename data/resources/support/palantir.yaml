@@ -1,0 +1,13 @@
+id: palantir
+name: Palantir
+url: http://palantir.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Software that helps groups integrate their data, decisions and operations. It has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

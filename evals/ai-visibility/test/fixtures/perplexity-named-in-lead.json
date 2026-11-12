@@ -1,0 +1,27 @@
+{
+  "id": "pplx_fixture_01",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1792368000,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Colorado Startups is the statewide community for founders, with a Slack and a resource directory [1].\n\n## Fort Collins\nThe city runs an incubator program [2].\n\n## Statewide\nFounder meetups happen across the state [3]."
+      }
+    }
+  ],
+  "citations": [
+    "https://coloradostartups.org/",
+    "https://fortcollins-incubator.example/",
+    "https://meetups.example/colorado"
+  ],
+  "search_results": [
+    { "title": "Colorado Startups", "url": "https://coloradostartups.org/", "date": "2026-10-18" },
+    { "title": "Fort Collins incubator", "url": "https://fortcollins-incubator.example/", "date": "2026-09-30" },
+    { "title": "Colorado founder meetups", "url": "https://meetups.example/colorado", "date": "2026-10-01" }
+  ],
+  "usage": { "prompt_tokens": 12, "completion_tokens": 140, "total_tokens": 152, "search_context_size": "low" }
+}

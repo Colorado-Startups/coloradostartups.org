@@ -1,0 +1,112 @@
+name: visual-check
+
+# ADVISORY. No ruleset requires this check, so it reports and never blocks a
+# merge. It runs on demand: this Mac renders nothing (Paul, 2026-11-02), so a
+# session or a reviewer takes screenshots here instead:
+#
+#   gh workflow run visual-check.yml -f ref=<sha or branch> -f paths=/,/team/ -f widths=375,1280
+#   gh run list --workflow visual-check.yml --limit 1
+#   gh run download <id> -n visual
+#
+# One job builds the site, serves dist/ and takes a full-page Chromium
+# screenshot for each route and width through `npm run -w @cs/site
+# test:visual` (site/playwright.visual.config.ts and site/test/visual/). That spec
+# checks the routes and widths, not this file, and lists each PNG in the job
+# summary. The PNGs upload as the artifact "visual", kept 7 days.
+#
+# A plain `gh workflow run visual-check.yml` runs main's copy of this file;
+# with `--ref <branch>` it runs that branch's copy, even before the file is on
+# main (run 41569110427). A pull request that changes this file or the visual
+# spec also runs a smoke pass: / at 375 px. The job runs on ubuntu-latest, a fixed
+# label: it has no change job to check CI_RUNNER through 04_tools/ci_runner.sh,
+# and a raw variable could send it to any runner.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit SHA or branch to render
+        required: true
+        type: string
+      paths:
+        description: Comma-separated site routes, such as /,/team/
+        required: false
+        default: "/"
+        type: string
+      widths:
+        description: Comma-separated viewport widths in px, 200 to 2560
+        required: false
+        default: "375,768,1280"
+        type: string
+  pull_request:
+    paths:
+      - ".github/workflows/visual-check.yml"
+      - "site/playwright.visual.config.ts"
+      - "site/test/visual/**"
+
+permissions:
+  contents: read
+
+# A pull request's newer push cancels its older smoke run. Each dispatch gets
+# a group of its own, so two sessions rendering different refs never cancel
+# each other.
+concurrency:
+  group: visual-check-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  screenshots:
+    name: visual-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # A dispatch runs the ref's code in main's cache scope, so this job may
+    # read caches and never write one. With cache-mode: read, setup-node's npm
+    # cache restores and its save is skipped (run 41569624486 restored it).
+    cache-mode: read
+    steps:
+      # The ref comes from whoever dispatches the run. Only a full commit SHA,
+      # or a branch or tag name with no leading "-" and no "..", passes; any
+      # other value exits 2 before checkout.
+      - name: Check the ref
+        env:
+          REF: ${{ inputs.ref || github.sha }}
+        run: |
+          if [[ "$REF" =~ ^[0-9a-f]{40}$ ]] \
+             || { [[ "$REF" =~ ^[A-Za-z0-9._/-]+$ ]] && [[ "$REF" != -* ]] && [[ "$REF" != *..* ]]; }; then
+            echo "ref: $REF"
+          else
+            echo "::error title=visual-check::ref must be a 40-character commit SHA, or a branch or tag name with no leading - and no .."
+            exit 2
+          fi
+
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium and its system libraries
+        run: npm run -w @cs/site e2e:install
+
+      - name: Build, serve and take the screenshots
+        # A test build, never a deploy: fixtures when no people data is there (#695).
+        env:
+          CS_PEOPLE_FIXTURES: "1"
+          VISUAL_PATHS: ${{ inputs.paths || '/' }}
+          VISUAL_WIDTHS: ${{ inputs.widths || '375' }}
+        run: npm run -w @cs/site test:visual
+
+      # Uploads whatever the spec wrote, even when a page failed its check.
+      - if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: visual
+          path: site/test-results/visual-shots
+          retention-days: 7
+          if-no-files-found: warn

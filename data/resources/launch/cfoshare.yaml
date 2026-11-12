@@ -1,0 +1,13 @@
+id: cfoshare
+name: CFOShare
+url: https://cfoshare.org/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Outsourced finance services for small business owners and founders. The firm does fractional CFO work, transaction advice and bookkeeping.
+tags:
+  - finance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

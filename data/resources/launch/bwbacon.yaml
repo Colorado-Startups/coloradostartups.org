@@ -1,0 +1,13 @@
+id: bwbacon
+name: BWBacon
+url: https://www.bwbacon.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver tech recruiting firm. It places technical talent with companies. Terms are contract, contract-to-hire or direct-hire.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

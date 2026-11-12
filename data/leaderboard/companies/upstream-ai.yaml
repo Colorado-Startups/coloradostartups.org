@@ -1,0 +1,8 @@
+id: upstream-ai
+name: "Upstream AI"
+website: "https://getupstream.ai"
+hq_city: "Glenwood Springs"
+sector: "Software"
+description: "Provides a compliance calendar and AI assistant. Small water and wastewater utilities use them to manage permits, reports and lab samples."
+sources:
+  - "https://getupstream.ai/about"

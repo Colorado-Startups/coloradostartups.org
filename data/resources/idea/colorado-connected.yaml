@@ -1,0 +1,13 @@
+id: colorado-connected
+name: Colorado Connected
+url: http://coloradoconnected.com/
+stage: idea
+substage: validate
+city: statewide
+type: community
+description: Organization that helps founders build a team. Listed in the Ecosystem Canvas for founders at the idea stage.
+tags:
+  - team
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

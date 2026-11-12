@@ -1,0 +1,36 @@
+---
+// Panel: a slab of carved stone with a chisel groove inside its edge and a
+// solid ledge beneath. Holds a form, a feature or a group of related content.
+// Styles: .panel in src/styles/hall.css (L12).
+//
+// Props
+//   as      the element: "div" (default), "section", "article", "aside" or "form"
+//   tone    "lit": lantern-lit surface (default)
+//           "stone": the carved stone face, for a quieter block beside a lit one
+//           "night": a dark accent slab; light text, gold links and focus
+//   raised  adds the lantern glow; one per view at most
+//   size    "md" (default padding) or "lg" (roomier, for a feature)
+//   class   extra classes, appended
+//   ...rest any other attribute; a form panel takes action and method here
+//
+// Slot: default, the panel's content.
+interface Props {
+  as?: "div" | "section" | "article" | "aside" | "form";
+  tone?: "lit" | "stone" | "night";
+  raised?: boolean;
+  size?: "md" | "lg";
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { as: Tag = "div", tone = "lit", raised = false, size = "md", class: extra, ...rest } = Astro.props;
+const classes = [
+  "panel",
+  tone !== "lit" && `panel--${tone}`,
+  raised && "panel--raised",
+  size === "lg" && "panel--lg",
+  extra,
+];
+---
+
+<Tag class:list={classes} {...rest}><slot /></Tag>

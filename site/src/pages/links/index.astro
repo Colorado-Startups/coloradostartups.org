@@ -1,0 +1,180 @@
+---
+// /links/: every way in, on one page. Owner: L1. The Instagram and LinkedIn
+// bios point here.
+//
+// Its Slack button, like every other on the site, opens WAYS_IN.slack, the
+// /slack/ short link that ops/redirects/map.csv sends to the Google Form. So
+// the Slack backend can change in that one row without touching any copy
+// (LinkedIn project decisions 30 and 35, #128). The page collects no data
+// itself.
+import { WAYS_IN } from "@cs/shared";
+
+import { STARTUP_COMMUNITY_PROJECT_URL } from "../../components/hall/channels";
+import { LINKEDIN_GROUP_URL, LINKEDIN_PAGE_URL } from "../../components/hall/ways";
+import Button from "../../components/ui/Button.astro";
+import Panel from "../../components/ui/Panel.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { GUIDES_INDEX } from "../../lib/guides/guides";
+
+interface LinkRow {
+  label: string;
+  href: string;
+  what: string;
+}
+
+const GROUPS: { id: string; heading: string; links: LinkRow[] }[] = [
+  {
+    id: "talk",
+    heading: "Talk with the community",
+    links: [
+      { label: "Join the LinkedIn Group", href: LINKEDIN_GROUP_URL, what: "Three weekly threads for Colorado founders." },
+      { label: "Follow the LinkedIn Page", href: LINKEDIN_PAGE_URL, what: "Founder wins and Colorado Startups news." },
+      { label: "Get the Startupers newsletter", href: WAYS_IN.newsletter, what: "News from the Hall in your inbox." },
+      { label: "See the event calendar", href: WAYS_IN.events, what: "Meetups and community events across the Front Range." },
+    ],
+  },
+  {
+    id: "find",
+    heading: "Find what you need",
+    links: [
+      { label: "Startup Resources", href: WAYS_IN.canvas, what: "Programs, investors and service providers for every stage." },
+      { label: "Guides", href: GUIDES_INDEX.path, what: "Short answers to the questions Colorado founders ask, by topic and by city." },
+      { label: "The Leaderboard", href: WAYS_IN.leaderboard, what: "Companies building in Colorado, and how to nominate one." },
+      { label: "Regions", href: "/regions/", what: "Photon Mountain, Space Peak and Fusion Canyon." },
+    ],
+  },
+  {
+    id: "about",
+    heading: "About Colorado Startups",
+    links: [
+      { label: "Founders forum", href: WAYS_IN.discourse, what: "A private forum for founders. It opens later." },
+      { label: "Get involved", href: "/get-involved/", what: "Open seats for moderators and organizers." },
+      { label: "Meet the team", href: "/team/", what: "The people, and the AI keepers who help them." },
+      { label: "Code of Conduct", href: "/code-of-conduct/", what: "The norms for the Slack and the LinkedIn Group." },
+    ],
+  },
+  {
+    id: "elsewhere",
+    heading: "Startup Hikes and Startup Ski Days",
+    links: [
+      {
+        label: "The Startup Community Project",
+        href: STARTUP_COMMUNITY_PROJECT_URL,
+        what: "Micah Mador and Lindsey Rohde run Startup Hikes, Startup Ski Days, Welcome to Boulder and Welcome to Denver here.",
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Links"
+  description="Every way into Colorado Startups in one place: join the Slack, the LinkedIn Group and the Startupers newsletter."
+>
+  <section class="section section--lit hero" aria-labelledby="links-title">
+    <div class="wrap">
+      <div class="narrow">
+        <h1 id="links-title">Every way in</h1>
+        <p class="lede">Colorado Startups in one list. Founders, start with the Slack.</p>
+
+        <Panel raised size="lg" class="slack" data-slack-entry>
+          <h2 id="slack">Join the Slack</h2>
+          <p>Founders across Colorado ask questions, trade advice and share wins here. Joining starts with a short Google Form.</p>
+          <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
+          <p class="meta" id="slack-form-note">Opens a Google Form.</p>
+        </Panel>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-label="More links">
+    <div class="wrap">
+      <div class="narrow">
+        {
+          GROUPS.map((group) => (
+            <div class="group" data-group={group.id}>
+              <h2 id={group.id}>{group.heading}</h2>
+              <ul class="rows" role="list">
+                {group.links.map((link) => (
+                  <li>
+                    <a class="row" href={link.href}>
+                      <span class="label">{link.label}</span>
+                      <span class="what">{link.what}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The column's width sits inside .wrap, so it keeps the header's left
+     gutter instead of centering (#260). */
+  .narrow {
+    max-width: 44rem;
+  }
+  .hero {
+    background:
+      radial-gradient(90% 80% at 50% 0%, color-mix(in oklab, var(--c-accent) 26%, transparent), transparent 70%),
+      var(--c-ground);
+  }
+  /* The Panel is L12's component, so its class is reached through :global. */
+  .narrow > :global(.slack) {
+    margin-top: var(--s-6);
+  }
+  #slack {
+    font-size: var(--t-step-3);
+    margin-bottom: var(--s-3);
+  }
+  #slack-form-note {
+    margin: var(--s-3) 0 0;
+  }
+  .group + .group {
+    margin-top: var(--s-7);
+  }
+  .group h2 {
+    font-size: var(--t-step-2);
+    margin-bottom: var(--s-4);
+  }
+  .rows {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    display: grid;
+    gap: var(--s-3);
+  }
+  .row {
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-4) var(--s-5);
+    min-height: var(--size-tap);
+    background: var(--c-ground);
+    border: var(--line-hair) solid var(--c-rule);
+    border-left: 4px solid var(--c-accent);
+    border-radius: var(--r-card);
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .row:hover {
+    background: var(--c-surface);
+    border-color: var(--c-border);
+    border-left-color: var(--c-accent-deep);
+  }
+  .label {
+    font-weight: 700;
+    color: var(--c-link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .what {
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+  }
+</style>

@@ -1,0 +1,13 @@
+id: fairfield-and-woods
+name: Fairfield and Woods
+url: https://www.fwlaw.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A full-service Denver law firm for Rocky Mountain businesses. It has practices in data privacy, real estate and wealth planning.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

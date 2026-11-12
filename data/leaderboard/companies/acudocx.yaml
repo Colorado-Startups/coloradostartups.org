@@ -1,0 +1,8 @@
+id: acudocx
+name: "AcudocX"
+website: "https://acudocx.com"
+hq_city: "Boulder"
+sector: "Software"
+description: "Provides a white-label platform for translation agencies. Agencies sell and manage certified translations through its client portal."
+sources:
+  - "https://acudocx.com"

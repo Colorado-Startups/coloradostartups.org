@@ -1,0 +1,24 @@
+{
+  "name": "@cs/communitas",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Communitas, the keeper of the doors: the Colorado Startups Slack app. Owner: L5.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "types": "wrangler types",
+    "test": "vitest run",
+    "deploy:staging": "wrangler deploy --env staging"
+  },
+  "dependencies": {
+    "@cs/shared": "*",
+    "slack-cloudflare-workers": "1.3.10",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.4.8",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5",
+    "wrangler": "4.153.0"
+  }
+}

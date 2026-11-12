@@ -1,0 +1,142 @@
+---
+// Site footer. Orchestrator-owned; L12 owns its look. The AI-agent disclosure
+// and the art credit live here so they appear on every page. The keepers'
+// names come from data/team/dwarves.yaml, so the disclosure never drifts.
+import { WAYS_IN } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { GUIDES_INDEX } from "../../lib/guides/guides";
+import { andList } from "../../lib/text";
+import { TAGLINE } from "../hall/org";
+import { POSTAL_ADDRESS } from "../info/links";
+
+const keepers = (await getCollection("dwarves")).map((entry) => entry.data.name);
+const keeperList = andList(keepers);
+---
+
+<footer class="site-footer section section--night">
+  <div class="wrap grid">
+    <div>
+      <p class="name">Colorado Startups</p>
+      <p class="meta">{TAGLINE}</p>
+      <p class="meta">{POSTAL_ADDRESS.map((line, i) => (i === 0 ? line : [<br />, line]))}</p>
+    </div>
+    <nav aria-label="Community">
+      <p class="head">Join in</p>
+      <ul>
+        <li><a class="community" href={WAYS_IN.slack}>Slack</a></li>
+        <li><a class="community" href={WAYS_IN["linkedin-group"]}>LinkedIn Group</a></li>
+        <li><a class="community" href={WAYS_IN["linkedin-page"]}>LinkedIn Page</a></li>
+        <li><a class="community" href={WAYS_IN.newsletter}>Newsletter</a></li>
+        <li><a class="community" href={WAYS_IN.events}>Events</a></li>
+        <li><a class="community" href="/founders/">Founders forum</a></li>
+        <li><a class="community" href="/get-involved/">Get involved</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Resources">
+      <p class="head">Resources</p>
+      <ul>
+        <li><a href={WAYS_IN.canvas}>Startup Resources</a></li>
+        <li><a href={GUIDES_INDEX.path}>Guides</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="About">
+      <p class="head">About</p>
+      <ul>
+        <li><a href="/team/">Team</a></li>
+        <li><a href="/dispatches/">Dispatches</a></li>
+        <li><a href="/code-of-conduct/">Code of Conduct</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap notes">
+    <p class="ai-note">
+      {keeperList} are AI agents run by Colorado Startups. They can make mistakes, and people review their
+      work. The Hall art is AI-generated.
+    </p>
+    <p class="meta">© Colorado Startups, Ltd.</p>
+  </div>
+</footer>
+
+<style>
+  /* The Hall at night. The Front Range rises from the footer's top edge, with
+     the Hall's windows lit gold along its foot. The ridge is a mask on an
+     empty pseudo-element: no markup, nothing for a screen reader. */
+  .site-footer {
+    --_ridge: 48px;
+    position: relative;
+    background:
+      radial-gradient(70% 50% at 50% 0%, color-mix(in oklab, var(--c-gold-on-night) 10%, transparent), transparent 70%),
+      var(--tex-night-stone, none),
+      var(--c-night);
+  }
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% - 1px);
+    height: var(--_ridge);
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 17% 84%, var(--c-molten) 0 2px, transparent 2.5px),
+      radial-gradient(circle at 19.5% 78%, var(--c-accent) 0 2px, transparent 2.5px),
+      radial-gradient(circle at 51% 86%, var(--c-molten) 0 2.5px, transparent 3px),
+      radial-gradient(circle at 53% 80%, var(--c-accent) 0 2px, transparent 2.5px),
+      radial-gradient(circle at 78% 84%, var(--c-molten) 0 2px, transparent 2.5px),
+      var(--c-night);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 60V44l60-6 50 4 50-12 45 6 45-14 40 8 40-12 30 8 35-12 35 14 40-4 50 10 50-14 40-12 40 14 50-6 45 12 45-4 50 10 50-8 40 6 50-12 40 8 50 8 50-4 40 8 40-2v22z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 60V44l60-6 50 4 50-12 45 6 45-14 40 8 40-12 30 8 35-12 35 14 40-4 50 10 50-14 40-12 40 14 50-6 45 12 45-4 50 10 50-8 40 6 50-12 40 8 50 8 50-4 40 8 40-2v22z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  }
+  .grid {
+    display: grid;
+    /* max-content keeps each link on one line down to the 721 px tablet. */
+    grid-template-columns: 2fr repeat(3, minmax(max-content, 1fr));
+    gap: var(--s-6);
+  }
+  .name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-1);
+    letter-spacing: 0.02em;
+    margin-bottom: var(--s-2);
+  }
+  .head {
+    color: var(--c-gold-on-night);
+    font-weight: 700;
+    margin-bottom: var(--s-2);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .notes {
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: var(--line-hair) solid color-mix(in oklab, var(--c-on-night) 18%, transparent);
+  }
+  @media (max-width: 720px) {
+    .site-footer {
+      --_ridge: 32px;
+    }
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    /* Phone tap targets are 44 px tall (#149). Each link takes block padding
+       to its 44 px row and the list drops its gap, so the links stay evenly
+       spaced, one row apart, and no two targets overlap. */
+    ul {
+      gap: 0;
+    }
+    ul a {
+      display: block;
+      min-height: var(--size-tap);
+      padding-block: var(--s-2);
+    }
+  }
+</style>

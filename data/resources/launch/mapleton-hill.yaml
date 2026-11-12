@@ -1,0 +1,13 @@
+id: mapleton-hill
+name: Mapleton Hill
+url: https://www.mapletonhill.net/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: Software development firm in Boulder. Listed in the Ecosystem Canvas for founders at the launch stage.
+tags:
+  - software
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

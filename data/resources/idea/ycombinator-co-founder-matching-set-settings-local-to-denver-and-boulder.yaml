@@ -1,0 +1,15 @@
+id: ycombinator-co-founder-matching-set-settings-local-to-denver-and-boulder
+name: YCombinator Co-Founder Matching (Set Settings > Local to Denver and Boulder)
+url: https://www.ycombinator.com/cofounder-matching
+stage: idea
+substage: validate
+city: online
+type: community
+description: A free online co-founder matching platform from Y Combinator's Startup School. It is for founders at any stage, with or without an idea. It has no commitment and takes no equity.
+tags:
+  - team
+  - denver
+  - boulder
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: hackcu
+name: HackCU
+url: https://hackcu.org/
+stage: idea
+substage: validate
+city: Boulder
+type: event
+description: Free student hackathon in Boulder with meals, workshops and prize tracks, open to first-time hackers.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

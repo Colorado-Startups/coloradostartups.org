@@ -1,0 +1,90 @@
+---
+// One badge on /leaderboard/kit/: its preview, the HTML to copy and the files
+// to download. The words, alt text and link come from badges.ts. Owner: L26.
+//
+// Props
+//   badge  one entry of KIT_BADGES
+//
+// Slot: default, one paragraph saying who may use this badge.
+import { BADGE_SIZE, badgeFile, badgeSnippet, type KitBadge } from "./badges";
+
+interface Props {
+  badge: KitBadge;
+}
+
+const { badge } = Astro.props;
+const { width, height } = BADGE_SIZE;
+const snippet = badgeSnippet(badge);
+const fieldId = `${badge.id}-html`;
+---
+
+<section class="panel kit-badge" aria-labelledby={badge.id} data-kit-badge={badge.id}>
+  <h2 id={badge.id}>{badge.name}</h2>
+  <slot />
+  <p class="kit-preview">
+    <img src={badgeFile(badge, "svg")} alt={badge.alt} width={width} height={height} />
+  </p>
+
+  <div class="field">
+    <label for={fieldId}>HTML to copy</label>
+    <textarea id={fieldId} class="kit-snippet" rows="4" readonly spellcheck="false" data-snippet>{snippet}</textarea>
+  </div>
+  <div class="kit-copy">
+    <button type="button" class="btn btn--gold" data-copy={fieldId} hidden>Copy the HTML</button>
+    <p class="meta" role="status" data-copy-status={fieldId}></p>
+  </div>
+
+  <h3 id={`${badge.id}-files`}>Files</h3>
+  <ul class="kit-files">
+    <li><a href={badgeFile(badge, "svg")} download>Download the SVG</a>, sharp at any size</li>
+    <li><a href={badgeFile(badge, "png")} download>Download the PNG</a>, {width} by {height} pixels</li>
+    <li>
+      <a href={badgeFile(badge, "png2x")} download>Download the large PNG</a>, {width * 2} by {height * 2} pixels, for
+      sharp screens
+    </li>
+  </ul>
+</section>
+
+<script>
+  import { initCopyButtons } from "./copy";
+
+  initCopyButtons(document, navigator.clipboard);
+</script>
+
+<style>
+  /* No width or outer margin of its own: the kit page's grid sizes and spaces
+     the panels (#243). */
+  .kit-badge h2 {
+    margin-top: 0;
+  }
+  .kit-preview {
+    margin-block: var(--s-5);
+  }
+  .kit-preview img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  .kit-snippet {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: var(--t-step--1);
+    line-height: 1.5;
+    resize: vertical;
+    word-break: break-all;
+  }
+  .kit-copy {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-4);
+    margin-bottom: var(--s-5);
+  }
+  .kit-copy .meta {
+    margin: 0;
+  }
+  /* .btn sets display, which beats the browser's own [hidden] rule. Without
+     this line the copy button shows, and does nothing, before the script runs. */
+  .kit-copy .btn[hidden] {
+    display: none;
+  }
+</style>

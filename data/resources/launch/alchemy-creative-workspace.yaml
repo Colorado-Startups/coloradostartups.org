@@ -1,0 +1,13 @@
+id: alchemy-creative-workspace
+name: Alchemy Creative Workspace
+url: https://www.alchemycw.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: coworking
+description: A Denver coworking space. It has private offices, dedicated desks and meeting rooms. It is for emerging founders and small businesses.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

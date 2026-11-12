@@ -1,0 +1,36 @@
+---
+// The home page's hero illustration slot (decision 21: generated art, not SVG).
+// The approved illustration lives at src/assets/art/hero/hall.(webp|png|jpg),
+// at 21:9 and at least 2400 px wide. L7's ArtImage finds it, lets Astro
+// optimize it, and adds the forge's idle motion (off under reduced motion, and
+// done within 5 seconds). If the file ever goes missing, it shows a warm
+// placeholder of the same proportions, so layout does not shift. Wired by L7
+// (lane/L7-wiring); the page passes only the alt text.
+import ArtImage from "../art/ArtImage.astro";
+
+interface Props {
+  alt: string;
+}
+
+const { alt } = Astro.props;
+---
+
+<ArtImage
+  src="hero/hall"
+  alt={alt}
+  aspect="21 / 9"
+  widths={[640, 960, 1280, 1920, 2400]}
+  sizes="(max-width: 1180px) 100vw, 1180px"
+  loading="eager"
+  motion="forge"
+  label="Illustration in progress"
+  class="hero-art"
+/>
+
+<style>
+  /* ArtImage renders the <figure>; this file only frames it on the home page. */
+  :global(.art-image.hero-art) {
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+</style>

@@ -1,0 +1,5 @@
+title: Warm Parchment
+framing: Flat, straight-on texture that fills the frame edge to edge. Very low detail and low contrast, evenly lit, calm enough to sit behind text.
+negative: people, faces, characters, objects, writing, ink, stains, folds, burnt edges, torn edges, vignette, busy detail, high contrast
+
+A sheet of warm handmade paper fills the whole frame. Soft fibers and a faint, even grain show across its surface. The light is soft and even, so there are no shadows, folds or bright spots. There is no writing and there are no edges, only calm paper texture.

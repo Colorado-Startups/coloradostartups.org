@@ -1,0 +1,13 @@
+id: avaya
+name: Avaya
+url: https://www.avaya.com/en/
+stage: support
+substage: organizations
+city: Thornton
+type: other
+description: Enterprise customer experience software and voice systems. It serves large organizations and government. It has an office in Thornton.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

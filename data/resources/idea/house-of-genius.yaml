@@ -1,0 +1,15 @@
+id: house-of-genius
+name: House of Genius
+url: http://houseofgenius.org/
+stage: idea
+substage: educate
+city: statewide
+type: event
+description: Monthly evening gatherings in Boulder, Denver, Colorado Springs and Fort Collins. Entrepreneurs share ideas and get feedback.
+tags:
+  - events
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

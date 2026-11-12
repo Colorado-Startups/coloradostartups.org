@@ -1,0 +1,10 @@
+id: xcimer-energy
+name: "Xcimer Energy"
+website: "https://xcimer.energy/"
+hq_city: "Denver"
+founded_year: 2022
+sector: "Energy and climate"
+description: "Develops laser-driven inertial fusion to make clean power. It also develops lasers for defense uses."
+sources:
+  - "https://xcimer.energy/faq/"
+  - "https://xcimer.energy/"

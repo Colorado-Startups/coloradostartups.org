@@ -1,0 +1,14 @@
+id: denver-tech-meetup-group-startup-pitch-events
+name: Denver Tech Meetup Group Startup Pitch Events
+url: https://www.meetup.com/Denver-Technology-Meetup-Group/events/
+stage: launch
+substage: develop
+city: Denver
+type: event
+description: Casual happy hours in Denver for people who work in tech, including founders and startups.
+tags:
+  - pitch
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,49 @@
+---
+// One resource in the directory. Owner: L3. Built from our own data at build
+// time; the heading's id is the anchor Pagefind and Resourcus link to.
+import type { ResourceCard } from "@cs/shared";
+
+import Badge from "../ui/Badge.astro";
+import { cityLabel, TYPE_LABELS } from "./labels";
+
+interface Props {
+  card: ResourceCard;
+}
+
+const { card } = Astro.props;
+---
+
+<li
+  class="canvas-card"
+  data-resource
+  data-id={card.id}
+  data-stage={card.stage}
+  data-type={card.type}
+  data-city={card.city}
+>
+  <h4 id={`r-${card.id}`}><a href={card.url}>{card.name}</a></h4>
+  <p>{card.description}</p>
+  <p class="canvas-card__facts">
+    <Badge>{TYPE_LABELS[card.type]}</Badge>
+    <Badge>{cityLabel(card.city)}</Badge>
+  </p>
+</li>
+
+<style>
+  .canvas-card {
+    list-style: none;
+    padding: var(--s-4) 0;
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .canvas-card h4 {
+    margin: 0;
+  }
+  .canvas-card p {
+    margin: var(--s-1) 0 0;
+  }
+  .canvas-card__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+</style>

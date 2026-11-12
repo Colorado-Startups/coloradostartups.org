@@ -1,0 +1,150 @@
+---
+// /data/: the license and the credit line for Startup Resources data
+// (GO-LIVE C9, decision 70). Lane L34. lib/data/license.ts holds the words;
+// this page renders them and passes one Dataset JSON-LD block to BaseLayout.
+// The data itself is /data/resources.json (resources.json.ts, owner L3).
+import { RESOURCES_JSON_PATH } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { CONTACT_EMAIL } from "../../components/info/links";
+import Button from "../../components/ui/Button.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  attributionHtml,
+  attributionText,
+  CARD_FIELDS,
+  DATASET_NAME,
+  datasetJsonLd,
+  LICENSE,
+} from "../../lib/data/license";
+import { asOf } from "../../lib/guides/guides";
+
+const site = Astro.site!;
+const count = (await getCollection("resources", (e) => e.data.status === "active")).length;
+const date = asOf(new Date());
+---
+
+<BaseLayout
+  title="Startup Resources data"
+  description={`Startup Resources as free JSON under ${LICENSE.name}: Colorado programs, events, investors and services for founders. Reuse it with credit to Colorado Startups.`}
+  jsonLd={datasetJsonLd(site, { dateModified: date.iso })}
+>
+  <section class="section section--band" aria-labelledby="data-title">
+    <div class="wrap stack">
+      <h1 id="data-title">Startup Resources data</h1>
+      <p class="lede" data-data-answer>
+        {DATASET_NAME} is free to reuse. The file at <code>{RESOURCES_JSON_PATH}</code> is licensed
+        under <a rel="license" href={LICENSE.url}>{LICENSE.name}</a>, so you may copy, change and share it, commercially
+        too, as long as you credit Colorado Startups.
+      </p>
+      <p class="btn-row">
+        <Button href={RESOURCES_JSON_PATH} data-data-get>Get resources.json</Button>
+      </p>
+      <p data-data-count>
+        {`${DATASET_NAME} lists ${count} active resources as of `}<time datetime={date.iso}>{date.label}</time>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="get-title">
+    <div class="wrap stack">
+      <h2 id="get-title">Get the data</h2>
+      <p>
+        <a href={RESOURCES_JSON_PATH}>{RESOURCES_JSON_PATH}</a> is one JSON array, sorted by id. It is rebuilt each time
+        the site is published, and it lists active resources only. Each listing has these fields:
+      </p>
+      <dl class="data-fields">
+        {
+          CARD_FIELDS.map((f) => (
+            <div>
+              <dt>
+                <code>{f.key}</code>
+              </dt>
+              <dd>{f.what}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="credit-title">
+    <div class="wrap stack">
+      <h2 id="credit-title">How to credit it</h2>
+      <p>Copy one of these lines into your page, app or dataset notes.</p>
+      <h3>Plain text</h3>
+      <pre class="data-credit" data-credit="text">{attributionText(site)}</pre>
+      <h3>HTML</h3>
+      <pre class="data-credit" data-credit="html">{attributionHtml(site)}</pre>
+      <p>If you change the data, say so next to the credit, as the license asks.</p>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="covers-title">
+    <div class="wrap stack">
+      <h2 id="covers-title">What the license covers</h2>
+      <ul>
+        <li>
+          The listings as Colorado Startups compiled them, and the descriptions it wrote. The full terms are the <a
+            href={LICENSE.url}>{LICENSE.title}</a
+          > license.
+        </li>
+        <li>
+          Not the names, logos or trademarks of the organizations listed. The license grants no trademark or patent
+          rights.
+        </li>
+        <li>Listings change. Check each organization's own site before you rely on a detail.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="fix-title">
+    <div class="wrap stack">
+      <h2 id="fix-title">Fix or add a listing</h2>
+      <p>
+        <a href="/ecosystem-canvas/suggest/">Suggest a resource</a>, or email <a href={`mailto:${CONTACT_EMAIL}`}
+          >{CONTACT_EMAIL}</a
+        > with a correction. To browse the listings, open <a href="/ecosystem-canvas/">Startup Resources</a> or the <a
+          href="/guides/">guides for founders</a
+        >.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .data-fields {
+    display: grid;
+    gap: var(--s-2);
+    margin: 0;
+  }
+  .data-fields div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-3);
+  }
+  .data-fields dt {
+    min-width: 7rem;
+    font-weight: 600;
+  }
+  .data-fields dd {
+    margin: 0;
+  }
+  /* On a phone every field stacks its definition under its name, so short
+     definitions do not stay inline while long ones wrap below. */
+  @media (max-width: 40rem) {
+    .data-fields div {
+      flex-direction: column;
+    }
+  }
+  .data-credit {
+    margin: 0;
+    padding: var(--s-3) var(--s-4);
+    border: var(--line-hair) solid var(--c-border);
+    background: var(--c-surface);
+    border-radius: var(--r-chisel);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: var(--t-step--1);
+  }
+</style>

@@ -1,0 +1,39 @@
+# dependencies and builds
+node_modules/
+dist/
+.astro/
+.wrangler/
+.dev.vars
+.env
+.env.*
+!.env.example
+!.dev.vars.example
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+# Claude Code worktrees and local scratch
+.claude/worktrees/
+.claude/settings.local.json
+local/
+# contact data never enters this repo (Paul's rule: lists live in Drive only)
+*.csv
+!ops/redirects/map.csv
+__pycache__/
+*.pyc
+# Quality and Speed: the CI run is rebuilt each time; local.json and history/ are committed
+quality/data/latest.json
+# the Process page's data, collected in CI each build (quality/process/config.json)
+quality/process/data/
+# the people overlay's marker: which Team data a local build used (scripts/people/overlay.mjs)
+data/team/.people-source
+
+# Written by scripts/people/overlay.mjs; the real data lives in private R2 storage
+data/team/people.yaml
+data/team/.people-source
+site/src/components/team/photos/
+# The private content rules overlay, which never leaves the archive repo
+04_tools/cs_site_rules.private.json
+04_tools/export_scan_allow.private.json
+04_tools/.private-overlay-required

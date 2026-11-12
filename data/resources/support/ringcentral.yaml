@@ -1,0 +1,13 @@
+id: ringcentral
+name: RingCentral
+url: https://www.ringcentral.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Cloud business phone, video meeting and contact center services for businesses of all sizes. The company has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

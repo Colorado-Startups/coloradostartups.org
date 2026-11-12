@@ -1,0 +1,14 @@
+id: xfactor-ventures
+name: XFactor Ventures
+url: https://www.xfactor.ventures/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A venture fund. It invests at pre-seed and seed in companies founded by women or mixed-gender teams.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

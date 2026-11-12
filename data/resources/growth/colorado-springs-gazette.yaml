@@ -1,0 +1,13 @@
+id: colorado-springs-gazette
+name: Colorado Springs Gazette
+url: https://gazette.com/business/
+stage: growth
+substage: service-providers
+city: Colorado Springs
+type: media
+description: A Colorado Springs newspaper. It has a business section. It covers the economy, jobs, real estate and Front Range companies.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,8 @@
+id: citra
+name: "Citra"
+website: "https://citra.space"
+hq_city: "Colorado Springs"
+sector: "Space and aerospace"
+description: "Makes telescopes, antennas and software. Its tools give government and commercial space operators a shared view of objects in orbit."
+sources:
+  - "https://citra.space"

@@ -1,0 +1,13 @@
+id: google-developer-group-denver
+name: Google Developer Group (Denver)
+url: https://www.meetup.com/GDG-Denver/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: A Google Developer Group for Denver developers and others interested in Google technologies. Topics include Flutter, Gemini, Chrome and Android. It offers talks, co-hosted online sessions and DevFest events.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

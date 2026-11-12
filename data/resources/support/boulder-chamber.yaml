@@ -1,0 +1,13 @@
+id: boulder-chamber
+name: Boulder Chamber
+url: https://boulderchamber.com/
+stage: support
+substage: organizations
+city: Boulder
+type: government
+description: The Boulder chamber of commerce. It offers networking events, workforce development and economic vitality work. Its member groups include Bolder Young Professionals and the Business Growth Network.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,14 @@
+id: denhac
+name: denhac
+url: https://www.meetup.com/denhac-hackerspace/
+stage: idea
+substage: validate
+city: Denver
+type: community
+description: A volunteer-run nonprofit hackerspace in Denver. It has a classroom and prototyping tools, including 3D printers, laser cutters, CNC machines and welders. It also holds Tuesday open houses and public classes.
+tags:
+  - product
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

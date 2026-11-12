@@ -1,0 +1,13 @@
+id: ewing-school
+name: Ewing School
+url: https://ewingschool.com/
+stage: launch
+substage: develop
+city: Durango
+type: service-provider
+description: Public speaking coaching for executives, leaders and teams, one on one or in group cohorts.
+tags:
+  - pitch
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

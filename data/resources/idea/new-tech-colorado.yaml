@@ -1,0 +1,14 @@
+id: new-tech-colorado
+name: New Tech Colorado
+url: https://www.meetup.com/bdnewtech/
+stage: idea
+substage: validate
+city: statewide
+type: community
+description: A tech community based in Colorado. Its events mix tech talks, live demos, founder and startup pitches, panels and networking. Events include Boulder New Tech nights and sessions in Denver and Colorado Springs.
+tags:
+  - team
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

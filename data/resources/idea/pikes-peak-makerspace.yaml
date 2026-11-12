@@ -1,0 +1,13 @@
+id: pikes-peak-makerspace
+name: Pikes Peak Makerspace
+url: https://pikespeakmakerspace.org/
+stage: idea
+substage: validate
+city: Colorado Springs
+type: event
+description: A nonprofit makerspace in Colorado Springs. Members of all skill levels use equipment and take classes.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

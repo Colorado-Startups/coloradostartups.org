@@ -1,0 +1,13 @@
+id: built-in-colorado
+name: Built-In Colorado
+url: https://www.builtincolorado.com/
+stage: idea
+substage: educate
+city: online
+type: media
+description: It has job listings. It has company profiles. It has local articles about Colorado tech companies.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

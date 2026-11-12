@@ -1,0 +1,13 @@
+id: startup-weekend
+name: Startup Weekend
+url: https://www.techstars.com/communities/startup-weekend
+stage: idea
+substage: educate
+city: statewide
+type: event
+description: A weekend event. Aspiring founders pitch ideas, form teams and launch companies. Mentors help them.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

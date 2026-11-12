@@ -1,0 +1,37 @@
+title: The Guidebook Alcove
+use: the guides index and the topic guides
+
+{
+  "short_description": "A bright reading alcove is carved into sandstone beside a dwarven hall's map room. A long table holds an open hand-drawn map of the Colorado Front Range and stacks of guidebooks. Two human founders plan their next step there.",
+  "objects": [
+    {
+      "description": "a large hand-drawn map of the Colorado Front Range with painted mountains, rivers and small town markers, and no words or letters on it",
+      "location": "center of the table",
+      "relationship": "what the founders are studying"
+    },
+    {
+      "description": "stacks of leather-bound guidebooks with plain covers and colored ribbon bookmarks",
+      "location": "on the table, to the left and right of the map",
+      "relationship": "the guides beside the map"
+    },
+    {
+      "description": "two human founders, one pointing at the map and one writing in a notebook",
+      "location": "behind the table, center left",
+      "relationship": "using the map and the guidebooks together"
+    },
+    {
+      "description": "tall carved sandstone shelves full of books and brass scroll cases, with a rolling brass ladder",
+      "location": "the back wall",
+      "relationship": "the library the guidebooks come from"
+    },
+    {
+      "description": "a small brass lamp of tiny gears around a glowing glass globe",
+      "location": "right foreground on the table",
+      "relationship": "lights the map with warm gold"
+    }
+  ],
+  "background_setting": "a bright library alcove carved into cream and red sandstone in a dwarven hall of the Colorado Front Range, with an arched window showing pine slopes and blue sky",
+  "lighting_direction": "warm lamplight on the table from the right and soft daylight from the window at the back",
+  "composition": "wide shot from standing height, looking slightly down at the table, with the map at the center and calm space across the top",
+  "context": "an illustration for a website's guides page, where founders find answers for building a company in Colorado"
+}

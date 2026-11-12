@@ -1,0 +1,13 @@
+id: innosphere-news
+name: Innosphere News
+url: https://innosphereventures.org/news/
+stage: idea
+substage: educate
+city: online
+type: media
+description: News source covering Colorado startups. Listed in the Ecosystem Canvas for founders at the idea stage.
+tags:
+  - news
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

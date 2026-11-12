@@ -1,0 +1,50 @@
+---
+// /leaderboard/nominate/: the nomination form, with the purpose limit stated
+// before the first field. Owner: L2.
+import HallSeal from "../../../components/hall/HallSeal.astro";
+import NominationForm from "../../../components/leaderboard/NominationForm.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Nominate your company"
+  description="Nominate a Colorado company for the first verified edition of the Colorado Startups Leaderboard."
+  ogImage="leaderboard"
+>
+  <section class="section section--lit">
+    <div class="wrap">
+      <h1>Nominate your company</h1>
+      <p class="lede">
+        Nominate a private Colorado company for the first verified edition of the Leaderboard. You need the company's
+        revenue for two years.
+      </p>
+
+      <section class="panel purpose" aria-labelledby="purpose">
+        <h2 id="purpose" class="purpose-title">How we use what you send</h2>
+        <ul>
+          <li>We use nomination data only to verify and rank companies for the Leaderboard.</li>
+          <li>We never use it for investment sourcing, and we never share it with investors.</li>
+          <li>Only Paul Foley, Founder and President of Colorado Startups, can see it.</li>
+          <li>We delete the revenue figures and headcount 90 days after the edition they feed is published.</li>
+          <li>The Leaderboard shows revenue as a range, never an exact figure.</li>
+        </ul>
+        <p class="meta">Read the full <a href="/privacy/">privacy policy</a>.</p>
+      </section>
+
+      <NominationForm />
+      <HallSeal />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .purpose {
+    max-width: 42rem;
+    margin-block: var(--s-6);
+  }
+  .purpose-title {
+    font-family: var(--font-body);
+    font-size: var(--t-step-2);
+    letter-spacing: 0;
+  }
+</style>

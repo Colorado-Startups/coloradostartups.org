@@ -1,0 +1,13 @@
+id: ignite-denver
+name: Ignite Denver
+url: https://ignitedenver.org/
+stage: idea
+substage: educate
+city: Denver
+type: event
+description: Live talk night in Denver where anyone with an idea gives a short talk over self-advancing slides.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

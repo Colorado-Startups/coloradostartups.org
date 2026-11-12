@@ -1,0 +1,13 @@
+id: fanum
+name: FANUM
+url: http://www.fanum.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: coworking
+description: A founders' club for serial entrepreneurs in Greenwood Village. It has memberships from coworking to furnished office suites. It also has shared work and meeting spaces and a gym.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

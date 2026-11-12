@@ -1,0 +1,9 @@
+id: exum-instruments
+name: "Exum Instruments"
+website: "https://www.exuminstruments.com/"
+hq_city: "Denver"
+sector: "Hardware and robotics"
+description: "Makes a desktop mass spectrometer for manufacturers and labs. It analyzes what elements make up solid materials."
+sources:
+  - "https://nmtccoalition.org/project/exum-instruments-inc/"
+  - "https://www.exuminstruments.com/contact"

@@ -1,0 +1,97 @@
+---
+// /newsletter/: Startupers, the Colorado Startups newsletter (decision 23).
+// The form and its words belong to L6 (components/newsletter/); this page
+// frames it. The section list follows the LinkedIn project's newsletter plan,
+// section 5. Owner: L13.
+//
+// The form is the inline variant, so Subscribe sits in the first screen at
+// 375 px (#218). The full variant's "why" lines (when it comes, the
+// confirmation email) move to the side column, under "When it arrives".
+import { WAYS_IN } from "@cs/shared";
+
+import InfoHeader from "../../components/info/InfoHeader.astro";
+import { NEWSLETTER_NAME, newsletterCopy } from "../../components/newsletter/copy";
+import NewsletterSignup from "../../components/newsletter/NewsletterSignup.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const SECTIONS = [
+  { name: "Hi Startupers", what: "A short note from Paul Foley, Founder & President of Colorado Startups." },
+  { name: "Colorado Wins", what: "One-line wins from Colorado companies, each with its source and date." },
+  { name: "Builder Notes", what: "One plain explainer or founder lesson." },
+  { name: "From the Group", what: "The best ask and the best offer from the LinkedIn Group, shared with permission." },
+  { name: "On the calendar", what: "Colorado Startups events first, then founder events across Colorado." },
+  { name: "One ask", what: "One thing you can do to help a Colorado founder." },
+];
+---
+
+<BaseLayout
+  title={`${NEWSLETTER_NAME} newsletter`}
+  description={`${NEWSLETTER_NAME} is the Colorado Startups newsletter. ${newsletterCopy.description}`}
+>
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <InfoHeader kicker="News from the Hall" title={NEWSLETTER_NAME}>
+        <p class="lede">The Colorado Startups newsletter, written for founders building companies in Colorado.</p>
+      </InfoHeader>
+      <div class="layout">
+        <div>
+          {/* The form's own title is an h3, so this keeps the heading outline in order. */}
+          <h2 class="visually-hidden">Subscribe</h2>
+          <NewsletterSignup variant="inline" returnTo="/newsletter/" />
+        </div>
+        <div class="about">
+          <h2 id="when">When it arrives</h2>
+          {newsletterCopy.why.map((line) => <p>{line}</p>)}
+          <h2 id="inside">What each edition carries</h2>
+          <dl class="sections">
+            {
+              SECTIONS.map((s) => (
+                <div>
+                  <dt>{s.name}</dt>
+                  <dd>{s.what}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <h2 id="two-ways">Email or LinkedIn</h2>
+          <p>
+            The same edition goes out by email and as a LinkedIn newsletter from the{" "}
+            <a class="community" href={WAYS_IN["linkedin-page"]}>Colorado Startups LinkedIn Page</a>. Read it
+            wherever you like.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: var(--s-7);
+    align-items: start;
+  }
+  .about h2 {
+    font-size: var(--t-step-2);
+  }
+  .about h2:not(:first-child) {
+    margin-top: var(--s-6);
+  }
+  .sections {
+    display: grid;
+    gap: var(--s-3);
+  }
+  .sections dt {
+    font-weight: 700;
+  }
+  .sections dd {
+    margin: 0;
+  }
+  @media (max-width: 860px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s-6);
+    }
+  }
+</style>

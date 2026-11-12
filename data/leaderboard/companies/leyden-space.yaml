@@ -1,0 +1,8 @@
+id: leyden-space
+name: "Leyden Space"
+website: "https://leydenspace.org"
+hq_city: "Golden"
+sector: "Space and aerospace"
+description: "Develops a magnetic propulsion engine. Its thrust efficiency is adjustable. It is for spacecraft, from small satellites upward."
+sources:
+  - "https://leydenspace.org"

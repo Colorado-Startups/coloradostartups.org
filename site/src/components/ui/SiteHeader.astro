@@ -1,0 +1,239 @@
+---
+// Site header and primary nav. Orchestrator-owned (the nav is shared); L12
+// owns its look. On phones the nav ships collapsed in the HTML, so the first
+// paint is the final layout. The module script runs only after the whole page
+// parses; when it collapsed the nav, long pages such as the Canvas painted it
+// open first and then shifted (CLS 0.186, L22). Without JavaScript the
+// <noscript> style shows the nav open and hides the toggle. The items and the
+// current-page test live in nav.ts.
+import { WAYS_IN } from "@cs/shared";
+import { Image } from "astro:assets";
+
+// A copy of public/brand/cs-logo-240.png: astro:assets cannot import from public/,
+// and the public file stays for the touch icon and the feed. Keep both.
+import logo from "../../assets/brand/cs-logo-240.png";
+import { isCurrent, NAV } from "./nav";
+
+const here = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href="/">
+      {/* 44 px drawn: WebP at 1x to 3x, not the 240 px PNG (41 KB) on every page. */}
+      <Image src={logo} alt="" width={44} height={44} densities={[1, 2, 3]} format="webp" loading="eager" />
+      <span>Colorado Startups</span>
+    </a>
+    <button class="menu-toggle btn btn--stone" type="button" aria-expanded="false" aria-controls="site-nav">
+      Menu
+    </button>
+    <nav id="site-nav" aria-label="Main" data-collapsible="true">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item, here) ? "page" : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="btn btn--gold cta" href={WAYS_IN.slack} aria-describedby="header-slack-note">Join the Slack</a>
+      <span class="cta-note" id="header-slack-note">Opens a Google Form.</span>
+    </nav>
+  </div>
+  <noscript>
+    <style is:inline>
+      .site-header .menu-toggle {
+        display: none !important;
+      }
+      .site-header #site-nav {
+        display: flex !important;
+      }
+    </style>
+  </noscript>
+</header>
+
+<script>
+  import { initSiteNav } from "./site-nav";
+
+  const header = document.querySelector<HTMLElement>(".site-header");
+  if (header) initSiteNav(header);
+</script>
+
+<style>
+  /* The Hall's gate: a lantern-lit lintel with a carved stone ledge and a
+     gold inlay along its foot. The current page wears a short molten bar. */
+  .site-header {
+    position: relative;
+    background:
+      radial-gradient(60% 160% at 50% 0%, color-mix(in oklab, var(--c-accent) 12%, transparent), transparent 70%),
+      var(--c-ground);
+    border-bottom: var(--line-bold) solid var(--c-stone-edge);
+    box-shadow:
+      inset 0 -2px 0 var(--c-accent),
+      0 3px 0 color-mix(in oklab, var(--c-stone-edge) 35%, transparent);
+  }
+  /* Padding, not a min-height, sizes the first row: the 48 px toggle and its
+     4 px ledge sit 12 below the top and 12 above the bottom of 76 px. With a
+     min-height, the open menu's second line took the spare space and the
+     first row jumped 14 px up. */
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding-block: var(--s-3) var(--s-4);
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: var(--size-tap);
+    color: var(--c-text);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-1);
+    letter-spacing: 0.02em;
+  }
+  .brand :global(img) {
+    filter: drop-shadow(0 2px 0 color-mix(in oklab, var(--c-stone-edge) 70%, transparent));
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    flex-wrap: wrap;
+  }
+  nav ul {
+    display: flex;
+    gap: var(--s-1) var(--s-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+  nav ul a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    color: var(--c-text);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  nav ul a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 5px;
+    height: 3px;
+    border-radius: 2px;
+    background: transparent;
+  }
+  nav ul a:hover::after {
+    background: var(--c-stone-edge);
+  }
+  nav ul a[aria-current="page"] {
+    font-weight: 700;
+  }
+  nav ul a[aria-current="page"]::after {
+    background: linear-gradient(90deg, var(--c-accent-ledge), var(--c-molten) 50%, var(--c-accent-ledge));
+  }
+  /* .btn sets display, so the toggle's visibility is stated here: never on
+     wide screens, always on narrow ones (the <noscript> style hides it when
+     JavaScript is off). */
+  .menu-toggle {
+    display: none;
+  }
+  /* While the menu is open the toggle stays pressed: the slab sits on its
+     ledge, as .btn:active draws a press in hall.css. */
+  .menu-toggle[aria-expanded="true"] {
+    --_face: var(--c-surface-2);
+    box-shadow: inset 0 1px 0 var(--_glint), 0 1px 0 var(--_ledge);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-toggle[aria-expanded="true"] {
+      translate: 0 3px;
+    }
+  }
+  /* On phones the badge already spells the name; the text stays for screen readers. */
+  @media (max-width: 480px) {
+    .brand span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+  /* "Join the Slack" opens a Google Form (#128). On the one-row header the note
+     is for screen readers only, so the row keeps its width; the open menu
+     shows it. */
+  .cta-note {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* Below 1200 px the nav sits behind the menu button, and the open menu is a
+     stone shelf under the lintel. Six items and the CTA need about 1,140 px for
+     one row (measured in #398); the rest is room for a 17 px classic scrollbar
+     and a fallback font, so a 1024 px tablet never gets a two-row header (#424). */
+  @media (max-width: 1199px) {
+    .menu-toggle {
+      display: inline-flex;
+    }
+    nav[data-collapsible="true"] {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--s-4);
+      padding: var(--s-2) var(--s-4) var(--s-4);
+      background: var(--c-stone);
+      border: var(--line-edge) solid var(--c-stone-edge);
+      border-radius: var(--r-chisel);
+      box-shadow: var(--sh-ledge);
+    }
+    nav[data-collapsible="true"][data-open="true"] {
+      display: flex;
+    }
+    nav ul {
+      flex-direction: column;
+      gap: 0;
+    }
+    nav ul li + li {
+      border-top: var(--line-hair) solid color-mix(in oklab, var(--c-stone-edge) 60%, transparent);
+    }
+    nav ul a {
+      width: 100%;
+      min-height: var(--size-control);
+    }
+    nav ul a::after {
+      right: auto;
+      width: 2.5rem;
+    }
+    .cta {
+      align-self: flex-start;
+    }
+    /* In the open menu the note sits under the button, in plain sight. */
+    .cta-note {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip-path: none;
+      white-space: normal;
+      margin-top: calc(-1 * var(--s-2));
+      font-size: var(--t-step--1);
+    }
+  }
+</style>

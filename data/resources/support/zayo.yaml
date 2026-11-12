@@ -1,0 +1,13 @@
+id: zayo
+name: Zayo
+url: http://www.zayo.com/
+stage: support
+substage: organizations
+city: Boulder
+type: other
+description: The company provides fiber and network connectivity services. Its clients are carriers, data centers and businesses. It has an office in Boulder.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

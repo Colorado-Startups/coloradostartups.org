@@ -1,0 +1,13 @@
+id: connects-workspace
+name: Connects Workspace
+url: https://www.connectsworkspace.com/
+stage: launch
+substage: service-providers
+city: Golden
+type: coworking
+description: A Golden coworking space. It has locations in the historic Armory building downtown, near Red Rocks and in Genesee. It offers private offices, reserved desks, coworking, meeting rooms and member events.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

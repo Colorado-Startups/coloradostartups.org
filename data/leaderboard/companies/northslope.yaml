@@ -1,0 +1,8 @@
+id: northslope
+name: "Northslope"
+website: "https://northslope.com"
+hq_city: "Denver"
+sector: "AI and data"
+description: "Builds AI apps on Palantir software. Large enterprise and government customers use them."
+sources:
+  - "https://northslope.com/"

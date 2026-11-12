@@ -1,0 +1,37 @@
+title: The Founders' Hearth Room, with the Flatirons
+use: the founders forum page, beside the text from 64rem and after it on a phone
+
+{
+  "short_description": "A private, cozy chamber is carved into warm sandstone deep inside a dwarven hall. A small circle of human founders sit in armchairs around a great stone hearth, talking and sharing notes.",
+  "objects": [
+    {
+      "description": "six human founders of different ages and backgrounds in casual clothes, sitting in deep leather armchairs, talking with open hands, notebooks and laptops on their knees",
+      "location": "a circle across the middle of the frame",
+      "relationship": "the heart of the scene, turned toward one another"
+    },
+    {
+      "description": "a great carved stone hearth with a warm, crackling fire under a hammered bronze hood, and a brass clock of turning gears on its mantel",
+      "location": "back center",
+      "relationship": "the founders sit around its glow"
+    },
+    {
+      "description": "a low round wooden table with mugs, a teapot and paper sketches",
+      "location": "center foreground, between the chairs",
+      "relationship": "shared by everyone in the circle"
+    },
+    {
+      "description": "tall closed bronze doors with a brass ring handle",
+      "location": "right side",
+      "relationship": "show that the room is private"
+    },
+    {
+      "description": "a tall arched window showing the tilted rock slabs of the Flatirons and golden aspens at sunset",
+      "location": "left side",
+      "relationship": "lets warm evening light into the room"
+    }
+  ],
+  "background_setting": "a private chamber carved into cream and red sandstone deep in a dwarven hall in the Colorado Front Range, with timber beams, carved shelves of books and brass lanterns",
+  "lighting_direction": "firelight from the hearth at the back and sunset light from the window at the left",
+  "composition": "wide shot at seated eye level, with the circle of founders in the middle third and calm, warm stone across the top",
+  "context": "an illustration for a private, founders-only forum page on a community website"
+}

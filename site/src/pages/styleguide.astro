@@ -1,0 +1,16 @@
+---
+// Review-only page: the Hall's tokens and primitives in one place. noindex and
+// excluded from the sitemap. Owned by L12 (the Hall look). The sections live
+// in components/styleguide/, and their look in styleguide.css there.
+import Foundations from "../components/styleguide/Foundations.astro";
+import Primitives from "../components/styleguide/Primitives.astro";
+import Rooms from "../components/styleguide/Rooms.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import "../components/styleguide/styleguide.css";
+---
+
+<BaseLayout title="Style guide" description="Tokens and components for the Hall." noindex>
+  <Foundations />
+  <Primitives />
+  <Rooms />
+</BaseLayout>

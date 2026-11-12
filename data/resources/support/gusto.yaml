@@ -1,0 +1,13 @@
+id: gusto
+name: Gusto
+url: https://gusto.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Large company with an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

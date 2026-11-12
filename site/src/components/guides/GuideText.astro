@@ -1,0 +1,17 @@
+---
+// Inline text built by lib/guides: plain words, links and dates. The parts
+// carry their own spaces, so nothing here adds whitespace. Owner: L23.
+import type { Part } from "../../lib/guides/guides";
+
+interface Props {
+  parts: readonly Part[];
+}
+
+const { parts } = Astro.props;
+---
+
+{
+  parts.map((p) =>
+    typeof p === "string" ? p : "href" in p ? <a href={p.href}>{p.text}</a> : <time datetime={p.datetime}>{p.text}</time>,
+  )
+}

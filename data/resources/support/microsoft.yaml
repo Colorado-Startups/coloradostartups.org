@@ -1,0 +1,13 @@
+id: microsoft
+name: Microsoft
+url: https://www.microsoft.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Windows, Azure cloud, security tools and Xbox. The products are for consumers, businesses, schools and developers. The company has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

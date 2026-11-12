@@ -1,0 +1,13 @@
+id: studioip-law-and-marketing-firm
+name: StudioIP Law & Marketing Firm
+url: https://www.studioip.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A law firm and creative agency in Denver. It takes founders' brands from first idea through IP protection and enforcement.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: ibm
+name: IBM
+url: https://www.ibm.com/
+stage: support
+substage: organizations
+city: Boulder
+type: other
+description: Enterprise software and services for AI, data and cloud. Businesses and developers use it. It has an office in Boulder.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

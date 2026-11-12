@@ -1,0 +1,13 @@
+id: front-range-staffing
+name: Front Range Staffing
+url: http://www.frontrangestaffing.com/
+stage: launch
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: A staffing agency in Colorado Springs. It places contract workers with Colorado employers. It places direct-hire workers too. It places contract-to-hire workers too.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

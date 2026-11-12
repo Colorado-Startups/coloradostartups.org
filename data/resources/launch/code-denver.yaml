@@ -1,0 +1,13 @@
+id: code-denver
+name: Code Denver
+url: https://codedenver.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Custom web, mobile app and cloud software. It is for businesses, including tech startups, that want to automate workflows.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

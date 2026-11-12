@@ -1,0 +1,9 @@
+id: engine
+name: "Engine"
+website: "https://www.engine.com"
+hq_city: "Denver"
+sector: "Travel, hospitality and events"
+description: "Runs a business travel platform. Companies use it to book hotels, flights and cars, set travel policy and manage spend."
+sources:
+  - "https://engine.com/company-news/hotel-engine-denver-tech-employer"
+  - "https://engine.com/company-news/hotel-engine-rebrands-to-engine-adds-new-services"

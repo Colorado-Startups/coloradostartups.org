@@ -1,0 +1,28 @@
+{
+  "_README": [
+    "Where gitleaks' inline allow marker may appear (#774). gitleaks skips every",
+    "finding on a line that carries the marker, so a marker beside a real key",
+    "would hide it. 04_tools/gitleaks_allow.py reads this file. It fails on any",
+    "marker in a tracked file that no entry names, on an entry that covers more",
+    "than one line, and on any marked line a commit in the run's range adds",
+    "that no entry names, even if a later commit deletes it. An entry that",
+    "matches no marker warns. An entry is a path plus text its line must also",
+    "hold (8 characters or more), so it survives the line moving but not a new",
+    "line. secret-scan.yml judges a pull request by the base commit's checker",
+    "and this file, and validates the pull request's copy of this file with",
+    "it, so a pull request cannot widen its own list: add the entry in one pull",
+    "request, then the marker in the next."
+  ],
+  "allowed": [
+    {
+      "path": "site/src/layouts/BaseLayout.astro",
+      "line_has": "data-cf-beacon='{\"token\": ",
+      "why": "Cloudflare Web Analytics' site tag, shipped in every page to every visitor; public by design (#767)"
+    },
+    {
+      "path": "site/test/dom/analytics-beacon.test.ts",
+      "line_has": "const SITE_TOKEN = ",
+      "why": "the dom test's copy of the same public site tag (#767)"
+    }
+  ]
+}

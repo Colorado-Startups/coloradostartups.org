@@ -1,0 +1,13 @@
+id: move-media-agency
+name: Move Media Agency
+url: https://www.movemediaagency.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Branding and marketing firm in Denver.
+tags:
+  - marketing
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

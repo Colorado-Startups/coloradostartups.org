@@ -1,0 +1,13 @@
+id: scape-accelerate
+name: SCAPE Accelerate
+url: https://www.goscape.org/accelerate
+stage: launch
+substage: develop
+city: statewide
+type: accelerator
+description: An accelerator from SCAPE. It is for scalable ventures based in rural Colorado or New Mexico. It favors the Southwest. It offers mentors, bookkeeping support and chances for funding.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

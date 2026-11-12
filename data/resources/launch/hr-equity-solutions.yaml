@@ -1,0 +1,13 @@
+id: hr-equity-solutions
+name: HR Equity Solutions
+url: https://hrequitysolutions.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: An HR consulting group for Colorado and multi-state employers. It offers workers' compensation strategy, talent architecture, HRIS implementation and HR training.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

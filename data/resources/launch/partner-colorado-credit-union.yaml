@@ -1,0 +1,13 @@
+id: partner-colorado-credit-union
+name: Partner Colorado Credit Union
+url: https://www.partnercoloradocu.org/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A credit union serving metro Denver. It offers personal and business banking. That includes business checking, loans and lines of credit.
+tags:
+  - banking
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

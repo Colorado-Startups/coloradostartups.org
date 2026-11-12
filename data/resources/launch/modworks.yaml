@@ -1,0 +1,13 @@
+id: modworks
+name: Modworks
+url: https://www.modworks.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: coworking
+description: Coworking space in Denver.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

@@ -1,0 +1,14 @@
+id: crawley-ventures
+name: Crawley Ventures
+url: http://www.crawleyventures.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A Denver private investment arm of Crawley Petroleum. It partners with founders across industries and stages. It looks for early revenue and customer adoption.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

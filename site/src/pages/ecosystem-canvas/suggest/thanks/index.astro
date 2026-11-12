@@ -1,0 +1,24 @@
+---
+// /ecosystem-canvas/suggest/thanks/: where a sent suggestion lands. Owner: L3.
+// Kept out of search results and the sitemap (astro.config.mjs).
+import HallSeal from "../../../../components/hall/HallSeal.astro";
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Thanks for the suggestion"
+  description="Your suggestion for Startup Resources reached Colorado Startups."
+  noindex
+>
+  <section class="section section--lit" aria-labelledby="thanks-title">
+    <div class="wrap stack">
+      <h1 id="thanks-title">Thanks for the suggestion</h1>
+      <p class="lede">It reached us. A person reviews it before it goes into Startup Resources.</p>
+      <p class="btn-row">
+        <a class="btn btn--gold" href="/ecosystem-canvas/">Back to Startup Resources</a>
+        <a class="btn btn--stone" href="/ecosystem-canvas/suggest/">Suggest another</a>
+      </p>
+      <HallSeal />
+    </div>
+  </section>
+</BaseLayout>

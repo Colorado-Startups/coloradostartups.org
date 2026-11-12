@@ -1,0 +1,13 @@
+id: fti-consulting
+name: FTI Consulting
+url: https://www.fticonsulting.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A firm that gives advice. It covers crisis, risk, compliance, tax and cybersecurity. Its clients are corporate boards, finance chiefs, general counsel and private equity firms.
+tags:
+  - consulting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

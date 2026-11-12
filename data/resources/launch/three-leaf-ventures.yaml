@@ -1,0 +1,15 @@
+id: three-leaf-ventures
+name: Three Leaf Ventures
+url: http://threeleafventures.com/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: A venture capital firm in Denver. It invests in emerging healthcare technology companies. The companies put access to and control over medical care in the hands of patients.
+tags:
+  - seed
+  - venture-capital
+  - healthcare
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,36 @@
+---
+// /leaderboard/nominate/thanks/: where /api/nominate sends a successful post.
+// Out of the sitemap (astro.config.mjs SITEMAP_EXCLUDE) and noindex. Owner: L2.
+import HallSeal from "../../../components/hall/HallSeal.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { NOMINATION_DRAFT } from "../../../lib/leaderboard/nomination";
+---
+
+<BaseLayout
+  title="Nomination received"
+  description="Thank you for nominating a company for the Colorado Startups Leaderboard."
+  noindex
+>
+  <section class="section section--lit" data-clear-draft={NOMINATION_DRAFT.key}>
+    <div class="wrap">
+      <h1>Thank you</h1>
+      <p class="lede">We have your nomination.</p>
+      <p>
+        When we assemble the first verified edition, we email the contact you gave to ask for documents that verify the
+        figures. Nothing is published before that check.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn--gold" href="/leaderboard/">Back to the Leaderboard</a>
+        <a class="btn btn--stone" href="/leaderboard/nominate/">Nominate another company</a>
+      </div>
+      <HallSeal />
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // The nomination went through, so this tab's draft of it is no longer needed.
+  import { clearNamedDrafts } from "../../../components/apply/client";
+
+  clearNamedDrafts(document);
+</script>

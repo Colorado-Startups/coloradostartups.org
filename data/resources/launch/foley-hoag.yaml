@@ -1,0 +1,13 @@
+id: foley-hoag
+name: Foley Hoag
+url: https://foleyhoag.com/home/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A law firm with a venture capital and emerging company practice. It also offers corporate, intellectual property and regulatory services.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

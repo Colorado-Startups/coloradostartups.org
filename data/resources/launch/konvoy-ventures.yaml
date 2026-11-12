@@ -1,0 +1,15 @@
+id: konvoy-ventures
+name: Konvoy Ventures
+url: https://konvoy.vc/
+stage: launch
+substage: investors
+city: Denver
+type: investor
+description: A thesis-driven venture capital firm in Denver. It invests in the technologies and platforms of interactive entertainment, deep tech and critical industries.
+tags:
+  - seed
+  - venture-capital
+  - technology
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

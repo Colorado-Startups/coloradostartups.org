@@ -1,0 +1,14 @@
+id: yellow-duck-capital
+name: Yellow Duck Capital
+url: https://www.yellowduckcapital.com/
+stage: launch
+substage: investors
+city: Loveland
+type: investor
+description: A Loveland venture capital firm. It invests in seed and early-stage companies already showing traction. It also supports their formation and growth.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

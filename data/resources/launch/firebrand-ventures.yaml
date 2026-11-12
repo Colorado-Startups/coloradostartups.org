@@ -1,0 +1,14 @@
+id: firebrand-ventures
+name: Firebrand Ventures
+url: https://www.firebrandvc.com/
+stage: launch
+substage: investors
+city: Boulder
+type: investor
+description: A seed-stage venture firm that invests in founders. The founders are in underserved and emerging startup ecosystems. The ecosystems span the Midwest, Texas and the Rockies.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

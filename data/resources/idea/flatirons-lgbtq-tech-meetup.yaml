@@ -1,0 +1,14 @@
+id: flatirons-lgbtq-tech-meetup
+name: Flatirons LGBTQ Tech Meetup
+url: https://www.meetup.com/Flatirons-LGBTQ-Tech-Startup-Meetup/
+stage: idea
+substage: validate
+city: Boulder
+type: community
+description: Meetup for finding cofounders and teammates in Boulder.
+tags:
+  - team
+  - meetup
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

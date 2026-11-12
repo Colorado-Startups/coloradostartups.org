@@ -1,0 +1,13 @@
+id: producttank
+name: ProductTank
+url: https://www.meetup.com/ProductTank-Denver/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: A Denver product management meetup. It has in-person and virtual speaker sessions, hands-on workshops and social hours. It also has a leadership series on how AI is changing product work.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,15 @@
+id: initial-capacity
+name: Initial Capacity
+url: https://initialcapacity.io/
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: A software consulting company. It builds web apps, data platforms and AI applications. It works with startups and enterprises.
+tags:
+  - software
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

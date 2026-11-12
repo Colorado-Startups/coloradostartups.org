@@ -1,0 +1,13 @@
+id: cisco
+name: Cisco
+url: https://www.cisco.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: Tech for networking, security and collaboration. Enterprises and service providers use it. It has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

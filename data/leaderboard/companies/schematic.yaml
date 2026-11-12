@@ -1,0 +1,8 @@
+id: schematic
+name: "Schematic"
+website: "https://schematichq.com"
+hq_city: "Boulder"
+sector: "Software"
+description: "Sells billing software that handles metering, pricing and feature access. It is for software companies and their product teams."
+sources:
+  - "https://schematichq.com/privacy"

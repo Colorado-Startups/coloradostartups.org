@@ -1,0 +1,13 @@
+id: women-who-startup
+name: Women Who Startup
+url: https://www.meetup.com/womenwhostartupcolorado/
+stage: idea
+substage: educate
+city: Denver
+type: event
+description: A Denver event series for women entrepreneurs. At each event, a guest speaker shares what they are building and why.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

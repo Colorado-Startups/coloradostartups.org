@@ -1,0 +1,100 @@
+---
+// The suggest-a-resource form. Owner: L3. A plain HTML form that POSTs to
+// /api/suggest-resource (site/worker/routes/suggest-resource.ts) with the
+// honeypot "website", the "ts" load stamp and the Turnstile widget. The
+// Worker stores the suggestion as text and never visits the link.
+import { STAGES } from "@cs/shared";
+
+import Turnstile from "../forms/Turnstile.astro";
+import { STAGE_LABELS } from "./labels";
+
+// Where the Worker sends an error back to: this form's own page.
+const RETURN_TO = "/ecosystem-canvas/suggest/";
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
+---
+
+<form class="suggest-form panel" method="post" action="/api/suggest-resource" data-suggest-form>
+  <p class="form-error" role="alert" data-form-error hidden></p>
+
+  <div class="field">
+    <label for="suggest-name">Name of the resource</label>
+    <input id="suggest-name" name="name" type="text" required maxlength="120" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label for="suggest-url">Link to its website</label>
+    <span class="hint" id="suggest-url-hint">For example, acme.org. A person checks the link before anything goes live.</span>
+    <input
+      id="suggest-url"
+      name="url"
+      type="text"
+      inputmode="url"
+      required
+      maxlength="300"
+      autocomplete="off"
+      aria-describedby="suggest-url-hint"
+    />
+  </div>
+
+  <div class="field">
+    <label for="suggest-stage">Stage it helps most (optional)</label>
+    <select id="suggest-stage" name="stage">
+      <option value="">Not sure</option>
+      {STAGES.map((s) => <option value={s}>{STAGE_LABELS[s]}</option>)}
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="suggest-city">City (optional)</label>
+    <input id="suggest-city" name="city" type="text" maxlength="60" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label for="suggest-note">What it does for founders (optional)</label>
+    <textarea id="suggest-note" name="note" rows="4" maxlength="2000"></textarea>
+  </div>
+
+  <div class="field">
+    <label for="suggest-email">Your email (optional)</label>
+    <span class="hint" id="suggest-email-hint">Only if you are happy for us to ask a follow-up question about this suggestion.</span>
+    <input id="suggest-email" name="email" type="email" maxlength="254" autocomplete="email" aria-describedby="suggest-email-hint" />
+  </div>
+
+  <div class="hp" aria-hidden="true">
+    <label for="suggest-website">Leave this empty</label>
+    <input id="suggest-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="ts" value="" />
+  <input type="hidden" name="return_to" value={RETURN_TO} />
+
+  {
+    siteKey ? (
+      <Turnstile action="suggest-resource" />
+    ) : (
+      <p class="meta">Verification is not set up on this build, so sending will not work here.</p>
+    )
+  }
+
+  <p class="meta">
+    We keep your suggestion, and your email if you give one, only to review this suggestion. The site never visits the
+    link you send.
+  </p>
+
+  <div class="btn-row">
+    <button class="btn btn--gold" type="submit">Send suggestion</button>
+  </div>
+</form>
+
+<script>
+  import { initSuggestForm } from "./suggest-form";
+
+  const form = document.querySelector<HTMLFormElement>("form[data-suggest-form]");
+  if (form) initSuggestForm(form, window.location.search);
+</script>
+
+<style>
+  /* The width ApplyForm.astro gives its fieldsets, so fields stay readable at 1280. */
+  .suggest-form {
+    max-width: 42rem;
+  }
+</style>

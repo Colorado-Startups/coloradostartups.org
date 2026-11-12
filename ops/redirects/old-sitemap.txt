@@ -1,0 +1,32 @@
+# The old Squarespace site's sitemap, saved before the cutover.
+# Source: https://coloradostartups.org/sitemap.xml, read 2026-10-18 while Squarespace still served it.
+# 20 page paths (image entries dropped). After launch.md step 5 this address serves the new site,
+# so this file is the only record of what the old site listed.
+#
+# 13 of these paths are in map.csv. The other 7 keep their path on the new site:
+# /contact, /code-of-conduct, /ecosystem-canvas, /leaderboard, /event-calendar, /newsletter, /links.
+# Squarespace also answered four aliases with a 302 (/events, /resources, /about, /social-groups);
+# those are in map.csv and not in this sitemap.
+#
+# The redirect test reads this file (GO-LIVE.md, B2): every path must reach a 200 page through
+# 301s only.
+/new-events-1
+/home
+/contact
+/code-of-conduct
+/ecosystem-canvas
+/leaderboard
+/overview
+/startup-happy-hour
+/event-connect
+/the-team
+/event-calendar
+/privacy-policy
+/startup-hikes
+/ski-days
+/pitch-colorado
+/seed-angel-forum
+/new-page-1
+/newsletter
+/links
+/store

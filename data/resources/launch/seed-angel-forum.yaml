@@ -1,0 +1,14 @@
+id: seed-angel-forum
+name: Seed Angel Forum
+url: https://seedangel.co/
+stage: launch
+substage: develop
+city: Boulder
+type: event
+description: A quarterly private pitch event in Denver or Boulder. Seed-stage founders pitch active angel investors.
+tags:
+  - investors
+  - networking
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

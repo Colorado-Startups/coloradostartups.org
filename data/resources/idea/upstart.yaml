@@ -1,0 +1,15 @@
+id: upstart
+name: UpStart
+url: https://upstartlab.org/hubs/colorado/
+stage: idea
+substage: educate
+city: statewide
+type: education
+description: Skills training resource in Boulder and Denver. Listed in the Ecosystem Canvas for founders at the idea stage.
+tags:
+  - skills
+  - boulder
+  - denver
+source: canvas-2026
+status: review
+last_checked: "2026-10-18"

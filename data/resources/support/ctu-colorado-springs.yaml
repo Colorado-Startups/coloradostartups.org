@@ -1,0 +1,13 @@
+id: ctu-colorado-springs
+name: CTU Colorado Springs
+url: https://www.coloradotech.edu/colorado-springs
+stage: support
+substage: organizations
+city: Colorado Springs
+type: university
+description: A Colorado Technical University campus in Colorado Springs. It offers undergraduate and graduate degrees in fields such as IT, computer engineering and electrical engineering. It also has blended class options.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

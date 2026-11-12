@@ -1,0 +1,13 @@
+id: jombine
+name: Jombine
+url: http://jombine.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Denver recruiting firm that matches job seekers with employers by skills and culture.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

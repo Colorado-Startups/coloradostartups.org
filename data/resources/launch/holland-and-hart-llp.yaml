@@ -1,0 +1,13 @@
+id: holland-and-hart-llp
+name: Holland & Hart LLP
+url: https://www.hollandhart.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A law firm. It has corporate, finance, tax, intellectual property and employment services. It has an Emerging Companies practice.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

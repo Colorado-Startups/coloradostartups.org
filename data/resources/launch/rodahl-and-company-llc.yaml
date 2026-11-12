@@ -1,0 +1,13 @@
+id: rodahl-and-company-llc
+name: Rodahl & Company LLC
+url: https://www.rodahlcpa.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: A CPA firm in Fort Collins. It offers accounting, bookkeeping, tax planning and advisory services. Its business clients include restaurants and medical practices.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

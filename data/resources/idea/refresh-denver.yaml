@@ -1,0 +1,13 @@
+id: refresh-denver
+name: Refresh Denver
+url: https://www.meetup.com/refreshdenver/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: A Denver networking group for internet professionals and tech enthusiasts. It is now Digital Denver. It hosts joint happy hours with the Denver Marketers group for developers, designers, marketers and entrepreneurs.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

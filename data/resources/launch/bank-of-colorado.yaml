@@ -1,0 +1,13 @@
+id: bank-of-colorado
+name: Bank of Colorado
+url: https://www.bankofcolorado.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A bank. It offers business checking, treasury management, credit cards and loans. It also offers personal banking. It serves people and businesses in Colorado.
+tags:
+  - banking
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: crs-insurance-brokerage
+name: CRS Insurance Brokerage
+url: https://www.crsdenver.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: An insurance firm in Colorado. It sells business insurance and surety bonds. It also offers loss control and claims management. It has employee benefits too.
+tags:
+  - insurance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,16 @@
+id: greystone-technology
+name: Greystone Technology
+url: https://www.greystonetech.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: Managed IT support, consulting, cybersecurity, and web and app development for businesses, including startups.
+tags:
+  - software
+  - boulder
+  - denver
+  - fort-collins
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

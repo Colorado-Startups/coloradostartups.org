@@ -1,0 +1,13 @@
+id: bradshaw-and-associates
+name: Bradshaw & Associates
+url: https://www.bradshawcpas.com/
+stage: launch
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: A Colorado Springs CPA firm. It offers tax planning, small business accounting, payroll and help starting a business.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

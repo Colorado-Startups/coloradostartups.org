@@ -1,0 +1,56 @@
+{
+  "id": "resp_fixture_01",
+  "object": "response",
+  "status": "completed",
+  "model": "gpt-5.5",
+  "output": [
+    {
+      "type": "web_search_call",
+      "id": "ws_fixture_01",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "startup accelerators Denver",
+        "sources": [
+          { "type": "url", "url": "https://www.coloradostartups.org/resources/" },
+          { "type": "url", "url": "https://mountainmakers.example/" }
+        ]
+      }
+    },
+    {
+      "type": "web_search_call",
+      "id": "ws_fixture_02",
+      "status": "completed",
+      "action": { "type": "open_page", "url": "https://mountainmakers.example/" }
+    },
+    {
+      "type": "message",
+      "id": "msg_fixture_01",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "Denver has several accelerators.\n\n- **Mountain Makers Accelerator** runs a cohort program. ([mountainmakers.example](https://mountainmakers.example/?utm_source=openai))\n- **Summit Seed Studio** works with software teams.\n- For a full list, the Startup Resources directory at [coloradostartups.org](https://coloradostartups.org/resources/?utm_source=openai) lists the accelerators in the state.",
+          "annotations": [
+            {
+              "type": "url_citation",
+              "start_index": 90,
+              "end_index": 160,
+              "url": "https://mountainmakers.example/?utm_source=openai",
+              "title": "Mountain Makers Accelerator"
+            },
+            {
+              "type": "url_citation",
+              "start_index": 260,
+              "end_index": 330,
+              "url": "https://coloradostartups.org/resources/?utm_source=openai",
+              "title": "Startup Resources"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "usage": { "input_tokens": 15000, "output_tokens": 900, "total_tokens": 15900 }
+}

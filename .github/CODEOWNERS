@@ -1,0 +1,18 @@
+# Code owners. GitHub requests a review from these owners on pull requests
+# that touch the paths below. The org has no teams (gh api
+# orgs/Colorado-Startups/teams, 2026-11-02), so the owner is the org owner's
+# login. When a team exists, name it here instead.
+#
+# The ruleset on main sets require_code_owner_review to false (gh api
+# repos/Colorado-Startups/coloradostartups-site/rules/branches/main,
+# 2026-11-02), so this file requests reviews and never blocks a merge.
+# The last matching line wins.
+
+*            @paul-co-startups
+
+# Enforcement files: the orchestrator reviews and merges every change here
+# (CLAUDE.md, Git).
+/.github/    @paul-co-startups
+/.githooks/  @paul-co-startups
+/04_tools/   @paul-co-startups
+/.claude/    @paul-co-startups

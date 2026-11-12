@@ -1,0 +1,15 @@
+id: grotech
+name: Grotech
+url: https://www.grotech.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A venture firm. It invests early. It backs technology companies outside Silicon Valley.
+tags:
+  - seed
+  - venture-capital
+  - technology
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

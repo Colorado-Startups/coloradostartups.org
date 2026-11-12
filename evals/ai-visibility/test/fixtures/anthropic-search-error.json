@@ -1,0 +1,27 @@
+[
+  {
+    "id": "msg_fixture_03",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "server_tool_use",
+        "id": "srvtoolu_fixture_03",
+        "name": "web_search",
+        "input": { "query": "startup incubators Fort Collins" }
+      },
+      {
+        "type": "web_search_tool_result",
+        "tool_use_id": "srvtoolu_fixture_03",
+        "content": { "type": "web_search_tool_result_error", "error_code": "unavailable" }
+      },
+      {
+        "type": "text",
+        "text": "I could not search just now. Fort Collins has a university incubator and a city small business office worth a call."
+      }
+    ],
+    "stop_reason": "end_turn",
+    "usage": { "input_tokens": 600, "output_tokens": 60, "server_tool_use": { "web_search_requests": 0 } }
+  }
+]

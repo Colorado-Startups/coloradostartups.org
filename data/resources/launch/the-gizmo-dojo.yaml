@@ -1,0 +1,13 @@
+id: the-gizmo-dojo
+name: The Gizmo Dojo
+url: https://thegizmodojo.com/index.html
+stage: launch
+substage: develop
+city: Northglenn
+type: incubator
+description: A member-run nonprofit makerspace in Northglenn. Hobbyists and small ventures share tools, a metal shop and an electronics lab. It also has low-commitment workspace and business addresses.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

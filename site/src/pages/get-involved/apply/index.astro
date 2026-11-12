@@ -1,0 +1,170 @@
+---
+// /get-involved/apply/: the application form for the seats in
+// data/team/positions.yaml whose `apply` block is open. Owner: L19.
+// /get-involved/ links each such seat here as ?role=<id>, and the form
+// preselects it. How we use what people send is stated before the first field.
+//
+// Copy rule (decision 67): the seats go by their titles, and the form says
+// UNPAID_VOLUNTEER_LINE once, beside the seat picker. The page leads with what
+// a seat gives. No "paid", "pay", "salary", "stipend", "hiring", "hire" or
+// "job", and "contributor" never names a seat. A DOM test checks all three.
+import { comparePositions, COURSE_TITLES, courseUrl } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import ApplyForm from "../../../components/apply/ApplyForm.astro";
+import HallSeal from "../../../components/hall/HallSeal.astro";
+import { COURSE_MINUTES, courseLength } from "../../../components/positions/courses";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { REGIONS } from "../../../lib/regions/match";
+import { andList } from "../../../lib/regions/page";
+
+const seats = (await getCollection("positions"))
+  .map((e) => e.data)
+  .filter((p) => p.status === "open" && p.apply?.open)
+  .sort(comparePositions(REGIONS));
+
+// Courses in the order the seats list them, each with the seats that need it.
+const courseIds = [...new Set(seats.flatMap((s) => s.apply?.courses ?? []))];
+const courses = courseIds.map((id) => {
+  const needs = seats.filter((s) => s.apply?.courses.includes(id));
+  return {
+    id,
+    title: COURSE_TITLES[id],
+    href: courseUrl(id),
+    length: courseLength(COURSE_MINUTES[id]),
+    who: needs.length === seats.length ? "Every seat" : andList(needs.map((s) => s.title)),
+  };
+});
+---
+
+<BaseLayout
+  title="Apply for a seat"
+  description="Apply to be the Slack Community Lead, or the Connector for Photon Mountain, Space Peak or Fusion Canyon, at Colorado Startups."
+  ogImage="get-involved"
+>
+  <section class="section section--lit" aria-labelledby="apply-title">
+    <div class="wrap stack">
+      <h1 id="apply-title">Apply for a seat</h1>
+      <p class="lede">
+        People run this community. Each of these seats runs one part of it with Paul Foley, Founder and President of
+        Colorado Startups.
+      </p>
+      {
+        /* The page's main action in the first screen (#218): the form starts
+           about 2,700 px down at 375 px, after the lists below. */
+        seats.length > 0 && (
+          <div class="first-action">
+            <div class="btn-row">
+              <a class="btn btn--gold" href="#form-title" aria-describedby="courses-first">
+                Start your application
+              </a>
+            </div>
+            <p class="meta" id="courses-first">
+              Take your seat's Claude Academy courses first. The form asks for a badge link from each.
+            </p>
+          </div>
+        )
+      }
+
+      <h2 id="gives-title">What a seat gives you</h2>
+      <ul class="steps" aria-labelledby="gives-title">
+        <li>You meet the founders building in your part of Colorado.</li>
+        <li>You learn to work with AI through Claude Academy, then use it to run a real community.</li>
+        <li>You carry the seat's title, such as Space Peak Connector, on LinkedIn.</li>
+      </ul>
+
+      <h2 id="how-title">How it works</h2>
+      <ol class="steps" aria-labelledby="how-title">
+        <li>Pick a seat, and tell us why you are excited about it.</li>
+        <li>Finish the Claude Academy courses your seat needs, and paste the public link to each completion badge.</li>
+        <li>If it looks like a fit, Paul sets up an interview.</li>
+      </ol>
+
+      {
+        seats.length > 0 ? (
+          <>
+            <h2 id="seats-title">The seats</h2>
+            <ul class="seats" aria-labelledby="seats-title" data-apply-seats>
+              {seats.map((s) => (
+                <li data-seat={s.id}>
+                  <strong>{s.title}.</strong> {s.summary}
+                </li>
+              ))}
+            </ul>
+
+            <h2 id="courses-title">The courses</h2>
+            <p>Claude Academy lists these as free courses, with the lengths below. Take them in any order.</p>
+            <ul class="courses" aria-labelledby="courses-title" data-apply-courses>
+              {courses.map((c) => (
+                <li data-course-id={c.id}>
+                  <a href={c.href}>{c.title}</a> ({c.length}): {c.who}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p data-apply-closed>
+            No seat takes applications right now. See the <a href="/get-involved/">open positions</a> to raise your hand
+            another way.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    seats.length > 0 && (
+      <section class="section section--band" aria-labelledby="form-title">
+        <div class="wrap stack">
+          <h2 id="form-title">Your application</h2>
+          <section class="panel purpose" aria-labelledby="purpose-title">
+            <h3 id="purpose-title" class="purpose-title">How we use what you send</h3>
+            <ul>
+              <li>We use your application only to consider you for the seat you choose.</li>
+              <li>Paul Foley reads every application. We never share it outside Colorado Startups.</li>
+              <li>We contact you about this seat only.</li>
+              <li>The site stores your links as text and never visits them.</li>
+              <li>
+                Once Paul decides, we delete your name, contact details and answers. We keep only the seat, the dates
+                and the outcome.
+              </li>
+            </ul>
+            <p class="meta">
+              Read the full <a href="/privacy/">privacy policy</a>.
+            </p>
+          </section>
+          <ApplyForm seats={seats} />
+          <HallSeal />
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  /* Each heading sits closer to its own list than to the list above it:
+     48 px above, the h2's own 24 px below (#235). */
+  .wrap.stack > h2:not(:first-child) {
+    margin-top: var(--s-7);
+  }
+  .steps,
+  .seats,
+  .courses {
+    max-width: 42rem;
+    margin: 0;
+    padding-left: 1.4em;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .purpose {
+    max-width: 42rem;
+  }
+  .first-action .meta {
+    margin: var(--s-3) 0 0;
+  }
+  .purpose-title {
+    font-family: var(--font-body);
+    font-size: var(--t-step-2);
+    letter-spacing: 0;
+  }
+</style>

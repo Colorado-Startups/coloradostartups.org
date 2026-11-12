@@ -1,0 +1,13 @@
+id: colorado-product-meetup
+name: Colorado Product Meetup
+url: https://www.meetup.com/Colorado-Product/
+stage: idea
+substage: educate
+city: Denver
+type: community
+description: A Colorado Product Foundation meetup for tech product managers in Boulder and Denver. It holds regular talks, happy hours and coworking sessions. Its events help with networking, problem solving and career development.
+tags:
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

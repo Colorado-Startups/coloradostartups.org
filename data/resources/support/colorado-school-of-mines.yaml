@@ -1,0 +1,13 @@
+id: colorado-school-of-mines
+name: Colorado School of Mines
+url: https://www.mines.edu/
+stage: support
+substage: organizations
+city: Golden
+type: university
+description: A public research university in Golden. It focuses on applied science and engineering. It has hands-on STEM education. That means lab work, field sessions and professional development.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

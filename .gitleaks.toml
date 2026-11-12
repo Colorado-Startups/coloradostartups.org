@@ -1,0 +1,20 @@
+# gitleaks config: its default rules, plus one allowlist ruled safe.
+# secret_scan.sh runs `gitleaks git .`, which reads this file from the repo
+# root; .gitleaksignore keeps the one-off fingerprints.
+
+[extend]
+useDefault = true
+
+# Lists of Quality metric ids in the old collector test claude.test.mjs (#566
+# and #582; the file left with #611, its history stays): generic-api-key reads
+# an id after "tokens_..., " as a key. Only that rule, only that file, and
+# only when the matched value is shaped like a metric id (area.snake_case,
+# lowercase): a real key in that file still fails. Ruled 2026-11-03 by the orchestrator; it replaces two
+# per-commit fingerprints, which broke whenever the line moved.
+[[allowlists]]
+description = "claude.test.mjs: metric-id lists, not keys"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''^quality/collectors/claude\.test\.mjs$''']
+regexTarget = "secret"
+regexes = ['''^[a-z_]+\.[a-z0-9_]+$''']

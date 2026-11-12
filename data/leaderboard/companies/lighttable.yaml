@@ -1,0 +1,10 @@
+id: lighttable
+name: "LightTable"
+website: "https://lighttable.ai"
+hq_city: "Denver"
+founded_year: 2024
+sector: "Real estate and construction"
+description: "Checks construction and real estate design documents with software to catch errors before building starts. It is for developers and contractors."
+sources:
+  - "https://commercialobserver.com/2025/08/lighttable-seed-round/"
+  - "https://lighttable.ai"

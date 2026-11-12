@@ -1,0 +1,13 @@
+id: trailhead-capital
+name: Trailhead Capital
+url: http://www.trailheadcap.com/
+stage: growth
+substage: investors
+city: Denver
+type: investor
+description: A Denver investment firm. It backs entrepreneurs who build regenerative food and agriculture firms. It weighs soil health and ecological impact. It weighs financial returns too.
+tags:
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

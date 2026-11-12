@@ -1,0 +1,13 @@
+id: university-of-denver-boot-camps
+name: University of Denver Boot Camps
+url: https://bootcamp.du.edu/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: Coding school or bootcamp in Denver. Listed in the Ecosystem Canvas for founders at the idea stage.
+tags:
+  - coding
+source: canvas-2026
+status: review
+last_checked: "2026-10-18"

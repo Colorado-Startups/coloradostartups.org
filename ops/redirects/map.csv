@@ -1,0 +1,36 @@
+old_path,new_path,reason
+/home,/,Squarespace home alias; the Hall is the home page
+/overview,/community/,Community page replaces Overview (PLAN Pages and URLs)
+/social-groups,/community/,Old alias of /overview (PLAN Pages and URLs)
+/resources,/ecosystem-canvas/,Old alias of the Ecosystem Canvas (PLAN Pages and URLs)
+/pitch-colorado,/ecosystem-canvas/,Live page is titled Ecosystem Canvas (checked 2026-10-08)
+/seed-angel-forum,/ecosystem-canvas/,Live page is titled Ecosystem Canvas (checked 2026-10-08)
+/the-team,/team/,Team page renamed (PLAN Pages and URLs)
+/about,/team/,Old alias of /the-team (PLAN Pages and URLs)
+/privacy-policy,/privacy/,Privacy page path on the new site (SiteFooter links /privacy/)
+/event-connect,/event-calendar/,Retired event page; events live on the calendar
+/events,/event-calendar/,Squarespace alias of /event-connect (302 on the live site; curl 2026-10-18)
+/startup-happy-hour,/event-calendar/,Retired event page (Startup Socials); events live on the calendar
+/new-events-1,/event-calendar/,Retired draft events page
+/ski-days,/event-calendar/#hikes-and-ski-days,Now run by the Startup Community Project; lands on the calendar's Hikes and Ski Days section (L13 review)
+/startup-hikes,/event-calendar/#hikes-and-ski-days,Now run by the Startup Community Project; lands on the calendar's Hikes and Ski Days section (L13 review)
+/gift-guide,/,Retired page
+/store,/,Retired store
+/cart,/,Retired store cart
+/new-page-1,/,Retired draft page
+/contact,/contact/,Kept path; one 301 to the slash form instead of html_handling's 307 (GO-LIVE B1)
+/code-of-conduct,/code-of-conduct/,Kept path; one 301 to the slash form instead of html_handling's 307 (GO-LIVE B1)
+/ecosystem-canvas,/ecosystem-canvas/,Kept path; one 301 to the slash form instead of html_handling's 307 (GO-LIVE B1)
+/leaderboard,/leaderboard/,Kept path; one 301 to the slash form instead of html_handling's 307 (GO-LIVE B1)
+/event-calendar,/event-calendar/,Kept path; one 301 to the slash form instead of html_handling's 307 (GO-LIVE B1)
+/newsletter,/newsletter/,Kept path; one 301 to the slash form instead of html_handling's 307 (GO-LIVE B1)
+/links,/links/,Kept path; one 301 to the slash form instead of html_handling's 307 (GO-LIVE B1)
+/sitemap.xml,/sitemap-index.xml,Squarespace's sitemap URL; @astrojs/sitemap writes only sitemap-index.xml (GO-LIVE B3)
+/slack,https://docs.google.com/forms/d/e/1FAIpQLSfM6EPCuXJ8IukLjApcecvggB7UoaXVGwLpqgNF5aPacRYNvQ/viewform,Short link: the one Slack sign-up (LinkedIn project decisions 30 and 35); every Join the Slack button opens it in one click (#128). The form's page title read Join the Colorado Startups Slack Community (checked 2026-10-18)
+/join,https://docs.google.com/forms/d/e/1FAIpQLSfM6EPCuXJ8IukLjApcecvggB7UoaXVGwLpqgNF5aPacRYNvQ/viewform,Short link to the Slack sign-up, the same form as /slack (#142)
+/nominate,/leaderboard/nominate/,Short link to nominate a company for the Leaderboard (#142)
+/volunteer,/get-involved/,Short link to the open volunteer seats (#142)
+/apply,/get-involved/apply/,Short link to the seat application (#142)
+/startup-resources,/ecosystem-canvas/,Short link: the directory's name is Startup Resources (#141 and #142)
+/request-help,/contact/,Old Squarespace page; asking for help now goes through the contact page (#394)
+/celebrate-wins,/community/,Old Squarespace page; celebrating wins now lives in the community hub (#394)

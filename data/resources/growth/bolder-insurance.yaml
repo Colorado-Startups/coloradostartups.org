@@ -1,0 +1,13 @@
+id: bolder-insurance
+name: Bolder Insurance
+url: https://www.bolderinsurance.com/
+stage: growth
+substage: service-providers
+city: Boulder
+type: service-provider
+description: An independent insurance agency. It sells business policies to firms in Boulder County. Some are made for one industry.
+tags:
+  - insurance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

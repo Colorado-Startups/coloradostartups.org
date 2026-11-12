@@ -1,0 +1,13 @@
+id: techstars-workforce-development-accelerator
+name: Techstars Workforce Development Accelerator
+url: https://www.techstars.com/accelerators/workforce-development
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: Mentorship-driven accelerator program in Denver. Listed in the Ecosystem Canvas for founders at the launch stage.
+tags:
+  - accelerator
+source: canvas-2026
+status: review
+last_checked: "2026-10-18"

@@ -1,0 +1,58 @@
+{
+  "_README": "Which render becomes which shipped file. art/tools/make-finals.mjs reads this file and writes site/src/assets/art/<out>.webp, and each texture tile through make-tiles.mjs's method. Picks and reasons: art/concepts/README.md. Crops are [left, top, width, height] in source pixels.",
+  "ground": {
+    "token": "surface",
+    "why": "Two keeper picks sit in a painted circle on white and one on cream. One token color under all three makes them read as a set inside the gold Frame."
+  },
+  "anchors": {
+    "_why": "Hue ranges in degrees for what Anima paints as each keeper's anchor, measured on batch 1 at 64 px. Each key is the brand token the anchor is named for. The Communitas cloak paints teal, near 187 degrees, while the community token sits at 212, so the ranges come from the art, not the token.",
+    "community": [175, 250],
+    "pine": [75, 170],
+    "fire": [0, 30]
+  },
+  "models": {
+    "_why": "What made each batch, keyed by the template id in art/runs/batch-<n>.json. art/tools/provenance.mjs writes it, with each render's prompt and seed, into every shipped file's XMP. License reviews: art/LICENSES.md.",
+    "image_anima_base_v1": {
+      "name": "Anima Base",
+      "maker": "CircleStone Labs",
+      "version": "v1.0 (anima-base-v1.0.safetensors)",
+      "license": "CircleStone Labs Anima license v1.2",
+      "license_url": "https://huggingface.co/circlestone-labs/Anima/blob/main/LICENSE.md"
+    },
+    "api_bria_fibo2_t2i": {
+      "name": "FIBO",
+      "maker": "Bria AI",
+      "version": "2.0, Bria's hosted model through Comfy Cloud's BriaImageGenerate node",
+      "license": "Bria commercial agreement with Colorado Startups (Paul, 2026-11-03) and Bria's Terms of Use",
+      "license_url": "https://bria.ai/terms-of-use"
+    },
+    "hf_space_fibo2_t2i": {
+      "name": "FIBO",
+      "maker": "Bria AI",
+      "version": "2.0 Dev (briaai/Fibo-2.0-dev), on Bria's ZeroGPU Space briaai/Fibo-2.0-T2I",
+      "license": "Bria commercial agreement with Colorado Startups (Paul, 2026-11-03) for the gated FIBO 2.0 weights",
+      "license_url": "https://huggingface.co/briaai/Fibo-2.0-dev"
+    }
+  },
+  "tiles": {
+    "_why": "Which render becomes each texture tile. make-finals.mjs runs make-tiles.mjs's method on each one and writes site/src/assets/art/textures/<tile>.webp. Verdicts: art/concepts/README.md, Texture tiles.",
+    "stone": { "batch": 2, "from": "tile-stone-3" },
+    "parchment": { "batch": 2, "from": "tile-parchment-3" },
+    "night-stone": { "batch": 1, "from": "tile-night-stone" }
+  },
+  "finals": [
+    { "out": "hero/hall", "batch": 1, "from": "hero-a", "kind": "hero" },
+    { "out": "regions/photon-mountain", "batch": 1, "from": "region-photon-mountain", "kind": "region" },
+    { "out": "regions/space-peak", "batch": 1, "from": "region-space-peak", "kind": "region" },
+    { "out": "regions/fusion-canyon", "batch": 2, "from": "region-fusion-canyon-2", "kind": "region" },
+    { "out": "agents/communitas", "batch": 1, "from": "keeper-communitas-3", "kind": "keeper-large", "crop": [0, 31, 880, 1100] },
+    { "out": "agents/communitas-small", "batch": 1, "from": "keeper-communitas-3", "kind": "keeper-small", "crop": [141, 400, 600, 600], "anchor": "community" },
+    { "out": "agents/resourcus", "batch": 1, "from": "keeper-resourcus-1", "kind": "keeper-large", "crop": [0, 20, 880, 1100] },
+    { "out": "agents/resourcus-small", "batch": 1, "from": "keeper-resourcus-1", "kind": "keeper-small", "crop": [50, 150, 660, 660], "anchor": "pine" },
+    { "out": "agents/publicus", "batch": 1, "from": "keeper-publicus-1", "kind": "keeper-large", "crop": [0, 70, 880, 1100] },
+    { "out": "agents/publicus-small", "batch": 1, "from": "keeper-publicus-1", "kind": "keeper-small", "crop": [174, 300, 520, 520], "anchor": "fire" },
+    { "out": "scenes/passage", "batch": 5, "from": "scene-passage-v4-2", "kind": "scene", "crop": [0, 6, 1344, 756], "alt": "A cog railway runs down a lantern-lit passage of pink granite to a blank stone wall, with a brass engine on its cart and a snowy peak beyond." },
+    { "out": "scenes/founders", "batch": 4, "from": "scene-founders-v3-2", "kind": "scene", "crop": [0, 6, 1344, 756], "alt": "Founders build a glowing fusion core in a brass ring at a workbench in a red sandstone workshop, with the Flatirons through the window." },
+    { "out": "scenes/guides", "batch": 4, "from": "scene-guides-v3-1", "kind": "scene", "crop": [0, 6, 1344, 756], "alt": "Two founders mark a hand-drawn map of the Front Range beside a copper rocket and a satellite, with snowy peaks above the Denver skyline through the window." }
+  ]
+}

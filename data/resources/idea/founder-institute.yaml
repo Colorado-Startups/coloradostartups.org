@@ -1,0 +1,13 @@
+id: founder-institute
+name: Founder Institute
+url: http://fi.co/
+stage: idea
+substage: educate
+city: statewide
+type: education
+description: A company-building program with a Colorado cohort. It takes aspiring, first-time and solo founders from idea to Funding Day. It uses AI tools, weekly feedback and a global network.
+tags:
+  - entrepreneurship
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

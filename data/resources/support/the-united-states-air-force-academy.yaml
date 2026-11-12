@@ -1,0 +1,13 @@
+id: the-united-states-air-force-academy
+name: The United States Air Force Academy
+url: https://www.usafa.edu/
+stage: support
+substage: organizations
+city: Colorado Springs
+type: university
+description: The Air Force Academy in Colorado Springs. It prepares cadets to serve through academics that balance STEM with the arts and humanities, plus research and leadership training.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

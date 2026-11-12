@@ -1,0 +1,14 @@
+id: peak-startup-pitch-night
+name: Peak Startup Pitch Night
+url: https://www.peakradar.com/event/peak-startup-pitch-night/
+stage: launch
+substage: develop
+city: Colorado Springs
+type: event
+description: Pitch event or demo day in Colorado Springs.
+tags:
+  - pitch
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

@@ -1,0 +1,9 @@
+id: lasa-health
+name: "Lasa Health"
+website: "https://lasahealth.com"
+hq_city: "Boulder"
+sector: "Health care"
+description: "Builds clinical software. Doctors use it to recognize and diagnose chronic pelvic pain faster."
+sources:
+  - "https://www.lasahealth.com/blog/nsf-sbir-press-release"
+  - "https://lasahealth.com"

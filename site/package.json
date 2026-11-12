@@ -1,0 +1,59 @@
+{
+  "name": "@cs/site",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=26.3.0"
+  },
+  "scripts": {
+    "predev": "CS_PEOPLE_FIXTURES=1 node ../scripts/people/overlay.mjs && node scripts/sync-brand.mjs",
+    "dev": "astro dev",
+    "prebuild": "node ../scripts/people/overlay.mjs && node scripts/sync-brand.mjs && (node ../scripts/events/fetch-ics.mjs --prebuild || true)",
+    "build": "astro build && pagefind --site dist",
+    "astro": "astro",
+    "precheck": "CS_PEOPLE_FIXTURES=1 node ../scripts/people/overlay.mjs",
+    "check": "astro check",
+    "types": "wrangler types",
+    "pretest": "CS_PEOPLE_FIXTURES=1 node ../scripts/people/overlay.mjs",
+    "test": "vitest run --project unit --project worker",
+    "test:watch": "vitest",
+    "pretest:unit": "CS_PEOPLE_FIXTURES=1 node ../scripts/people/overlay.mjs",
+    "test:unit": "vitest run --project unit",
+    "test:worker": "vitest run --project worker",
+    "test:dom": "vitest run --project dom",
+    "test:content": "npm run build && npm run test:dom",
+    "test:full": "npm run check && npm run test && npm run test:content",
+    "test:security": "vitest run --project unit --project worker security",
+    "test:e2e": "playwright test",
+    "e2e:install": "playwright install --with-deps --only-shell chromium",
+    "preview:dist": "node scripts/serve-dist.mjs --port 3302",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "deploy:staging": "wrangler deploy --env staging",
+    "test:visual": "playwright test --config playwright.visual.config.ts"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
+    "@cs/shared": "*",
+    "@observablehq/plot": "0.6.17",
+    "astro": "7.4.1",
+    "yaml": "2.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.11",
+    "@axe-core/playwright": "4.14.0",
+    "@cloudflare/vitest-plugin": "1.4.8",
+    "@mswjs/interceptors": "0.45.9",
+    "@playwright/test": "1.64.1",
+    "axe-core": "4.14.0",
+    "fontkitten": "1.0.3",
+    "jsdom": "30.1.3",
+    "msw": "3.0.3",
+    "pagefind": "1.5.2",
+    "sharp": "0.35.5",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5",
+    "wrangler": "4.153.0"
+  }
+}

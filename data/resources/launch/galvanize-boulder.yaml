@@ -1,0 +1,13 @@
+id: galvanize-boulder
+name: Galvanize (Boulder)
+url: https://www.galvanize.com/coworking/
+stage: launch
+substage: service-providers
+city: Boulder
+type: coworking
+description: Coworking space in Boulder.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

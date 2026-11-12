@@ -1,0 +1,13 @@
+id: tie-denver
+name: TiE Denver
+url: https://colorado.tie.org/
+stage: idea
+substage: validate
+city: Denver
+type: community
+description: The nonprofit Denver chapter of TiE, a global entrepreneur network. It serves founders in every industry and stage. It offers mentoring, networking, education, funding and incubation programs.
+tags:
+  - team
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

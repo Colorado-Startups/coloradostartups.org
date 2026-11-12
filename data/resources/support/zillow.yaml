@@ -1,0 +1,15 @@
+id: zillow
+name: Zillow
+url: https://www.zillow.com/
+stage: support
+substage: organizations
+city: statewide
+type: other
+description: Large company with an office in Denver and Centennial.
+tags:
+  - corporate
+  - denver
+  - centennial
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

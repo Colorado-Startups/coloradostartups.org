@@ -1,0 +1,14 @@
+id: denver-tech-happy-hour
+name: Denver Tech Happy Hour
+url: https://www.meetup.com/Denver-Tech-Happy-Hour/
+stage: idea
+substage: validate
+city: Denver
+type: community
+description: Meetup for finding cofounders and teammates in Denver.
+tags:
+  - team
+  - meetup
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

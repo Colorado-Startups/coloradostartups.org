@@ -1,0 +1,13 @@
+id: foundation-digital
+name: Foundation Digital
+url: https://foundation.codes/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A web development studio. It builds first products for founders and early-stage companies. It also has product design and product management.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

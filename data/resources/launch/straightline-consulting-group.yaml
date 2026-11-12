@@ -1,0 +1,13 @@
+id: straightline-consulting-group
+name: Straightline Consulting Group
+url: https://www.straightline.consulting/
+stage: launch
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: A Colorado Springs consulting firm. It builds repeatable hiring systems for owner-led companies, alongside planning and culture work.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

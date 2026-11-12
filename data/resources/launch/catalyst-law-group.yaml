@@ -1,0 +1,15 @@
+id: catalyst-law-group
+name: Catalyst Law Group
+url: https://catalyst.law/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A law firm in Boulder and Denver. It helps startups and founders with formation, venture financing, technology deals and exits.
+tags:
+  - legal
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

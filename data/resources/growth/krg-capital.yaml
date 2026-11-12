@@ -1,0 +1,13 @@
+id: krg-capital
+name: KRG Capital
+url: http://www.krgcapital.com/
+stage: growth
+substage: investors
+city: Denver
+type: investor
+description: A private equity or specialty financing firm in Denver.
+tags:
+  - private-equity
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

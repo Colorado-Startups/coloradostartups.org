@@ -1,0 +1,305 @@
+---
+// One block of a seat page (lane L38): a chart, a map, tiles, a list from
+// roles.json, the steps or the apply button. lib/seats/layouts.ts says which
+// blocks each page shows; this file says how each kind looks. A split renders
+// its two columns through this same component.
+//
+// Every figure renders inside an element with data-fact (or data-course and
+// data-course-total for the course lengths), beside a FactRef to its source,
+// so the DOM test can find each one and check it against facts.yaml.
+// Copy from roles.json goes through withKeeperDisclosure(), so a keeper named
+// there is disclosed as an AI agent in the same sentence.
+import Portrait from "../art/Portrait.astro";
+import { portraitAlt } from "../art/keepers";
+import Button from "../ui/Button.astro";
+import { barWidths, withKeeperDisclosure as disclose } from "../../lib/seats/copy";
+import { icon, type IconName } from "../../lib/seats/icons";
+import type { Block } from "../../lib/seats/layouts";
+import { factById } from "../../lib/seats/load";
+import { formatHours, type SeatContext } from "../../lib/seats/page";
+import { COURSES_REF } from "../../lib/seats/sources";
+import { frontRangeMap, hoursBar, networkDiagram, stepsTrail } from "../../lib/seats/viz";
+import FactRef from "./FactRef.astro";
+
+interface Props {
+  block: Block;
+  ctx: SeatContext;
+}
+
+const { block, ctx } = Astro.props;
+const { common, seat } = ctx;
+
+// The five perks in roles.json order: the Team page, the LinkedIn title, the
+// reimbursed coffees and tickets, the one-year term and the badges.
+const PERK_ICONS: readonly IconName[] = ["people", "badge", "coffee", "calendar", "star"];
+
+const fact = (id: string) => ({ id, ...factById(ctx.facts, id), n: ctx.notes.noteFor(id) });
+const bars =
+  block.kind === "bars"
+    ? (() => {
+        const rows = block.facts.map(fact);
+        const widths = barWidths(rows.map((r) => r.value));
+        return rows.map((r, i) => ({ ...r, width: widths[i]! }));
+      })()
+    : [];
+// A split whose first column holds a map or a network diagram sizes that
+// column for the drawing (seats.css, #367).
+const figureSplit = block.kind === "split" && block.left.some((b) => b.kind === "map" || b.kind === "network");
+const courseNote = block.kind === "courses" ? ctx.notes.noteFor(COURSES_REF) : 0;
+const totalHours = ctx.courses.reduce((n, c) => n + c.hours, 0);
+const COURSE_SHORT = "Claude Academy course pages";
+---
+
+{block.kind === "perks" && (
+  <>
+    <ul class="seat-perks" data-perks>
+      {common.perks.map((perk, i) => (
+        <li class="seat-perk">
+          <Fragment set:html={icon(PERK_ICONS[i] ?? "spark")} />
+          <span>{disclose(perk)}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="seat-perks__rule">{disclose(common.linkedin_rule)}</p>
+  </>
+)}
+
+{block.kind === "bars" && (
+  <figure class="seat-figure">
+    <ul class="seat-bars" data-bars>
+      {bars.map((r) => (
+        <li class="seat-bar" data-fact={r.id}>
+          <span class="seat-bar__label">{r.bar ?? r.label}</span>
+          <span class="seat-bar__track" aria-hidden="true">
+            <span class="seat-bar__fill" style={`--w: ${r.width}%`} />
+          </span>
+          <span class="seat-bar__value">
+            <span data-value>{r.value}</span>
+            <FactRef n={r.n} short={r.short} />
+          </span>
+        </li>
+      ))}
+    </ul>
+    <figcaption>{block.caption}</figcaption>
+  </figure>
+)}
+
+{block.kind === "stats" && (
+  <div class="seat-stats">
+    {block.facts.map(fact).map((f) => (
+      <div class="seat-stat" data-fact={f.id}>
+        <p class="seat-stat__num">
+          <span data-value>{f.value}</span>
+          <FactRef n={f.n} short={f.short} />
+        </p>
+        <p class="seat-stat__label">{f.label}</p>
+      </div>
+    ))}
+  </div>
+)}
+
+{block.kind === "map" && (
+  <figure class="seat-figure" data-map={block.region}>
+    <div class="seat-figure__wide" set:html={frontRangeMap(block.region, ctx.geo)} />
+    <div class="seat-figure__narrow" set:html={frontRangeMap(block.region, ctx.geo, { narrow: true })} />
+    <figcaption>{block.caption}</figcaption>
+  </figure>
+)}
+
+{block.kind === "network" && (
+  <figure class="seat-figure" data-network={block.seat}>
+    <div class="seat-figure__wide" set:html={networkDiagram(block.seat)} />
+    <div class="seat-figure__narrow" set:html={networkDiagram(block.seat, { narrow: true })} />
+    <figcaption>{block.caption}</figcaption>
+  </figure>
+)}
+
+{block.kind === "tiles" && (
+  <figure class="seat-figure">
+    {block.caption && <figcaption>{block.caption}</figcaption>}
+    <ul class="seat-tiles">
+      {block.tiles.map((t) => (
+        <li class="seat-tile">
+          <Fragment set:html={icon(t.icon)} />
+          <span class="seat-tile__label">{t.label}</span>
+          {t.note && <span class="seat-tile__note">{t.note}</span>}
+        </li>
+      ))}
+    </ul>
+  </figure>
+)}
+
+{block.kind === "week" && (
+  <figure class="seat-figure">
+    <ul class="seat-week" aria-label={block.label}>
+      {block.days.map((d) => (
+        <li class:list={["seat-day", d.thread && "seat-day--on"]}>
+          <span class="seat-day__name">{d.name}</span>
+          <Fragment set:html={icon(d.icon)} />
+          <span class="seat-day__label">
+            {d.thread && <strong>{d.thread}</strong>}
+            {d.label}
+          </span>
+        </li>
+      ))}
+    </ul>
+    <figcaption>{block.caption}</figcaption>
+  </figure>
+)}
+
+{block.kind === "keeperFlow" && (
+  <div class="seat-flow" data-keeper-flow>
+    <div class="seat-flow__card" data-keeper={ctx.keeper.id}>
+      <Portrait id={ctx.keeper.id} size="small" alt={portraitAlt(ctx.keeper.id, ctx.keeper.name, ctx.keeper.title)} />
+      <h3>{ctx.keeper.name}, an AI agent</h3>
+      <p class="meta">{ctx.keeper.disclosure}</p>
+      <ul>
+        {block.keeper.lines.map((line) => <li>{line}</li>)}
+      </ul>
+    </div>
+    <div class="seat-flow__arrow" aria-hidden="true" />
+    <div class="seat-flow__card">
+      <Fragment set:html={icon(block.you.icon)} />
+      <h3>{block.you.title}</h3>
+      {block.you.note && <p class="meta">{block.you.note}</p>}
+      <ul>
+        {block.you.lines.map((line) => <li>{line}</li>)}
+      </ul>
+    </div>
+  </div>
+)}
+
+{block.kind === "plaque" && (
+  <div class="seat-plaque">
+    {block.title && (
+      <p>
+        <strong>{block.title}</strong>
+      </p>
+    )}
+    {block.lines.map((line) => <p>{line}</p>)}
+    {block.pills && (
+      <ul class="seat-pills" aria-label="Where it reaches">
+        {block.pills.map((p) => (
+          <li class="hall-badge">{p}</li>
+        ))}
+      </ul>
+    )}
+  </div>
+)}
+
+{block.kind === "leadPlaque" && (
+  <div class="seat-plaque" data-org-lead>
+    <p>
+      {block.before} {common.org.lead}.
+    </p>
+  </div>
+)}
+
+{block.kind === "lede" && <p class="lede">{block.text}</p>}
+
+{block.kind === "note" && <p class="meta">{block.text}</p>}
+
+{block.kind === "split" && (
+  <div class:list={["seat-split", figureSplit && "seat-split--figure"]}>
+    <div>
+      {block.left.map((b) => (
+        <Astro.self block={b} ctx={ctx} />
+      ))}
+    </div>
+    <div>
+      {block.right.map((b) => (
+        <Astro.self block={b} ctx={ctx} />
+      ))}
+    </div>
+  </div>
+)}
+
+{(block.kind === "bring" || block.kind === "lookFor") && (
+  <div>
+    <h3>{block.heading}</h3>
+    <ul class="seat-traits" data-traits={block.kind}>
+      {(block.kind === "bring" ? seat.bring : common.look_for).map((line) => (
+        <li class="seat-trait">{disclose(line)}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
+{block.kind === "rules" && (
+  <div class="seat-plaque" data-rules>
+    <h3>{block.heading}</h3>
+    <ul>
+      {[...common.rules_common, ...seat.rules_extra].map((rule) => (
+        <li>{disclose(rule)}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
+{block.kind === "steps" && (
+  <div class="seat-steps" data-steps>
+    <div class="seat-trail" set:html={stepsTrail()} />
+    <ol class="seat-steps__list">
+      {common.steps.map((step) => (
+        <li>
+          <h3>{disclose(step.title)}</h3>
+          <p>{disclose(step.body)}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+)}
+
+{block.kind === "courses" && (
+  <div class="seat-courses-block" data-courses>
+    <h3>The courses</h3>
+    {block.intro && <p>{block.intro}</p>}
+    <div class="seat-table-wrap">
+      <table class="seat-courses">
+        <caption class="visually-hidden">Claude Academy courses for the {seat.title} seat</caption>
+        <thead>
+          <tr>
+            <th scope="col">Course</th>
+            <th scope="col">Length</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ctx.courses.map((c, i) => (
+            <tr data-course={c.id}>
+              <th scope="row">
+                <span class:list={["seat-swatch", `sv-seg-${i % 4}`]} aria-hidden="true" />
+                <a href={c.url}>{c.title}</a>
+              </th>
+              <td>
+                <span data-length>{c.length}</span>
+                <FactRef n={courseNote} short={COURSE_SHORT} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr data-course-total>
+            <th scope="row">In total</th>
+            <td>
+              <span data-total>{formatHours(totalHours)} hours</span>
+              <FactRef n={courseNote} short={COURSE_SHORT} />
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="seat-hours" set:html={hoursBar(ctx.courses.map((c) => c.hours))} />
+  </div>
+)}
+
+{block.kind === "apply" && (
+  <div class="panel panel--raised seat-apply" id="apply" data-apply-block>
+    <h3>{block.heading}</h3>
+    <p>The form asks for your note and the link to each badge. A person reads every application.</p>
+    <p class="btn-row">
+      <Button href={ctx.applyHref} size="lg" data-apply>
+        Apply for this seat<span class="visually-hidden"> ({seat.title})</span>
+      </Button>
+    </p>
+  </div>
+)}

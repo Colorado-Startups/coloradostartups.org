@@ -1,0 +1,8 @@
+id: demand-ai-group
+name: "Demand AI Group"
+website: "https://www.demandai.net"
+hq_city: "Denver"
+sector: "Software"
+description: "Provides AI-driven demand generation and marketing services. Its clients sell to other businesses."
+sources:
+  - "https://www.demandai.net/press/2-5-million-funding/"

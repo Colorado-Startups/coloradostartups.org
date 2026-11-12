@@ -1,0 +1,181 @@
+---
+// Startup Resources based in a region's cities, grouped by stage the way the
+// directory groups them (L3's groupByStage and labels, reused by import). Each
+// city links into /ecosystem-canvas/ filtered to it. The list is left out of
+// the Pagefind index, so a search finds each resource once, on the directory.
+// Owner: L8.
+import type { Region, ResourceCard } from "@cs/shared";
+
+import { groupByStage } from "../canvas/canvas-data";
+import { cityLabel, STAGE_LABELS, STAGE_SUMMARIES, SUBSTAGE_LABELS, TYPE_LABELS } from "../canvas/labels";
+import { countBy } from "../../lib/leaderboard/board";
+import { canvasCityHref } from "../../lib/regions/page";
+
+interface Props {
+  region: Region;
+  /** Active resources whose city maps to this region. */
+  cards: readonly ResourceCard[];
+  /** Active statewide resources, which serve every region. */
+  statewide: number;
+}
+
+const { region, cards, statewide } = Astro.props;
+const groups = groupByStage(cards).filter((g) => g.total > 0);
+const cities = countBy(cards, (c) => c.city);
+const noun = (n: number) => (n === 1 ? "resource" : "resources");
+---
+
+<div class="region-resources" data-region-resources>
+  {
+    cards.length > 0 ? (
+      <p>
+        Startup Resources lists {cards.length} {noun(cards.length)} based in {region.name}. Open a city to see its
+        resources in the full directory, with every filter.
+      </p>
+    ) : (
+      <p>Startup Resources lists no resources based in {region.name} yet.</p>
+    )
+  }
+  {
+    cities.length > 0 && (
+      <ul class="city-links" aria-label={`Startup Resources by city in ${region.name}`}>
+        {cities.map((c) => (
+          <li>
+            <a href={canvasCityHref(c.key)}>
+              {cityLabel(c.key)} <span class="count">({c.count})</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  <p>
+    {
+      statewide > 0 ? (
+        <>
+          Statewide programs serve every region too.{" "}
+          <a href={canvasCityHref("statewide")}>{`See the ${statewide} statewide ${noun(statewide)}`}</a>, or{" "}
+          <a href="/ecosystem-canvas/">browse all of Startup Resources</a>.
+        </>
+      ) : (
+        <a href="/ecosystem-canvas/">Browse all of Startup Resources</a>
+      )
+    }
+  </p>
+
+  <div class="stages" data-pagefind-ignore>
+    {
+      groups.map((g) => (
+        <details class="stage">
+          <summary>
+            <span class="stage-name">{STAGE_LABELS[g.stage]}</span> <span class="count">({g.total})</span>
+            <span class="meta stage-summary">{STAGE_SUMMARIES[g.stage]}</span>
+          </summary>
+          {g.substages.map((s) => (
+            <section aria-label={`${STAGE_LABELS[g.stage]}: ${SUBSTAGE_LABELS[s.substage] ?? s.substage}`}>
+              <h3>{SUBSTAGE_LABELS[s.substage] ?? s.substage}</h3>
+              <ul class="items">
+                {s.cards.map((card) => (
+                  <li data-id={card.id} data-city={card.city}>
+                    <a href={card.url}>{card.name}</a>
+                    <span class="meta">
+                      {TYPE_LABELS[card.type]}, {cityLabel(card.city)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </details>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .city-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+  .city-links a {
+    display: inline-block;
+    padding-block: var(--s-1);
+  }
+  .count {
+    color: var(--c-text-dim);
+  }
+  .stages {
+    display: grid;
+    gap: var(--s-3);
+    margin-top: var(--s-5);
+  }
+  /* A control, so its edge is the UI border token (3:1 or better), not the
+     decorative rule, and its name underlines on hover like a link (#249). */
+  .stage {
+    background: var(--c-ground);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-card);
+    padding: var(--s-3) var(--s-4);
+  }
+  .stage summary:hover .stage-name {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .stage summary {
+    cursor: pointer;
+    min-height: var(--size-tap);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s-2);
+    padding-block: var(--s-2);
+    list-style: none;
+  }
+  .stage summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A flex summary drops the native triangle, so draw a chevron that turns. */
+  .stage summary::before {
+    content: "";
+    align-self: center;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: var(--s-1);
+    border-right: var(--line-edge) solid currentColor;
+    border-bottom: var(--line-edge) solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+  }
+  .stage[open] summary::before {
+    transform: rotate(45deg);
+  }
+  .stage-name {
+    font-weight: 700;
+    font-size: var(--t-step-1);
+  }
+  .stage-summary {
+    flex-basis: 100%;
+  }
+  .stage h3 {
+    font-size: var(--t-step-1);
+    margin: var(--s-4) 0 var(--s-2);
+  }
+  .items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--s-2) var(--s-5);
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+  .items li {
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--s-1);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+</style>

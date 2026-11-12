@@ -1,0 +1,13 @@
+id: intel
+name: Intel
+url: https://www.intel.com/
+stage: support
+substage: organizations
+city: Fort Collins
+type: other
+description: Processors, AI accelerators and networking chips. It also has developer software. Consumers and businesses use them. It has an office in Fort Collins.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

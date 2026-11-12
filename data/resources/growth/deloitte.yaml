@@ -1,0 +1,15 @@
+id: deloitte
+name: Deloitte
+url: https://www2.deloitte.com/us/en.html
+stage: growth
+substage: service-providers
+city: statewide
+type: service-provider
+description: A services firm. It offers audit and assurance, tax, consulting and cyber services. It works with groups in many industries.
+tags:
+  - accounting
+  - colorado-springs
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

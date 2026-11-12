@@ -1,0 +1,13 @@
+id: fort-collins-creator-hub
+name: Fort Collins Creator Hub
+url: http://www.fortcollinscreatorhub.org/
+stage: idea
+substage: validate
+city: Fort Collins
+type: event
+description: A volunteer-run Fort Collins makerspace. Members use woodworking, welding and electronics tools. The public can take classes.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

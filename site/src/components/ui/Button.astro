@@ -1,0 +1,52 @@
+---
+// Button: a forged slab on a solid ledge that sinks when pressed.
+// Renders <a> when href is set, otherwise <button>. Styles: .btn in
+// src/styles/hall.css (L12); script that builds DOM uses those classes.
+//
+// Props
+//   variant   "primary": forge gold, the one main action in a view (default)
+//             "secondary": hammered bronze, a second action beside it
+//             "stone": light and plain, for utility actions such as a menu toggle
+//             "quiet": link weight, for a third action or "Cancel"
+//   size      "md" (default, 48px tall) or "lg" (56px, for a hero)
+//   href      a URL; renders a link styled as a button
+//   type      "button" (default), "submit" or "reset"; buttons only
+//   disabled  buttons only; a link cannot be disabled, so leave it out instead
+//   class     extra classes, appended
+//   ...rest   any other attribute: aria-*, data-*, id, name, value, form
+//
+// Copy: say exactly what happens. "Join the Slack", never "Submit".
+type Variant = "primary" | "secondary" | "stone" | "quiet";
+
+interface Props {
+  variant?: Variant;
+  size?: "md" | "lg";
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const VARIANT_CLASS: Record<Variant, string> = {
+  primary: "btn--gold",
+  secondary: "btn--bronze",
+  stone: "btn--stone",
+  quiet: "btn--quiet",
+};
+
+const { variant = "primary", size = "md", href, type = "button", disabled, class: extra, ...rest } = Astro.props;
+const classes = ["btn", VARIANT_CLASS[variant], size === "lg" && "btn--lg", extra];
+---
+
+{
+  href ? (
+    <a class:list={classes} href={href} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button class:list={classes} type={type} disabled={disabled} {...rest}>
+      <slot />
+    </button>
+  )
+}

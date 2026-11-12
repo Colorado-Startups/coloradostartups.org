@@ -1,0 +1,13 @@
+id: epicentral-coworking
+name: Epicentral Coworking
+url: https://epicentral.org/
+stage: launch
+substage: service-providers
+city: Colorado Springs
+type: coworking
+description: A coworking space in downtown Colorado Springs. It is at Epicentral Main and The Carlton. It has day passes, memberships, dedicated desks, private offices, meeting rooms and social events.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

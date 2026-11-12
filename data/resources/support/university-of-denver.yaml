@@ -1,0 +1,13 @@
+id: university-of-denver
+name: University of Denver
+url: https://www.du.edu/
+stage: support
+substage: organizations
+city: Denver
+type: university
+description: A university in Denver. It has research, internships, service learning and study abroad. Its 4D Experience is for building careers and lives of purpose.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

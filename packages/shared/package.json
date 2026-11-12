@@ -1,0 +1,13 @@
+{
+  "name": "@cs/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Contracts shared by the site, its Worker and the Communitas Worker. Owned by the orchestrator; lanes request changes.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  }
+}

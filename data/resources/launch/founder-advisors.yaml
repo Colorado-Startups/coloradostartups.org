@@ -1,0 +1,13 @@
+id: founder-advisors
+name: Founder Advisors
+url: https://founderadvisors.tech/
+stage: launch
+substage: develop
+city: Boulder
+type: incubator
+description: A Boulder team of seasoned entrepreneurs and business specialists. Startup founders get an advisory team by subscription. The team coaches and mentors, reviews documents and makes introductions.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

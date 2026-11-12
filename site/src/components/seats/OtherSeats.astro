@@ -1,0 +1,46 @@
+---
+// Links from one seat page to the other three (lane L38), as L12's cards.
+// The kit's pages linked each other through claude.ai artifact links; on the
+// site the seats link to their own pages instead. Each card's picture keeps
+// its seat hero's alt, so the Slack seat's Great Hall, which shows keepers,
+// says they are AI agents here too (#714).
+import ArtImage from "../art/ArtImage.astro";
+import Card from "../ui/Card.astro";
+import { withKeeperDisclosure } from "../../lib/seats/copy";
+import { SEAT_LAYOUTS, hasLayout } from "../../lib/seats/layouts";
+import type { Seat } from "../../lib/seats/load";
+import { seatPagePath } from "../../lib/seats/page";
+
+interface Props {
+  seats: readonly Seat[];
+}
+
+const { seats } = Astro.props;
+---
+
+<section class="section section--lit" aria-labelledby="other-seats-title" data-other-seats>
+  <div class="wrap">
+    <h2 id="other-seats-title">The other volunteer seats</h2>
+    <ul class="hall-grid seat-others">
+      {
+        seats.map((s) => (
+          <Card title={s.title} href={seatPagePath(s.id)} element="li" data-seat-link={s.id}>
+            {hasLayout(s.id) && (
+              <ArtImage
+                slot="media"
+                src={SEAT_LAYOUTS[s.id].hero.art}
+                alt={SEAT_LAYOUTS[s.id].hero.alt}
+                aspect="16 / 9"
+                widths={[400, 640, 800]}
+                sizes="(max-width: 720px) 100vw, 380px"
+                motion="none"
+              />
+            )}
+            <p>{withKeeperDisclosure(s.one_liner)}</p>
+            <span slot="meta">{s.eyebrow}</span>
+          </Card>
+        ))
+      }
+    </ul>
+  </div>
+</section>

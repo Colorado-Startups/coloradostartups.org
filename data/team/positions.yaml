@@ -1,0 +1,118 @@
+# Open positions for people (decision 44). Seeded by the orchestrator in Wave 0b;
+# L9 owns this file. People fill every moderator and organizer seat; the AI
+# keepers never moderate. When someone says yes, add them to people.yaml with
+# group "community", set status: filled and holder: <their person id>.
+#
+# A seat with an `apply` block takes applications at
+# /get-involved/apply/?role=<id> (lane L19). Its courses must match
+# REQUIRED_COURSES in packages/shared/src/apply.ts; site/test/unit/l19/ checks.
+# Set `open: false` to send the seat back to the email call to action.
+# These four seats lead with what the seat gives, then the card adds
+# UNPAID_VOLUNTEER_LINE (decision 67).
+
+- id: slack-community-lead
+  title: Slack Community Lead
+  area: community
+  summary: Meet founders from every corner of Colorado. Learn to run an online community with AI, and carry the Slack Community Lead title on LinkedIn.
+  what_you_do:
+    - Run and organize the Colorado Startups Slack, so founders find the right conversation fast.
+    - Welcome new members and point them to the right channels.
+    - Keep threads on topic, and step in when the Code of Conduct needs it.
+    - Tell us where Communitas, the AI agent that welcomes new members, gets it wrong.
+  status: open
+  apply:
+    open: true
+    courses:
+      - claude-101
+      - ai-fluency-framework-foundations
+      - building-effective-human-agent-teams
+
+- id: linkedin-moderator
+  title: LinkedIn Group moderator
+  area: community
+  summary: Keep the Colorado Startups LinkedIn Group a tight, useful space for Colorado founders.
+  what_you_do:
+    - Approve new members and keep posts on topic.
+    - Run the weekly threads with the community.
+    - Spot founder wins worth sharing.
+  status: open
+
+- id: community-organizer
+  title: Community organizer, statewide
+  area: community
+  summary: Connect founders across Colorado and help the region Connectors do their best work.
+  what_you_do:
+    - Help plan meetups and community events.
+    - Connect founders across Photon Mountain, Space Peak and Fusion Canyon.
+    - Bring new founders into the community.
+  status: open
+
+- id: photon-mountain-connector
+  title: Photon Mountain Connector
+  area: region
+  region: photon-mountain
+  summary: Meet the founders of Boulder, Denver and Golden, and the rest of Photon Mountain. Learn to work with AI, and carry the Photon Mountain Connector title on LinkedIn.
+  what_you_do:
+    - Go to local startup events across Boulder, Denver, Golden and the rest of Photon Mountain.
+    - Connect Boulder, Denver and Golden, and introduce founders in one to the people they need in the others.
+    - Share local wins and events with the whole community.
+  status: open
+  apply:
+    open: true
+    courses:
+      - claude-101
+      - ai-fluency-framework-foundations
+      - ai-fluency-for-small-businesses
+
+- id: space-peak-connector
+  title: Space Peak Connector
+  area: region
+  region: space-peak
+  summary: Meet the founders of Colorado Springs and the Pikes Peak region. Learn to work with AI, and carry the Space Peak Connector title on LinkedIn.
+  what_you_do:
+    - Go to local startup events in Colorado Springs and the Pikes Peak region.
+    - Connect its founders with the rest of Colorado, and introduce them around.
+    - Share local wins and events with the whole community.
+  status: open
+  apply:
+    open: true
+    courses:
+      - claude-101
+      - ai-fluency-framework-foundations
+      - ai-fluency-for-small-businesses
+
+- id: fusion-canyon-connector
+  title: Fusion Canyon Connector
+  area: region
+  region: fusion-canyon
+  summary: Meet the founders of Fort Collins, Loveland, Windsor and Greeley. Learn to work with AI, and carry the Fusion Canyon Connector title on LinkedIn.
+  what_you_do:
+    - Go to local startup events in Fort Collins, Loveland, Windsor and Greeley.
+    - Connect its founders with the rest of Colorado, and introduce them around.
+    - Share local wins and events with the whole community.
+  status: open
+  apply:
+    open: true
+    courses:
+      - claude-101
+      - ai-fluency-framework-foundations
+      - ai-fluency-for-small-businesses
+
+- id: resources-curator
+  title: Startup Resources curator
+  area: project
+  summary: Keep the Startup Resources directory accurate and useful for founders.
+  what_you_do:
+    - Review suggested resources.
+    - Check links and descriptions.
+    - Flag gaps a founder would notice.
+  status: open
+
+- id: startupers-contributor
+  title: Startupers contributor
+  area: project
+  summary: Help the Startupers newsletter tell the stories of Colorado founders.
+  what_you_do:
+    - Send founder wins, lessons and events worth sharing.
+    - Help draft editions for review.
+  status: open

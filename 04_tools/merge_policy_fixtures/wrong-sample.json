@@ -1,0 +1,39 @@
+{
+  "_README": [
+    "Bad policy for merge_policy.py --self-test: well formed, but its maintainer_only sample",
+    "waits only because it misses the allowlist, not because a maintainer_only glob hits it.",
+    "The self-test must FAIL (exit 1)."
+  ],
+  "_expect": {
+    "exit": 1,
+    "text": "should wait as maintainer_only"
+  },
+  "maintainer_only": [
+    ".github/**"
+  ],
+  "ai_mergeable": [
+    "site/src/pages/**"
+  ],
+  "samples": {
+    "ai_mergeable": [
+      [
+        "site/src/pages/x.astro"
+      ]
+    ],
+    "maintainer_only": [
+      [
+        "ops/runbooks/launch.md"
+      ]
+    ],
+    "default_deny": [
+      [
+        "README.md"
+      ]
+    ],
+    "refused": [
+      [
+        "site/src/pages/../../.github/x.yml"
+      ]
+    ]
+  }
+}

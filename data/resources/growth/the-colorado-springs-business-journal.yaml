@@ -1,0 +1,13 @@
+id: the-colorado-springs-business-journal
+name: The Colorado Springs Business Journal
+url: https://www.csbj.com/
+stage: growth
+substage: service-providers
+city: Colorado Springs
+type: media
+description: A regional news outlet. It is in Colorado Springs.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

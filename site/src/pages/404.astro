@@ -1,0 +1,65 @@
+---
+// 404: every unknown path. The heading carries the Hall's voice; the help
+// below it stays literal (01_doctrine/voice.md). Owner: L13.
+// The art is L6's lantern-lit passage that ends at a blank wall (#711), made
+// for this page; no keeper is in it. It sits beside the text from 64rem and
+// after it on a phone, so the way home stays in the first screen.
+import ArtImage from "../components/art/ArtImage.astro";
+import InfoHeader from "../components/info/InfoHeader.astro";
+import { CONTACT_EMAIL, mailto } from "../components/info/links";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found" description="This page is not in the Hall." noindex>
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap lost">
+      <div>
+        <InfoHeader kicker="Page not found" title="This passage leads nowhere">
+          <p class="lede">
+            We could not find that page. It may have moved when we rebuilt the site, or the link may have a typo.
+          </p>
+        </InfoHeader>
+        <div class="btn-row">
+          <a class="btn btn--gold" href="/">Go to the home page</a>
+          <a class="btn btn--stone" href="/ecosystem-canvas/">Browse Startup Resources</a>
+        </div>
+        <p class="help">
+          Followed a link from another site and think it should work? Tell us at{" "}
+          <a href={mailto("Broken link on coloradostartups.org")}>{CONTACT_EMAIL}</a>.
+        </p>
+      </div>
+      <ArtImage
+        src="scenes/passage"
+        alt="A cog railway runs down a lantern-lit passage of pink granite to a blank stone wall, with a brass engine on its cart and a snowy peak beyond."
+        aspect="16 / 9"
+        widths={[640, 960, 1280]}
+        sizes="(min-width: 64rem) 560px, 100vw"
+        loading="eager"
+        class="lost__art"
+      />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lost {
+    display: grid;
+    gap: var(--s-6);
+    align-items: center;
+  }
+  .lost :global(.lost__art) {
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  /* The text column takes 7 of 12 parts, so the title breaks into two lines
+     at 1280 px, not three. */
+  @media (min-width: 64rem) {
+    .lost {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--s-7);
+    }
+  }
+  .help {
+    margin-top: var(--s-6);
+  }
+</style>

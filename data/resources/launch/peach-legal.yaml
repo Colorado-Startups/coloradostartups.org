@@ -1,0 +1,13 @@
+id: peach-legal
+name: Peach Legal
+url: https://www.peach.legal/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A Boulder law firm. It offers startup founders flat-fee legal help. That covers company formation, contracts and fundraising documents.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

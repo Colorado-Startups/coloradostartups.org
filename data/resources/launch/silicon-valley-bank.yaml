@@ -1,0 +1,13 @@
+id: silicon-valley-bank
+name: Silicon Valley Bank
+url: https://www.svb.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: National bank or business banking service in Denver. Listed in the Ecosystem Canvas for founders at the launch stage.
+tags:
+  - banking
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

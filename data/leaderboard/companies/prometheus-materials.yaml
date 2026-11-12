@@ -1,0 +1,9 @@
+id: prometheus-materials
+name: "Prometheus Materials"
+website: "https://prometheusmaterials.com/"
+hq_city: "Longmont"
+sector: "Materials and manufacturing"
+description: "Grows microalgae to make a cement replacement. Concrete producers blend it into their mix."
+sources:
+  - "https://www.colorado.edu/venturepartners/startup-portfolio/prometheus-materials-inc"
+  - "https://prometheusmaterials.com/"

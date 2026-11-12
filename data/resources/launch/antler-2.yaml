@@ -1,0 +1,14 @@
+id: antler-2
+name: Antler
+url: http://antler.co/colorado
+stage: launch
+substage: investors
+city: Boulder
+type: investor
+description: Seed-stage venture capital firm in Boulder.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

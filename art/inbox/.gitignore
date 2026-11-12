@@ -1,0 +1,3 @@
+# Renders land here (art/tools/run-space.py --inbox art/inbox); they never ship from here.
+*
+!.gitignore

@@ -1,0 +1,9 @@
+id: stackhawk
+name: "StackHawk"
+website: "https://www.stackhawk.com"
+hq_city: "Denver"
+sector: "Cybersecurity"
+description: "Sells application security testing. Developers run it in their build pipelines to find and fix bugs."
+sources:
+  - "https://www.stackhawk.com/terms-of-service"
+  - "https://www.stackhawk.com/contact-us/"

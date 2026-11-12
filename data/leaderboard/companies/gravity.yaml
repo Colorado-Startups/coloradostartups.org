@@ -1,0 +1,8 @@
+id: gravity
+name: "Gravity"
+website: "https://www.bygravity.com"
+hq_city: "Boulder"
+sector: "AI and data"
+description: "Sells an AI analyst product. It connects to data warehouses and BI tools and explains metric changes to business teams."
+sources:
+  - "https://www.bygravity.com/about"

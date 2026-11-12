@@ -1,0 +1,194 @@
+---
+// The Hall (home). Owner: L1. Founders first (decision 46): in a few seconds a
+// Colorado founder should know this community is for them and how to get in.
+//
+// Order: the hero and its art slot; the four ways in; the welcome desk, the
+// Resourcus panel and the newsletter; then teasers for Startup Resources, the
+// Leaderboard, the three regions and the keepers. The keepers come last: they
+// are the fun around the founders, not the point.
+//
+// The hero has one gold action, Join the Slack; the other two ways in are
+// quiet links beside it (#201). Two sections carry a Banner, Ways in and
+// Inside the Hall, so the section titles do not all read alike.
+//
+// The Leaderboard teaser never mentions investing (decision 17), and no line
+// here states a member count.
+import { WAYS_IN } from "@cs/shared";
+
+import WelcomeDesk from "../components/communitas/WelcomeDesk.astro";
+import { HALL_ART_ALT } from "../components/art/keepers";
+import HeroArt from "../components/hall/HeroArt.astro";
+import KeeperTeasers from "../components/hall/KeeperTeasers.astro";
+import { homeJsonLd, TAGLINE } from "../components/hall/org";
+import RegionTeasers from "../components/hall/RegionTeasers.astro";
+import WaysIn from "../components/hall/WaysIn.astro";
+import Badge from "../components/ui/Badge.astro";
+import Banner from "../components/ui/Banner.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import NewsletterSignup from "../components/newsletter/NewsletterSignup.astro";
+import ResourcusPanel from "../components/resourcus/ResourcusPanel.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const site = Astro.site!;
+const description = `${TAGLINE} Join the Slack and the LinkedIn Group, find startup resources and meet the founders building here.`;
+---
+
+<BaseLayout title="Colorado Startups" description={description} ogImage="home" jsonLd={homeJsonLd(site)}>
+  <section class="hero" aria-labelledby="hall-title">
+    <div class="wrap hero-copy">
+      <h1 id="hall-title">Colorado Startups</h1>
+      <p class="lede">
+        {TAGLINE} Come in, meet the founders already building here and find what your company needs next.
+      </p>
+      <p class="welcome-too">Talent, investors, lenders and service providers who back founders are welcome too.</p>
+      <div class="btn-row">
+        <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
+        <Button variant="quiet" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
+        <Button variant="quiet" href={WAYS_IN.newsletter}>Get the newsletter</Button>
+      </div>
+      <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
+    </div>
+    <div class="wrap hero-art">
+      <HeroArt alt={HALL_ART_ALT} />
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="ways-in">
+    <div class="wrap">
+      <Banner tone="sky" id="ways-in">Ways in</Banner>
+      <p class="intro">Four places to meet the community. Start with the one that fits how you work.</p>
+      <WaysIn />
+      <p class="forum-note">
+        Coming later: a private forum for founders only.{" "}
+        <a href={WAYS_IN.discourse}>Read about the founders forum</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="start">
+    <div class="wrap">
+      <h2 id="start">Start here</h2>
+      <div class="pair">
+        <WelcomeDesk compact />
+        <ResourcusPanel compact />
+      </div>
+      <div class="signup">
+        <NewsletterSignup variant="inline" returnTo="/" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="rooms">
+    <div class="wrap">
+      <Banner variant="lintel" id="rooms">Inside the Hall</Banner>
+      <ul class="hall-grid rooms" role="list">
+        <Card element="li" title="Startup Resources" data-teaser="resources">
+          <Badge slot="badges">Directory</Badge>
+          <p>
+            Programs, accelerators, investors and service providers for every stage of a company, mapped by the
+            community. Ask a question in plain words and get the resources that fit.
+          </p>
+          <Button slot="actions" href={WAYS_IN.canvas}>Browse Startup Resources</Button>
+        </Card>
+        <Card element="li" title="The Leaderboard" data-teaser="leaderboard">
+          <Badge slot="badges">Leaderboard gallery</Badge>
+          <p>
+            The Leaderboard recognizes companies building in Colorado and their founders. Every listing links to the
+            sources we used.
+          </p>
+          <Button slot="actions" href={WAYS_IN.leaderboard}>See the Leaderboard</Button>
+          <Button slot="actions" variant="secondary" href="/leaderboard/nominate/">Nominate your company</Button>
+        </Card>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="regions">
+    <div class="wrap">
+      <h2 id="regions">Three regions</h2>
+      <p class="intro">
+        The Hall keeps three outposts along the Front Range. Each one has a Connector seat for a person, never a
+        keeper.
+      </p>
+      <RegionTeasers />
+      <p class="after">
+        Building elsewhere in Colorado? Every room in the Hall is yours too.{" "}
+        <a href="/regions/">See all regions</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="keepers">
+    <div class="wrap">
+      <h2 id="keepers">The keepers</h2>
+      <p class="intro">
+        Three AI agents help around the Hall. They welcome newcomers, map resources and draft the news. People run
+        the community, and every moderator and organizer seat is for a person.
+      </p>
+      <KeeperTeasers />
+      <div class="btn-row after">
+        <Button variant="secondary" href="/team/">Meet the team</Button>
+        <Button variant="secondary" href="/get-involved/">See open positions</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The note under the Slack button says where it goes (#128). */
+  #slack-form-note {
+    margin: var(--s-3) 0 0;
+  }
+  .hero {
+    padding-block: var(--s-8) var(--s-7);
+    background:
+      radial-gradient(90% 70% at 50% 0%, color-mix(in oklab, var(--c-accent) 28%, transparent), transparent 70%),
+      var(--c-ground);
+  }
+  .hero h1 {
+    margin-bottom: var(--s-4);
+  }
+  .hero .lede {
+    margin-bottom: var(--s-3);
+  }
+  .welcome-too {
+    color: var(--c-text-dim);
+    margin-bottom: var(--s-5);
+  }
+  /* The quiet links already stand 44 px tall, so wrapped rows sit closer. */
+  .hero .btn-row {
+    row-gap: var(--s-1);
+  }
+  .hero-art {
+    margin-top: var(--s-7);
+  }
+  .intro {
+    color: var(--c-text-dim);
+    margin-bottom: var(--s-5);
+  }
+  .forum-note,
+  .after {
+    margin-top: var(--s-5);
+    margin-bottom: 0;
+  }
+  /* The welcome desk and Ask Resourcus stretch to one height, as on
+     /community/ (#213), so the pair ends on one line (#723). */
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+  .signup {
+    margin-top: var(--s-5);
+  }
+  .rooms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (max-width: 760px) {
+    .pair,
+    .rooms {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

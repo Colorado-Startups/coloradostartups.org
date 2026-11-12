@@ -1,0 +1,9 @@
+id: sunday
+name: "Sunday"
+website: "https://getsunday.com/"
+hq_city: "Boulder"
+sector: "Consumer and retail"
+description: "Sells subscription lawn and garden care plans. Homeowners receive seasonal treatments matched to their soil."
+sources:
+  - "https://getsunday.com/"
+  - "https://bizwest.com/2021/10/06/boulder-lawn-care-startup-sunday-raises-50m-series-c-funding-round/"

@@ -1,0 +1,13 @@
+id: google
+name: Google
+url: https://www.google.com/
+stage: support
+substage: organizations
+city: Boulder
+type: other
+description: Search engine and apps such as Gmail, plus advertising and business tools, with an office in Boulder.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

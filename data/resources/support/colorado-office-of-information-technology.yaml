@@ -1,0 +1,13 @@
+id: colorado-office-of-information-technology
+name: Colorado Office of Information Technology
+url: http://www.oit.state.co.us/
+stage: support
+substage: organizations
+city: statewide
+type: government
+description: Colorado's state technology office. It runs state IT services such as the myColorado app. It offers IT skills training for state employees.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

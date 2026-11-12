@@ -1,0 +1,13 @@
+id: access-mode
+name: Access Mode
+url: https://www.accessmode.org/
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: A Denver program with an MVP Lab for tech founders. The lab serves Black, Latino, Asian American and Pacific Islander, and Indigenous founders. It gives them mentoring, capital, business training and technology guidance.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

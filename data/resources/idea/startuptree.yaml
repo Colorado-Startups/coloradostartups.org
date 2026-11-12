@@ -1,0 +1,13 @@
+id: startuptree
+name: StartupTree
+url: https://cuboulder.startuptree.co/
+stage: idea
+substage: validate
+city: Boulder
+type: community
+description: An online portal for the CU Boulder entrepreneurship community. It has events, competitions and applications, jobs, a forum and mentors. Members can add a venture or project.
+tags:
+  - team
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

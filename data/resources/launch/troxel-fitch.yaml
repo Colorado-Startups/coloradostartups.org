@@ -1,0 +1,13 @@
+id: troxel-fitch
+name: Troxel Fitch
+url: https://www.troxelfitchlaw.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver business and real estate law firm. It helps startups and small businesses with formation, contracts, equity deals and IP.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

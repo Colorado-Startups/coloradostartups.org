@@ -1,0 +1,8 @@
+id: exer-labs
+name: "Exer Labs"
+website: "https://Exer.ai"
+hq_city: "Denver"
+sector: "Health care"
+description: "Makes software that uses a camera to measure how patients move. Clinicians use it to assess and track musculoskeletal conditions."
+sources:
+  - "https://Exer.ai"

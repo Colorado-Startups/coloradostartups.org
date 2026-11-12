@@ -1,0 +1,8 @@
+id: termscout
+name: "TermScout"
+website: "https://www.termscout.com/"
+hq_city: "Centennial"
+sector: "Software"
+description: "Analyzes, benchmarks and certifies contracts as data. Software buyers and sellers use it to speed up deal reviews."
+sources:
+  - "https://www.termscout.com/about"

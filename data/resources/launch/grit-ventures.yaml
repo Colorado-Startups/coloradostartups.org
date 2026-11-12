@@ -1,0 +1,15 @@
+id: grit-ventures
+name: Grit Ventures
+url: http://www.gritventures.com/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A deep tech venture firm. It backs teams that spin out of university labs. Its areas are robotics, AI, energy and space.
+tags:
+  - seed
+  - venture-capital
+  - sustainability
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

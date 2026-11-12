@@ -1,0 +1,13 @@
+id: the-colorado-sun
+name: The Colorado Sun
+url: https://coloradosun.com/category/news/business/
+stage: growth
+substage: service-providers
+city: statewide
+type: media
+description: A nonprofit news outlet. It reports on business, the environment and housing. It covers all of Colorado.
+tags:
+  - news
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

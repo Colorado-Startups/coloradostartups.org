@@ -1,0 +1,27 @@
+---
+// Callout: a note set apart from the text around it, rendered as role="note".
+// Styles: .hall-callout in src/styles/hall.css (L12).
+//
+// Props
+//   tone    "parchment": a note on a scroll, for tips and asides (default)
+//           "slate": a carved slate tablet, for the one thing on a page a
+//           reader must not miss; one per page at most
+//   title   an optional bold first line; say the point, not "Note"
+//   class   extra classes, appended
+//   ...rest any other attribute
+//
+// Slot: default, one or two short paragraphs.
+interface Props {
+  tone?: "parchment" | "slate";
+  title?: string;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { tone = "parchment", title, class: extra, ...rest } = Astro.props;
+---
+
+<div class:list={["hall-callout", `hall-callout--${tone}`, extra]} role="note" {...rest}>
+  {title && <p class="hall-callout__title">{title}</p>}
+  <slot />
+</div>

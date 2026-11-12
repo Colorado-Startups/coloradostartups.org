@@ -1,0 +1,13 @@
+id: fort-collins-insurance
+name: Fort Collins Insurance
+url: https://focoins.com/
+stage: growth
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: An independent insurance firm in Fort Collins. It sells commercial liability and auto coverage. It also sells workers' compensation and bonds. Personal plans are sold too.
+tags:
+  - insurance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

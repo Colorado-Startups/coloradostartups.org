@@ -1,0 +1,110 @@
+---
+// Any illustration of the Hall: heroes, region scenes, section textures.
+// Pass the asset key (a path under src/assets/art without an extension); the
+// component finds the .webp, .png or .jpg, lets Astro optimize it, and covers a
+// fixed-ratio box so layout never shifts. Until the art exists it shows a warm
+// placeholder of the same ratio. Idle motion (lantern glow, rising embers) is
+// off for visitors who ask for reduced motion. Owned by L7; see
+// art/DIRECTION.md.
+import { Image } from "astro:assets";
+import { findArt, fitWidths } from "./art-assets";
+import { EMBERS, emberStyle } from "./embers";
+import "./idle-motion.css";
+
+interface Props {
+  /** Asset key, e.g. "hero/hall", "regions/space-peak", "textures/stone". */
+  src: string;
+  /** Describe the picture. Pass "" only when it is decoration. */
+  alt: string;
+  /** Box ratio as CSS, e.g. "16 / 7". The picture covers the box. */
+  aspect?: string;
+  widths?: number[];
+  sizes?: string;
+  loading?: "eager" | "lazy";
+  /** "glow" flickers a lantern light; "forge" adds rising sparks to it. */
+  motion?: "none" | "glow" | "forge";
+  /** Visible words on the placeholder until the art exists, e.g. "Illustration in progress". */
+  label?: string;
+  /** CSS color that glows from the top of the placeholder, e.g. a region's color. */
+  tint?: string;
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  aspect = "16 / 9",
+  widths = [640, 960, 1280, 1920, 2400],
+  sizes = "100vw",
+  loading = "lazy",
+  motion = "glow",
+  label,
+  tint,
+  class: className,
+} = Astro.props;
+
+const art = findArt(src);
+const showGlow = motion !== "none";
+const showEmbers = motion === "forge";
+const style = [`--art-aspect:${aspect}`, tint && `--art-tint:${tint}`].filter(Boolean).join(";");
+---
+
+<figure class:list={["art-frame", "art-image", className]} style={style} data-art={src}>
+  {
+    art ? (
+      <Image
+        src={art}
+        alt={alt}
+        widths={fitWidths(widths, art.width)}
+        sizes={sizes}
+        loading={loading}
+        fetchpriority={loading === "eager" ? "high" : "auto"}
+      />
+    ) : alt ? (
+      <div class="art-placeholder" role="img" aria-label={alt}>
+        {label && <span>{label}</span>}
+      </div>
+    ) : (
+      <div class="art-placeholder" aria-hidden="true">
+        {label && <span>{label}</span>}
+      </div>
+    )
+  }
+  {showGlow && <span class="art-glow" aria-hidden="true" />}
+  {
+    showEmbers && (
+      <span class="art-embers" aria-hidden="true">
+        {EMBERS.map((e) => (
+          <i style={emberStyle(e)} />
+        ))}
+      </span>
+    )
+  }
+</figure>
+
+<style>
+  .art-image {
+    margin: 0;
+    aspect-ratio: var(--art-aspect);
+    background: var(--c-surface-2);
+  }
+  .art-image :global(img),
+  .art-placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .art-placeholder {
+    display: grid;
+    place-items: end start;
+    padding: var(--s-4);
+    color: var(--c-text);
+    font-weight: 700;
+    background:
+      radial-gradient(70% 90% at 50% 0%, color-mix(in oklab, var(--art-tint, transparent) 55%, transparent), transparent 75%),
+      radial-gradient(60% 80% at 50% 70%, color-mix(in oklab, var(--c-fire) 45%, transparent), transparent 70%),
+      radial-gradient(90% 90% at 50% 100%, color-mix(in oklab, var(--c-accent) 60%, transparent), transparent 75%),
+      linear-gradient(180deg, var(--c-surface), var(--c-surface-2));
+  }
+</style>

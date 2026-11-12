@@ -1,0 +1,395 @@
+/* The Hall: base styles (v2, gold, fire and light). Orchestrator-owned; lanes
+   style their own components with scoped <style> blocks and the role tokens in
+   tokens.css (generated from 01_doctrine/brand_tokens.yaml), and request
+   changes here. */
+
+@import "./tokens.css";
+@import "./fonts.css";
+@import "./hall.css";
+
+/* ---------- Reset and ground ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--c-ground);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: var(--t-step-0);
+  line-height: 1.55;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+img {
+  display: block;
+}
+
+/* ---------- Type ----------
+   Cinzel is an inscription face (capitals by design), reserved for h1 and h2.
+   Everything else, labels included, is sentence case in Alegreya Sans. */
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.08;
+  text-wrap: balance;
+  margin: 0 0 var(--s-5);
+  /* Inherit, so night bands (.section--night, the footer) keep their light
+     text; body already sets --c-text. */
+  color: inherit;
+}
+/* Weight 800 is the chunky carved cut, for the page title only. */
+/* A 36 px floor, so one long word such as "Leaderboard" or "Accelerators"
+   fits a 375 px phone; break-word is the net for any word that still does not. */
+h1 {
+  font-size: clamp(var(--t-step-3), 6vw + 0.75rem, var(--t-step-6));
+  font-weight: 800;
+  overflow-wrap: break-word;
+}
+h2 {
+  font-size: clamp(var(--t-step-2), 3vw + 0.5rem, var(--t-step-3));
+}
+h3,
+h4 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+  margin: 0 0 var(--s-3);
+}
+/* On a phone h2 is 24 px, so h3 steps down to 21 px and the two levels
+   differ in size as well as face (#208). Both sizes sit on the scale. */
+h3 {
+  font-size: var(--t-step-1);
+}
+@media (min-width: 48rem) {
+  h3 {
+    font-size: var(--t-step-2);
+  }
+}
+h4 {
+  font-size: var(--t-step-1);
+}
+p,
+ul,
+ol,
+dl {
+  margin: 0 0 var(--s-4);
+  max-width: var(--t-measure);
+}
+small,
+.meta {
+  font-size: var(--t-step--1);
+  color: var(--ink-dim, var(--c-text-dim));
+}
+.lede {
+  font-size: var(--t-step-1);
+  line-height: 1.5;
+  max-width: 54ch;
+}
+/* Copy never ends on a one-word line where the browser can avoid it (#202). */
+p,
+li,
+.lede {
+  text-wrap: pretty;
+}
+
+/* ---------- Links and focus ----------
+   Link, dim-text and focus colors read inherited custom properties. A night
+   band sets them to its light and gold values, and a light material inside it
+   (a panel, a card) sets them back, so neither has to out-rank the other. */
+a {
+  color: var(--ink-link, var(--c-link));
+  text-decoration-thickness: var(--line-hair);
+  text-underline-offset: 0.18em;
+}
+a:hover {
+  text-decoration-thickness: var(--line-edge);
+}
+a.community {
+  color: var(--ink-community, var(--c-community));
+}
+:focus-visible {
+  /* Night bands set --focus-ring to gold: the sky ring is 2.36:1 on night. */
+  outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+  outline-offset: var(--size-ring-offset);
+}
+/* The skip link moves focus to <main>, a container rather than a control, so
+   it takes no ring; the next Tab lands on the first link inside it. */
+main:focus-visible {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--s-4);
+  /* Parked just above the page, whatever its height. */
+  top: 0;
+  translate: 0 -100%;
+  z-index: 100;
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-chisel);
+  font-weight: 700;
+}
+.skip-link:focus {
+  top: var(--s-4);
+  translate: none;
+}
+/* A hairline square: large enough that screen readers keep it, too small to
+   see. */
+.visually-hidden {
+  position: absolute !important;
+  width: var(--line-hair);
+  height: var(--line-hair);
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Layout ---------- */
+.wrap {
+  width: min(100% - 2 * var(--s-5), var(--size-wrap));
+  margin-inline: auto;
+}
+.stack > * + * {
+  margin-top: var(--s-4);
+}
+
+/* Sections, the rooms of the Hall.
+   lit: lantern light on the daylight ground, the default.
+   band: a warmer room, lit from a lantern overhead.
+   stone: a carved stone wall, for a quieter run of content.
+   hearth: forge glow rising from below, for a closing call to action.
+   night: the Front Range after dark, for the footer and city-lights rows.
+   Stone, night and the parchment callout read L7's textures through --tex-*
+   properties (src/components/ui/HallTextures.astro); until a texture file
+   exists the property is unset and the flat color shows. */
+.section {
+  padding-block: var(--s-8);
+}
+.section--lit {
+  background: var(--c-ground);
+}
+.section--band {
+  background:
+    radial-gradient(80% 120% at 50% 0%, color-mix(in oklab, var(--c-accent) 18%, transparent), transparent 70%),
+    var(--c-surface);
+}
+.section--stone {
+  /* The veil keeps links at 4.5:1 over the tile's darkest pixel; the texture
+     block in brand_tokens.yaml records the floor and the math. */
+  --_veil: color-mix(in oklab, var(--c-stone) 50%, transparent);
+  border-top: var(--line-bold) solid var(--c-stone-edge);
+  box-shadow: inset 0 var(--line-hair) 0 color-mix(in oklab, var(--c-ground) 70%, transparent);
+  background:
+    radial-gradient(70% 90% at 15% 0%, color-mix(in oklab, var(--c-ground) 55%, transparent), transparent 70%),
+    linear-gradient(var(--_veil), var(--_veil)),
+    var(--tex-stone, none),
+    var(--c-stone);
+}
+.section--hearth {
+  background:
+    radial-gradient(60% 80% at 50% 115%, color-mix(in oklab, var(--c-molten) 70%, transparent), transparent 70%),
+    radial-gradient(90% 60% at 50% 100%, color-mix(in oklab, var(--c-accent) 28%, transparent), transparent 75%),
+    var(--c-surface);
+}
+.section--night {
+  --ink-link: var(--c-gold-on-night);
+  --ink-community: var(--c-gold-on-night);
+  --ink-dim: var(--c-on-night-dim);
+  --ink-danger: var(--c-danger-on-night);
+  --focus-ring: var(--c-focus-on-night);
+  background: var(--tex-night-stone, none), var(--c-night);
+  color: var(--c-on-night);
+}
+/* Panels and buttons live in hall.css with the other Hall materials. */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+/* On a phone each button takes a line of its own, so stacked buttons share
+   one width and one right edge (#257). The full basis, not auto: with auto,
+   two short buttons shared a line when their words happened to fit, and a
+   web font a few pixels wider than its fallback broke the line as it loaded
+   (#762). A quiet link keeps its own width. */
+@media (max-width: 30rem) {
+  .btn-row > .btn:not(.btn--quiet) {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Forms ---------- */
+.field {
+  display: grid;
+  gap: var(--s-1);
+  margin-bottom: var(--s-4);
+}
+.field label {
+  font-weight: 700;
+}
+.field .hint,
+fieldset > .hint {
+  font-size: var(--t-step--1);
+  color: var(--ink-dim, var(--c-text-dim));
+}
+/* The global .field rule sets display: grid, which beats the hidden
+   attribute's display: none, so a hidden field needs this. */
+.field[hidden] {
+  display: none;
+}
+/* A group of fields under one heading, as the apply and nomination forms
+   use (#195). */
+fieldset {
+  border: var(--line-hair) solid var(--c-rule);
+  border-radius: var(--r-chisel);
+  padding: var(--s-5);
+  margin: 0 0 var(--s-5);
+  max-width: 42rem;
+}
+legend {
+  font-weight: 700;
+  padding-inline: var(--s-2);
+}
+fieldset > .hint {
+  margin: 0 0 var(--s-4);
+}
+/* A checkbox with its label beside it, the box on the first line. */
+.check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-3);
+  align-items: start;
+  margin-bottom: var(--s-4);
+}
+.check input {
+  margin-top: 0.3em;
+}
+input:not([type="checkbox"], [type="radio"], [type="hidden"]),
+select,
+textarea {
+  width: 100%;
+  min-height: var(--size-tap);
+  padding: var(--s-2) var(--s-3);
+  background: var(--c-ground);
+  color: var(--c-text);
+  border: var(--line-hair) solid var(--c-border);
+  border-radius: var(--r-chisel);
+  font: inherit;
+}
+/* A field takes the ring close in, with its border lit to match, so the ring
+   reads as part of the field rather than a box around it. */
+:is(input, select, textarea):focus-visible {
+  border-color: var(--focus-ring, var(--c-focus));
+  outline-offset: var(--line-hair);
+}
+/* rem, not em: a control's em is the browser's 13.3 px control font, which
+   drew a 15 px box. */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--c-accent-deep);
+  width: var(--size-check);
+  height: var(--size-check);
+}
+.form-error {
+  color: var(--ink-danger, var(--c-danger));
+  font-weight: 700;
+}
+/* Honeypot: present for bots, hidden from people and screen readers. */
+.hp {
+  position: absolute;
+  left: -100vw;
+  width: var(--line-hair);
+  height: var(--line-hair);
+  overflow: hidden;
+}
+
+/* ---------- Small pieces ---------- */
+.ai-note {
+  font-size: var(--t-step--1);
+  color: var(--ink-dim, var(--c-text-dim));
+  border-left: var(--line-bold) solid var(--c-fire);
+  padding-left: var(--s-3);
+}
+/* The small label above a page or section title: one style on every page
+   (#217). The words are written in sentence case; the caps are style. A
+   breadcrumb can wear it too, with its links in the same ink. */
+.kicker {
+  margin: 0 0 var(--s-2);
+  font-size: var(--t-step--1);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-link, var(--c-link));
+}
+.kicker::before {
+  content: "";
+  display: inline-block;
+  width: 1.6em;
+  height: var(--line-edge);
+  margin-right: var(--s-2);
+  vertical-align: middle;
+  background: var(--c-accent);
+}
+/* A breadcrumb trail: the parent pages, then this page (#195). Wrap it in
+   <nav aria-label="Breadcrumb" class="crumbs"> around an <ol>. */
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--t-step--1);
+}
+.crumbs li + li::before {
+  content: "/";
+  margin-right: var(--s-2);
+  color: var(--c-text-dim);
+}
+/* A link that stands alone, such as a jump link, a breadcrumb or a feed
+   link, is a 44 px tall target on a phone (#259). A link inside a sentence
+   stays inline; WCAG 2.2 SC 2.5.8 exempts it. Breadcrumb links get it
+   without the class. */
+@media (max-width: 40rem) {
+  .tap-target,
+  .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+  }
+}
+
+/* ---------- Reduced motion ----------
+   With reduced motion on, nothing animates or transitions. animation: none
+   leaves each element in its resting style. The old rule cut every duration
+   to 0.01ms, which jumps to the end state and can flash (modern-web-guidance,
+   "motion"). Components still gate movement they own, as .btn does. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
+}

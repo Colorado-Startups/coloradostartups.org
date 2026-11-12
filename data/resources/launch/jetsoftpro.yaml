@@ -1,0 +1,13 @@
+id: jetsoftpro
+name: JetSoftPro
+url: https://jetsoftpro.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A software engineering firm. It builds new products, modernizes platforms and automates workflows. Its clients are enterprises, small businesses and startups.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: elefund
+name: Elefund
+url: http://www.elefund.com/
+stage: growth
+substage: investors
+city: statewide
+type: investor
+description: A venture capital firm. It invests in pre-seed, seed and Series A companies. That includes fintech, enterprise and aerospace.
+tags:
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

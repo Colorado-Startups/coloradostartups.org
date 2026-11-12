@@ -1,0 +1,9 @@
+id: two-boxes
+name: "Two Boxes"
+website: "https://www.twoboxes.com"
+hq_city: "Denver"
+sector: "Logistics and mobility"
+description: "Provides returns processing software and services. Brands and logistics providers use them to handle returned goods."
+sources:
+  - "https://www.twoboxes.com/privacy-policy"
+  - "https://www.twoboxes.com/about"

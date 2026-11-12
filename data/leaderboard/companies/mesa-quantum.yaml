@@ -1,0 +1,9 @@
+id: mesa-quantum
+name: "Mesa Quantum"
+website: "https://mesaquantum.com"
+hq_city: "Boulder"
+sector: "Quantum and photonics"
+description: "Develops chip-scale quantum sensors and atomic clocks. Industry uses them for timing and navigation without relying on GPS."
+sources:
+  - "https://mesaquantum.com"
+  - "https://www.colorado.edu/venturepartners/2026/09/24/external-news/mesa-quantum-raises-118m-scale-gps-independent-quantum-timing"

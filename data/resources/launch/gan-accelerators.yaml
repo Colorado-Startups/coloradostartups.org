@@ -1,0 +1,13 @@
+id: gan-accelerators
+name: GAN Accelerators
+url: https://www.gan.co/
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: A mentor-driven accelerator program in Denver.
+tags:
+  - accelerator
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

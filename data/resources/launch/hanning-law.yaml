@@ -1,0 +1,13 @@
+id: hanning-law
+name: Hanning Law
+url: https://www.thatdamnlawyer.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: A Fort Collins law firm. It helps startups and business owners with formation, contracts, trademarks, copyrights and estate planning.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,140 @@
+---
+// /event-calendar/: the community's Google Calendar, Luma, and a warm pointer
+// to the Startup Community Project for Hikes and Ski Days (PLAN, Pages and
+// URLs). The path stays because it is in email signatures. Old Squarespace
+// event paths 301 here (public/_redirects). Owner: L13. The upcoming-events
+// list and its Event JSON-LD are L24's (components/events/), built from
+// data/events/upcoming.json so crawlers can read what the iframe hides.
+import ArtImage from "../components/art/ArtImage.astro";
+import { HALL_ART_ALT } from "../components/art/keepers";
+import { eventsJsonLd, SNAPSHOT, upcomingEvents } from "../components/events/events";
+import UpcomingEvents from "../components/events/UpcomingEvents.astro";
+import CalendarEmbed from "../components/info/CalendarEmbed.astro";
+import InfoHeader from "../components/info/InfoHeader.astro";
+import { calendarSubscribeUrl, CONTACT_EMAIL, LUMA_CS, LUMA_SCP, mailto } from "../components/info/links";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const events = upcomingEvents(SNAPSHOT, new Date());
+---
+
+<BaseLayout
+  title="Event calendar"
+  description="Startup events across Colorado in one calendar, plus Colorado Startups events on Luma and where to find Startup Hikes and Startup Ski Days."
+  jsonLd={eventsJsonLd(events)}
+>
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <div class="cal-head">
+        <InfoHeader kicker="Gatherings in the Hall" title="Event calendar">
+          <p class="lede">
+            Startup events across Colorado, in one calendar. It holds Colorado Startups events and events from across
+            the community.
+          </p>
+          {/* The page's two main actions in the first screen (#225, #723); the
+              cards below say more about each. */}
+          <div class="btn-row hero-actions">
+            <a class="btn btn--gold" href={LUMA_CS}>See our events on Luma</a>
+            <a class="btn btn--stone" href={calendarSubscribeUrl()}>Add to Google Calendar</a>
+          </div>
+        </InfoHeader>
+        <ArtImage
+          src="hero/hall"
+          alt={HALL_ART_ALT}
+          aspect="21 / 9"
+          widths={[640, 960, 1280]}
+          sizes="(min-width: 60rem) 26rem, 100vw"
+          loading="eager"
+          class="cal-art"
+        />
+      </div>
+      <UpcomingEvents events={events} />
+      <h2 id="full-calendar">The full calendar</h2>
+      <CalendarEmbed />
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="more-ways">
+    <div class="wrap">
+      <h2 id="more-ways">More ways to find events</h2>
+      <div class="cards">
+        <article class="panel">
+          <h3>Colorado Startups on Luma</h3>
+          <p>We post the events we host on Luma, where you can RSVP and get reminders.</p>
+          <a class="btn btn--gold" href={LUMA_CS}>See our events on Luma</a>
+        </article>
+        <article class="panel">
+          <h3>Add the calendar to yours</h3>
+          <p>This link opens Google Calendar and asks to add our calendar to your own. It needs a Google account.</p>
+          <a class="btn btn--stone" href={calendarSubscribeUrl()}>Add to Google Calendar</a>
+        </article>
+        <article class="panel" id="hikes-and-ski-days">
+          <h3>Startup Hikes and Startup Ski Days</h3>
+          <p>
+            Micah Mador and Lindsey Rohde led Colorado Startups as co-Executive Directors and did an incredible job.
+            They now run Startup Hikes, Startup Ski Days, Welcome to Boulder and Welcome to Denver through their
+            Startup Community Project.
+          </p>
+          <a class="btn btn--stone" href={LUMA_SCP}>See Startup Community Project events</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="add-your-event">
+    <div class="wrap">
+      <h2 id="add-your-event">Add your event</h2>
+      <p>
+        Hosting a startup event in Colorado? Email the details to{" "}
+        <a href={mailto("Event for the Colorado Startups calendar")}>{CONTACT_EMAIL}</a>.
+      </p>
+      <p>Include these, and we will review it for the calendar:</p>
+      <ul>
+        <li>The event's name, date and time</li>
+        <li>Where it happens, or that it is online</li>
+        <li>A short description and the RSVP link</li>
+        <li>Who is organizing it</li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-actions {
+    margin-top: var(--s-4);
+  }
+  /* The home hero, cropped to its tables and hearth. A strip under the lede on
+     phones; beside the header, in the space the lede leaves, from 60rem. */
+  .cal-head :global(.cal-art) {
+    margin-bottom: var(--s-6);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-edge);
+  }
+  .cal-head :global(.cal-art img) {
+    object-position: 72% 85%;
+  }
+  @media (min-width: 60rem) {
+    .cal-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 26rem;
+      gap: var(--s-6);
+      align-items: center;
+    }
+    .cal-head :global(.cal-art) {
+      aspect-ratio: 8 / 5;
+    }
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--s-5);
+  }
+  .cards .panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cards .btn {
+    margin-top: auto;
+  }
+</style>

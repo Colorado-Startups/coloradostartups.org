@@ -1,0 +1,69 @@
+name: dependency-age
+
+# ADVISORY. No ruleset requires this check, so it reports and never blocks a
+# merge; the orchestrator still merges only when every check passed.
+#
+# On a pull request that changes package-lock.json or a package.json, two
+# checks of what it adds, neither reimplemented here:
+#   04_tools/package_age.py --base <base>, the base commit's copy: every
+#     added version comes from the npm registry and is at least 14 days old
+#     (decision 12), or 7 for a security fix (decision 89); the pull
+#     request's own self-test runs first
+#   npm audit --omit=dev --package-lock-only   no known vulnerability in what
+#     ships, read from the lockfile alone (no install)
+# package_age.py's exit 3 (could not reach the registry, or a lockfile before
+# v2) warns and passes through 04_tools/ci_gate.sh; a version with no publish
+# time is exit 1. npm audit has no could-not-check code, so a failed audit
+# request is red. ubuntu-slim: the job only reads the registry.
+on:
+  pull_request:
+    paths:
+      - "package-lock.json"
+      - "package.json"
+      - "site/package.json"
+      - "workers/communitas/package.json"
+      - "packages/shared/package.json"
+      - "04_tools/package_age.py"
+      - ".github/workflows/dependency-age.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-age-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-age:
+    name: dependency-age
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      # Every commit, so the base lockfile and the base's checker are here
+      # without a second fetch; no token is left in .git/config.
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Self-test (known-bad and known-clean lockfiles, no network)
+        run: python3 -I 04_tools/package_age.py --self-test
+
+      # The check runs the base commit's checker, so a pull request cannot
+      # loosen the rule it is judged by. A base with no checker yet (the pull
+      # request that adds it) runs this pull request's copy.
+      - name: Every added version is old enough
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          checker="$RUNNER_TEMP/package_age.py"
+          git show "$PR_BASE:04_tools/package_age.py" > "$checker" 2>/dev/null || cp 04_tools/package_age.py "$checker"
+          bash 04_tools/ci_gate.sh python3 -I "$checker" --base "$PR_BASE"
+
+      - name: npm audit, production dependencies
+        if: ${{ !cancelled() }}
+        run: npm audit --omit=dev --package-lock-only

@@ -1,0 +1,29 @@
+---
+// Badge: a stamped tag for a short fact about an item. Text, not decoration,
+// so every tone pairs one wash with one ink at 4.5:1 or better (recorded in
+// 01_doctrine/brand_tokens.yaml). Styles: .hall-badge in src/styles/hall.css.
+//
+// Props
+//   tone   one meaning per tone, the same on every page:
+//          "stone": a place or a type, such as Boulder or Accelerator (default)
+//          "copper": a company stage, such as Idea, Launch or Growth
+//          "sky": a community space, such as a Slack channel
+//          "pine": open or active, such as Open or Hiring
+//          "gold": featured or new; one per view
+//          "night": any badge on a night band
+//   as     "span" (default) or "li", for a list of badges
+//   class  extra classes, appended
+//   ...rest any other attribute
+//
+// Slot: default, one to three words in sentence case.
+interface Props {
+  tone?: "stone" | "copper" | "sky" | "pine" | "gold" | "night";
+  as?: "span" | "li";
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { tone = "stone", as: Tag = "span", class: extra, ...rest } = Astro.props;
+---
+
+<Tag class:list={["hall-badge", tone !== "stone" && `hall-badge--${tone}`, extra]} {...rest}><slot /></Tag>

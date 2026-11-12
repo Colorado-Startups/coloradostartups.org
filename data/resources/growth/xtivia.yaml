@@ -1,0 +1,13 @@
+id: xtivia
+name: XTIVIA
+url: https://www.xtivia.com/
+stage: growth
+substage: service-providers
+city: Colorado Springs
+type: service-provider
+description: An IT services firm. It offers AI, cloud, data analytics, integration and managed services. It serves groups across industries.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

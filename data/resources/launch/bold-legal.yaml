@@ -1,0 +1,13 @@
+id: bold-legal
+name: Bold Legal
+url: https://bold.legal/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A law firm. It advises start-ups, entrepreneurs and growth-stage businesses. It covers formation and founder equity. It also covers financing rounds and contracts.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

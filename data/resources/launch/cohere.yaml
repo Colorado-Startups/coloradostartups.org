@@ -1,0 +1,13 @@
+id: cohere
+name: Cohere
+url: https://coherecommunity.com/
+stage: launch
+substage: service-providers
+city: Fort Collins
+type: coworking
+description: A coworking space on Remington Street in downtown Fort Collins. It has day passes, part-time and full-time memberships and phone booths. It also has a bookable meeting room and opt-in social gatherings.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,14 @@
+id: ncc-business-networking
+name: NCC Business Networking
+url: https://www.meetup.com/NCC-Business-Networking/
+stage: idea
+substage: validate
+city: Fort Collins
+type: community
+description: Meetup for finding cofounders and teammates in Fort Collins.
+tags:
+  - team
+  - meetup
+source: canvas-2026
+status: dead
+last_checked: "2026-11-02"

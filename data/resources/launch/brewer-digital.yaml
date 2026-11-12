@@ -1,0 +1,13 @@
+id: brewer-digital
+name: Brewer Digital
+url: https://brewerdigital.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver healthcare software team. It offers product strategy, design and engineering. It serves early-stage founders and digital health platforms.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

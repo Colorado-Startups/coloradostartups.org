@@ -1,0 +1,14 @@
+id: brex
+name: Brex
+url: https://www.brex.com/
+stage: launch
+substage: service-providers
+city: statewide
+type: service-provider
+description: A finance platform. It offers corporate cards, expense management, bill pay and business accounts. It serves startups through enterprises.
+tags:
+  - banking
+source: cs
+status: active
+last_checked: "2026-11-02"
+added: "2026-10-08"

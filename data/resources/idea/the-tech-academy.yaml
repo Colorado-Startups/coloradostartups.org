@@ -1,0 +1,13 @@
+id: the-tech-academy
+name: The Tech Academy
+url: https://www.learncodinganywhere.com/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: An online coding school headquartered in Portland, Oregon. It offers self-paced and instructor-supported bootcamps for beginners. Enrollment is open year-round.
+tags:
+  - coding
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

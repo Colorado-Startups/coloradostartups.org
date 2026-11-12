@@ -1,0 +1,13 @@
+id: mckinsey-and-company
+name: McKinsey & Company
+url: https://www.mckinsey.com/
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A management consulting firm in Denver.
+tags:
+  - consulting
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

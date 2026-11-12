@@ -1,0 +1,9 @@
+id: scotch
+name: "Scotch"
+website: "https://www.scotchpos.com/"
+hq_city: "Denver"
+sector: "Software"
+description: "Sells point-of-sale, payments and inventory software. It is built just for liquor stores."
+sources:
+  - "https://www.prnewswire.com/news-releases/scotch-raises-20m-series-a-to-modernize-liquor-stores-surpasses-1b-in-payment-volume-302790781.html"
+  - "https://www.scotchpos.com/"

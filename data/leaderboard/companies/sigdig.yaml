@@ -1,0 +1,9 @@
+id: sigdig
+name: "SigDig"
+website: "https://sigdig.com"
+hq_city: "Westminster"
+sector: "Software"
+description: "Runs a growth agency for small businesses. It builds websites, search visibility and data tracking systems."
+sources:
+  - "https://denverchamber.org/members/sigma-digital/"
+  - "https://sigdig.com/about/"

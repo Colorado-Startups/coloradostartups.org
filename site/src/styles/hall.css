@@ -1,0 +1,727 @@
+/* The Hall look: material primitives (L12, 2026-10-18).
+
+   Each primitive is one material in a dwarven forge-kingdom carved into the
+   Front Range. Panels and cards are carved stone. Frames are gilded and
+   riveted. Banners hang from bronze rods; lintels are carved over a doorway.
+   Buttons are forged slabs that sit on a solid ledge and sink when pressed.
+   Dividers are molten-gold channels. Badges are stamped tags. Callouts are
+   parchment or slate.
+
+   The components in src/components/ui/ emit these classes, and script that
+   builds DOM can use them directly. New classes carry a hall- prefix, because
+   this file is global and lane components use short scoped names. .panel and
+   .btn keep their Wave 0 names, which lanes already use.
+
+   Colors, spacing, radii, line widths, sizes and ledges come from tokens.css
+   only. A one-off ornament (a rivet, a finial, a keystone, a hammered dent)
+   is drawn in rem in its own rule, as brand_tokens.yaml says, so it scales
+   with the reader's text size and draws the same at the default 16 px root.
+   Contrast for every pairing is recorded in 01_doctrine/brand_tokens.yaml. */
+
+/* ---------- Light and night materials ----------
+   A light material resets the ink properties that global.css reads, so a
+   stone card inside a night band still reads bronze on stone. A night
+   material sets them to light text, gold links, a coral error ink and a gold
+   focus ring. */
+.panel,
+.hall-card,
+.hall-callout--parchment {
+  --ink-link: var(--c-link);
+  --ink-community: var(--c-community);
+  --ink-dim: var(--c-text-dim);
+  --ink-danger: var(--c-danger);
+  color: var(--c-text);
+}
+.panel--night,
+.hall-card--night,
+.hall-callout--slate {
+  --ink-link: var(--c-gold-on-night);
+  --ink-community: var(--c-gold-on-night);
+  --ink-dim: var(--c-on-night-dim);
+  --ink-danger: var(--c-danger-on-night);
+  color: var(--c-on-night);
+}
+/* The focus ring is set on a material's children, not on the material. A
+   card's own ring is drawn outside it, on the band around it, so the card
+   keeps the band's ring: sky on a light band, gold on a night band. */
+:is(.panel, .hall-card, .hall-callout--parchment) > * {
+  --focus-ring: var(--c-focus);
+}
+:is(.panel--night, .hall-card--night, .hall-callout--slate) > * {
+  --focus-ring: var(--c-focus-on-night);
+}
+
+/* ---------- Carved stone panel ---------- */
+.panel {
+  --_face: var(--c-surface);
+  --_hi: color-mix(in oklab, var(--c-ground) 70%, transparent);
+  --_edge: var(--c-stone-edge);
+  --_groove: color-mix(in oklab, var(--c-stone-edge) 60%, transparent);
+  --_tex: none;
+  --_veil: transparent;
+  position: relative;
+  padding: var(--s-5);
+  background:
+    linear-gradient(to bottom, var(--_hi), transparent 45%),
+    linear-gradient(var(--_veil), var(--_veil)),
+    var(--_tex),
+    var(--_face);
+  border: var(--line-edge) solid var(--_edge);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-edge), 0 var(--size-ledge) 0 var(--_edge);
+  /* The carved groove a chisel leaves just inside the edge. */
+  outline: var(--line-hair) solid var(--_groove);
+  outline-offset: -0.4375rem;
+}
+.panel--stone {
+  --_face: var(--c-stone);
+  --_tex: var(--tex-stone, none);
+  --_veil: color-mix(in oklab, var(--c-stone) 50%, transparent);
+}
+.panel--raised {
+  box-shadow: var(--sh-edge), 0 var(--size-ledge) 0 var(--_edge), var(--sh-glow);
+}
+.panel--lg {
+  padding: var(--s-6);
+}
+@media (min-width: 45rem) {
+  .panel--lg {
+    padding: var(--s-7);
+  }
+}
+
+.panel--night {
+  --_face: var(--c-night);
+  --_hi: color-mix(in oklab, var(--c-gold-on-night) 10%, transparent);
+  --_edge: var(--c-bronze);
+  --_groove: color-mix(in oklab, var(--c-gold-on-night) 35%, transparent);
+  box-shadow: var(--sh-ledge-bronze);
+}
+
+/* ---------- Forged buttons ----------
+   gold: the one main action in a view. bronze: a second action beside it.
+   stone: a light, plain action (the menu toggle). quiet: a link-weight action.
+   Button.astro maps its primary and secondary variants to gold and bronze. */
+.btn {
+  --_hi: var(--c-ground);
+  --_face: var(--c-ground);
+  --_lo: var(--c-surface);
+  --_rim: var(--c-border);
+  --_ink: var(--c-text);
+  --_ledge: var(--c-stone-edge);
+  --_glint: color-mix(in oklab, var(--c-ground) 60%, transparent);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: var(--size-control);
+  padding: var(--s-2) var(--s-5);
+  border: var(--line-edge) solid var(--_rim);
+  border-radius: var(--r-chisel);
+  background: linear-gradient(to bottom, var(--_hi), var(--_face) 50%, var(--_lo));
+  color: var(--_ink);
+  box-shadow: inset 0 var(--line-hair) 0 var(--_glint), 0 var(--size-ledge) 0 var(--_ledge);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    translate 90ms ease-out,
+    box-shadow 90ms ease-out;
+}
+.btn:hover {
+  --_lo: var(--_face);
+}
+/* Offset by the ledge's depth, so the ring clears the ledge under the slab. */
+.btn:focus-visible {
+  outline-offset: var(--size-ledge);
+}
+.btn--gold {
+  --_hi: var(--c-molten);
+  --_face: var(--c-accent);
+  --_lo: var(--c-accent-deep);
+  --_rim: var(--c-accent-ledge);
+  --_ink: var(--c-on-accent);
+  --_ledge: var(--c-accent-ledge);
+}
+.btn--gold:hover {
+  --_face: color-mix(in oklab, var(--c-accent) 65%, var(--c-molten));
+  box-shadow: inset 0 var(--line-hair) 0 var(--_glint), 0 var(--size-ledge) 0 var(--_ledge), var(--sh-glow);
+}
+.btn--bronze {
+  --_hi: color-mix(in oklab, var(--c-bronze) 82%, var(--c-molten));
+  --_face: var(--c-bronze);
+  --_lo: var(--c-bronze-deep);
+  --_rim: var(--c-bronze-deep);
+  --_ink: var(--c-on-bronze);
+  --_ledge: var(--c-bronze-deep);
+  --_glint: color-mix(in oklab, var(--c-molten) 45%, transparent);
+  /* Hammered: soft dents, lit on one side and shaded on the other, in two
+     fields of different sizes so the pattern never lines up into a grid.
+     The dents are ornament, so they are drawn in rem. */
+  background:
+    radial-gradient(circle at 35% 35%, color-mix(in oklab, var(--c-molten) 16%, transparent), transparent 0.3125rem)
+      0 0 / 1.1875rem 0.9375rem,
+    radial-gradient(circle at 60% 65%, color-mix(in oklab, var(--c-bronze-deep) 30%, transparent), transparent 0.375rem)
+      0.4375rem 0.25rem / 1.4375rem 1.0625rem,
+    linear-gradient(to bottom, var(--_hi), var(--_face) 50%, var(--_lo));
+}
+/* Hover lifts bronze and stone the way it lifts gold: molten gold lights the
+   face, and the lantern glow spreads under the slab. Moving only the lower
+   stop was too faint to see on these two. Bronze takes 6% molten, not 15%,
+   because the hammered dents add their own glint on top. Against on-bronze,
+   the lightest face under a label reads 4.66:1 on a 48 px button and 4.55:1
+   on the 56 px .btn--lg; at 8% the large button fell to 4.45:1, and at 15% a
+   48 px one measured 4.12:1 (WCAG 2.2; computed from the tokens in oklab and
+   measured in Chrome, 2026-11-02). Stone has no rule of its own; it wears
+   the .btn defaults. */
+.btn--bronze:hover {
+  --_face: color-mix(in oklab, var(--c-bronze) 94%, var(--c-molten));
+  box-shadow: inset 0 var(--line-hair) 0 var(--_glint), 0 var(--size-ledge) 0 var(--_ledge), var(--sh-glow);
+}
+.btn--stone:hover {
+  --_face: color-mix(in oklab, var(--c-ground) 85%, var(--c-molten));
+  box-shadow: inset 0 var(--line-hair) 0 var(--_glint), 0 var(--size-ledge) 0 var(--_ledge), var(--sh-glow);
+}
+/* Pressed: the slab sinks onto its ledge. This sits after every variant's
+   hover rule on purpose. A press is also a hover, and both selectors weigh
+   the same, so the later rule wins; before this order, a pressed gold button
+   kept its hover ledge and gave no feedback under reduced motion.
+   test/unit/l12/hall-css.test.ts holds the order. The ledge thins to a
+   hairline, and the slab drops by the difference. */
+.btn:active {
+  box-shadow: inset 0 var(--line-hair) 0 var(--_glint), 0 var(--line-hair) 0 var(--_ledge);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn:active {
+    translate: 0 calc(var(--size-ledge) - var(--line-hair));
+  }
+}
+.btn--quiet {
+  --_ink: var(--ink-link, var(--c-link));
+  min-height: var(--size-tap);
+  padding-inline: var(--s-1);
+  border: 0;
+  background: none;
+  box-shadow: none;
+  text-decoration: underline;
+  text-decoration-thickness: var(--line-edge);
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+}
+.btn--quiet:hover {
+  text-decoration-color: currentColor;
+}
+.btn--quiet:active {
+  box-shadow: none;
+  translate: none;
+}
+.btn--lg {
+  min-height: var(--size-control-lg);
+  padding-inline: var(--s-6);
+  font-size: var(--t-step-1);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  translate: none;
+  box-shadow: none;
+}
+
+
+/* ---------- Card ----------
+   A carved stone tablet for a resource, a position, a keeper or a region.
+   The title link stretches over the whole card; actions sit above it.
+   auto-fit, not auto-fill: a row of three on a wide screen spans the row
+   instead of leaving a fourth track empty. */
+.hall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--s-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: none;
+}
+.hall-card {
+  --_face: var(--c-surface);
+  --_edge: var(--c-stone-edge);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background:
+    linear-gradient(to bottom, color-mix(in oklab, var(--c-ground) 70%, transparent), transparent 40%), var(--_face);
+  border: var(--line-edge) solid var(--_edge);
+  border-radius: var(--r-card);
+  box-shadow:
+    var(--sh-edge),
+    0 var(--size-ledge) 0 var(--_edge);
+  overflow: clip;
+}
+.hall-card__media {
+  border-bottom: var(--line-bold) solid var(--c-accent);
+  background: var(--c-surface-2);
+}
+.hall-card__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--card-ratio, 16 / 9);
+  object-fit: cover;
+}
+.hall-card__media--inset {
+  padding: var(--s-4) var(--s-4) 0;
+  border-bottom: 0;
+  background: none;
+}
+.hall-card__media--inset img {
+  aspect-ratio: auto;
+}
+.hall-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-5);
+}
+.hall-card__body > * {
+  margin: 0;
+}
+.hall-card__title {
+  font-family: var(--font-body);
+  font-size: var(--t-step-1);
+  font-weight: 700;
+  line-height: 1.25;
+}
+.hall-card__title a {
+  color: inherit;
+  text-decoration: none;
+}
+.hall-card__title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.hall-card__title a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--c-accent);
+  text-decoration-thickness: var(--line-bold);
+  text-underline-offset: 0.2em;
+}
+.hall-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.hall-card__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: auto;
+  padding-top: var(--s-2);
+}
+.hall-card__meta {
+  font-size: var(--t-step--1);
+  color: var(--ink-dim);
+}
+/* Links and buttons inside the card stay clickable above the stretched title. */
+.hall-card :is(.hall-card__text, .hall-card__badges, .hall-card__foot) :is(a, button) {
+  position: relative;
+  z-index: 1;
+}
+.hall-card--row {
+  flex-flow: row wrap;
+}
+.hall-card--row .hall-card__media {
+  flex: 1 1 11rem;
+  border-bottom: 0;
+}
+.hall-card--row .hall-card__body {
+  flex: 999 1 16rem;
+}
+.hall-card--row .hall-card__media--inset {
+  max-width: 16rem;
+  padding: var(--s-4) 0 var(--s-4) var(--s-4);
+}
+.hall-card--gilded {
+  --_edge: var(--c-accent);
+  border-width: var(--line-bold);
+  box-shadow:
+    var(--sh-edge),
+    inset 0 0 0 var(--line-edge) var(--c-molten),
+    var(--sh-ledge-gold),
+    var(--sh-glow);
+}
+.hall-card--night {
+  --_face: var(--c-night);
+  --_edge: var(--c-bronze);
+  background:
+    linear-gradient(to bottom, color-mix(in oklab, var(--c-gold-on-night) 10%, transparent), transparent 45%),
+    var(--_face);
+  box-shadow: var(--sh-ledge-bronze);
+}
+@supports selector(:has(*)) {
+  .hall-card:has(.hall-card__title a:focus-visible) {
+    outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+    outline-offset: var(--size-ring-offset);
+  }
+  .hall-card__title a:focus-visible {
+    outline: none;
+  }
+  .hall-card:has(.hall-card__title a:hover) {
+    --_edge: var(--c-accent);
+    box-shadow:
+      var(--sh-edge),
+      var(--sh-ledge-gold),
+      var(--sh-glow);
+  }
+}
+
+/* ---------- Gilded frame ----------
+   For art and portraits. A gold (or bronze) bevel with brass rivets at the
+   corners and a dark inner line around the picture. */
+.hall-frame {
+  --_metal-hi: var(--c-molten);
+  --_metal: var(--c-accent);
+  --_metal-lo: var(--c-accent-ledge);
+  --_rim: var(--c-bronze);
+  /* The gilded band is one rivet wide, so each rivet sits in its corner. */
+  --_band: 0.75rem;
+  --_rivet: radial-gradient(
+    circle,
+    var(--c-molten) 0 0.09375rem,
+    var(--c-brass) 0.125rem 0.21875rem,
+    var(--c-bronze-deep) 0.25rem 0.28125rem,
+    transparent 0.3125rem
+  );
+  display: grid;
+  justify-items: center;
+  gap: var(--s-3);
+  margin: 0;
+}
+.hall-frame__mount {
+  position: relative;
+  width: 100%;
+  padding: var(--_band);
+  border: var(--line-edge) solid var(--_rim);
+  border-radius: var(--r-chisel);
+  background:
+    var(--_rivet) left 0 top 0 / var(--_band) var(--_band) no-repeat,
+    var(--_rivet) right 0 top 0 / var(--_band) var(--_band) no-repeat,
+    var(--_rivet) left 0 bottom 0 / var(--_band) var(--_band) no-repeat,
+    var(--_rivet) right 0 bottom 0 / var(--_band) var(--_band) no-repeat,
+    linear-gradient(145deg, var(--_metal-hi), var(--_metal) 30%, var(--_metal-lo) 72%, var(--_metal));
+  box-shadow:
+    inset 0 0 0 var(--line-hair) color-mix(in oklab, var(--c-molten) 70%, transparent),
+    var(--sh-ledge-bronze),
+    var(--sh-glow);
+}
+.hall-frame__mount img,
+.hall-frame__mount > .hall-frame__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--frame-ratio, auto);
+  object-fit: cover;
+  border-radius: 0.1875rem;
+  box-shadow: 0 0 0 var(--line-edge) var(--c-bronze-deep);
+}
+.hall-frame--bronze {
+  --_metal-hi: color-mix(in oklab, var(--c-bronze) 65%, var(--c-molten));
+  --_metal: var(--c-bronze);
+  --_metal-lo: var(--c-bronze-deep);
+  --_rim: var(--c-bronze-deep);
+}
+/* Arched like the Hall's windows. The top rivets would fall outside the
+   curve, so a gold keystone sits at the crown instead. */
+.hall-frame--arch .hall-frame__mount {
+  padding-top: 0.875rem;
+  border-radius: 50% 50% var(--r-card) var(--r-card) / 30% 30% var(--r-card) var(--r-card);
+  background:
+    var(--_rivet) left 0 bottom 0 / var(--_band) var(--_band) no-repeat,
+    var(--_rivet) right 0 bottom 0 / var(--_band) var(--_band) no-repeat,
+    linear-gradient(145deg, var(--_metal-hi), var(--_metal) 30%, var(--_metal-lo) 72%, var(--_metal));
+}
+.hall-frame--arch .hall-frame__mount img,
+.hall-frame--arch .hall-frame__mount > .hall-frame__art {
+  border-radius: 50% 50% 0.1875rem 0.1875rem / 30% 30% 0.1875rem 0.1875rem;
+}
+.hall-frame--arch .hall-frame__mount::before {
+  content: "";
+  position: absolute;
+  top: -0.625rem;
+  left: 50%;
+  translate: -50% 0;
+  width: 1.625rem;
+  height: 1.25rem;
+  background: linear-gradient(to bottom, var(--c-molten), var(--c-accent) 45%, var(--c-accent-ledge));
+  clip-path: polygon(0 0, 100% 0, 78% 100%, 22% 100%);
+}
+.hall-frame__caption {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-1);
+  max-width: 40ch;
+  font-size: var(--t-step--1);
+  color: var(--ink-dim, var(--c-text-dim));
+  text-align: center;
+}
+/* A cast-bronze nameplate that sits on the frame's lower edge. */
+.hall-frame__plaque {
+  position: relative;
+  z-index: 1;
+  margin-top: -1.625rem;
+  padding: var(--s-1) var(--s-4);
+  border: var(--line-hair) solid var(--c-bronze-deep);
+  border-radius: var(--r-chisel);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--c-bronze) 82%, var(--c-molten)),
+    var(--c-bronze) 50%,
+    var(--c-bronze-deep)
+  );
+  box-shadow:
+    inset 0 var(--line-hair) 0 color-mix(in oklab, var(--c-molten) 45%, transparent),
+    0 0.1875rem 0 var(--c-bronze-deep);
+  color: var(--c-on-bronze);
+  font-size: var(--t-step-0);
+  font-weight: 700;
+}
+
+/* ---------- Banner heading ----------
+   hang: a section title on cloth hung from a bronze rod, cut swallowtail.
+   lintel: a section title carved into the stone over a doorway, with a gold
+   keystone. Cinzel, so h1 and h2 only (decision 15). */
+.hall-banner {
+  --_cloth-hi: var(--c-molten);
+  --_cloth: var(--c-accent);
+  --_cloth-lo: var(--c-accent-deep);
+  --_ink: var(--c-on-accent);
+  --_trim: var(--c-accent-ledge);
+  --_notch: 1.125rem;
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 var(--s-5);
+}
+.hall-banner--center {
+  justify-content: center;
+  text-align: center;
+}
+.hall-banner__heading {
+  position: relative;
+  max-width: min(100%, 30ch);
+  margin: 0;
+  font-weight: 800;
+}
+.hall-banner--hang {
+  /* The shadow follows the swallowtail, because the cloth inside is clipped
+     and this wrapper is not. */
+  filter: drop-shadow(0 0.3125rem 0 color-mix(in oklab, var(--c-bronze-deep) 28%, transparent));
+}
+.hall-banner--hang .hall-banner__heading {
+  margin-inline: 0.875rem;
+  padding-top: 0.625rem;
+}
+/* The rod, with a round finial at each end. */
+.hall-banner--hang .hall-banner__heading::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -0.875rem;
+  right: -0.875rem;
+  height: 0.75rem;
+  border-radius: 0.375rem;
+  background:
+    radial-gradient(circle, var(--c-molten) 0 0.125rem, var(--c-brass) 0.1875rem 0.3125rem, transparent 0.375rem)
+      left center / 0.75rem 0.75rem no-repeat,
+    radial-gradient(circle, var(--c-molten) 0 0.125rem, var(--c-brass) 0.1875rem 0.3125rem, transparent 0.375rem)
+      right center / 0.75rem 0.75rem no-repeat,
+    linear-gradient(to bottom, var(--c-brass), var(--c-bronze) 55%, var(--c-bronze-deep));
+}
+.hall-banner__cloth {
+  display: block;
+  padding: var(--s-3) var(--s-6) calc(var(--s-4) + var(--_notch));
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0.4375rem,
+      var(--_trim) 0.4375rem 0.5625rem,
+      transparent 0.5625rem calc(100% - 0.5625rem),
+      var(--_trim) calc(100% - 0.5625rem) calc(100% - 0.4375rem),
+      transparent calc(100% - 0.4375rem)
+    ),
+    linear-gradient(to bottom, var(--_cloth-hi), var(--_cloth) 35%, var(--_cloth-lo));
+  color: var(--_ink);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - var(--_notch)), 0 100%);
+}
+.hall-banner--copper {
+  --_cloth-hi: var(--c-link);
+  --_cloth: var(--c-link);
+  --_cloth-lo: color-mix(in oklab, var(--c-link) 80%, var(--c-bronze-deep));
+  --_ink: var(--c-ground);
+  --_trim: var(--c-molten);
+}
+.hall-banner--sky {
+  --_cloth-hi: var(--c-community);
+  --_cloth: var(--c-community);
+  --_cloth-lo: color-mix(in oklab, var(--c-community) 78%, var(--c-night));
+  --_ink: var(--c-ground);
+  --_trim: var(--c-molten);
+}
+.hall-banner--lintel {
+  padding-top: 0.75rem;
+}
+.hall-banner--lintel .hall-banner__heading {
+  padding: var(--s-4) var(--s-7);
+  border: var(--line-edge) solid var(--c-stone-edge);
+  border-radius: var(--r-chisel);
+  background:
+    linear-gradient(var(--c-accent), var(--c-accent)) center bottom 0.625rem / 40% var(--line-edge) no-repeat,
+    linear-gradient(to bottom, color-mix(in oklab, var(--c-ground) 70%, transparent), transparent 55%),
+    var(--c-stone);
+  box-shadow:
+    var(--sh-edge),
+    var(--sh-ledge);
+  color: var(--c-text);
+  outline: var(--line-hair) solid color-mix(in oklab, var(--c-stone-edge) 60%, transparent);
+  outline-offset: -0.4375rem;
+}
+.hall-banner--lintel .hall-banner__heading::before {
+  content: "";
+  position: absolute;
+  top: -0.75rem;
+  left: 50%;
+  translate: -50% 0;
+  width: 2.125rem;
+  height: 1.5rem;
+  background: linear-gradient(to bottom, var(--c-molten), var(--c-accent) 45%, var(--c-accent-ledge));
+  clip-path: polygon(0 0, 100% 0, 76% 100%, 24% 100%);
+}
+
+/* ---------- Badge ----------
+   A stamped tag: a stage, a region, a status. Text, not decoration, so every
+   tone pairs one wash with one ink at 4.5:1 or better. */
+.hall-badge {
+  --_wash: var(--c-stone);
+  --_ink: var(--c-text);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: calc(var(--s-1) / 2) var(--s-3);
+  border: var(--line-hair) solid color-mix(in oklab, var(--_ink) 40%, transparent);
+  border-radius: var(--r-chisel);
+  background: var(--_wash);
+  box-shadow: inset 0 var(--line-hair) 0 color-mix(in oklab, var(--c-ground) 70%, transparent);
+  color: var(--_ink);
+  font-size: var(--t-step--1);
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.hall-badge--gold {
+  --_wash: var(--c-accent);
+  --_ink: var(--c-on-accent);
+}
+.hall-badge--sky {
+  --_wash: var(--c-sky-wash);
+  --_ink: var(--c-community);
+}
+.hall-badge--copper {
+  --_wash: var(--c-copper-wash);
+  --_ink: var(--c-link);
+}
+.hall-badge--pine {
+  --_wash: var(--c-pine-wash);
+  --_ink: var(--c-pine);
+}
+.hall-badge--night {
+  --_wash: var(--c-night);
+  --_ink: var(--c-gold-on-night);
+  box-shadow: none;
+}
+
+/* ---------- Callout ----------
+   parchment: a note on a scroll, light. slate: a carved slate tablet, dark,
+   for the one thing on a page a reader must not miss. */
+.hall-callout {
+  position: relative;
+  margin-block: var(--s-5);
+  padding: var(--s-5) var(--s-5) var(--s-5) var(--s-6);
+  max-width: var(--t-measure);
+  border-radius: var(--r-chisel);
+}
+.hall-callout > :last-child {
+  margin-bottom: 0;
+}
+.hall-callout__title {
+  margin: 0 0 var(--s-2);
+  font-weight: 700;
+  font-size: var(--t-step-1);
+  line-height: 1.3;
+}
+.hall-callout--parchment {
+  margin-block: calc(var(--s-5) + 0.5rem);
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--c-ground), transparent 60%),
+    var(--tex-parchment, none),
+    radial-gradient(120% 90% at 50% 0%, var(--c-ground), var(--c-surface) 55%, var(--c-surface-2));
+  border-inline: var(--line-hair) solid var(--c-rule);
+  box-shadow: inset 0.25rem 0 0 var(--c-fire);
+}
+/* The two rolled ends of the scroll. */
+.hall-callout--parchment::before,
+.hall-callout--parchment::after {
+  content: "";
+  position: absolute;
+  left: -0.375rem;
+  right: -0.375rem;
+  height: 0.75rem;
+  border-radius: 0.375rem;
+  background: linear-gradient(to bottom, var(--c-surface-2), var(--c-stone-edge) 50%, var(--c-surface-2));
+  box-shadow: 0 0.125rem 0 color-mix(in oklab, var(--c-bronze-deep) 25%, transparent);
+}
+.hall-callout--parchment::before {
+  top: -0.5rem;
+}
+.hall-callout--parchment::after {
+  bottom: -0.5rem;
+}
+.hall-callout--slate {
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--c-gold-on-night) 9%, transparent), transparent 50%),
+    var(--c-night);
+  border: var(--line-bold) solid var(--c-bronze);
+  box-shadow: var(--sh-ledge-bronze);
+  outline: var(--line-hair) solid color-mix(in oklab, var(--c-gold-on-night) 35%, transparent);
+  outline-offset: -0.5rem;
+}
+.hall-callout--slate .hall-callout__title {
+  color: var(--c-gold-on-night);
+}
+
+/* ---------- Cut corners ----------
+   corner-shape: bevel cuts each corner flat, and borders, ledges and focus
+   rings follow the cut. It is not Baseline yet, so it sits behind @supports;
+   elsewhere the radii above round the corners a little, like worn stone.
+   This block comes last so it wins over the radii above. */
+@supports (corner-shape: bevel) {
+  .panel,
+  .hall-card,
+  .hall-callout--slate,
+  .hall-banner--lintel .hall-banner__heading {
+    border-radius: var(--r-bevel);
+    corner-shape: bevel;
+  }
+  .btn:not(.btn--quiet),
+  .hall-badge,
+  .hall-frame__plaque {
+    border-radius: var(--r-bevel-sm);
+    corner-shape: bevel;
+  }
+}

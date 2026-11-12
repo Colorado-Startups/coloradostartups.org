@@ -1,0 +1,13 @@
+id: prosight-fullstack-finance-plus-accounting
+name: ProSight - Fullstack Finance + Accounting
+url: https://prosightfinance.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Accounting firm in Denver.
+tags:
+  - accounting
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

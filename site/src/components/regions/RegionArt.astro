@@ -1,0 +1,73 @@
+---
+// A region's illustration slot. L7 drops each scene at
+// src/assets/art/<region.art>.(webp|png|jpg), for example
+// src/assets/art/regions/space-peak.webp. L7's ArtImage finds it, lets Astro
+// optimize it, and shows a placeholder tinted with the region's color until the
+// file lands, so layout does not shift. The region page's hero gets a lantern
+// glow; list cards stay still. Owner: L8; wired by L7 (lane/L7-wiring).
+import type { Region } from "@cs/shared";
+
+import { REGION_COLORS } from "../../lib/regions/map";
+import ArtImage from "../art/ArtImage.astro";
+import { regionArtAlt } from "../art/keepers";
+
+interface Props {
+  region: Region;
+  /** "hero" for the region page, "card" for the /regions/ list. */
+  size?: "hero" | "card";
+  /** Defaults to eager for a hero and lazy for a card; a card in the first screen passes "eager" (#258). */
+  loading?: "eager" | "lazy";
+  /** The drawn width, for a card in a grid other than the 17rem .hall-grid. */
+  sizes?: string;
+}
+
+const { region, size = "card", loading, sizes } = Astro.props;
+// Keepers work in every region scene, so the alt always says they are AI
+// agents (#761); no caller can blank it, and a region with no alt fails the
+// build instead of rendering an empty one.
+const alt = regionArtAlt(region.id);
+const hero = size === "hero";
+
+// `sizes` is the width the art really draws, so a phone picks the smallest
+// file that still covers it. Both sit in .wrap (100vw less two 24 px
+// gutters, at most 1180 px). A card sits in a .hall-grid of 17rem columns
+// with 24 px gaps, inside a 2 px border on each side: one column below
+// 616 px, two below 912 px, three from there. On the mobile lab's 412 px
+// screen at 1.75x, a card draws 360 px wide, so it fetches the 640w file
+// (58 KB) instead of the 800w (86 KB), and the hero the 640w instead of the
+// 960w. The three cards load at once on a phone: the lazy two sit inside
+// Chrome's lazy-load distance, so they share the bandwidth with the first.
+const SIZES = {
+  hero: "(max-width: 1227px) calc(100vw - 48px), 1180px",
+  card: "(max-width: 615px) calc(100vw - 52px), (max-width: 911px) calc(50vw - 40px), 380px",
+};
+---
+
+<ArtImage
+  src={region.art}
+  alt={alt}
+  aspect={hero ? "21 / 9" : "16 / 9"}
+  widths={hero ? [640, 960, 1280, 1920] : [400, 640, 800]}
+  sizes={sizes ?? SIZES[size]}
+  loading={loading ?? (hero ? "eager" : "lazy")}
+  motion={hero ? "glow" : "none"}
+  label="Illustration in progress"
+  tint={REGION_COLORS[region.id]}
+  class={`region-art region-art--${size}`}
+/>
+
+<style>
+  /* ArtImage renders the <figure>. On the region page it gets the card radius
+     and glow; in a Card's media slot the card's own frame does the rounding. */
+  :global(.art-image.region-art--hero) {
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
+  }
+  /* 21:9 shows the scene 327 by 140 px on a phone, a strip that loses its
+     detail. 16:9 keeps it readable (#251). */
+  @media (max-width: 760px) {
+    :global(figure.art-image.region-art--hero) {
+      aspect-ratio: 16 / 9;
+    }
+  }
+</style>

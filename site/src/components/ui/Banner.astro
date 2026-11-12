@@ -1,0 +1,51 @@
+---
+// Banner: a section title on a hanging banner or a carved lintel.
+// Styles: .hall-banner in src/styles/hall.css (L12).
+//
+// Props
+//   as       "h2" (default) or "h1". Cinzel is for h1 and h2 only (decision 15),
+//            so a lower heading uses a plain <h3>.
+//   variant  "hang": cloth hung from a bronze rod, cut swallowtail (default)
+//            "lintel": carved into the stone over a doorway, with a gold keystone
+//   tone     "gold" (default), "copper" or "sky"; hang only. Sky marks a
+//            community section, the same meaning sky carries for links.
+//   align    "start" (default) or "center"
+//   id       on the heading, for in-page links and aria-labelledby
+//   class    extra classes, on the wrapper
+//   ...rest  any other attribute, on the wrapper
+//
+// Slot: default, the heading text. Keep it to a few words: one line on desktop.
+// One banner per section; most sections need a plain h2 instead.
+interface Props {
+  as?: "h1" | "h2";
+  variant?: "hang" | "lintel";
+  tone?: "gold" | "copper" | "sky";
+  align?: "start" | "center";
+  id?: string;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { as: Tag = "h2", variant = "hang", tone = "gold", align = "start", id, class: extra, ...rest } = Astro.props;
+const classes = [
+  "hall-banner",
+  `hall-banner--${variant}`,
+  variant === "hang" && tone !== "gold" && `hall-banner--${tone}`,
+  align === "center" && "hall-banner--center",
+  extra,
+];
+---
+
+<div class:list={classes} {...rest}>
+  <Tag class="hall-banner__heading" id={id}>
+    {
+      variant === "hang" ? (
+        <span class="hall-banner__cloth">
+          <slot />
+        </span>
+      ) : (
+        <slot />
+      )
+    }
+  </Tag>
+</div>

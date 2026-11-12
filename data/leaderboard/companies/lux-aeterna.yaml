@@ -1,0 +1,8 @@
+id: lux-aeterna
+name: "Lux Aeterna"
+website: "https://luxaeterna.com"
+hq_city: "Denver"
+sector: "Space and aerospace"
+description: "Develops a reusable satellite that can return to Earth so payloads can be retrieved after orbit."
+sources:
+  - "https://luxaeterna.com"

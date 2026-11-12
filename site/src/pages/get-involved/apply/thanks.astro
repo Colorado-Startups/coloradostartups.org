@@ -1,0 +1,36 @@
+---
+// /get-involved/apply/thanks/: where /api/apply sends a successful post.
+// Out of the sitemap (astro.config.mjs SITEMAP_EXCLUDE matches /thanks/) and
+// noindex. Clears the form's sessionStorage draft. Owner: L19.
+import HallSeal from "../../../components/hall/HallSeal.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Application received"
+  description="Thank you for applying for a seat at Colorado Startups."
+  noindex
+>
+  <section class="section section--lit">
+    <div class="wrap stack">
+      <h1>Thank you</h1>
+      <p class="lede">We have your application.</p>
+      <p>
+        Paul Foley reads every application. Next, if it looks like a fit, he emails you to set up an interview. We
+        contact you about this seat only.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn--gold" href="/get-involved/">Back to Get involved</a>
+        <a class="btn btn--stone" href="/community/">See the community</a>
+      </div>
+      <HallSeal />
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // The application went through, so this tab's draft of it is no longer needed.
+  import { clearDraft } from "../../../components/apply/client";
+
+  clearDraft();
+</script>

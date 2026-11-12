@@ -1,0 +1,13 @@
+id: university-of-colorado-colorado-springs
+name: University of Colorado Colorado Springs
+url: http://www.uccs.edu/
+stage: support
+substage: organizations
+city: Colorado Springs
+type: university
+description: A public research university in Colorado Springs. It has undergraduate and graduate programs. It has doctoral and certificate programs too. It has some in engineering, applied science, nursing and health sciences.
+tags:
+  - university
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

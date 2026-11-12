@@ -1,0 +1,13 @@
+id: qualcomm
+name: Qualcomm
+url: https://www.qualcomm.com/
+stage: support
+substage: organizations
+city: Boulder
+type: other
+description: A technology company for AI, low-power computing and connectivity. Its tech is used in many industries. It has an office in Boulder.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

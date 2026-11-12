@@ -1,0 +1,14 @@
+id: deming-center-venture-fund
+name: Deming Center Venture Fund
+url: https://www.colorado.edu/dcvf/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A student venture fund at the University of Colorado Boulder. Graduate students learn venture capital by doing the work. Students do diligence on emerging companies and invest in them.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

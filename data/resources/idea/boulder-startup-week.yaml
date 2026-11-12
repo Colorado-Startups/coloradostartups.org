@@ -1,0 +1,13 @@
+id: boulder-startup-week
+name: Boulder Startup Week
+url: https://boulderstartupweek.com/
+stage: idea
+substage: educate
+city: Boulder
+type: event
+description: A free conference in Boulder for entrepreneurs.
+tags:
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

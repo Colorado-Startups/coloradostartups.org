@@ -1,0 +1,9 @@
+id: ridley
+name: "Ridley"
+website: "https://getridley.com"
+hq_city: "Boulder"
+founded_year: 2024
+sector: "Real estate and construction"
+description: "Runs a software platform that lets homeowners sell their homes. It uses a flat-fee agent model instead of traditional listing commissions."
+sources:
+  - "https://getridley.com/"

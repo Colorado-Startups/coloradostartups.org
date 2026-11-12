@@ -1,0 +1,188 @@
+---
+// The Resourcus chat panel. Owner of the internals: L4 Resourcus.
+// Frozen props: L1 (home) and L3 (Startup Resources) place this component with
+// these props and nothing else. L4 may add optional props through the
+// orchestrator; it may not rename or remove these.
+//
+//   compact?:  boolean          short version for the home page (default false)
+//   heading?:  string           visible heading (default "Ask Resourcus")
+//
+// A third prop, filters, was removed in #289 with the orchestrator's review.
+// No page passed it, and AskRequest defaults filters to {}
+// (packages/shared/src/ask.ts), so /api/ask receives the same input.
+//
+// Behavior: the form POSTs AskRequest to /api/ask, with a Turnstile token on
+// the first question of a session (panel.ts). Answers and cards render with
+// textContent only; card links come from our data. When the answer is a
+// fallback, the panel offers Pagefind keyword search of the site.
+//
+// Styling uses the existing tokens and classes only. Visual polish waits for
+// Gate A v2 (decision 21).
+import { ASK_LIMITS } from "@cs/shared";
+import { getEntry } from "astro:content";
+
+import { ASK_LOG_RETENTION_DAYS } from "../../../worker/resourcus/logs";
+import { portraitAlt } from "../art/keepers";
+import Portrait from "../art/Portrait.astro";
+
+interface Props {
+  compact?: boolean;
+  heading?: string;
+}
+
+const { compact = false, heading = "Ask Resourcus" } = Astro.props;
+
+// The disclosure comes from the one persona source, data/team/dwarves.yaml.
+const resourcus = await getEntry("dwarves", "resourcus");
+if (!resourcus) throw new Error("data/team/dwarves.yaml has no resourcus entry");
+const { disclosure } = resourcus.data;
+
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
+const uid = `resourcus-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<section
+  class="panel resourcus"
+  data-resourcus
+  data-compact={String(compact)}
+  data-sitekey={siteKey}
+  aria-labelledby={`${uid}-heading`}
+>
+  {/* Resourcus's small portrait beside the heading, as Communitas's sits on
+      the welcome desk (#209). Its alt text says "AI agent". */}
+  <div class="resourcus__head">
+    <Portrait
+      id="resourcus"
+      size="small"
+      alt={portraitAlt("resourcus", resourcus.data.name, resourcus.data.title)}
+      sizes="64px"
+      widths={[64, 128, 320]}
+    />
+    <h3 id={`${uid}-heading`}>{heading}</h3>
+    <p class="meta">
+      Ask in plain words. Resourcus searches Startup Resources and answers with the ones that fit.
+    </p>
+  </div>
+
+  <div class="resourcus__thread stack" data-thread aria-live="polite"></div>
+
+  <form class="resourcus__form" data-form novalidate>
+    <div class="field">
+      <label for={`${uid}-question`}>Your question</label>
+      <textarea
+        id={`${uid}-question`}
+        name="question"
+        rows={compact ? 2 : 3}
+        minlength="2"
+        maxlength={ASK_LIMITS.maxQuestionChars}
+        required
+        aria-describedby={`${uid}-hint`}
+        placeholder="Where can I find a coworking space in Denver?"></textarea>
+      <p class="hint" id={`${uid}-hint`}>
+        {`Up to ${ASK_LIMITS.maxQuestionChars} characters. Colorado Startups keeps questions for ${ASK_LOG_RETENTION_DAYS} days to improve answers, so leave out personal details.`}
+      </p>
+    </div>
+    <div class="resourcus__turnstile" data-turnstile></div>
+    <div class="btn-row">
+      <button type="submit" class="btn btn--gold" data-submit>Ask Resourcus</button>
+    </div>
+    <p class="resourcus__status" data-status role="status"></p>
+  </form>
+
+  <p class="ai-note">{disclosure}</p>
+</section>
+
+<script>
+  import { initResourcusPanels } from "./panel";
+
+  initResourcusPanels();
+</script>
+
+<!--
+  Global, but every selector starts with .resourcus: panel.ts builds the
+  answer and the cards at run time, and Astro's scoped styles only reach
+  elements written in this template.
+-->
+<style is:global>
+  /* The portrait floats beside the heading and the line under it, as on the
+     welcome desk; flow-root keeps the float inside the head. */
+  .resourcus .resourcus__head {
+    --portrait-small: 64px;
+    display: flow-root;
+  }
+  .resourcus .resourcus__head .portrait {
+    float: left;
+    margin: 0 var(--s-4) var(--s-2) 0;
+  }
+  .resourcus .resourcus__thread:empty {
+    display: none;
+  }
+  .resourcus .resourcus__thread {
+    margin-block: var(--s-4);
+  }
+  .resourcus .resourcus__turn + .resourcus__turn {
+    border-top: var(--line-hair) solid var(--c-strata);
+    padding-top: var(--s-4);
+  }
+  .resourcus .resourcus__asked {
+    color: var(--c-quartz-dim);
+    font-size: var(--t-step--1);
+    margin-bottom: 0;
+  }
+  .resourcus .resourcus__answer {
+    white-space: pre-line;
+    margin-bottom: 0;
+  }
+  .resourcus .resourcus__note {
+    font-size: var(--t-step--1);
+    color: var(--c-quartz-dim);
+    margin-bottom: 0;
+  }
+  .resourcus .resourcus__cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  }
+  .resourcus .resourcus__card {
+    background: var(--c-granite-2);
+    border: var(--line-hair) solid var(--c-strata);
+    border-radius: var(--r-chisel);
+    padding: var(--s-4);
+  }
+  .resourcus .resourcus__card h4 {
+    margin: 0 0 var(--s-1);
+  }
+  .resourcus .resourcus__card p {
+    margin: var(--s-1) 0 0;
+  }
+  .resourcus .resourcus__links {
+    margin: 0;
+    padding-left: var(--s-5);
+  }
+  .resourcus .resourcus__status:empty {
+    display: none;
+  }
+  .resourcus .resourcus__status {
+    margin: var(--s-3) 0 0;
+    color: var(--c-quartz-dim);
+  }
+  .resourcus .resourcus__status[data-tone="error"] {
+    color: var(--c-danger);
+    font-weight: 700;
+  }
+  .resourcus .resourcus__turnstile:empty {
+    display: none;
+  }
+  .resourcus[aria-busy="true"] [data-submit] {
+    opacity: 0.7;
+    cursor: progress;
+  }
+  /* The AI disclosure stands apart from the form above it, not pressed
+     under the Ask button (design re-score, #723). */
+  .resourcus .ai-note {
+    margin-top: var(--s-5);
+  }
+</style>

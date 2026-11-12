@@ -1,0 +1,14 @@
+id: pitch-to-developers
+name: Pitch to Developers
+url: https://www.meetup.com/Pitch-to-Developers/
+stage: launch
+substage: develop
+city: Boulder
+type: event
+description: Pitch event or demo day in Boulder.
+tags:
+  - pitch
+  - events
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

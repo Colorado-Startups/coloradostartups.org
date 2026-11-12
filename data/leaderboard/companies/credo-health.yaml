@@ -1,0 +1,9 @@
+id: credo-health
+name: "Credo Health"
+website: "https://credohealth.com"
+hq_city: "Denver"
+sector: "Health care"
+description: "Sells software that uses medical record data. It helps physician groups and health plans with value-based care."
+sources:
+  - "https://credohealth.com"
+  - "https://www.builtincolorado.com/articles/credo-health-raises-5m-seed-20240108"

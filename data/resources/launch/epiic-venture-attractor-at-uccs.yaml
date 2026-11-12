@@ -1,0 +1,13 @@
+id: epiic-venture-attractor-at-uccs
+name: EPIIC Venture Attractor at UCCS
+url: https://ventureattractor.org/
+stage: launch
+substage: develop
+city: Colorado Springs
+type: incubator
+description: A university-based initiative at UCCS that helps early-stage startups in Colorado Springs. The startups work in sports and outdoors, health and human performance. Some work in property technology and space technology.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: solid-state-depot
+name: Solid State Depot
+url: https://boulderhackerspace.com/
+stage: idea
+substage: validate
+city: Boulder
+type: event
+description: Hackathon or maker community in Boulder.
+tags:
+  - hackathon
+source: canvas-2026
+status: review
+last_checked: "2026-11-02"

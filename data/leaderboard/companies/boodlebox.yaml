@@ -1,0 +1,8 @@
+id: boodlebox
+name: "BoodleBox"
+website: "https://boodlebox.ai"
+hq_city: "Colorado Springs"
+sector: "Education"
+description: "Provides a shared AI workspace. Students, educators and teams use it to work with multiple AI models together."
+sources:
+  - "https://oedit.colorado.gov/press-release/boodlebox-selects-colorado-springs-for-headquarters-relocation-accelerating-ai"

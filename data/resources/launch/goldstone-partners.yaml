@@ -1,0 +1,13 @@
+id: goldstone-partners
+name: Goldstone Partners
+url: https://www.goldstonepartners.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: Human resources and hiring services in Denver.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

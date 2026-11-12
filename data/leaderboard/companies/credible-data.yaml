@@ -1,0 +1,9 @@
+id: credible-data
+name: "Credible Data"
+website: "https://www.credibledata.com/"
+hq_city: "Boulder"
+sector: "AI and data"
+description: "Makes an analytics engine that stores what business data means. Dashboards, apps and AI agents then give consistent answers."
+sources:
+  - "https://www.credibledata.com/about"
+  - "https://www.credibledata.com/"

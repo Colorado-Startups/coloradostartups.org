@@ -1,0 +1,13 @@
+id: the-lab-denver
+name: The Lab Denver
+url: https://thelabdenver.org/
+stage: idea
+substage: validate
+city: Denver
+type: event
+description: Hackathon or maker community in Denver. Listed in the Ecosystem Canvas for founders at the idea stage.
+tags:
+  - hackathon
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

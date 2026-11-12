@@ -1,0 +1,31 @@
+---
+// HallTextures: turns L7's texture files into the --tex-* custom properties
+// that hall.css and global.css read. Place it once in the page <head>
+// (BaseLayout). A file that does not exist yet sets nothing, so the flat
+// token color shows and the build never breaks while the art is in progress.
+//
+// Files (L12 and L7 contract, 2026-10-18), in src/assets/art/textures/:
+//   stone.webp        seamless 512px tile; read by .section--stone and .panel--stone
+//   parchment.webp    seamless 512px tile; read by the parchment Callout
+//   night-stone.webp  seamless 512px tile; read by .section--night (the footer)
+// Each file ships as it is, copied with a content hash and never re-encoded.
+// L7 makes the tiles lossless so every pixel stays on its contrast floor
+// (brand_tokens.yaml, texture block); a lossy re-encode shifts colors past
+// those floors (L7's tests, 2026-10-18).
+//
+// Props: none.
+const TEXTURES = ["stone", "parchment", "night-stone"] as const;
+
+const files = import.meta.glob<{ default: ImageMetadata }>("../../assets/art/textures/*.{webp,png}", {
+  eager: true,
+});
+
+const declarations: string[] = [];
+for (const name of TEXTURES) {
+  const match = Object.entries(files).find(([path]) => path.split("/").pop()?.replace(/\.\w+$/, "") === name);
+  if (match) declarations.push(`--tex-${name}: url("${match[1].default.src}");`);
+}
+const css = declarations.length ? `:root{${declarations.join("")}}` : "";
+---
+
+{css && <style is:inline set:html={css} />}

@@ -1,0 +1,13 @@
+id: 1000-gretas
+name: 1000 Gretas
+url: https://1000gretas.org/
+stage: support
+substage: organizations
+city: statewide
+type: nonprofit
+description: A nonprofit. It supports first-time climate entrepreneurs worldwide. It gives them courses, AI support and community. It finds startups through accelerator partners.
+tags:
+  - nonprofit
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

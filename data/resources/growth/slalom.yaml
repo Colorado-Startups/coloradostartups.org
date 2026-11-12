@@ -1,0 +1,13 @@
+id: slalom
+name: Slalom
+url: https://www.slalom.com/home
+stage: growth
+substage: service-providers
+city: Denver
+type: service-provider
+description: A firm that sells business, technology and AI consulting. It serves established enterprises and public-sector organizations. Its clients work in healthcare, financial services and manufacturing.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

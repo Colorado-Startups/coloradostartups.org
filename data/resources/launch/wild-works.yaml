@@ -1,0 +1,13 @@
+id: wild-works
+name: Wild Works
+url: https://www.wildwork.space/
+stage: launch
+substage: service-providers
+city: Bailey
+type: coworking
+description: A work-from-nature space on a mountain property. Founders, professionals and startup teams hike to outdoor work spots with satellite internet. Passes and meeting spaces are booked in its app.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

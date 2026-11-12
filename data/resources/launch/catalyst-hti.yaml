@@ -1,0 +1,13 @@
+id: catalyst-hti
+name: Catalyst HTI
+url: http://catalysthealthtech.com/
+stage: launch
+substage: develop
+city: Denver
+type: incubator
+description: A workspace in Denver's RiNo district. It offers offices, coworking, conference rooms and event space. Startups work alongside larger companies there.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

@@ -1,0 +1,13 @@
+id: miraclemaxmarketing-com
+name: Miraclemaxmarketing.com
+url: http://miraclemaxmarketing.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver marketing firm. It offers fractional event, product and SEO marketing to B2B companies and founders.
+tags:
+  - marketing
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,13 @@
+id: basecamp-legal
+name: Basecamp Legal
+url: https://basecamplegal.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver business law firm. It helps startups and founders with company formation, co-founder agreements, contracts and trademarks.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

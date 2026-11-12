@@ -1,0 +1,13 @@
+id: slack
+name: Slack
+url: http://slack.com/
+stage: support
+substage: organizations
+city: Denver
+type: other
+description: A workplace messaging and collaboration platform for teams and businesses. It is a Salesforce company. It has an office in Denver.
+tags:
+  - corporate
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

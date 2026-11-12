@@ -1,0 +1,13 @@
+id: score
+name: SCORE
+url: https://www.score.org/find-location?state=CO
+stage: launch
+substage: develop
+city: Denver
+type: incubator
+description: SCORE's national small business mentoring network. Its Colorado chapters serve Metro Denver and Northern Colorado. More chapters serve Southern Colorado and the Western Slope.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

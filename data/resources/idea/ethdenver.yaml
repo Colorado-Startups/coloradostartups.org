@@ -1,0 +1,13 @@
+id: ethdenver
+name: ETHDenver
+url: https://www.ethdenver.com/
+stage: idea
+substage: validate
+city: Denver
+type: event
+description: An Ethereum festival in Denver. It has talks, workshops, a hackathon and side events. It is for builders and founders.
+tags:
+  - hackathon
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

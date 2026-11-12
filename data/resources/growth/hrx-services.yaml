@@ -1,0 +1,13 @@
+id: hrx-services
+name: HRx Services
+url: https://www.hrxservices.com/
+stage: growth
+substage: service-providers
+city: Fort Collins
+type: service-provider
+description: A Fort Collins HR consulting company. It advises on strategy, compliance and support. It offers an HR audit and monthly service options.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

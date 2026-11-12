@@ -1,0 +1,13 @@
+id: rvc-hyperaccelerator
+name: RVC HyperAccelerator
+url: http://www.hyperaccelerator.org/
+stage: launch
+substage: develop
+city: Denver
+type: accelerator
+description: Mentorship-driven accelerator program in Denver. Listed in the Ecosystem Canvas for founders at the launch stage.
+tags:
+  - accelerator
+source: canvas-2026
+status: review
+last_checked: "2026-10-08"

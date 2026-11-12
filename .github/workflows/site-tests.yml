@@ -1,0 +1,252 @@
+name: site-tests
+
+# REQUIRED. The repository ruleset "main: required checks" requires the
+# site-tests, e2e and DCO checks on main (gh api repos/{repo}/rulesets/26477102,
+# created 2026-11-03), so a red or missing site-tests check blocks a merge.
+# That is why this workflow has no trigger path filter: its verdict job always
+# reports, and the change job skips the work instead. The
+# test job is the only place `npm run check:push` runs: the git hooks run no
+# tests on this Mac (Paul, 2026-11-02).
+#
+# Runs on every pull request and every push to main. Its first job decides
+# whether the site layers apply: a path-filtered trigger never reports on PRs
+# that miss the path. The test job's steps run only when 04_tools/site_changed.sh
+# finds a site-tests input in the change. That script holds the path list, the
+# one definition this workflow and e2e.yml share (#336); its self-test runs
+# first. If package.json, package-lock.json or .nvmrc is missing (early
+# scaffold), the change job says so with a notice and the test job is skipped.
+#
+# Layers, all defined in package.json scripts, not here, in one job. Two
+# parallel jobs measured 212 s against one job's 205 s median for 29% more
+# billed time (#524), so the layers share one job's setup:
+#   npm run check:push   the tmp-leak-check self-test, astro check, the site
+#                        unit and Worker tests, Communitas and AI visibility
+#   npm run build        the static build
+#   npm run lint:built   cs_site_lint.py --built site/dist (HTML, .txt, .json),
+#                        through 04_tools/ci_gate.sh (exit 3 warns and passes)
+#   npm run test:dom     the dom project over that build (test:content would
+#                        build the site a second time)
+#
+# On a push to main, the change job also asks whether the pull request this
+# push merged already passed site-tests on the same inputs: the same blob for
+# every site-tests input path (04_tools/site_changed.sh hash). Each pull
+# request's test job uploads that hash as the artifact site-tests-inputs-HASH,
+# and `site_changed.sh passed` accepts it only from a successful pull_request
+# run of this workflow on the merged head. Then the test job is skipped and the
+# verdict job says which run passed. 7 of 22 push runs with tests on
+# 2026-11-03 had nothing new for site-tests after their pull request's last
+# run (#569). Anything it cannot prove runs the tests.
+#
+# The change job also picks the test job's runner through 04_tools/ci_runner.sh,
+# which takes only an empty CI_RUNNER or a GitHub-hosted standard Linux label.
+# The change and verdict jobs run only bash and git, so they stay on
+# ubuntu-slim. The last job, named site-tests, keeps the one check this
+# workflow always reported. It fails when a job failed or was cancelled, when
+# the change job gave no clear answer, or when the test job was skipped
+# although the change touched a site-tests input.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Concurrency (issue #111). On a pull request, a newer push cancels the older
+# run: that commit is superseded, so a cancelled run there is expected and is
+# not a failure. Count pass rates over finished runs only. Pushes to main share
+# one group and are never cancelled: a running check finishes, and in a burst of
+# merges only the newest waiting push runs next. A push replaced while it waits
+# is checked only through its own pull request: the next run diffs against that
+# replaced push (PUSH_BEFORE), so it does not see the replaced push's changes.
+# A replaced run never gets a runner, so it bills nothing: Actions bills runner
+# processing time (docs.github.com, "GitHub Actions billing"). Decision in #532;
+# per-SHA push groups reverse it.
+concurrency:
+  group: site-tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    name: "site-tests: changes"
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      run: ${{ steps.passed.outputs.passed == 'true' && 'false' || steps.changes.outputs.run }}
+      inputs_hash: ${{ steps.hash.outputs.hash }}
+      passed: ${{ steps.passed.outputs.passed }}
+      runner: ${{ steps.runner.outputs.runner }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Change detector self-test (known-bad and known-clean paths)
+        run: bash 04_tools/site_changed.sh --self-test
+
+      # Every PR and push, unfiltered: each tracked path must be public or
+      # private in 04_tools/export_manifest.json (default deny, #552), and no
+      # overlay file may land on a private path.
+      - name: Export manifest check (every path classified)
+        run: python3 04_tools/export_public.py --check
+
+      - name: Runner check self-test (known-bad and known-clean labels)
+        run: bash 04_tools/ci_runner.sh --self-test
+
+      # Bare, not through ci_gate.sh: while 04_tools/.private-overlay-required
+      # is here, a missing, empty or short private overlay exits 3, and this
+      # required check goes red instead of passing on the public rules (#624).
+      - name: Content gate self-test (rules, samples, the private overlay)
+        run: python3 04_tools/cs_site_lint.py --self-test
+
+      - name: Detect site changes and package files
+        id: changes
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          if [ ! -f package.json ] || [ ! -f package-lock.json ] || [ ! -f .nvmrc ]; then
+            echo "::notice title=site-tests skipped::package.json, package-lock.json or .nvmrc is missing; nothing to install or test yet."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          bash 04_tools/site_changed.sh site-tests "${PR_BASE:-$PUSH_BEFORE}"
+
+      - name: Hash the site-tests inputs
+        id: hash
+        run: bash 04_tools/site_changed.sh hash site-tests
+
+      - name: Did the merged pull request already pass these inputs
+        id: passed
+        if: github.event_name == 'push' && steps.changes.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HASH: ${{ steps.hash.outputs.hash }}
+        run: bash 04_tools/site_changed.sh passed site-tests "$HASH"
+
+      - name: Pick the test job's runner
+        id: runner
+        env:
+          CI_RUNNER: ${{ vars.CI_RUNNER }}
+        run: bash 04_tools/ci_runner.sh
+
+  tests:
+    name: "site-tests: tests"
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    runs-on: ${{ needs.changes.outputs.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - id: install
+        run: npm ci --no-audit --no-fund
+
+      - name: Type check, unit, Worker and Communitas tests
+        run: npm run check:push
+
+      - name: Build the site
+        id: build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        # A test build, never a deploy: fixtures when no people data is there (#695).
+        env:
+          CS_PEOPLE_FIXTURES: "1"
+        run: npm run build
+
+      # 04_tools/ci_gate.sh turns the lint's exit 3 (could not check) into a
+      # warning and keeps every other code, so a usage error stays red.
+      - name: Lint the built HTML, .txt and .json
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: bash 04_tools/ci_gate.sh npm run lint:built
+
+      # vitest's JSON report beside its default output: per-file timings for
+      # the Quality page's Tests tab, which runs no suite (#538).
+      - name: DOM tests over the built dist/
+        id: dom
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:dom -- --reporter=default --reporter=json --outputFile.json="$RUNNER_TEMP/test-report/vitest-dom.json"
+
+      - uses: actions/upload-artifact@v7.0.2
+        if: ${{ !cancelled() && steps.dom.outcome != 'skipped' }}
+        with:
+          name: test-report-vitest-dom
+          path: ${{ runner.temp }}/test-report/
+          retention-days: 7
+          if-no-files-found: warn
+
+      # Runs only when every step above passed. The push to main that merges
+      # this pull request looks for it (see the header).
+      - name: Record the inputs these tests passed on
+        if: github.event_name == 'pull_request' && needs.changes.outputs.inputs_hash != ''
+        env:
+          HASH: ${{ needs.changes.outputs.inputs_hash }}
+        run: printf '%s\n' "$HASH" > "$RUNNER_TEMP/site-tests-inputs.txt"
+      - uses: actions/upload-artifact@v7.0.2
+        if: github.event_name == 'pull_request' && needs.changes.outputs.inputs_hash != ''
+        with:
+          name: site-tests-inputs-${{ needs.changes.outputs.inputs_hash }}
+          path: ${{ runner.temp }}/site-tests-inputs.txt
+          retention-days: 7
+          if-no-files-found: error
+
+  # The one check under the workflow's old name. Its steps read only the
+  # results of the jobs above; they check no content.
+  site-tests:
+    name: site-tests
+    needs: [changes, tests]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      # Advisory, warn only: a code change with no test change, or over 400
+      # reviewed lines (04_tools/pr_shape.sh, the Claude tab's rules). It lists
+      # the PR's files through the API, so the job needs no checkout, and it
+      # runs first so a red verdict still shows the warnings.
+      - name: PR shape (warn only)
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/contents/04_tools/pr_shape.sh?ref=$GITHUB_SHA" -H "Accept: application/vnd.github.raw" > pr_shape.sh \
+            || { echo "::warning title=PR shape::could not fetch 04_tools/pr_shape.sh"; exit 0; }
+          bash pr_shape.sh --self-test >/dev/null || echo "::warning title=PR shape::pr_shape.sh --self-test failed; its warnings may be wrong"
+          bash pr_shape.sh || echo "::warning title=PR shape::pr_shape.sh could not check (exit $?)"
+      - name: Fail on a failed, cancelled or unexpectedly skipped job
+        if: >-
+          needs.changes.result != 'success'
+          || (needs.changes.outputs.run != 'true' && needs.changes.outputs.run != 'false')
+          || contains(needs.*.result, 'failure')
+          || contains(needs.*.result, 'cancelled')
+          || (needs.changes.outputs.run == 'true' && contains(needs.*.result, 'skipped'))
+          || (needs.changes.outputs.passed == 'true' && github.event_name != 'push')
+        env:
+          RUN: ${{ needs.changes.outputs.run }}
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "changes said run=$RUN"
+          echo "$RESULTS"
+          exit 1
+      - name: Every job passed, or was skipped because no site-tests input changed
+        env:
+          PASSED: ${{ needs.changes.outputs.passed }}
+        run: |
+          if [ "$PASSED" = "true" ]; then
+            echo "site-tests passed: the merged pull request passed these exact inputs (see the changes job)"
+          else
+            echo "site-tests passed"
+          fi

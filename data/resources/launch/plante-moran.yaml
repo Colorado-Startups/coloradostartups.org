@@ -1,0 +1,13 @@
+id: plante-moran
+name: Plante Moran
+url: https://www.plantemoran.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: An accounting and advisory firm. It offers audit, tax and consulting. It serves technology companies too.
+tags:
+  - finance
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

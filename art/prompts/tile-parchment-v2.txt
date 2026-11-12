@@ -1,0 +1,5 @@
+title: Warm Parchment, take 2
+framing: Flat, straight-on close-up texture that fills the frame edge to edge. Evenly lit with no gradient, low contrast, calm enough to sit behind text.
+negative: people, faces, characters, objects, writing, ink, stains, folds, burnt edges, torn edges, vignette, gradient, light falloff, glow, horizontal stripes, banding, high contrast
+
+A close-up of warm handmade paper fills the whole frame. Short soft fibers and tiny flecks are scattered across it in an even, all-over pattern, running in every direction. Every part of the frame has the same brightness and the same amount of texture, like a sample swatch. The light is flat and even, with no shadows, no folds and no change from top to bottom.

@@ -1,0 +1,10 @@
+id: electra
+name: "Electra"
+website: "https://electra.earth/"
+hq_city: "Boulder"
+founded_year: 2020
+sector: "Materials and manufacturing"
+description: "Makes high-purity iron from low-grade ores with an electrochemical process. The iron is for steelmakers and battery and magnet makers."
+sources:
+  - "https://www.canarymedia.com/articles/green-steel/electra-meta-nucor-clean-iron-production"
+  - "https://electra.earth/"

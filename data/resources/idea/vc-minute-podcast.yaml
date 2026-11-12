@@ -1,0 +1,13 @@
+id: vc-minute-podcast
+name: VC Minute (podcast)
+url: https://springtimeventures.com/vc-minute
+stage: idea
+substage: educate
+city: online
+type: media
+description: Podcast with quick advice to help startup founders raise money.
+tags:
+  - podcast
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

@@ -1,0 +1,10 @@
+id: crusoe
+name: "Crusoe"
+website: "https://crusoe.ai"
+hq_city: "Denver"
+founded_year: 2018
+sector: "Cloud and infrastructure"
+description: "Builds and runs AI data centers and GPU cloud capacity. It is for companies that train and serve AI models."
+sources:
+  - "https://www.crusoe.ai/resources/newsroom/crusoe-expands-denver-hq"
+  - "https://crusoe.ai"

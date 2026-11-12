@@ -1,0 +1,13 @@
+id: sage-advisors
+name: SAGE Advisors
+url: https://innosphere.org/sage/
+stage: launch
+substage: develop
+city: Fort Collins
+type: incubator
+description: An Innosphere advisory program in Fort Collins. Early-stage startups present to seasoned advisors. The advisors help them refine their business strategy, product definition and plans to go to market.
+tags:
+  - incubator
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

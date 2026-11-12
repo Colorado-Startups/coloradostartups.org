@@ -1,0 +1,14 @@
+id: gan-ventures
+name: GAN Ventures
+url: https://www.gan.co/engage/ventures/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A seed-stage venture capital firm.
+tags:
+  - seed
+  - venture-capital
+source: canvas-2026
+status: active
+last_checked: "2026-10-08"

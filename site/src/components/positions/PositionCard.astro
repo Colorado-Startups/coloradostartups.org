@@ -1,0 +1,182 @@
+---
+// One position card (decision 44). Owner: L9. /get-involved/ places it, and
+// L8's region pages may place it for their organizer seat. Built on L12's
+// Card, Badge and Button.
+//
+// Props:
+//   position:  Position            from data/team/positions.yaml
+//   holder?:   Person              the person in a filled seat (holderOf())
+//   showRegionLink?: boolean       link a region seat to /regions/<id>/ (default true)
+//   element?:  "article" | "li" | "div"   "li" inside a <ul class="hall-grid"> (default "article")
+//
+// The title is an h3 and "What you do" an h4 wherever the card sits.
+//
+// An open seat shows "Email us about this seat", a mailto: with the seat in
+// the subject. The label says it opens an email (#139), and the address shows
+// as text for readers whose mail link does nothing. A seat
+// that takes applications (L19) shows "Apply for this seat" instead, linked to
+// /get-involved/apply/?role=<id>, and its summary (which leads with what the
+// seat gives) is followed by UNPAID_VOLUNTEER_LINE (decision 67). The
+// button's accessible name adds the seat, so eight buttons read as eight
+// different actions; the visible words stay first (WCAG 2.5.3).
+//
+// The buttons rank (#229): "Apply for this seat" is gold, the main action,
+// and "Email us about this seat" is stone. The button row sits right under
+// the text (#230). On /get-involved/ the grid sets align-items: start, so a
+// short card ends at its button instead of stretching to the tallest one
+// (#723).
+//
+// A region's seat shows the region's painted scene on top, as its card on
+// /regions/ does (#204). Not on the region's own page (showRegionLink false),
+// where the page's hero already shows it.
+//
+// A seat that takes applications lists its Claude Academy courses above the
+// apply button, each linked and timed, because the form needs a badge for
+// each one (#146). The line under the button names Paul and links /team/.
+import { COURSE_TITLES, courseUrl, type Person, type Position } from "@cs/shared";
+
+import { REGIONS } from "../../lib/regions/match";
+import { seatPagePath } from "../../lib/seats/page";
+import RegionArt from "../regions/RegionArt.astro";
+import Badge from "../ui/Badge.astro";
+import Button from "../ui/Button.astro";
+import Card from "../ui/Card.astro";
+import { COURSE_MINUTES, courseLength, totalLength } from "./courses";
+import { applyHref, RAISE_HAND_EMAIL, raiseHandHref, takesApplications, UNPAID_VOLUNTEER_LINE } from "./positions";
+
+interface Props {
+  position: Position;
+  holder?: Person;
+  showRegionLink?: boolean;
+  element?: "article" | "li" | "div";
+}
+
+const { position, holder, showRegionLink = true, element = "article" } = Astro.props;
+const open = position.status === "open";
+const applies = takesApplications(position);
+const courses = applies ? (position.apply?.courses ?? []) : [];
+const region = showRegionLink && position.region ? REGIONS.find((r) => r.id === position.region) : undefined;
+
+// The drawn width on /get-involved/'s .seat-grid: 20rem tracks with 24 px
+// gaps in .wrap, inside the card's 2 px borders. One column below 712 px,
+// two below 1056 px, three from there.
+const SEAT_GRID_SIZES = "(max-width: 711px) calc(100vw - 52px), (max-width: 1055px) calc(50vw - 40px), 380px";
+---
+
+<Card
+  title={position.title}
+  element={element}
+  class="position"
+  data-position={position.id}
+  data-status={position.status}
+  data-area={position.area}
+>
+  {region && <RegionArt slot="media" region={region} sizes={SEAT_GRID_SIZES} />}
+  {open ? <Badge slot="badges" tone="pine">Open seat</Badge> : <Badge slot="badges">Filled</Badge>}
+  <div class="position__text">
+    <p>{position.summary}</p>
+    {
+      applies && (
+        <p class="position__unpaid" data-unpaid-line>
+          {UNPAID_VOLUNTEER_LINE}
+        </p>
+      )
+    }
+    <h4 class="position__sub">What you do</h4>
+    <ul class="position__list">
+      {position.what_you_do.map((line) => <li>{line}</li>)}
+    </ul>
+    {applies && <p class="meta"><a class="tap-target" href={seatPagePath(position.id)} data-seat-page>Read about the role<span class="visually-hidden">: {position.title}</span></a></p>}
+    {
+      showRegionLink && position.region && (
+        <p class="meta">
+          <a class="tap-target" href={`/regions/${position.region}/`}>
+            About the region<span class="visually-hidden">: {position.title}</span>
+          </a>
+        </p>
+      )
+    }
+    {
+      courses.length > 0 && (
+        <div data-seat-courses>
+          <h4 class="position__sub">Take these courses first</h4>
+          <ul class="position__list">
+            {courses.map((id) => (
+              <li data-course-id={id}>
+                <a href={courseUrl(id)}>{COURSE_TITLES[id]}</a>, {courseLength(COURSE_MINUTES[id])}
+              </li>
+            ))}
+          </ul>
+          <p class="meta">
+            Claude Academy lists them as free, {totalLength(courses)} in all. The form asks for each completion badge.
+          </p>
+        </div>
+      )
+    }
+  </div>
+  <Fragment slot="actions">
+    {
+      applies ? (
+        <>
+          <Button href={applyHref(position)} data-apply>
+            Apply for this seat<span class="visually-hidden"> ({position.title})</span>
+          </Button>
+          <span class="meta position__email-line">
+            <a href="/team/">Paul Foley</a>, our founder, reads every application. If it looks like a fit, Paul sets up an
+            interview.
+          </span>
+        </>
+      ) : open ? (
+        <>
+          <Button variant="stone" href={raiseHandHref(position)} data-raise-hand>
+            Email us about this seat<span class="visually-hidden"> ({position.title})</span>
+          </Button>
+          <span class="meta position__email-line">
+            Or write to <span class="position__email">{RAISE_HAND_EMAIL}</span> and name the seat.
+          </span>
+        </>
+      ) : (
+        <span data-holder={holder?.id}>
+          {holder ? (
+            <>
+              Held by <a href={`/team/#${holder.id}`}>{holder.name}</a>.
+            </>
+          ) : (
+            "This seat is filled."
+          )}
+        </span>
+      )
+    }
+  </Fragment>
+</Card>
+
+<style>
+  /* Card.astro renders the foot, so it takes :global. hall.css pins it to the
+     card's bottom with margin-top: auto; here it follows the text (#230). */
+  .position :global(.hall-card__foot) {
+    margin-top: 0;
+  }
+  .position__text > * + * {
+    margin-top: var(--s-3);
+  }
+  .position__unpaid {
+    font-weight: 700;
+  }
+  .position__sub {
+    font-size: var(--t-step-0);
+  }
+  .position__list {
+    margin: 0;
+    padding-left: 1.2em;
+    display: grid;
+    gap: var(--s-1);
+  }
+  .position__email-line {
+    flex-basis: 100%;
+  }
+  .position__email {
+    overflow-wrap: anywhere;
+    color: var(--c-text);
+    font-weight: 500;
+  }
+</style>

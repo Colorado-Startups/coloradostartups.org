@@ -1,0 +1,13 @@
+id: johnson-and-wales-university
+name: Johnson & Wales University
+url: https://www.jwu.edu/campuses/denver/index.html
+stage: support
+substage: organizations
+city: Denver
+type: university
+description: University in Denver. Listed in the Ecosystem Canvas as support for founders at any stage.
+tags:
+  - university
+source: canvas-2026
+status: review
+last_checked: "2026-10-18"

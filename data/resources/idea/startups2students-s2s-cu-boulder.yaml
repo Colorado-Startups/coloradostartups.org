@@ -1,0 +1,14 @@
+id: startups2students-s2s-cu-boulder
+name: Startups2Students / S2S (CU Boulder)
+url: https://www.colorado.edu/innovate/programs-resources/startups2students-s2s
+stage: idea
+substage: validate
+city: Boulder
+type: community
+description: A CU Boulder program. It connects students with high-growth Colorado startups through events. The events are typically in September, January and April. Startups pitch their jobs and internships there.
+tags:
+  - team
+  - meetup
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

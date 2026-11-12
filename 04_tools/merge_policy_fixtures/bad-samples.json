@@ -1,0 +1,23 @@
+{
+  "_README": [
+    "Bad policy for merge_policy.py --self-test: a sample that is not a list of strings. Must exit 3."
+  ],
+  "_expect": {
+    "exit": 3,
+    "text": "samples.ai_mergeable entry"
+  },
+  "maintainer_only": [
+    ".github/**"
+  ],
+  "ai_mergeable": [
+    "site/src/pages/**"
+  ],
+  "samples": {
+    "ai_mergeable": [
+      [
+        "site/src/pages/x.astro",
+        7
+      ]
+    ]
+  }
+}

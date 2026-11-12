@@ -1,0 +1,15 @@
+id: buoyant-ventures
+name: Buoyant Ventures
+url: https://www.buoyant.vc/
+stage: launch
+substage: investors
+city: statewide
+type: investor
+description: A Chicago venture capital firm with a team member in Denver. It invests at seed and Series A in AI, software and simple hardware. The aims are efficiency, resiliency and decarbonization.
+tags:
+  - seed
+  - venture-capital
+  - sustainability
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

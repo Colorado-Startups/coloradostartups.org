@@ -1,0 +1,10 @@
+id: proof
+name: "Proof"
+website: "https://www.proofserve.com"
+hq_city: "Denver"
+founded_year: 2017
+sector: "Software"
+description: "Provides software for law firms to order and track service of legal documents. The software works through a network of process servers."
+sources:
+  - "https://www.proofserve.com/about"
+  - "https://proofserve.com"

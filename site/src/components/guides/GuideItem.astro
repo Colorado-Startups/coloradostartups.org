@@ -1,0 +1,40 @@
+---
+// One listed record in a guide: its name links to the organization's own site,
+// and a second link opens its entry in Startup Resources. Owner: L23.
+import { cityLabel, TYPE_LABELS } from "../canvas/labels";
+import { canvasHref, type GuideRecord } from "../../lib/guides/guides";
+
+interface Props {
+  item: GuideRecord;
+}
+
+const { item } = Astro.props;
+---
+
+<li class="guide-item" data-guide-item data-id={item.id}>
+  <p class="guide-item__name"><a href={item.url}>{item.name}</a></p>
+  <p class="meta">{TYPE_LABELS[item.type]}, {cityLabel(item.city)}</p>
+  <p>{item.description}</p>
+  <p class="guide-item__listing">
+    <a href={canvasHref(item.id)}>In Startup Resources<span class="visually-hidden">: {item.name}</span></a>
+  </p>
+</li>
+
+<style>
+  .guide-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    padding-block: var(--s-3);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .guide-item p {
+    margin: 0;
+  }
+  .guide-item__name {
+    font-weight: 700;
+  }
+  .guide-item__listing {
+    font-size: var(--t-step--1);
+  }
+</style>

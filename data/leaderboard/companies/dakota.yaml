@@ -1,0 +1,8 @@
+id: dakota
+name: "Dakota"
+website: "https://dakota.xyz"
+hq_city: "Boulder"
+sector: "Fintech and insurance"
+description: "Provides stablecoin custody, payments and operational accounts through APIs. They are for businesses."
+sources:
+  - "https://dakota.xyz/"

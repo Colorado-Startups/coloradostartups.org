@@ -1,0 +1,13 @@
+id: expect-technical-staffing
+name: Expect Technical Staffing
+url: https://expectllc.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A recruiting firm. It places technical and non-technical contractors and direct hires with companies of any size.
+tags:
+  - hiring
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

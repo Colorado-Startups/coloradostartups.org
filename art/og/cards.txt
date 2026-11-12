@@ -1,0 +1,58 @@
+id: default
+title: Colorado Startups
+subtitle: A community of founders building companies in Colorado.
+art: hero/hall
+
+id: home
+title: Colorado Startups
+subtitle: A community of founders building companies in Colorado.
+art: hero/hall
+
+id: community
+title: Community
+subtitle: Join the Slack and the LinkedIn Group, and meet the founders building across the Front Range.
+art: hero/hall
+
+id: leaderboard
+title: Leaderboard
+subtitle: Colorado startups worth knowing, each one verified from its own sources.
+art: hero/hall
+
+id: ecosystem-canvas
+title: Startup Resources
+subtitle: The community's map of Front Range startup resources. Ask Resourcus, our AI agent, to search it.
+art: agents/resourcus
+
+id: regions
+title: Regions
+subtitle: Photon Mountain, Space Peak and Fusion Canyon, from Fort Collins to Colorado Springs.
+art: hero/hall
+
+id: photon-mountain
+region: photon-mountain
+
+id: space-peak
+region: space-peak
+
+id: fusion-canyon
+region: fusion-canyon
+
+id: team
+title: Team
+subtitle: Paul Foley, volunteer Ryan Shuken and the Hall's three AI agents: Communitas, Resourcus and Publicus.
+art: hero/hall
+
+id: get-involved
+title: Get involved
+subtitle: Volunteer, host, mentor or share a win. There is a seat for you in the Hall.
+art: hero/hall
+
+id: founders
+title: Founders
+subtitle: Colorado founders come first. Find the people, programs and rooms that help you build.
+art: hero/hall
+
+id: dispatches
+title: Dispatches
+subtitle: News from the Hall: new resources, Leaderboard editions and Colorado founder wins. Publicus, our AI agent, drafts some of it.
+art: agents/publicus

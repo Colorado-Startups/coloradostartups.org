@@ -1,0 +1,101 @@
+---
+// /dispatches/: the Hall's public log, newest first. Owner: L9.
+// Publicus keeps the log and drafts some of it; a person publishes every
+// dispatch (hard constraint 11). Publicus's disclosure comes from
+// data/team/dwarves.yaml, because it is named here (hard constraint 10).
+// L7's small portrait of Publicus sits beside the lines that name it (#209);
+// its alt text, from portraitAlt(), says it is an AI agent too. It sits in the
+// first screen, so it loads eagerly (#428).
+import { getEntry } from "astro:content";
+
+import { portraitAlt } from "../../components/art/keepers";
+import Portrait from "../../components/art/Portrait.astro";
+import { dispatchesNewestFirst, dispatchPath } from "../../components/dispatches/collect";
+import DispatchDate from "../../components/dispatches/DispatchDate.astro";
+import Card from "../../components/ui/Card.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const dispatches = await dispatchesNewestFirst();
+const publicus = await getEntry("dwarves", "publicus");
+if (!publicus) throw new Error("data/team/dwarves.yaml has no publicus entry");
+---
+
+<BaseLayout
+  title="Dispatches"
+  description="News from Colorado Startups, newest first. Follow along by RSS or JSON Feed."
+  ogImage="dispatches"
+>
+  <section class="section section--band" aria-labelledby="dispatches-title">
+    <div class="wrap stack">
+      <h1 id="dispatches-title">Dispatches</h1>
+      <p class="lede">News from Colorado Startups, newest first.</p>
+      <div class="herald">
+        <Portrait
+          id="publicus"
+          size="small"
+          alt={portraitAlt("publicus", publicus.data.name, publicus.data.title)}
+          sizes="80px"
+          widths={[80, 160, 320]}
+          loading="eager"
+        />
+        <p>
+          <a href="/team/#publicus">Publicus</a>, our herald, keeps this log and drafts some of what goes in it. A person
+          reviews and publishes every dispatch.
+        </p>
+        <p class="ai-note" data-disclosure>{publicus.data.disclosure}</p>
+      </div>
+      <p class="meta">
+        Follow along by <a href="/rss.xml">RSS</a> or <a href="/feed.json">JSON Feed</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="log-title">
+    <div class="wrap stack">
+      <h2 id="log-title" class="visually-hidden">All dispatches</h2>
+      {
+        dispatches.length === 0 ? (
+          <p>No dispatches yet.</p>
+        ) : (
+          <ol class="hall-grid log">
+            {dispatches.map((d) => (
+              <Card title={d.data.title} href={dispatchPath(d)} element="li" data-dispatch={d.id}>
+                <p>{d.data.summary}</p>
+                <DispatchDate slot="meta" date={d.data.date} />
+              </Card>
+            ))}
+          </ol>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Publicus's portrait beside the lines that name it. It floats, so on a
+     narrow screen the text wraps under it. The disclosure is its own block
+     formatting context, so its rule never runs behind the portrait. */
+  .herald {
+    --portrait-small: 80px;
+    display: flow-root;
+    max-width: var(--t-measure);
+  }
+  .herald :global(.portrait) {
+    float: left;
+    margin: 0 var(--s-4) var(--s-2) 0;
+  }
+  .herald > p {
+    margin: 0;
+  }
+  .herald > p + p {
+    margin-top: var(--s-3);
+  }
+  .herald > .ai-note {
+    display: flow-root;
+  }
+  /* L12's .hall-grid as one readable column: a log reads top to bottom. */
+  .log {
+    grid-template-columns: 1fr;
+    max-width: var(--t-measure);
+  }
+</style>

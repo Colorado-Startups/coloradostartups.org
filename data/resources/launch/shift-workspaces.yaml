@@ -1,0 +1,13 @@
+id: shift-workspaces
+name: Shift Workspaces
+url: https://shiftworkspaces.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: coworking
+description: A coworking company. It has locations in Denver's Golden Triangle, Alamo Placita and downtown Littleton. It offers private and team offices, coworking and dedicated desks. It also has meeting rooms and event space.
+tags:
+  - coworking
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

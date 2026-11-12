@@ -1,0 +1,95 @@
+# Communitas welcome desk: who the visitor is -> what Communitas recommends.
+# Compiled at build time into a static island (no API, no model). Kinds map to
+# fixed URLs in packages/shared/src/communitas.ts (WAYS_IN).
+# L10 owns it since 2026-10-18.
+#
+# Rules:
+# - Doors run in VISITOR_KINDS order: founders first (idea, building, hiring),
+#   then the startup community (talent, investing, service-provider), then
+#   student and curious (decision 46).
+# - Founder doors also offer the founders forum (discourse, /founders/). No
+#   other door does, because the forum is for founders only (decision 49).
+# - Never point "investing" visitors at the Leaderboard (decision 17).
+# - "Startup Resources" is the Ecosystem Canvas's new title (decision 46).
+# - The idea and building doors open the matching founder guide under
+#   /guides/ (card #150). A door shows at most three steps and keeps the
+#   forum, so the guide takes the place of the Startup Resources stage link.
+#   The desk's Resourcus line still links Startup Resources.
+
+# Founders
+
+- id: idea
+  label: I have an idea for a company
+  recommends:
+    - kind: guide-start
+      note: The guide covers the first steps, from learning the basics and testing the idea to registering the company.
+    - kind: slack
+      note: Ask early questions in the Slack. Founders there have been where you are.
+    - kind: discourse
+      note: A private forum for Colorado founders opens later.
+
+- id: building
+  label: I'm building a company
+  recommends:
+    - kind: slack
+      note: Bring your ask to the Wednesday Asks and Offers thread in the Slack. Founders there answer founders.
+    - kind: guide-accelerators
+      note: The guide lists the accelerators and incubators in Startup Resources, with each program's city.
+    - kind: discourse
+      note: A private forum for Colorado founders opens later.
+
+- id: hiring
+  label: I'm hiring for my startup
+  recommends:
+    - kind: slack
+      note: Post each open role in the Wednesday Asks and Offers thread in the Slack.
+    - kind: linkedin-group
+      note: The LinkedIn Group runs the same Wednesday thread, so share the role there too.
+    - kind: discourse
+      note: A private forum for Colorado founders opens later.
+
+# The startup community that backs founders
+
+- id: talent
+  label: I want to work at a startup
+  recommends:
+    - kind: slack
+      note: Founders post open roles in the Wednesday Asks and Offers thread in the Slack.
+    - kind: events
+      note: Meet Colorado founders in person at community events.
+
+- id: investing
+  label: I invest in or lend to startups
+  recommends:
+    - kind: events
+      note: Meet Colorado founders in person at community events.
+    - kind: newsletter
+      note: Startupers covers what founders across Colorado are building.
+
+- id: service-provider
+  label: I offer services to startups
+  recommends:
+    - kind: slack
+      note: Share your offer in the Wednesday Asks and Offers thread in the Slack. It is the one place for offers.
+    - kind: canvas
+      canvas_stage: launch
+      note: Founders find service providers in Startup Resources. Suggest your firm from that page.
+
+# Everyone else
+
+- id: student
+  label: I'm a student
+  recommends:
+    - kind: canvas
+      canvas_stage: idea
+      note: The Educate section of the Idea stage lists courses and programs for new founders.
+    - kind: events
+      note: Events are a good way to meet founders and find an internship.
+
+- id: curious
+  label: I'm just curious
+  recommends:
+    - kind: newsletter
+      note: The Startupers newsletter is the easiest way to follow along.
+    - kind: linkedin-page
+      note: Follow the Colorado Startups LinkedIn Page for Colorado founder wins.

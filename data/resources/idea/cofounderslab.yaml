@@ -1,0 +1,13 @@
+id: cofounderslab
+name: CoFoundersLab
+url: https://cofounderslab.com/
+stage: idea
+substage: validate
+city: online
+type: community
+description: An online startup community. Founders search for a cofounder by interests, skills and location. Members also get advice from expert advisors and prepare a pitch for funding.
+tags:
+  - team
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

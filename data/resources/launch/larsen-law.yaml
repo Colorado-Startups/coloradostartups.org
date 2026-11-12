@@ -1,0 +1,13 @@
+id: larsen-law
+name: Larsen Law
+url: https://www.larsenlawoffices.com/
+stage: launch
+substage: service-providers
+city: Denver
+type: service-provider
+description: A Denver law firm that drafts and reviews technology contracts. The contracts include software licensing and SaaS agreements.
+tags:
+  - legal
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

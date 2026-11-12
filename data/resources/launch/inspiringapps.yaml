@@ -1,0 +1,13 @@
+id: inspiringapps
+name: InspiringApps
+url: https://www.inspiringapps.com/
+stage: launch
+substage: service-providers
+city: Boulder
+type: service-provider
+description: A team in Boulder that builds custom mobile and web apps. It also offers consulting. Its clients are mainly enterprise companies.
+tags:
+  - software
+source: canvas-2026
+status: active
+last_checked: "2026-11-02"

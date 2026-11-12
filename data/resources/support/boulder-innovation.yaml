@@ -1,0 +1,13 @@
+id: boulder-innovation
+name: Boulder Innovation
+url: https://bouldercolorado.gov/government/departments/innovation-technology
+stage: support
+substage: organizations
+city: Boulder
+type: government
+description: A City of Boulder department. It is for innovation and technology. It runs the city's open data catalog. It also runs the community broadband and fiber network projects.
+tags:
+  - economic-development
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

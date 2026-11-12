@@ -1,0 +1,13 @@
+id: flatiron-school
+name: Flatiron School
+url: https://flatironschool.com/
+stage: idea
+substage: educate
+city: Denver
+type: education
+description: A tech school with work-integrated programs in AI, cybersecurity and software engineering. Its programs pair coursework with a paid apprenticeship. It also offers certificate programs for working professionals.
+tags:
+  - coding
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"

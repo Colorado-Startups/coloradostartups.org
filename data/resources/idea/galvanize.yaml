@@ -1,0 +1,15 @@
+id: galvanize
+name: Galvanize
+url: https://www.galvanize.com/
+stage: idea
+substage: educate
+city: statewide
+type: education
+description: A Denver tech training firm. It onboards, upskills and reskills company teams in AI, software engineering, data and cloud. It also runs immersive programs for active-duty military.
+tags:
+  - coding
+  - boulder
+  - denver
+source: canvas-2026
+status: active
+last_checked: "2026-10-18"
