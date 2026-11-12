@@ -36,15 +36,15 @@
     "@astrojs/sitemap": "3.7.4",
     "@cs/shared": "*",
     "@observablehq/plot": "0.6.17",
-    "astro": "7.4.1",
+    "astro": "7.4.4",
     "yaml": "2.9.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.11",
+    "@astrojs/check": "0.9.12",
     "@axe-core/playwright": "4.14.0",
-    "@cloudflare/vitest-plugin": "1.4.8",
-    "@mswjs/interceptors": "0.45.9",
+    "@cloudflare/vitest-plugin": "1.4.11",
+    "@mswjs/interceptors": "0.45.10",
     "@playwright/test": "1.64.1",
     "axe-core": "4.14.0",
     "fontkitten": "1.0.3",
@@ -54,6 +54,6 @@
     "sharp": "0.35.5",
     "typescript": "6.0.3",
     "vitest": "5.0.5",
-    "wrangler": "4.153.0"
+    "wrangler": "4.156.0"
   }
 }

@@ -31,10 +31,10 @@
     "secrets": "secretlint \"**/*\""
   },
   "devDependencies": {
-    "@secretlint/secretlint-rule-preset-recommend": "13.0.7",
+    "@secretlint/secretlint-rule-preset-recommend": "13.1.0",
     "@vitest/coverage-v8": "5.0.5",
-    "knip": "6.42.1",
-    "secretlint": "13.0.7",
+    "knip": "6.44.0",
+    "secretlint": "13.1.0",
     "typescript": "6.0.3"
   },
   "overrides": {
