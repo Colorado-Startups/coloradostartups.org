@@ -1,6 +1,6 @@
 # AI-visibility panel
 
-- [x] Built 2026-10-18 by lane L27 for [GO-LIVE.md](../../00_project_system/GO-LIVE.md) item C12: at T+7, then monthly (its Verification section).
+- [x] Built 2026-10-18 by lane L27 for the go-live checklist's item C12 (private archive): at T+7, then monthly (its Verification section).
 - [ ] Baseline run: it spends money, so it waits for Paul's yes in chat, then the orchestrator runs it.
 
 | Item | Fact |

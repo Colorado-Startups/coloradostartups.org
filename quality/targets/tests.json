@@ -1,0 +1,48 @@
+[
+  {
+    "id": "tests.e2e_routes",
+    "params": {
+      "suites": [
+        {
+          "label": "Unit",
+          "dir": "site/test/unit/",
+          "file": "\\.test\\.ts$"
+        },
+        {
+          "label": "DOM",
+          "dir": "site/test/dom/",
+          "file": "\\.test\\.ts$"
+        },
+        {
+          "label": "Worker: site",
+          "dir": "site/test/worker/",
+          "file": "\\.test\\.ts$"
+        },
+        {
+          "label": "Worker: Communitas",
+          "dir": "workers/communitas/test/",
+          "file": "\\.test\\.ts$"
+        },
+        {
+          "label": "End to end",
+          "dir": "site/e2e/",
+          "file": "\\.(spec|test)\\.ts$",
+          "e2e": true
+        }
+      ],
+      "pages_dir": "site/src/pages/",
+      "workflows": [
+        {
+          "file": "site-tests.yml",
+          "script": "check:push",
+          "role": "suite"
+        },
+        {
+          "file": "e2e.yml",
+          "script": "test:e2e",
+          "role": "e2e"
+        }
+      ]
+    }
+  }
+]

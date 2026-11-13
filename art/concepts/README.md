@@ -3,8 +3,8 @@
 | What | Where |
 | --- | --- |
 | Style, palette and prompt system | [`art/DIRECTION.md`](../DIRECTION.md) |
-| Each image's words; its seed and size. | [`art/prompts/<id>.txt`](../prompts/); [`art/runs/batch-<n>.plan.json`](../runs/) |
-| The requests; every run, in order. | [`batch-1.json`](../runs/batch-1.json), [`batch-2.json`](../runs/batch-2.json), [`batch-3.json`](../runs/batch-3.json), [`batch-4.json`](../runs/batch-4.json), [`batch-5.json`](../runs/batch-5.json); [`LOG.md`](../runs/LOG.md) |
+| Each image's words; its seed and size. | [`art/prompts/<id>.txt`](../prompts/); the batch plans (private archive) |
+| The requests; every run, in order. | batches 1 to 5 and the run log (private archive) |
 | A 480 px preview of each render. | `batch-<n>/<id>.webp`, in this folder. |
 | Which render ships as which file. | [`art/finals.json`](../finals.json), read by [`make-finals.mjs`](../tools/make-finals.mjs) |
 | This record | L7 wrote the plan; L17 recorded the picks and the batch 2 run; all 2026-10-18. |

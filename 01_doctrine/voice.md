@@ -32,6 +32,6 @@ The site is a hall carved inside the Front Range, where founders build. Use the 
 
 ## Never
 
-- Political or election content, fund talk, the transition's terms, or the avoid list in [`00_project_system/BRIEF.md`](../00_project_system/BRIEF.md#2-hard-constraints-never-cross-these) section 2.
+- Political or election content, fund talk, the transition's terms, or the avoid list in the site brief's section 2 (private archive).
 - Franchise names or anything that imitates a game or film franchise.
 - Unattributed member counts.

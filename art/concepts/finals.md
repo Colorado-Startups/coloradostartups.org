@@ -16,7 +16,7 @@
 | L17, once on Modal, with L14's pipeline (PR #31) | Figure |
 | --- | --- |
 | Cap and GPU | `--max-usd 2`; one L4, ComfyUI v0.41.0 (source: run log `run-1792351096.json`). |
-| Planner estimate | $0.08 to $0.14, worst case $0.36 (source: `ops/gpu/modal/workflow.py`). |
+| Planner estimate | $0.08 to $0.14, worst case $0.36 (source: the archive's Modal planner). |
 | Time | ComfyUI ready in 21.1 s (source: run log). Each image took 29.2 to 43.2 s, the first the slowest. The container ran 307.3 s. |
 | Cost | About $0.087 at Modal's published rates (source: run log). |
 | `modal billing summary`, this month | Before, at 13:12 MDT: $0.35 metered, $0.34 credits, $0.00 billed (source: the reading). After, at 13:18 MDT: $0.46 metered, $0.45 credits, $0.00 billed (source: the reading). |

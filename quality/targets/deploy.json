@@ -1,0 +1,13 @@
+[
+  {
+    "id": "deploy.waiting_merges",
+    "params": {
+      "worker_dir": "site",
+      "deploy_paths": [
+        "site",
+        "data",
+        "packages"
+      ]
+    }
+  }
+]

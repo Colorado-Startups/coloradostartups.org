@@ -25,8 +25,8 @@
 | File | Holds |
 | --- | --- |
 | [`cs_site_rules.json`](cs_site_rules.json) | Scope, grades, term rules with samples, date windows, rules shared with LinkedIn |
-| [`cs_site_rules.private.json`](cs_site_rules.private.json) | The private avoid list (20 term rules), never exported (#552); `CS_SITE_PRIVATE_RULES` names another path. Without it, 10 public rules run and C11 skips |
-| [`.private-overlay-required`](.private-overlay-required) | Marks the archive (#624, #667): the overlay must load with its minimums and `required_ids`. Missing: lint 3, C11 FAIL |
+| `cs_site_rules.private.json` (archive only) | The private avoid list (20 term rules), never exported (#552); `CS_SITE_PRIVATE_RULES` names another path. Without it, 10 public rules run and C11 skips |
+| `.private-overlay-required` (archive only) | Marks the archive (#624, #667): the overlay must load with its minimums and `required_ids`. Missing: lint 3, C11 FAIL |
 
 ## Exit contract
 

@@ -34,7 +34,7 @@
 | Fact | Source |
 | --- | --- |
 | No daily rebuild is set up. | No workflow has a `schedule:` trigger (`git grep -n "schedule:" -- .github/workflows`, 2026-11-02) |
-| Production deploys on each green merge, from `production`, since 2026-11-03; it and every hand build fetch the feed. | [`workers-builds.md`](../../ops/runbooks/workers-builds.md); decisions 70, [72](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L116), 91. |
+| Production deploys on each green merge, from `production`, since 2026-11-03; it and every hand build fetch the feed. | the Workers Builds runbook (private archive); decisions 70, [72](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L116), 91. |
 | The 2026-11-02 deploy fetched 65 events; the page listed dates through 2026-12-31. | `fetchedAt` 2026-11-02T23:50:57Z in `upcoming.json`; `curl` of `/event-calendar/`, 2026-11-02. |
 | Before it, the page stopped at 2026-12-17, the 2026-10-19 snapshot's window. | [#396](https://github.com/Colorado-Startups/coloradostartups-site/issues/396) |
 

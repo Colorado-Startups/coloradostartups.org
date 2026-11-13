@@ -1,0 +1,36 @@
+[
+  {
+    "id": "ci.latest_flow",
+    "params": {
+      "repo": "Colorado-Startups/coloradostartups.org",
+      "hook_says": [
+        {
+          "match": "not-head",
+          "says": "refuses a push of any commit but HEAD"
+        }
+      ],
+      "hook_checks": "run_checker \"([\\w-]+)\"|run_(secret)lint\\b",
+      "stages": [
+        {
+          "label": "Pinned review and merge",
+          "stage": "review",
+          "kind": "manual",
+          "runs": "The orchestrator reviews the diff at the head SHA, then merges with gh pr merge --match-head-commit and that literal SHA",
+          "file": "CLAUDE.md",
+          "key": "Merges"
+        },
+        {
+          "label": "Workers Builds to staging",
+          "stage": "deploy",
+          "kind": "workflow",
+          "runs": "Cloudflare Workers Builds builds and deploys the staging Worker on every merge to main",
+          "file": "CONTRIBUTING.md",
+          "key": "Review and merge"
+        }
+      ],
+      "deploy_apps": [
+        "cloudflare-workers-and-pages"
+      ]
+    }
+  }
+]

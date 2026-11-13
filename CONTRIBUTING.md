@@ -60,3 +60,12 @@ Check your PR yourself: `python3 04_tools/merge_policy.py --base origin/main`. A
 ## 5. Forks and CI
 
 CI runs on a fork's PR after a maintainer approves the first run. A fork PR gets no secrets.
+
+## 6. Scores
+
+| Page | Shows |
+| --- | --- |
+| [Quality, Speed and Consumption](https://colorado-startups.github.io/coloradostartups.org/) | every tab's metrics against its goal |
+| [Process](https://colorado-startups.github.io/coloradostartups.org/process.html) | each process map, step by step, scored by those metrics |
+
+A PR that adds or moves a doc maps it in `quality/targets/docs.json`, or the `pages` check fails.

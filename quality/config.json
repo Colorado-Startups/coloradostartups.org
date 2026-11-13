@@ -1,0 +1,11 @@
+{
+ "comment": "coloradostartups.org's Quality, Speed and Consumption config, from Git Crafter v7.0.0 templates/quality/config.json: all 13 tabs (web: true turns on Pages, the tab that scores the live site). The six Claude tabs come from the Claudius pack, pinned at a full commit SHA and named as [id, Name] pairs because actions/pages reads this list before it checks the pack out (as Colorado-Startups/link does). Keys: Git Crafter quality/CONFIG.md.",
+ "tabs": [
+  "code", "documentation", "issues", "pull-requests", "discussions", "actions", "projects",
+  "security", "dependabot", "scanning", "insights", "settings", "pages",
+  ["claude", "Claude"], ["claude-settings", "Claude settings"], ["desktop-app", "Claude desktop app"],
+  ["blockers", "Blockers"], ["tokens", "Tokens"], ["instructions", "Instructions"]
+ ],
+ "web": true,
+ "packs": ["Colorado-Startups/claudius@9d1fa89a9ee98d3e86048bcca3c5c1a51a54b086"]
+}

@@ -1,6 +1,6 @@
 # Concepts: the scenes
 
-*Part of the [v3 concepts record](README.md). Previews sit in `batch-<n>/` here; every other take's verdict is a QC line in [`LOG.md`](../runs/LOG.md).*
+*Part of the [v3 concepts record](README.md). Previews sit in `batch-<n>/` here; every other take's verdict is a QC line in the run log (private archive).*
 
 ## What ships
 

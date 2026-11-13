@@ -1,7 +1,7 @@
 name: site-tests
 
 # REQUIRED. The repository ruleset "main: required checks" requires the
-# site-tests, e2e and DCO checks on main (gh api repos/{repo}/rulesets/26477102,
+# site-tests, e2e and DCO checks on main (gh api repos/{repo}/rulesets/27158066,
 # created 2026-11-03), so a red or missing site-tests check blocks a merge.
 # That is why this workflow has no trigger path filter: its verdict job always
 # reports, and the change job skips the work instead. The
@@ -81,7 +81,7 @@ jobs:
       passed: ${{ steps.passed.outputs.passed }}
       runner: ${{ steps.runner.outputs.runner }}
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -142,10 +142,10 @@ jobs:
     runs-on: ${{ needs.changes.outputs.runner }}
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v7.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -177,7 +177,7 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:dom -- --reporter=default --reporter=json --outputFile.json="$RUNNER_TEMP/test-report/vitest-dom.json"
 
-      - uses: actions/upload-artifact@v7.0.2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() && steps.dom.outcome != 'skipped' }}
         with:
           name: test-report-vitest-dom
@@ -192,7 +192,7 @@ jobs:
         env:
           HASH: ${{ needs.changes.outputs.inputs_hash }}
         run: printf '%s\n' "$HASH" > "$RUNNER_TEMP/site-tests-inputs.txt"
-      - uses: actions/upload-artifact@v7.0.2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: github.event_name == 'pull_request' && needs.changes.outputs.inputs_hash != ''
         with:
           name: site-tests-inputs-${{ needs.changes.outputs.inputs_hash }}

@@ -1,0 +1,51 @@
+[
+  {
+    "id": "code.loc_change_pct",
+    "params": {
+      "areas": [
+        "site/src",
+        "site/worker",
+        "workers/communitas/src",
+        "packages/shared",
+        "scripts",
+        "04_tools"
+      ],
+      "workers": [
+        "site",
+        "workers/communitas"
+      ],
+      "client_dist": {
+        "dir": "site/dist",
+        "source": "site"
+      },
+      "test_suites": [
+        {
+          "label": "site unit + worker",
+          "cwd": "site",
+          "args": [
+            "--project",
+            "unit",
+            "--project",
+            "worker"
+          ],
+          "cover": {
+            "site/src": "src/**/*.{ts,mjs}",
+            "site/worker": "worker/**/*.ts"
+          }
+        },
+        {
+          "label": "communitas",
+          "cwd": "workers/communitas",
+          "args": [],
+          "cover": {
+            "workers/communitas/src": "src/**/*.ts"
+          }
+        }
+      ],
+      "check": {
+        "workflow": "site-tests.yml",
+        "job": "site-tests: tests"
+      }
+    }
+  }
+]

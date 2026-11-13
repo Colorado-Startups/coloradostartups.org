@@ -37,3 +37,9 @@ site/src/components/team/photos/
 04_tools/cs_site_rules.private.json
 04_tools/export_scan_allow.private.json
 04_tools/.private-overlay-required
+
+# Git Crafter pages: build output and run data (pages.yml)
+quality/data/
+quality/history/
+quality/dist/
+.code-os-packs/

@@ -1,0 +1,55 @@
+[
+  {
+    "id": "usability.reading_grade",
+    "params": {
+      "origin": "https://coloradostartups.org",
+      "key_pages": [
+        "/",
+        "/ecosystem-canvas/",
+        "/leaderboard/",
+        "/regions/",
+        "/team/",
+        "/get-involved/"
+      ],
+      "form_pages": [
+        "/get-involved/apply/",
+        "/leaderboard/nominate/",
+        "/ecosystem-canvas/suggest/",
+        "/newsletter/"
+      ],
+      "tasks": [
+        {
+          "label": "Join the Slack",
+          "goals": [
+            {
+              "path": "/slack/"
+            },
+            {
+              "path": "/slack"
+            }
+          ]
+        },
+        {
+          "label": "Find resources",
+          "path": "/ecosystem-canvas/"
+        },
+        {
+          "label": "Nominate a company",
+          "path": "/leaderboard/nominate/"
+        },
+        {
+          "label": "Apply for a seat",
+          "path": "/get-involved/apply/"
+        },
+        {
+          "label": "Subscribe",
+          "path": "/newsletter/"
+        },
+        {
+          "label": "Privacy policy",
+          "path": "/privacy/"
+        }
+      ]
+    }
+  }
+]

@@ -4,8 +4,8 @@
 # login. When a team exists, name it here instead.
 #
 # The ruleset on main sets require_code_owner_review to false (gh api
-# repos/Colorado-Startups/coloradostartups-site/rules/branches/main,
-# 2026-11-02), so this file requests reviews and never blocks a merge.
+# repos/Colorado-Startups/coloradostartups.org/rulesets/27158066,
+# 2026-11-13), so this file requests reviews and never blocks a merge.
 # The last matching line wins.
 
 *            @paul-co-startups
