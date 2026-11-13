@@ -28,6 +28,17 @@ No live run yet. The baseline goes here after the orchestrator runs it.
 
 ## Running it
 
+```mermaid
+flowchart LR
+  D["Dry run: no network, keys or cost"] --> Y{"Paul's yes in chat"}
+  Y --> S["Smoke test: about 1/20 of the estimate"]
+  S --> B["Live baseline: $7.30 estimate"]
+  B --> R["--write-report fills Results"]
+  R --> M["T+7, then monthly"]
+```
+
+*The order a baseline follows; flags below.*
+
 | Run | `npm run eval:ai-visibility --` plus |
 | --- | --- |
 | Dry run: no network, keys or cost | nothing |

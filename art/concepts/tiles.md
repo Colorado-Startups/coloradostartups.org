@@ -2,6 +2,13 @@
 
 *Part of the [v3 concepts record](README.md): batch 1 and batch 2 on Modal, 2026-10-18. Previews sit in `batch-<n>/` here.*
 
+```mermaid
+flowchart LR
+  R("Render") --> C{"make-tiles check"} -->|"FAIL"| X("Re-render")
+  C -->|"ok"| L{"DIRECTION's look"} -->|"no"| X
+  L -->|"yes"| S("Ships")
+```
+
 | Render (for L12's tiles) | Batch | `make-tiles.mjs` verdict (source: make-tiles, 2026-10-18) | Look | Decision |
 | --- | --- | --- | --- | --- |
 | [`tile-night-stone`](batch-1/tile-night-stone.webp) | 1 | ok: 34 KB, seam 0.92. | Fine, light granite speckle that maps to a calm dark band. | **Ships** as `textures/night-stone.webp` |

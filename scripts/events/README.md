@@ -4,20 +4,25 @@
 
 ## How it flows
 
+```mermaid
+flowchart LR
+  F["Public ICS feed"] --> P["Parse, expand series"] --> G["Content gate"] --> J["upcoming.json"] --> B["Build renders it"]
+```
+
 | Step | File | What happens |
 | --- | --- | --- |
-| 1 | [`fetch-ics.mjs`](fetch-ics.mjs) | Reads the calendar's public ICS feed. The URL is fixed by `CALENDAR_ID` in [`links.ts`](../../site/src/components/info/links.ts); the script takes no URL. |
-| 2 | [`lib/ics.mjs`](lib/ics.mjs), [`lib/events.mjs`](lib/events.mjs) | Parses the feed and expands recurring series (weekly, every other week, "second Thursday", "last Thursday", COUNT, UNTIL). Removes EXDATEs, swaps in moved instances, leaves out cancelled and private events. |
-| 3 | [`lib/lint.mjs`](lib/lint.mjs) | Runs each title, location, link and description through [`cs_site_lint.py`](../../04_tools/cs_site_lint.py), the hooks' and CI's gate. A term-rule finding, FAIL or WARN, keeps the event off the page; so does a prose FAIL in the title or location, the two lines shown. The log names the rule. |
+| 1 | [`fetch-ics.mjs`](fetch-ics.mjs) | Reads the feed, whose URL `CALENDAR_ID` fixes in [`links.ts`](../../site/src/components/info/links.ts); it takes no URL. |
+| 2 | [`lib/ics.mjs`](lib/ics.mjs), [`lib/events.mjs`](lib/events.mjs) | Expands recurring series (weekly, every other week, "second Thursday", "last Thursday", COUNT, UNTIL). Drops EXDATEs, cancelled and private events; swaps in moved instances. |
+| 3 | [`lib/lint.mjs`](lib/lint.mjs) | Lints each title, location, link and description with [`cs_site_lint.py`](../../04_tools/cs_site_lint.py), the hooks' and CI's gate. Any term-rule finding (FAIL or WARN), or a prose FAIL in the shown title or location, keeps the event off the page. The log names the rule. |
 | 4 | [`data/events/upcoming.json`](../../data/events/) | The snapshot |
-| 5 | [`site/src/components/events/`](../../site/src/components/events/) | Reads the snapshot at build time, keeps what has not ended, renders it in Mountain Time. |
+| 5 | [`site/src/components/events/`](../../site/src/components/events/) | At build time keeps what has not ended, rendered in Mountain Time. |
 
 ## When it runs
 
 | Where | What happens |
 | --- | --- |
-| Workers Builds (`WORKERS_CI=1`) | The prebuild fetches the feed and rewrites the snapshot inside the build, so the deployed page is fresh. |
-| A local `npm run build`, GitHub Actions. | The prebuild skips the feed and lists the committed snapshot: builds stay offline, tests repeatable. |
+| Workers Builds (`WORKERS_CI=1`) | The prebuild fetches the feed and rewrites the snapshot, so the deployed page is fresh. |
+| A local `npm run build`, GitHub Actions. | The prebuild lists the committed snapshot: builds stay offline, tests repeatable. |
 | `CS_EVENTS_FETCH=1 npm run build` | Fetches, like Workers Builds; every hand build for production sets it (decision [91](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L160)) |
 | `node scripts/events/fetch-ics.mjs` | Rewrites the committed snapshot; commit it for a fresher repo copy. |
 

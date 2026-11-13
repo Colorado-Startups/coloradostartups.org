@@ -4,6 +4,12 @@
 
 ## Settings, edits and upscales
 
+```mermaid
+flowchart LR
+  R("Bria render") -->|"2x upscale, none wired yet"| W("WebP or keeper crops")
+  T("Tile render") -->|"make-tiles.mjs"| X("512 × 512 WebP")
+```
+
 | Kind | `aspect_ratio` | `resolution` | Delivered as |
 | --- | --- | --- | --- |
 | Hero | 21:9 | 1MP | 2x upscale, then WebP at 2400 px wide or more. |

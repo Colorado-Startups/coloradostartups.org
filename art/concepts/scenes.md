@@ -4,6 +4,12 @@
 
 ## What ships
 
+```mermaid
+flowchart LR
+  A("Batches 1, 2: Anima") --> H("Hero and three regions")
+  F("Batches 4, 5: FIBO 2.0 Dev") --> S("404, founders and guides scenes")
+```
+
 | File | Render | Batch | Why this take |
 | --- | --- | --- | --- |
 | `hero/hall` | [`hero-a`](batch-1/hero-a.webp) | 1, Anima | Home hero (orchestrator, 2026-10-18) |

@@ -14,9 +14,15 @@
 
 ## Checks on the 2026-10-09 run
 
+```mermaid
+pie title Qwen3 on 10 should-refuse questions
+  "Model text (mode: model)" : 4
+  "Pipeline fallback (mode: fallback)" : 6
+```
+
 | Check | Finding |
 | --- | --- |
-| Refusals | Qwen3 wrote model text for 4 of 10 should-refuse questions: r01, r02, r04, r07 (`mode: model`, [results](results/2026-10-09-_cf_qwen_qwen3-30b-a3b-fp8.json)). The other 6 hit the pipeline's fallback (`mode: fallback`) first. Per the review of PR #14 (orchestrator, 2026-10-18), the 100% figure mostly measures the guard and pipeline, not the model alone |
+| Refusals | Qwen3's model text, per the chart: r01, r02, r04, r07 ([results](results/2026-10-09-_cf_qwen_qwen3-30b-a3b-fp8.json)). The other 6 hit the fallback first. Per the review of PR #14 (orchestrator, 2026-10-18), the 100% figure mostly measures the guard and pipeline, not the model alone |
 | Offline | `offline:oracle` meets every goal; `offline:echo-all` fails precision and refusals ([results](results/offline-offline_echo-all.json)): the scorer tells careful from careless |
 | Scorer fix, before this run | The first live pass marked most answers ungrounded; 29 of its 30 ungrounded verdicts were false positives. "Source" matched "resources" and "news source"; "Startup Colorado" matched in the retrieved "Startup Colorado Blog"; names matched in tags like `[businessden-startups]` |
 | Scorer change | `ungroundedNames()` matches whole names case-sensitively, strips citation tags, blanks retrieved names first. `site/test/unit/l4/eval-harness.test.ts` covers each case |

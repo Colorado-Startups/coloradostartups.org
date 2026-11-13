@@ -4,6 +4,12 @@
 
 ## The rules
 
+```mermaid
+flowchart LR
+  W("One warm key light: lantern, hearth or low sun") --> I("Image")
+  C("One cool note: community sky blue") --> I
+```
+
 | # | Rule | Always | Never | Source |
 | --- | --- | --- | --- | --- |
 | 1 | Gold, fire and light | Bright and warm. Grand but welcoming: open doors and warm light, a capital that invites you in. | A dark dungeon | Decision [21](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L30) |

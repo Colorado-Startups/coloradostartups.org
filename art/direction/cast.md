@@ -2,6 +2,19 @@
 
 *Part of [`DIRECTION.md`](../DIRECTION.md), art direction v3; [`LICENSES.md`](../LICENSES.md) says which route is allowed.*
 
+```mermaid
+mindmap
+  The Hall
+    Keepers, AI agents
+      Communitas, sky blue
+      Resourcus, pine
+      Publicus, ember
+    Regions
+      Photon Mountain, light
+      Space Peak, space
+      Fusion Canyon, fusion
+```
+
 ## The keepers
 
 All three are AI agents ([who each is](../../data/team/dwarves.yaml)), painted as stylized fantasy characters so no portrait implies a real person.

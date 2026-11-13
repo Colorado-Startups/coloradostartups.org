@@ -19,8 +19,14 @@
 
 ## The reasoning, rows 6 to 8
 
+```mermaid
+flowchart LR
+  Rev{"Annual revenue, with affiliates"} -->|"below $10M"| Free("Royalty-free, any purpose")
+  Rev -->|"above $10M"| Paid("Paid Commercial Use Agreement")
+```
+
 | # | Question | What the text says | Reading for Colorado Startups, Ltd. | Verdict |
 | --- | --- | --- | --- | --- |
-| 6 | Is CS under LTX's revenue line? | §2.1: royalty-free for any purpose below $10M a year, per §2.1; above it, a paid Commercial Use Agreement. The line counts affiliates under common Control (§1.6): owning over 50%, per §1.3, or the power to run the company. | The repo records no revenue figure. A fiscal sponsor that neither owns nor runs the company is not under common Control. | **Allowed** once Paul confirms revenue under the line. |
+| 6 | Is CS under LTX's revenue line? | §2.1 sets the line in the chart above. It counts affiliates under common Control (§1.6): owning over 50%, per §1.3, or the power to run the company. | The repo records no revenue figure. A fiscal sponsor that neither owns nor runs the company is not under common Control. | **Allowed** once Paul confirms revenue under the line. |
 | 7 | Can Comfy Cloud run LTX-2.5 for us? | §3 lets a host offer LTX-2.x as a service if it passes the license terms on. | Comfy hosts; our use stays under the Community License (§2.1). The verdict rests on the license, not on Comfy's provider table. | **Allowed** |
 | 8 | Do real places need clearance? | The AUP: commercial content must not replicate a real-world likeness, person, brand or location unless independently cleared. | Landforms such as the Flatirons and Pikes Peak are stylized. Built places carry no shop names (no text in images) and no brands; no real people appear. 17 U.S.C. §120(a) allows pictures of buildings visible from public places. | **Cleared** here; the orchestrator confirms. |

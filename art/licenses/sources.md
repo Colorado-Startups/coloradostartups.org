@@ -2,6 +2,22 @@
 
 *Part of [`LICENSES.md`](../LICENSES.md). The art-models session read each in full on 2026-11-02, through the Hugging Face API, `gh api`, a web fetch or the in-app browser. The license text at each link wins over every summary here.*
 
+```mermaid
+mindmap
+  Sources
+    FIBO 2.0
+      Hugging Face cards
+      CC BY-NC 4.0
+      Bria plans, pricing, terms
+    LTX-2.5
+      Community License
+      Acceptable Use Policy
+      Hugging Face cards
+    Comfy Cloud
+      Terms of Service
+      Providers, pricing, marketing
+```
+
 | Source | What it is | Date on the source |
 | --- | --- | --- |
 | [briaai/Fibo-2.0-dev](https://huggingface.co/briaai/Fibo-2.0-dev) card and access form. | FIBO 2.0 Dev weights: tagged `license: other`, named `bria-fibo`, linked to CC BY-NC 4.0. | Repo updated 2026-10-25 (Hugging Face API). |

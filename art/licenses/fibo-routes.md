@@ -2,10 +2,13 @@
 
 *Part of [`LICENSES.md`](../LICENSES.md). Each route's reasoning row: [`fibo-reasoning.md`](fibo-reasoning.md). Read 2026-11-02.*
 
-| Credits to dollars | Source |
-| --- | --- |
-| 211 credits a dollar (computed here). | `comfy cloud status` shows 4,082 credits for $19.35 (source: the CLI). |
-| The same rate, per Comfy's table: 736.39 credits for $3.49. | Comfy's price table for deployed workflows (source: comfy.org/pricing, "Comfy API pricing"). |
+*Credits to dollars:*
+
+```mermaid
+flowchart LR
+  CLI("comfy cloud status, the CLI: 4,082 credits for $19.35") --> R("211 credits a dollar, computed here")
+  P("comfy.org/pricing, Comfy API pricing for deployed workflows: 736.39 credits for $3.49") -->|"the same rate"| R
+```
 
 | Route | For the site | Usable today | Price | Run tier |
 | --- | --- | --- | --- | --- |
