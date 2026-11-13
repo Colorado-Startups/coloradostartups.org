@@ -33,3 +33,17 @@ No gate runs a test, build or render on this Mac (Paul, 2026-11-02). Here the gi
 `npm run lint:selftest` chains four of them: the lint, the contract test, `hook_selftest.sh` and `tmp-leak-check.mjs`.
 
 **Exit contract** for every checker: 0 clean, 1 blocking finding, 2 usage error, 3 could not check. Exit 2 or 3 is an infrastructure condition, never a content violation: could not verify is not the same as verified and red. Git hooks pass 2 and 3 with a note; CI passes 3 with a warning and keeps 2 red (`04_tools/README.md` says why).
+
+## Why `.claude/settings.json` reads as it does
+
+Moved from its old `_README` key on 2026-11-13: Claude Code rejects unknown settings keys.
+
+| Rule | Why |
+| --- | --- |
+| No blanket `Bash(git commit:*)`; the allowed forms cannot carry `--no-verify` | a gate an agent can skip is not a gate |
+| `git push origin main` denied though `git push origin` is allowed | deny beats allow; `.githooks/pre-push` refuses `main` too |
+| `wrangler d1` only as `npx wrangler d1 execute --local ...` | remote D1 writes need a person |
+| Read denies on `.env` (`./**/.env`), `secrets/`, keys, `~/.ssh`, `~/.aws`, `.dev.vars` | credential files stay out of Claude's tools (code.claude.com/docs/en/permissions, read 2026-11-03) |
+| `gh pr merge` allowed | the orchestrator merges with `--match-head-commit` and a literal SHA (decision 56); the bash guard refuses `--auto` and `--admin` |
+| Deploys, secrets and remote D1 | the orchestrator only (decision 57) |
+

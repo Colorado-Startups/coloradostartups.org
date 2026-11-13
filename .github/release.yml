@@ -8,7 +8,7 @@ changelog:
     - title: Fixes
       labels: [bug]
     - title: Features
-      labels: [enhancement, "idea: accepted"]
+      labels: ["idea: accepted"]
     - title: Documentation
       labels: [documentation]
     - title: Dependencies
