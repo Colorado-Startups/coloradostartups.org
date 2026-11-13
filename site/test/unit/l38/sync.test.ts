@@ -1,6 +1,7 @@
 // L38: scripts/positions/sync-volunteers.mjs, the hand-run copy of the
-// volunteer kit into data/positions/. The kit lives on one Mac, so every test
-// here seeds its own small kit, and CI never needs the real one.
+// volunteer kit into data/positions/. The kit lives in the maintainers'
+// private repo, so every test here seeds its own small kit, and CI never
+// needs the real one.
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
