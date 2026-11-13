@@ -210,6 +210,7 @@ results = []
 
 
 def record(name, status, detail=""):
+    """Print one contract's result and keep it for the summary."""
     results.append((name, status, detail))
     label = {"OK": "OK  ", "FAIL": "FAIL", "SKIP": "SKIP", "INFRA": "INFRA"}[status]
     line = "  %s %s" % (label, name)
@@ -219,25 +220,30 @@ def record(name, status, detail=""):
 
 
 def check(name, ok, detail=""):
+    """Record OK when ok is true, else FAIL; returns ok."""
     record(name, "OK" if ok else "FAIL", detail)
     return ok
 
 
 def path(rel):
+    """The absolute path of a repo-relative path."""
     return os.path.join(REPO, rel)
 
 
 def read(rel):
+    """A repo file's text, by repo-relative path."""
     with open(path(rel), encoding="utf-8") as fh:
         return fh.read()
 
 
 def load_json(p):
+    """A JSON file's parsed value."""
     with open(p, encoding="utf-8") as fh:
         return json.load(fh)
 
 
 def import_lint():
+    """The content lint module, imported from beside this file."""
     sys.path.insert(0, HERE)
     import cs_site_lint  # noqa: E402
     return cs_site_lint
@@ -247,6 +253,7 @@ def import_lint():
 
 
 def c1_selftest():
+    """C1: cs_site_lint.py --self-test passes."""
     # The lint's self-test also fails a rule with no hit or no miss sample.
     try:
         proc = subprocess.run([sys.executable, os.path.join(HERE, "cs_site_lint.py"), "--self-test"],
@@ -266,6 +273,7 @@ def c1_selftest():
 
 
 def c2_parity(rules):
+    """C2: the rules shared with the LinkedIn gate match it, where that gate is present."""
     shared = rules.get("shared_from") or {}
     li_path = os.path.expanduser(shared.get("path", ""))
     if not li_path or not os.path.isfile(li_path):
@@ -300,6 +308,7 @@ def c2_parity(rules):
 
 
 def c3_paths(rules, lint):
+    """C3: franchise-name paths equal the pinned list, and every rule path lands inside scope.content."""
     franchise = next((r for r in rules["rules"] if r["id"] == "franchise-name"), None)
     got = franchise.get("paths") if franchise else None
     check("C3a franchise-name paths equal the pinned list", got == EXPECTED_FRANCHISE_PATHS,
@@ -326,6 +335,7 @@ def c3_paths(rules, lint):
 
 
 def c4_settings():
+    """C4: .claude/settings.json denies every agent bypass; returns the settings, or None."""
     rel = ".claude/settings.json"
     if not os.path.isfile(path(rel)):
         check("C4 settings deny every agent bypass", False, "%s is absent" % rel)
@@ -415,6 +425,7 @@ def c5_problems(text, settings, githooks):
 
 
 def c5_selftest():
+    """C5 self-test: the gate table check flags every known-bad sample and passes the clean one."""
     wrong = ["missed known-bad %r" % label for label, text in C5_BAD
              if not c5_problems(text, C5_SETTINGS, C5_GITHOOKS)]
     clean = c5_problems(C5_CLEAN, C5_SETTINGS, C5_GITHOOKS)
@@ -425,6 +436,7 @@ def c5_selftest():
 
 
 def c5_gate_table(settings):
+    """C5: the gate table in site-gates.md names every wired gate."""
     c5_selftest()
     text = read(GATE_TABLE) if os.path.isfile(path(GATE_TABLE)) else None
     githooks = path(".githooks")
@@ -434,6 +446,7 @@ def c5_gate_table(settings):
 
 
 def c6_severities(rules):
+    """C6: every severity is FAIL, WARN or off, and voice_lint's grades are the pinned ones."""
     bad = []
     for r in rules["rules"]:
         for field in ("severity", "severity_built", "after_expiry"):
@@ -450,6 +463,7 @@ def c6_severities(rules):
 
 
 def c7_windows(rules):
+    """C7: every dated rule window, public and private, is the one pinned here."""
     ours = {r["id"]: r for r in rules["rules"]}
     expected = dict(EXPECTED_WINDOWS)
     for rid, spec in (rules.get("private_windows") or {}).items():
@@ -467,6 +481,7 @@ def c7_windows(rules):
 
 
 def c8_wiring(settings):
+    """C8: every wired hook exists, is executable, and its header matches the settings."""
     if settings is None:
         check("C8 hook wiring", False, ".claude/settings.json unreadable")
         return
@@ -513,6 +528,7 @@ def bare_lint_call(line):
 
 
 def c9c_selftest():
+    """C9c self-test: the bare lint call matcher flags every known-bad sample and no clean one."""
     wrong = ["missed known-bad %r" % s for s in C9C_BAD if not bare_lint_call(s)]
     wrong += ["flagged known-clean %r" % s for s in C9C_CLEAN if bare_lint_call(s)]
     check("C9c self-test: the matcher flags every known-bad sample and passes every known-clean one",
@@ -520,6 +536,7 @@ def c9c_selftest():
 
 
 def c9_workflows():
+    """C9: workflows call 04_tools instead of inline checks, and say whether they block."""
     wf_dir = path(".github/workflows")
     if not os.path.isdir(wf_dir):
         check("C9 workflows call 04_tools and say they are advisory", False, ".github/workflows is absent")
@@ -548,6 +565,7 @@ def c9_workflows():
 
 
 def import_tool(name):
+    """A tool module from beside this file, by name."""
     sys.path.insert(0, HERE)
     return __import__(name)
 
@@ -613,6 +631,7 @@ def seeded(obj, how, glob):
 
 
 def c12_c13():
+    """C12 and C13: the merge policy and the export manifest agree with the gate files and the tree."""
     try:
         mp, ex = import_tool("merge_policy"), import_tool("export_public")
         policy = mp.load_policy()
@@ -661,6 +680,7 @@ def c12_c13():
 
 
 def c10_registry(rules):
+    """C10: every shared id is a rule here, and every not-lintable rule names its enforcer."""
     ids = set(r["id"] for r in rules["rules"])
     missing = [i for i in (rules.get("shared_from") or {}).get("ids", []) if i not in ids]
     check("C10a every shared id is a rule here", not missing, "missing: %s" % missing)
@@ -675,6 +695,7 @@ def load_errors():
 
 
 def c11_private_split(rules, overlay_path):
+    """C11: the private overlay is whole, and the public rules file names none of it."""
     name = "C11 the private overlay is whole, and the public rules file names none of it"
     mark = rules.get("private_marker")
     if overlay_path is None:
@@ -699,6 +720,7 @@ def c11_private_split(rules, overlay_path):
           "; ".join(["overlay holds " + x for x in short] + leaked[:8]))
 
 def main():
+    """Run every contract; returns the exit code."""
     print("coloradostartups-site contract test")
     try:
         lint = import_lint()

@@ -73,6 +73,7 @@ def load_allowlist(path):
 
 
 def git(root, *args):
+    """A git command's (exit code, stdout bytes, stderr text) in root."""
     r = subprocess.run(["git", "-C", root, "-c", "core.quotePath=false", *args], capture_output=True, check=False)
     return r.returncode, r.stdout, r.stderr.decode("utf-8", "replace").strip()
 
@@ -143,6 +144,7 @@ def added_markers(root, rng):
 
 
 def covers(entry, path, text):
+    """Whether an allowlist entry covers this path and line."""
     return entry["path"] == path and entry["line_has"] in text
 
 
@@ -168,6 +170,7 @@ def check(tree, added, allowed):
 
 
 def self_test():
+    """Run the checks on throwaway repos; returns the exit code."""
     wrong = 0
     good = [{"path": "a.html", "line_has": "data-cf-beacon='x'", "why": "public tag"}]
     tag = f"<script data-cf-beacon='x'></script> <!-- {MARKER} -->\n"
@@ -267,6 +270,7 @@ def self_test():
 
 
 def main(argv):
+    """Run the command line; returns the exit code."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--root", default=".", help="the git work tree to read (default .)")
     ap.add_argument("--allowlist", default=DEFAULT_ALLOWLIST, help="the allowlist (default 04_tools/gitleaks_allow.json beside this file)")

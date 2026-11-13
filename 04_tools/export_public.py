@@ -63,6 +63,7 @@ REPLACEABLE = {"README.md", "CONTRIBUTING.md", "SECURITY.md", "AGENTS.md", "CLAU
 
 
 def glob_match_any_case(pattern, path):
+    """Whether path matches the lint's glob, ignoring case."""
     return bool(re.compile(_LINT.glob_to_regex(pattern).pattern, re.IGNORECASE).match(path))
 
 
@@ -90,6 +91,7 @@ def malformed(path):
 
 
 def load_manifest(path=MANIFEST):
+    """The export manifest, checked; raises InfraError when it cannot be read or used."""
     try:
         with open(path, encoding="utf-8") as fh:
             manifest = json.load(fh)
@@ -164,6 +166,7 @@ def plan(manifest, paths):
 
 
 def git(args, repo=REPO):
+    """A git command's stdout as bytes; raises InfraError when git fails."""
     try:
         proc = subprocess.run(["git", "-C", repo] + args, capture_output=True, timeout=120)
     except (OSError, subprocess.SubprocessError) as exc:
@@ -174,6 +177,7 @@ def git(args, repo=REPO):
 
 
 def tracked(ref, repo=REPO):
+    """Every path tracked at ref."""
     return [p for p in git(["ls-tree", "-r", "-z", "--name-only", ref], repo).decode().split("\0") if p]
 
 
@@ -192,6 +196,7 @@ def counts(paths, exported, private):
 
 
 def safe_out(out, repo=REPO):
+    """The --out folder made absolute; raises InfraError inside the repo or when not empty."""
     out = os.path.abspath(out)
     root = os.path.realpath(repo)
     if os.path.realpath(out) == root or os.path.realpath(out).startswith(root + os.sep):
@@ -235,6 +240,7 @@ def write_tree(manifest, ref, exported, out, repo=REPO):
 
 
 def report(paths, exported, private, unlisted, clashes):
+    """Print the per-folder counts and every unlisted path and clash; returns the exit code."""
     print("| Folder | Public | Private |")
     print("| --- | --- | --- |")
     for folder, pub, priv in counts(paths, exported, private):
@@ -249,6 +255,7 @@ def report(paths, exported, private, unlisted, clashes):
 
 
 def self_test(manifest):
+    """Check the manifest's samples and a throwaway export; returns the exit code."""
     wrong = []
     samples = manifest.get("samples", {})
     for path in samples.get("public", []):
@@ -355,6 +362,7 @@ class _Parser(argparse.ArgumentParser):
 
 
 def main(argv=None):
+    """Run the command line; returns the exit code."""
     parser = _Parser(description="build the public tree from the export manifest")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true", help="classify every path and print counts")
