@@ -1,7 +1,7 @@
 # Bug report form. The work-tracking rule (CLAUDE.md, "Work tracking") wins over this file: every bug, error or needed
 # fix is an issue labeled bug plus one area label, fixed right away by a PR that says "Fixes #N". Paul, 2026-11-03:
 # cards and issues are visual first, tables and numbers over prose. The area options below match the repo's area
-# labels. A new area label changes, in the same PR, this list, enhancement.yml, and the Work tracking tables in
+# labels. A new area label changes, in the same PR, this list and the Work tracking tables in
 # CLAUDE.md and CONTRIBUTING.md.
 name: Bug
 description: Something is broken, wrong or out of date. It gets a fix PR right away.

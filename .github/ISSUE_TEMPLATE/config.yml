@@ -1,7 +1,11 @@
-# Blank issues are off, so every issue opened on the web goes through a form: bug.yml for a bug, error or needed fix,
-# enhancement.yml for an improvement until the org Project board exists (CLAUDE.md, "Work tracking").
+# Blank issues are off, so every issue goes through a form: bug.yml for a bug or error, fix.yml for a quick fix.
+# Ideas and features start in Discussions; an accepted one becomes a card or an issue labeled "idea: accepted".
+# From Git Crafter templates/open/.github/ISSUE_TEMPLATE/config.yml at v7.0.0.
 blank_issues_enabled: false
 contact_links:
+  - name: An idea or a feature
+    url: https://github.com/Colorado-Startups/coloradostartups.org/discussions/categories/ideas
+    about: Start in Discussions; an accepted idea becomes an issue.
   - name: Security vulnerability
-    url: https://github.com/Colorado-Startups/coloradostartups-site/blob/main/SECURITY.md
-    about: Report it privately, as SECURITY.md describes. Do not open a public issue.
+    url: https://github.com/Colorado-Startups/coloradostartups.org/security/advisories/new
+    about: Report it privately. Do not open a public issue.

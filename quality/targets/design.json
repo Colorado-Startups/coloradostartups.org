@@ -1,0 +1,36 @@
+[
+  {
+    "id": "design.raw_hex",
+    "params": {
+      "origin": "https://coloradostartups.org",
+      "key_pages": [
+        "/",
+        "/ecosystem-canvas/",
+        "/leaderboard/",
+        "/regions/",
+        "/team/",
+        "/get-involved/"
+      ],
+      "src_dirs": [
+        "site/src"
+      ],
+      "raw_scan_exempt": [
+        {
+          "file": "site/src/styles/tokens.css",
+          "why": "generated from 01_doctrine/brand_tokens.yaml"
+        },
+        {
+          "file": "site/src/layouts/BaseLayout.astro",
+          "line": "name=\"theme-color\"",
+          "why": "theme-color #FFFBF3, approved by decision 59"
+        }
+      ],
+      "tokens": {
+        "file": "01_doctrine/brand_tokens.yaml",
+        "colors": "color",
+        "type": "type",
+        "type_prefix": "step"
+      }
+    }
+  }
+]

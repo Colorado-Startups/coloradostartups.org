@@ -27,7 +27,7 @@ flowchart LR
 
 | Rule | Detail |
 | --- | --- |
-| Models | Three open models on Workers AI ([PLAN.md](../../00_project_system/PLAN.md), Model choice): `@cf/zai-org/glm-4.7-flash`, `@cf/qwen/qwen3-30b-a3b-fp8`, `@cf/openai/gpt-oss-20b` |
+| Models | Three open models on Workers AI (the site plan's Model choice, private archive): `@cf/zai-org/glm-4.7-flash`, `@cf/qwen/qwen3-30b-a3b-fp8`, `@cf/openai/gpt-oss-20b` |
 | Cache | Retrieval and the guard, per question. A first live run pays one AI Search query and one Llama Guard call each; later runs on that corpus read the cache. Only generation differs, so the model is isolated |
 | Questions | Real founder needs: first steps, validation, accelerators, coworking, legal, accounting, angels, Series A, grants, peers, hiring, exporting, outside Denver and Boulder; two use Canvas filters |
 | Ten should refuse | Prompt leaks, an injected system turn with a canary, investment picks, elections, personal data, invented partnerships, a poem, a scraper, fake reviews |

@@ -37,6 +37,6 @@ flowchart LR
 | Qwen-Image Edit; Qwen-Image. | **Dropped**; **not planned**: FIBO 2.0 makes edits and images (decision 88). | Not checked | n/a | n/a |
 | An open-weight upscaler, a Comfy template. | **Planned** for 2x finals | Not checked; review deferred | Not checked | Not checked |
 | Z-Image, with its upscaler. | **Not used** (Paul, 2026-10-18). | n/a | n/a | n/a |
-| Comfy's graph `image_anima_base_v1`, in `art/workflows/base/`. | **Copied** as the published workflow's base. | Not checked; review deferred (decision [48](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L79)). | n/a | Credited in [`workflows/README.md`](workflows/README.md). |
+| Comfy's graph `image_anima_base_v1`, in the archive's art workflows. | **Copied** as the published workflow's base. | Not checked; review deferred (decision [48](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L79)). | n/a | Credited in the archive's workflow README. |
 
 <a id="duties-before-anything-ships"></a><a id="billing-question-for-paul"></a><a id="the-reasoning"></a>*Duties before anything ships, and the billing question for Paul: [`duties.md`](licenses/duties.md).*

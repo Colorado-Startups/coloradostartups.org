@@ -28,10 +28,10 @@
 | Path | Holds |
 | --- | --- |
 | [`art/prompts/`](../prompts/) | The words, as `.txt` so the content gate scans them. |
-| [`art/runs/`](../runs/README.md) | Batch requests and `LOG.md` |
+| the archive's run folder | Batch requests and the run log (private) |
 | [`art/concepts/`](../concepts/README.md) | Picks and previews per batch |
 | [`art/finals.json`](../finals.json) | Which render ships as which file, for `make-finals.mjs` |
-| [`art/workflows/`](../workflows/README.md) | The open workflow package |
+| the archive's workflow folder | The open workflow package (private) |
 | [`art/og/cards.txt`](../og/cards.txt) | OG card copy |
 | [`art/tools/trace-logo.mjs`](../tools/trace-logo.mjs) | The logo's SVG tracer |
 | [`site/src/components/art/`](../../site/src/components/art/) | `ArtImage` and `Portrait`. `HeroArt`, `RegionArt`, `KeeperCard` and the seat pages render through them, so lookup, placeholders and idle motion have one definition. |
