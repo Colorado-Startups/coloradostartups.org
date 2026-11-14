@@ -24,6 +24,14 @@
 
 ## Who we write for
 
+```mermaid
+flowchart LR
+  F["Founders building in Colorado"] -->|"first"| P["Every page and line"]
+  W["Talent, capital, service providers"] -->|"second, never a vendor directory"| P
+  M["Hall metaphor"] --> HR["Headings, room names,<br/>the dwarves' lines (AI agents)"]
+  LT["Literal words"] --> IF["Instructions, forms,<br/>policies, errors"]
+```
+
 Founders building companies in Colorado come first in every page and line. The wider startup community (talent, capital and service providers) is welcome; write to them second, and never let a page read as a vendor directory.
 
 ## The Hall's metaphor, used lightly

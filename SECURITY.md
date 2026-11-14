@@ -9,6 +9,15 @@
 
 Please do not open a public issue. A person replies.
 
+```mermaid
+flowchart LR
+  V["You find a vulnerability"] --> G["GitHub private reporting"]
+  V -.->|"no GitHub"| E["Email"]
+  G --> P["A person replies"]
+  E --> P
+  V -.-x X["Public issue"]
+```
+
 ## How the site stays safe
 
 | Control | Where |

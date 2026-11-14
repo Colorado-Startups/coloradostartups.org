@@ -4,6 +4,12 @@
 
 ## FIBO 2.0 prompts: the Hall in VGL
 
+```mermaid
+flowchart LR
+  P("Plain prompt") -->|"the node writes one"| C("JSON caption")
+  C -->|"structured_prompt"| N("Bria node") --> S("Still")
+```
+
 | Prompt rule | Source |
 | --- | --- |
 | One JSON caption, a field per concern. The Bria node takes it in `structured_prompt`, or writes and returns one from a plain `prompt` | [VGL caption guide](https://huggingface.co/briaai/Fibo-2.0-dev/blob/main/vgl/README.md), read 2026-11-02. |

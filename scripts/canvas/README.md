@@ -16,6 +16,13 @@ On 2026-11-02, 108 of the 608 records in `data/resources/` still carry a templat
 
 ## Sync the Resourcus corpus
 
+```mermaid
+flowchart LR
+  D["data/resources/<br/>active records"] --> S["sync-corpus.mjs<br/>one markdown doc each"]
+  S --> A["AI Search built-in storage<br/>upsert by content hash"]
+  S -.-> O["Orphans deleted"]
+```
+
 See the header of [`sync-corpus.mjs`](sync-corpus.mjs). A dry run needs no credentials:
 
 ```bash

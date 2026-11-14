@@ -2,6 +2,11 @@
 
 You may use an AI agent to contribute. These rules apply to it, and to you. Claude Code also reads [`CLAUDE.md`](CLAUDE.md) and runs the hooks in `.claude/settings.json`; other agents read this file. When they disagree, `CLAUDE.md` wins.
 
+```mermaid
+flowchart LR
+  H["Set hooksPath once"] --> E["Edit"] --> L["Lint content"] --> C["npm run check:push"] --> S["Commit with -s"] --> P["PR says an agent helped"] --> CI["CI and DCO check"]
+```
+
 | # | Rule | Where it is enforced |
 | --- | --- | --- |
 | 1 | `git config core.hooksPath .githooks` once per clone | [`.githooks/`](.githooks/) |

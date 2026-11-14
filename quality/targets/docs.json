@@ -10,6 +10,10 @@
         {
           "glob": ".github/pull_request_template.md",
           "why": "the PR form; PR bodies are scored on the Pull requests tab"
+        },
+        {
+          "glob": "CODE_OF_CONDUCT.md",
+          "why": "the Contributor Covenant 3.0, adopted verbatim; third-party text we may not shorten"
         }
       ],
       "skip_dirs": [
@@ -124,6 +128,12 @@
           ]
         },
         {
+          "doc": ".claude/rules/site-settings.md",
+          "area": [
+            ".claude/settings.json"
+          ]
+        },
+        {
           "doc": ".claude/rules/site-ci.md",
           "area": [
             ".github/"
@@ -140,6 +150,13 @@
           "doc": "01_doctrine/*.md",
           "area": [
             "01_doctrine/"
+          ]
+        },
+        {
+          "doc": "04_tools/RULES.md",
+          "area": [
+            "04_tools/cs_site_rules.json",
+            "04_tools/contract_test.py"
           ]
         },
         {

@@ -2,6 +2,14 @@
 
 Colorado Startups owns the project. The maintainers ([`MAINTAINERS.md`](MAINTAINERS.md)) run it day to day.
 
+```mermaid
+flowchart LR
+  I["Idea in Discussions"] -->|"a maintainer"| IS["Issue"] --> PR["Pull request"]
+  PR --> Q{"AI-mergeable?"}
+  Q -->|"yes, checks and both AI reviews pass"| A["An AI agent merges"]
+  Q -->|"no"| O["The orchestrator rebuilds it,<br/>contributor as co-author"]
+```
+
 | Decision | Who decides |
 | --- | --- |
 | An idea becomes an issue | A maintainer, in Discussions |

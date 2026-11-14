@@ -2,6 +2,11 @@
 
 *Part of the [v3 concepts record](README.md): batch 1 and batch 2 on Modal, 2026-10-18. Previews sit in `batch-<n>/` here.*
 
+```mermaid
+flowchart LR
+  PNG("ComfyUI PNG, full prompt inside") --> W("make-finals: WebP, no EXIF, ICC or graph") --> X("Provenance XMP") --> B("Read back to prove it")
+```
+
 | Step | What |
 | --- | --- |
 | Keeper sizes | DIRECTION's goal sizes: 960 x 1200 for the large crop, 320 x 320 for the small one. The large crop scales up 9% from the render's 880 px width (source: the crops in `art/finals.json`). |

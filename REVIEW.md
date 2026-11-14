@@ -2,6 +2,13 @@
 
 Reviewers, people and AI agents alike, check every row a PR touches. One verdict: pass, or block with each finding as location, problem and fix.
 
+```mermaid
+flowchart LR
+  PR["PR"] --> R["Check every row it touches"] --> V{"Any finding?"}
+  V -->|"no"| P["Pass"]
+  V -->|"yes"| B["Block: location, problem, fix"]
+```
+
 | Check | How | Fails when |
 | --- | --- | --- |
 | Paths | `python3 04_tools/merge_policy.py --pr <n> --sha <head>` | An agent merges a PR the checker calls not AI-mergeable, or at another SHA, or anyone approves as an agent |

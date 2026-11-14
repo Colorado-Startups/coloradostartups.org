@@ -1,6 +1,6 @@
 # AI-visibility panel: providers, spend and limits
 
-*For [the panel](REPORT.md); the method: [`METHOD.md`](METHOD.md). The estimate: [the report](REPORT.md#spend).*
+*For [the panel](REPORT.md) and its [estimate](REPORT.md#spend); the method: [`METHOD.md`](METHOD.md).*
 
 ## Who it asks
 
@@ -26,13 +26,13 @@ xychart-beta
 | Basis | Each pricing page's prices (read 2026-10-18) times assumed per-question token and search counts |
 | Real cost | Each live run's summary shows it beside the estimate, from the usage blocks |
 | Keys | Environment variables only, never written, scrubbed from error text. Tests grep every written file for their fake keys |
-| 401 or 403 | Records only `HTTP <status>` and never reads the body: OpenAI's 401 body echoes a masked key (`sk-proj-****abcd`) the exact-key scrub misses. `test/auth-errors.test.ts` serves it from every provider at both and fails if any reaches a results file or the log |
+| 401 or 403 | Records only `HTTP <status>`, never the body: OpenAI's 401 body echoes a masked key (`sk-proj-****abcd`) the exact-key scrub misses. `test/auth-errors.test.ts` serves it from every provider at both and fails if any reaches a results file or the log |
 
 ## Decisions in this lane
 
 | Decision | Why | To reverse |
 | --- | --- | --- |
-| Plain fetch, not vendor SDKs | Neither SDK is installed, and the lockfile is the orchestrator's. One HTTP layer serves all three and replays recorded responses in tests | Add `@anthropic-ai/sdk` at the root; swap the body of `anthropic.ask()` |
+| Plain fetch, not vendor SDKs | Neither SDK is installed; the lockfile is the orchestrator's. One HTTP layer serves all three and replays recorded responses in tests | Add `@anthropic-ai/sdk` at the root; swap `anthropic.ask()`'s body |
 | No refusal fallback on Anthropic | A fallback answers with another model, so a refusal is a result | Add `fallbacks` and its beta header in `providers.ts` |
 | `gpt-5.5` for OpenAI | OpenAI's web search guide (2026-10-18) recommends it for new Responses integrations | Edit `model` and prices in `pricing.yaml` |
 | No user location | Questions name their cities; Perplexity's field was not in the docs read; the providers stay alike | Add `user_location` per provider |
@@ -43,9 +43,9 @@ xychart-beta
 
 | Limit | Read it as |
 | --- | --- |
-| API answers are not app answers | The apps add system prompts, memory, location and model choices. The same API question each month makes months comparable: a proxy, not a copy |
-| One sample per question | Answers vary: one or two changed answers are noise; look for movement across months and providers |
+| API answers are not app answers | The apps add system prompts, memory, location and model choices. The same API question monthly makes months comparable: a proxy, not a copy |
+| One sample per question | Answers vary: one or two changes are noise; look for movement across months and providers |
 | Training data is not measured | A search-off mode would show what each model knows |
-| Title-case false positive | A heading "Top Colorado Startups To Watch" counts. The questions avoid the phrase to keep it rare |
+| Title-case false positive | A heading "Top Colorado Startups To Watch" counts. Questions avoid the phrase, keeping it rare |
 | Perplexity's search context size | A response without it is charged the high request fee (`pricing.yaml`) |
 | Prices drift | Re-read the three pricing pages before a run that matters; update `pricing.yaml` and its date |
