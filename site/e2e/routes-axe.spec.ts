@@ -15,6 +15,7 @@ const PAGES = [
   "/guides/start-a-company-in-colorado/",
   "/guides/startup-credits/",
   "/leaderboard/nominate/thanks/",
+  "/sponsors/",
   "/styleguide/",
 ];
 
