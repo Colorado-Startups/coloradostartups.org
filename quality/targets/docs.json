@@ -10,6 +10,10 @@
         {
           "glob": ".github/pull_request_template.md",
           "why": "the PR form; PR bodies are scored on the Pull requests tab"
+        },
+        {
+          "glob": "CODE_OF_CONDUCT.md",
+          "why": "the Contributor Covenant 3.0, adopted verbatim; third-party text we may not shorten"
         }
       ],
       "skip_dirs": [
