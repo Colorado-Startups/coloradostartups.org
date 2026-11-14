@@ -107,6 +107,7 @@ def tarball(name, version):
 
 
 def held_by_name(found):
+    """Every version held per package name."""
     held = {}
     for name, version, _ in found:
         held.setdefault(name, set()).add(version)
@@ -153,6 +154,7 @@ def _get(url, data=None):
 
 
 def registry_published(name, version, _cache={}):
+    """When the npm registry says this version was published, or None."""
     if name not in _cache:
         _cache[name] = _get(f"{REGISTRY}/{urllib.parse.quote(name, safe='@')}").get("time") or {}
     stamp = _cache[name].get(version)
@@ -163,11 +165,13 @@ def registry_published(name, version, _cache={}):
 
 
 def registry_advised(name, versions):
+    """Whether the npm registry has an advisory for any of these versions."""
     body = json.dumps({name: versions}).encode()
     return bool(_get(f"{REGISTRY}/-/npm/v1/security/advisories/bulk", body).get(name))
 
 
 def self_test():
+    """Check the age and advisory rules on seeded lockfiles; returns the exit code."""
     now = datetime(2026, 11, 4, tzinfo=timezone.utc)
     ages = {"old": 30, "young": 3, "fix": 9, "fix-early": 5, "still-bad": 9}
     published = lambda name, version: None if version == "no-time" else now - timedelta(days=ages[version])  # noqa: E731
@@ -246,6 +250,7 @@ def self_test():
 
 
 def main(argv):
+    """Run the command line; returns the exit code."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--base", help="git ref whose package-lock.json is the base")
     ap.add_argument("--lock", default="package-lock.json", help="head lockfile path (default package-lock.json)")
