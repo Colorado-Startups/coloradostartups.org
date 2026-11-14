@@ -106,6 +106,7 @@ def read_lines_file(path):
 
 
 def private_term_res(path):
+    """The private overlay's (id, regex) pairs, or [] with no path."""
     if not path:
         return []
     try:
@@ -310,6 +311,7 @@ CHECKS = ["emails", "phones", "names", "profiles", "keys", "private-links", "pri
 
 
 def report(findings, read, quiet=False, inputs=None):
+    """Print the findings table, then each finding unless quiet; returns the exit code."""
     by = collections.OrderedDict((c, []) for c in CHECKS)
     for f in findings:
         by[f[0]].append(f)
@@ -341,6 +343,7 @@ PROVENANCE_SAMPLE = (
 
 
 def self_test():
+    """Scan seeded bad and clean trees; returns the exit code."""
     wrong = []
     tmp = tempfile.mkdtemp(prefix="cs-export-scan-")
     try:
@@ -479,6 +482,7 @@ class _Parser(argparse.ArgumentParser):
 
 
 def main(argv=None):
+    """Run the command line; returns the exit code."""
     parser = _Parser(description="scan an exported public tree")
     parser.add_argument("dir", nargs="?", help="the exported tree")
     parser.add_argument("--names", help="file: one name per line to look for")

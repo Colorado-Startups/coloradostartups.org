@@ -17,12 +17,12 @@ flowchart LR
   S -.-> C
   P --> SC["Score against THRESHOLDS"]
   SC --> R["recommend(), Results"]
-  click Q href "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/evals/resourcus/questions.yaml"
-  click E href "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/evals/resourcus/harness.ts"
-  click G href "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/site/worker/resourcus/answer.ts"
-  click C href "https://github.com/Colorado-Startups/coloradostartups-site/tree/main/evals/resourcus/cache"
+  click Q href "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/evals/resourcus/questions.yaml"
+  click E href "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/evals/resourcus/harness.ts"
+  click G href "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/site/worker/resourcus/answer.ts"
+  click C href "https://github.com/Colorado-Startups/coloradostartups.org/tree/main/evals/resourcus/cache"
   click SC "#what-is-measured"
-  click R "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/evals/resourcus/REPORT.md#results"
+  click R "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/evals/resourcus/REPORT.md#results"
 ```
 
 | Rule | Detail |

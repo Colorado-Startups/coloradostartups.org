@@ -131,6 +131,7 @@ class Infra(Exception):
 
 
 def say(msg):
+    """Print one line with the script's prefix, whitespace collapsed."""
     print("%s %s" % (PREFIX, " ".join(str(msg).split())), flush=True)
 
 
@@ -147,6 +148,7 @@ _LIBC = []
 
 
 def libc():
+    """macOS libc with clonefile and getattrlist typed; raises Infra elsewhere."""
     if not _LIBC:
         if sys.platform != "darwin":
             raise Infra("not macOS, so no APFS clones")
@@ -200,6 +202,7 @@ def tree_size(root):
 # ---------------------------------------------------------------- manifests
 
 def git(cwd, *args):
+    """A git command's stripped stdout in cwd; raises Infra when git fails."""
     r = subprocess.run(["git", "-C", cwd] + list(args), capture_output=True, text=True)
     if r.returncode != 0:
         raise Infra("git %s failed: %s" % (" ".join(args), r.stderr.strip()[:200]))
@@ -215,6 +218,7 @@ def safe_rel(rel):
 
 
 def workspace_patterns(package_json):
+    """The workspaces globs from package.json text; raises Infra when it is not a JSON object."""
     try:
         pkg = json.loads(package_json)
     except ValueError as exc:
@@ -440,6 +444,7 @@ def session_dir():
 
 @contextlib.contextmanager
 def seed_lock(seed_root):
+    """Hold the seed folder's lock while the block runs, waiting up to LOCK_WAIT_S."""
     os.makedirs(seed_root, exist_ok=True)
     fd = os.open(os.path.join(seed_root, "lock"), os.O_CREAT | os.O_RDWR, 0o644)
     try:
@@ -506,6 +511,7 @@ def build_seed(seed_root, current, want, main_modules):
 
 
 def seed(start_dir):
+    """Give this worktree a node_modules cloned from the shared seed."""
     top = git(start_dir, "rev-parse", "--show-toplevel")
     git_dir = git(start_dir, "rev-parse", "--path-format=absolute", "--git-dir")
     common = git(start_dir, "rev-parse", "--path-format=absolute", "--git-common-dir")
@@ -574,6 +580,7 @@ def seed(start_dir):
 # ---------------------------------------------------------------- measure
 
 def measure(paths):
+    """Print each path's file count, du size and private size."""
     for root in paths:
         files, counted, private = tree_size(root)
         say("%s: %d files; du counts %.1f MiB; private %.1f MiB (what deleting it frees)"
@@ -909,6 +916,7 @@ def self_test():
 # ---------------------------------------------------------------- entry point
 
 def run(argv):
+    """Dispatch the command line to its mode; returns the exit code."""
     if argv == ["--session-dir"]:
         return session_dir()
     if argv == ["--self-test"]:
@@ -926,6 +934,7 @@ def run(argv):
 
 
 def main(argv):
+    """Run the command line; turns Infra into an INFRA line and its exit code."""
     what = "check" if argv else "seed"
     advice = "" if argv else (" Run python3 -I scripts/worktree_deps.py again, "
                               "or npm ci for a full private install.")

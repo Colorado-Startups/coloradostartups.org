@@ -33,13 +33,13 @@ flowchart LR
 
 ## Outside the doors: the towns
 
-*The doors open onto real towns (decision [90](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L191)) and a town square, where founders meet neighbors, trade help and set out again.*
+*The doors open onto real towns (decision 90) and a town square, where founders meet neighbors, trade help and set out again.*
 
 | Rule | What it means |
 | --- | --- |
 | They look like Colorado | Main streets, cottages, headframes, windpumps, footbridges and aspens, as [the vocabulary](../art/DIRECTION.md#the-vocabulary-of-the-hall) paints them |
 | The townsfolk | Founders and neighbors. Dwarves and gnomes visit from the Hall; each keeper keeps its one job |
-| People, not scores | No points, levels or ranks for people. The Leaderboard ranks companies, from verified data (decision [6](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L12)) |
+| People, not scores | No points, levels or ranks for people. The Leaderboard ranks companies, from verified data (decision 6) |
 
 ## The keepers
 

@@ -3,30 +3,170 @@
     "id": "docs.dead_paths",
     "params": {
       "doc_set_left_out": [
-        {"glob": "data/**", "why": "site content (dispatches, legal pages), not docs; the content gate lints it"},
-        {"glob": ".github/pull_request_template.md", "why": "the PR form; PR bodies are scored on the Pull requests tab"}
+        {
+          "glob": "data/**",
+          "why": "site content (dispatches, legal pages), not docs; the content gate lints it"
+        },
+        {
+          "glob": ".github/pull_request_template.md",
+          "why": "the PR form; PR bodies are scored on the Pull requests tab"
+        }
       ],
-      "skip_dirs": ["node_modules", "worktrees", "dist", ".astro", ".wrangler", "quality"],
-      "lint": {"interpreter": "python3", "script": "04_tools/cs_site_lint.py", "args": ["--root", "{root}"], "scope": "04_tools/cs_site_rules.json scope.content"},
+      "skip_dirs": [
+        "node_modules",
+        "worktrees",
+        "dist",
+        ".astro",
+        ".wrangler",
+        "quality"
+      ],
+      "lint": {
+        "interpreter": "python3",
+        "script": "04_tools/cs_site_lint.py",
+        "args": [
+          "--root",
+          "{root}"
+        ],
+        "scope": "04_tools/cs_site_rules.json scope.content"
+      },
       "areas": [
-        {"doc": "README.md", "area": ["site/", "data/", "packages/", "workers/", "quality/config.json"]},
-        {"doc": "CONTRIBUTING.md", "area": [".githooks/", ".github/", "04_tools/merge_policy.json"]},
-        {"doc": "REVIEW.md", "area": ["04_tools/merge_policy.py"]},
-        {"doc": "SECURITY.md", "area": [".gitleaks.toml", ".github/workflows/secret-scan.yml"]},
-        {"doc": "SUPPORT.md", "area": [".github/ISSUE_TEMPLATE/", ".github/DISCUSSION_TEMPLATE/"]},
-        {"doc": "GOVERNANCE.md", "area": [".github/CODEOWNERS", "04_tools/merge_policy.json"]},
-        {"doc": "MAINTAINERS.md", "area": [".github/CODEOWNERS"]},
-        {"doc": "CODE_OF_CONDUCT.md", "area": []},
-        {"doc": "ROADMAP.md", "area": ["data/", "site/src/pages/"]},
-        {"doc": "CLAUDE.md", "area": [".claude/", ".githooks/", ".github/workflows/", "04_tools/"]},
-        {"doc": "AGENTS.md", "area": ["CLAUDE.md"]},
-        {"doc": ".claude/rules/site-gates.md", "area": [".githooks/", ".claude/hooks/", ".claude/settings.json", ".github/"]},
-        {"doc": ".claude/rules/site-ci.md", "area": [".github/"]},
-        {"doc": ".claude/rules/ai-disclosure.md", "area": ["data/team/", "site/src/components/team/"]},
-        {"doc": "01_doctrine/*.md", "area": ["01_doctrine/"]},
-        {"doc": "04_tools/RULES.md", "area": ["04_tools/cs_site_rules.json", "04_tools/contract_test.py"]},
-        {"doc": "04_tools/README.md", "area": ["04_tools/"]},
-        {"doc": "**", "area": ["{dir}/"]}
+        {
+          "doc": "README.md",
+          "area": [
+            "site/",
+            "data/",
+            "packages/",
+            "workers/",
+            "quality/config.json"
+          ]
+        },
+        {
+          "doc": "CONTRIBUTING.md",
+          "area": [
+            ".githooks/",
+            ".github/",
+            "04_tools/merge_policy.json"
+          ]
+        },
+        {
+          "doc": "REVIEW.md",
+          "area": [
+            "04_tools/merge_policy.py"
+          ]
+        },
+        {
+          "doc": "SECURITY.md",
+          "area": [
+            ".gitleaks.toml",
+            ".github/workflows/secret-scan.yml"
+          ]
+        },
+        {
+          "doc": "THREAT-MODEL.md",
+          "area": [
+            "site/worker/",
+            "workers/communitas/src/"
+          ]
+        },
+        {
+          "doc": "SUPPORT.md",
+          "area": [
+            ".github/ISSUE_TEMPLATE/",
+            ".github/DISCUSSION_TEMPLATE/"
+          ]
+        },
+        {
+          "doc": "GOVERNANCE.md",
+          "area": [
+            ".github/CODEOWNERS",
+            "04_tools/merge_policy.json"
+          ]
+        },
+        {
+          "doc": "MAINTAINERS.md",
+          "area": [
+            ".github/CODEOWNERS"
+          ]
+        },
+        {
+          "doc": "CODE_OF_CONDUCT.md",
+          "area": []
+        },
+        {
+          "doc": "ROADMAP.md",
+          "area": [
+            "data/",
+            "site/src/pages/"
+          ]
+        },
+        {
+          "doc": "CLAUDE.md",
+          "area": [
+            ".claude/",
+            ".githooks/",
+            ".github/workflows/",
+            "04_tools/"
+          ]
+        },
+        {
+          "doc": "AGENTS.md",
+          "area": [
+            "CLAUDE.md"
+          ]
+        },
+        {
+          "doc": ".claude/rules/site-gates.md",
+          "area": [
+            ".githooks/",
+            ".claude/hooks/",
+            ".claude/settings.json",
+            ".github/"
+          ]
+        },
+        {
+          "doc": ".claude/rules/site-settings.md",
+          "area": [
+            ".claude/settings.json"
+          ]
+        },
+        {
+          "doc": ".claude/rules/site-ci.md",
+          "area": [
+            ".github/"
+          ]
+        },
+        {
+          "doc": ".claude/rules/ai-disclosure.md",
+          "area": [
+            "data/team/",
+            "site/src/components/team/"
+          ]
+        },
+        {
+          "doc": "01_doctrine/*.md",
+          "area": [
+            "01_doctrine/"
+          ]
+        },
+        {
+          "doc": "04_tools/RULES.md",
+          "area": [
+            "04_tools/cs_site_rules.json",
+            "04_tools/contract_test.py"
+          ]
+        },
+        {
+          "doc": "04_tools/README.md",
+          "area": [
+            "04_tools/"
+          ]
+        },
+        {
+          "doc": "**",
+          "area": [
+            "{dir}/"
+          ]
+        }
       ]
     }
   }

@@ -2,7 +2,7 @@
 
 *Part of [`DIRECTION.md`](../DIRECTION.md), art direction v3; [`LICENSES.md`](../LICENSES.md) says which route is allowed.*
 
-## Models (decision [88](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L183), 2026-11-02)
+## Models (decision 88, 2026-11-02)
 
 ```mermaid
 flowchart LR
@@ -10,13 +10,13 @@ flowchart LR
   G --> E("Edit: FIBO 2.0 Edit") --> A
   A --> F("Shipped WebP")
   A --> M("Clip: LTX-2.5") --> R("IC-LoRA pass") --> V("Shipped clip")
-  click C "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/art/direction/fibo-prompts.md"
-  click G "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/art/licenses/fibo-routes.md"
-  click E "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/art/direction/settings.md"
-  click F "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/art/finals.json"
-  click M "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/art/direction/models.md#ltx-25-motion"
-  click R "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/art/direction/models.md#ltx-25-motion"
-  click V "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/art/licenses/duties.md"
+  click C "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/art/direction/fibo-prompts.md"
+  click G "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/art/licenses/fibo-routes.md"
+  click E "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/art/direction/settings.md"
+  click F "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/art/finals.json"
+  click M "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/art/direction/models.md#ltx-25-motion"
+  click R "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/art/direction/models.md#ltx-25-motion"
+  click V "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/art/licenses/duties.md"
 ```
 
 | Job | Model: Comfy Cloud template | Tier: spend | Status, 2026-11-02 |
