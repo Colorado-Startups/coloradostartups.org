@@ -4,8 +4,7 @@ name: pages
 # v7.0.0: Git Crafter's actions/pages builds both from quality/config.json (with the Claudius pack) and
 # quality/process/config.json, and GitHub Pages publishes them at colorado-startups.github.io/coloradostartups.org/.
 # A pull request builds the pages and runs the docs.unmapped gate, so its trigger lists the doc globs; only main
-# publishes. The daily run keeps the scores fresh between merges. ADMIN_READ_TOKEN (API-Key-GitHub-AdminRead, a
-# fine-grained read-only token) reaches the collect step on main only, so a pull request's code never sees it; unset,
+# publishes. The daily run keeps the scores fresh between merges. The quality reader App's token reaches the collect step on main only, so a pull request's code never sees it; unset,
 # the metrics that need it read not measured. The repo's own leak scan checks the built pages before upload.
 on:
   push:
@@ -56,12 +55,32 @@ jobs:
       - name: Install the repo's packages for knip
         run: npm ci --ignore-scripts --no-audit --no-fund --loglevel=error
 
+      # The read-only "Colorado Startups quality reader" App's token: main only, one hour, this repo only (the
+      # action's default scope), so a pull request's code never sees it. It reads the settings, alerts and board
+      # metrics marked needs github-admin or project-scope. The key went from GitHub's manifest exchange straight
+      # into QUALITY_APP_KEY (2026-11-14); nobody held it.
+      - id: admin-app
+        if: github.ref == 'refs/heads/main'
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.QUALITY_APP_CLIENT_ID }}
+          private-key: ${{ secrets.QUALITY_APP_KEY }}
+          permission-administration: read
+          permission-environments: read
+          permission-secrets: read
+          permission-secret-scanning-alerts: read
+          permission-security-events: read
+          permission-vulnerability-alerts: read
+          permission-organization-administration: read
+          permission-members: read
+          permission-organization-projects: read
+
       - uses: SoulCraft-Org/git-crafter/actions/pages@a9d6b45b7e5ac54091123e2cda1efcfcd2f63696 # v7.0.0
         with:
           pages: process quality
           config: quality/process/config.json
           quality-config: quality/config.json
-          admin-read-token: ${{ github.ref == 'refs/heads/main' && secrets.ADMIN_READ_TOKEN || '' }}
+          admin-read-token: ${{ github.ref == 'refs/heads/main' && steps.admin-app.outputs.token || '' }}
 
       # The built pages are public: the repo's own leak scan (names, private repos, keys) runs on them first.
       - name: Leak scan the built pages
