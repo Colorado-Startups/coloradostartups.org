@@ -2,7 +2,7 @@
 // known-clean sample: the content gate (cs_site_lint.py, run for real) and
 // the link checker (run against a fake fetch, never the network).
 import { spawnSync } from "node:child_process";
-import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -111,7 +111,9 @@ describe.skipIf(!hasPython)("lintRecords (real cs_site_lint.py)", () => {
   const publicGate = () => {
     const root = tempDir("cs-public-gate-");
     mkdirSync(path.join(root, "04_tools"));
-    for (const f of ["cs_site_lint.py", "voice_lint.py", "cs_site_rules.json"]) {
+    // The lint and every part it imports (cs_site_lint_*.py), its voice rules and its rules file.
+    const parts = readdirSync(path.join(ROOT, "04_tools")).filter((f) => /^cs_site_lint(_[a-z]+)?\.py$/.test(f));
+    for (const f of [...parts, "voice_lint.py", "cs_site_rules.json"]) {
       copyFileSync(path.join(ROOT, "04_tools", f), path.join(root, "04_tools", f));
     }
     mkdirSync(path.join(root, "data/dispatches"), { recursive: true });

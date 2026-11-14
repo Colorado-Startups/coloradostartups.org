@@ -47,7 +47,7 @@ COMMON='site/|packages/|data/|art/|scripts/|01_doctrine/brand_tokens\.yaml$|pack
 # The anchored pattern for SUITE, or nothing for an unknown suite.
 pattern() {
   case "$1" in
-    site-tests) printf '^(%s|workers/|evals/|ops/|04_tools/(cs_site_lint\\.py|cs_site_rules\\.json|voice_lint\\.py)$|\\.github/workflows/site-tests\\.yml$)' "$COMMON" ;;
+    site-tests) printf '^(%s|workers/|evals/|ops/|04_tools/(cs_site_lint(_[a-z]+)?\\.py|cs_site_rules\\.json|voice_lint\\.py)$|\\.github/workflows/site-tests\\.yml$)' "$COMMON" ;;
     e2e) printf '^(%s|\\.github/workflows/e2e\\.yml$)' "$COMMON" ;;
     process-page) printf '^(quality/process/|quality/targets/|04_tools/site_changed\\.sh$|\\.github/workflows/quality-pages\\.yml$)' ;;
     *) return 1 ;;
@@ -148,6 +148,7 @@ site-tests package-lock.json run
 site-tests .github/workflows/site-tests.yml run
 site-tests 04_tools/site_changed.sh run
 site-tests 04_tools/cs_site_lint.py run
+site-tests 04_tools/cs_site_lint_extract.py run
 site-tests 04_tools/cs_site_rules.json run
 site-tests 04_tools/voice_lint.py run
 site-tests 04_tools/contract_test.py skip
