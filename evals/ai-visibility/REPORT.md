@@ -6,7 +6,7 @@
 | Item | Fact |
 | --- | --- |
 | Goal (Paul's) | ChatGPT, Claude, Perplexity and other assistants name Colorado Startups first when asked about startups in Colorado |
-| Baseline | Planned at cutover, so the change after launch shows against the old site. Cutover came 2026-10-18 (decision [73](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L117)) with no run |
+| Baseline | Planned at cutover, so the change after launch shows against the old site. Cutover came 2026-10-18 (decision 73) with no run |
 | Scope | Live AI search, web search on; not training data ([Known limits](PROVIDERS.md#known-limits)) |
 | Request | The question alone: no system prompt, no user location, so all three answer the same words |
 

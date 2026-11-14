@@ -10,7 +10,7 @@ Tools that check resource links and keep the Resourcus corpus in step with [`dat
 
 ## The Canvas importer is retired
 
-The import that turned the Ecosystem Canvas Google Doc into `data/resources/` is gone (decision [92](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L195)). The records it wrote stay. Change a record by hand, in a pull request. The canvas review in the private archive is edited by hand too.
+The import that turned the Ecosystem Canvas Google Doc into `data/resources/` is gone (decision 92). The records it wrote stay. Change a record by hand, in a pull request. The canvas review in the private archive is edited by hand too.
 
 On 2026-11-02, 108 of the 608 records in `data/resources/` still carry a template line (`grep -rl "Listed in the Ecosystem Canvas" data/resources`).
 

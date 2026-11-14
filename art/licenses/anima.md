@@ -1,6 +1,6 @@
 # Anima in detail
 
-*Part of [`LICENSES.md`](../LICENSES.md). Superseded for new work by decision [88](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L183) (2026-11-02); the record for the shipped art, which stays. A record for Paul, not legal advice.*
+*Part of [`LICENSES.md`](../LICENSES.md). Superseded for new work by decision 88 (2026-11-02); the record for the shipped art, which stays. A record for Paul, not legal advice.*
 
 | Clause | What the text says | For the site |
 | --- | --- | --- |
@@ -21,4 +21,4 @@
 | Against | The license defines neither "charity" nor whether a fiscally sponsored project counts. A public website reaches third-party end users. |
 | Weakens "For" (2026-11-02). | The art is made for Colorado Startups, Ltd., a company (`BRIEF.md`; decision 88); a fiscal sponsorship does not make it a charity. Batches 1 and 2 ran on Modal, not Comfy Cloud (the run log, private archive, 2026-10-18), so Comfy's arrangement, if any, does not cover them. |
 | Where it stands | §2(e) still lets the site use the images. The open point stays the model-use clauses §2(a), §2(b), §4(a)(i): the orchestrator's legal call. |
-| Optional step for Paul | Email CircleStone Labs at the commercial contact on its model card for written confirmation or a commercial license. File the reply in Paul's Drive, dated here. The 2026-10-08 draft assumed a charity: reword it first ([record](https://github.com/Colorado-Startups/coloradostartups-site/blob/16e379570647b6b55483aa3e032ec62be0dd338a/art/LICENSES.md)). |
+| Optional step for Paul | Email CircleStone Labs at the commercial contact on its model card for written confirmation or a commercial license. File the reply in Paul's Drive, dated here. The 2026-10-08 draft assumed a charity: reword it first (record). |

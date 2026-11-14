@@ -17,11 +17,11 @@ flowchart TD
   S --> F["results/"]
   F -->|"--write-report"| R["Results"]
   click Q "#what-it-asks"
-  click P "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/evals/ai-visibility/PROVIDERS.md#spend-gate-and-cost"
-  click A href "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/evals/ai-visibility/cli.ts"
-  click V "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/evals/ai-visibility/PROVIDERS.md#who-it-asks"
+  click P "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/evals/ai-visibility/PROVIDERS.md#spend-gate-and-cost"
+  click A href "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/evals/ai-visibility/cli.ts"
+  click V "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/evals/ai-visibility/PROVIDERS.md#who-it-asks"
   click S "#what-is-measured"
-  click R "https://github.com/Colorado-Startups/coloradostartups-site/blob/main/evals/ai-visibility/REPORT.md#results"
+  click R "https://github.com/Colorado-Startups/coloradostartups.org/blob/main/evals/ai-visibility/REPORT.md#results"
 ```
 
 ## What it asks

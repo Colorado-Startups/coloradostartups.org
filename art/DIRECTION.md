@@ -1,6 +1,6 @@
 # Art direction v3: the forge-kingdom of the Front Range
 
-*Decisions [21](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L30), 28, 29, [43](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L74), 45, 47, 48 and 88 win; fix this file in the same session. Routes: [`LICENSES.md`](LICENSES.md); keepers: [`dwarves.yaml`](../data/team/dwarves.yaml); hex: [`brand_tokens.yaml`](../01_doctrine/brand_tokens.yaml). v3 by L7, 2026-10-18; v2 and Anima: [`96d3182`](https://github.com/Colorado-Startups/coloradostartups-site/blob/96d318267713b22ab4a71edde451353ecb4def50/art/DIRECTION.md).*
+*Decisions 21, 28, 29, 43, 45, 47, 48 and 88 win; fix this file in the same session. Routes: [`LICENSES.md`](LICENSES.md); keepers: [`dwarves.yaml`](../data/team/dwarves.yaml); hex: [`brand_tokens.yaml`](../01_doctrine/brand_tokens.yaml). v3 by L7, 2026-10-18; v2 and Anima: `96d3182`.*
 
 | Part | Holds |
 | --- | --- |
@@ -24,7 +24,7 @@
 | Mountain folk | Dwarves and gnomes only: hearty, cheerful, quick to share a meal at long tables. | A folk of living rock, any game's creature. |
 | Founders | People of mixed ages and backgrounds in casual Colorado clothes, with laptops, sketches and prototypes. | Suits in a boardroom |
 | Colorado | The Flatirons as three tilted slabs of reddish rock. Golden aspens, the Front Range skyline, alpenglow, Pikes Peak, plains towns. | Generic fantasy peaks, desert, mesas |
-| Town main streets (decision [90](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L191)) | Brick and timber false-front storefronts from Colorado's mining towns; awnings, hanging lanterns, the mountains close behind. | Any game's town, castle walls, a medieval market. |
+| Town main streets (decision 90) | Brick and timber false-front storefronts from Colorado's mining towns; awnings, hanging lanterns, the mountains close behind. | Any game's town, castle walls, a medieval market. |
 | The town square | Aspens and benches around a stone fountain, a notice board of blank papers, founders and neighbors talking. | A quest giver, signs with lettering. |
 | Cottages | Stone foundations, timber frames, steep roofs for snow, warm windows at golden hour. | Thatch fairy-tale huts, mushroom houses. |
 | Plains and creeks | Windpumps near Fort Collins and Greeley; footbridges over Boulder Creek, Clear Creek and the Poudre; mine headframes on the hills. | Rope bridges over chasms, ruins |

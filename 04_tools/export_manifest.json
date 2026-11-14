@@ -51,6 +51,7 @@
     {"glob": "GOVERNANCE.md", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
     {"glob": "LICENSE", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
     {"glob": "MAINTAINERS.md", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
+    {"glob": "THREAT-MODEL.md", "public": true, "reason": "The Workers threat model, written in this repo (2026-11-13)"},
     {"glob": "SUPPORT.md", "public": true, "reason": "A public root doc, written in this repo (2026-11-13)"},
     {"glob": "ROADMAP.md", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
     {"glob": "LICENSES/**", "public": true, "reason": "License texts beside the root LICENSE; in the archive they live only in the overlay, so this rule matches in the public repo"},

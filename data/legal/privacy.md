@@ -5,7 +5,7 @@ summary: What Colorado Startups collects on this website, why, who helps us run 
 status: approved
 ---
 
-<!-- Approved at Gate B on 2026-10-18 (decision [71](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L115)). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. -->
+<!-- Approved at Gate B on 2026-10-18 (decision 71). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. -->
 
 Colorado Startups, Ltd. runs this website for a community of entrepreneurs building companies in Colorado, and for the wider startup community around them. This page says what we collect, why, and what you can ask us to do with it.
 

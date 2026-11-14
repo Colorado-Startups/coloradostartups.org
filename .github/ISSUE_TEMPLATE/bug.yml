@@ -5,6 +5,7 @@
 # CLAUDE.md and CONTRIBUTING.md.
 name: Bug
 description: Something is broken, wrong or out of date. It gets a fix PR right away.
+type: Bug
 labels: ["bug"]
 body:
   - type: markdown

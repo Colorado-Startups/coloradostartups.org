@@ -23,7 +23,7 @@ Recommended by the harness: none yet. No live model has met every goal in this r
 
 ## Recommendation
 
-**Run Qwen3 30B (`@cf/qwen/qwen3-30b-a3b-fp8`), provisionally.** The harness picks only a model meeting every goal; none did, so this is the orchestrator's call (decision [41](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L69)).
+**Run Qwen3 30B (`@cf/qwen/qwen3-30b-a3b-fp8`), provisionally.** The harness picks only a model meeting every goal; none did, so this is the orchestrator's call (decision 41).
 
 ```mermaid
 xychart-beta

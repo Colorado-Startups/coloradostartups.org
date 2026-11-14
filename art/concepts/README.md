@@ -8,7 +8,7 @@
 | A 480 px preview of each render. | `batch-<n>/<id>.webp`, in this folder. |
 | Which render ships as which file. | [`art/finals.json`](../finals.json), read by [`make-finals.mjs`](../tools/make-finals.mjs) |
 | This record | L7 wrote the plan; L17 recorded the picks and the batch 2 run; all 2026-10-18. |
-| The v2 sidecars (Gate A v2, 2026-10-08), retired with v3. | Commit [`da82d0f`](https://github.com/Colorado-Startups/coloradostartups-site/commit/da82d0f); their one run finding is in `LOG.md` |
+| The v2 sidecars (Gate A v2, 2026-10-08), retired with v3. | Commit `da82d0f`; their one run finding is in `LOG.md` |
 
 ## Status
 
@@ -16,7 +16,7 @@
 | --- | --- |
 | Done | Batch 1: 18 images from `batch-1.json`, rendered by L14 on Modal, 2026-10-18 (PR #31). The orchestrator picked; L17 recorded the picks and made the shipped files. |
 | Done | Batch 2: Fusion Canyon at three seeds, the stone and parchment tiles at three each, by L17 on Modal, 2026-10-18. |
-| Done | Decision [88](https://github.com/Colorado-Startups/coloradostartups-site/blob/25a00d88d28a9a0895ac1e57d58e2ef4d21e6d09/00_project_system/decisions.md#L183), 2026-11-02, moves new stills to FIBO 2.0 and motion to LTX-2.5. Batches 1 and 2 are Anima's; their picks stand. |
+| Done | Decision 88, 2026-11-02, moves new stills to FIBO 2.0 and motion to LTX-2.5. Batches 1 and 2 are Anima's; their picks stand. |
 | Open | `hero-b` waits for a slot. The 2x upscale of the hero, regions and keepers waits for an upscale workflow ([models](../direction/models.md)) |
 | Done | Batch 3: 11 FIBO 2.0 stills from JSON captions ([prompts](../direction/fibo-prompts.md)), on Comfy Cloud's Bria node, by L6, 2026-11-03. They are the 404, founders forum and guides scenes ([scenes](scenes.md)). Route and 144-credit cap: Paul, in L6's chat; 133 credits spent (`LOG.md`). |
 | Done | Batch 4: 6 Colorado-first stills of the founders forum and the guides, on Bria's Hugging Face Space at 0 credits, by L6, 2026-11-03. Their picks replace batch 3's for those two pages. |
