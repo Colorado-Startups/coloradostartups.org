@@ -52,6 +52,12 @@ npm run dev
 | [`GOVERNANCE.md`](GOVERNANCE.md), [`MAINTAINERS.md`](MAINTAINERS.md) | Who decides and who merges |
 | [`ROADMAP.md`](ROADMAP.md) | Where ideas go and where to help |
 
+## Sponsors
+
+Sponsor Colorado Startups on [GitHub Sponsors](https://github.com/sponsors/Colorado-Startups). Summit Sponsors, Peak Partners and $100 one-time sponsors get their name and link here. Every sponsor is on [coloradostartups.org/sponsors/](https://coloradostartups.org/sponsors/).
+
+<!-- sponsors: one "- [Name](https://url)" line each, from data/sponsors/sponsors.yaml -->
+
 ## License
 
 Use anything here for anything, except the Exceptions below. You need not ask, credit us or keep a notice.

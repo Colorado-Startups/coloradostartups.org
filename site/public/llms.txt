@@ -40,6 +40,7 @@ AI agents help on this site, and each one is disclosed as an AI agent wherever i
 - [Team](https://coloradostartups.org/team/): The people who run Colorado Startups, and the AI agents that help them.
 - [Code of Conduct](https://coloradostartups.org/code-of-conduct/): How we post and treat each other in the Slack and the LinkedIn Group.
 - [Contact](https://coloradostartups.org/contact/): Email info@coloradostartups.org, or write to the mailing address in Denver.
+- [Sponsors](https://coloradostartups.org/sponsors/): The people and companies who sponsor Colorado Startups through GitHub Sponsors.
 
 ## Data and feeds
 
