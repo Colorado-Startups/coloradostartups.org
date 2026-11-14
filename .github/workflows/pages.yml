@@ -50,6 +50,12 @@ jobs:
         with:
           node-version: 26
 
+      # The Code tab's knip maps a script's binary (secretlint, wrangler, pagefind) to its package and loads the
+      # Playwright and Vitest configs only from node_modules. Without an install it read 5 used packages as unused.
+      # No install scripts run: knip reads package metadata only.
+      - name: Install the repo's packages for knip
+        run: npm ci --ignore-scripts --no-audit --no-fund --loglevel=error
+
       - uses: SoulCraft-Org/git-crafter/actions/pages@a9d6b45b7e5ac54091123e2cda1efcfcd2f63696 # v7.0.0
         with:
           pages: process quality
