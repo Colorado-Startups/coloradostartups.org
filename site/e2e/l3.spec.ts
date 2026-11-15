@@ -22,6 +22,8 @@ test.describe("/ecosystem-canvas/", () => {
     await expect(closing.getByRole("link", { name: "Founder Institute" })).toHaveAttribute("href", "https://fi.co/");
     await expect(page.getByRole("status")).toHaveText(/^All \d+ resources\.$/);
     await expect(visibleCards(page)).toHaveCount(24);
+    // Hidden means not drawn: a row past the first page takes no room.
+    await expect(page.locator("[data-resource]").nth(24)).toBeHidden();
   });
 
   test("filters by stage and type in place, and keeps the filters in the URL", async ({ page }) => {
@@ -48,6 +50,8 @@ test.describe("/ecosystem-canvas/", () => {
     await page.goto("/ecosystem-canvas/");
     await page.getByRole("button", { name: "Show 24 more" }).click();
     await expect(visibleCards(page)).toHaveCount(48);
+    await expect(page.locator("[data-resource]").nth(47)).toBeVisible();
+    await expect(page.locator("[data-resource]").nth(48)).toBeHidden();
   });
 
   test("opens with the filters a link carries, and a stage anchor chooses its stage", async ({ page }) => {

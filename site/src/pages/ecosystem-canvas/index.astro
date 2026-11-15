@@ -147,6 +147,11 @@ const groups = groupByStage(cards);
     gap: var(--s-3) var(--s-4);
     margin-top: var(--s-5);
   }
+  /* Hidden until the island finds more matches than it shows; display: flex
+     above would otherwise outrank the browser's own [hidden] rule. */
+  .canvas-more[hidden] {
+    display: none;
+  }
   .canvas-more p {
     margin: 0;
   }

@@ -37,6 +37,11 @@ const { card } = Astro.props;
     border-top: var(--line-hair) solid var(--c-rule);
     list-style: none;
   }
+  /* The island hides rows past the shown page; display: grid above would
+     otherwise outrank the browser's own [hidden] rule. */
+  .canvas-row[hidden] {
+    display: none;
+  }
   .canvas-row__name {
     margin: 0;
     font-size: var(--t-step-0);
