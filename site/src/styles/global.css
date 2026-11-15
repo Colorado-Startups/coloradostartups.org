@@ -6,12 +6,8 @@
 @import "./tokens.css";
 @import "./hall.css";
 
-/* Body text is Trebuchet MS (brand tokens/type.yaml), a system font on macOS
-   and Windows that the brand never ships; Lucida Grande and Tahoma stand in
-   where it is missing. Aileron, the display face, comes from astro.config.mjs. */
-:root {
-  --font-body: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
-}
+/* --font-body (Atkinson Hyperlegible) and --font-display (Aileron) come from
+   the Astro Fonts API (astro.config.mjs). */
 
 /* ---------- Reset and ground ---------- */
 *,
@@ -44,7 +40,7 @@ img {
 
 /* ---------- Type ----------
    Aileron, the brand's display face, is reserved for h1 and h2. Everything
-   else, labels included, is sentence case in Trebuchet MS. */
+   else, labels included, is sentence case in Atkinson Hyperlegible. */
 h1,
 h2 {
   font-family: var(--font-display);
