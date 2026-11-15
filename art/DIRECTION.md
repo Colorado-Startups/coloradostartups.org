@@ -15,7 +15,7 @@ flowchart LR
 | Every keeper (Communitas, Resourcus, Publicus) is disclosed as an AI agent wherever it appears, in words or a picture. | The surfaces in [`ai-disclosure.md`](../.claude/rules/ai-disclosure.md); PR review. | In force |
 | No franchise word in site text or alt text. | The `franchise-name` gate in [`cs_site_rules.json`](../04_tools/cs_site_rules.json), on `data/**`, `art/**` and the built site. | In force |
 | Image credits and the AI-made label live in each image's metadata, plus a `/credits/` page. | Brand writes the metadata ([decision 45](https://github.com/Colorado-Startups/brand/blob/main/decisions.md)); the site's [duties](licenses/duties.md). | No `/credits/` page on `main` at `2879a77` |
-| Art comes only from brand releases, pinned in `brand.lock.json`. | `brand_pull.py --check` in CI ([brand decision 10](https://github.com/Colorado-Startups/brand/blob/main/decisions.md)). | Neither file on `main` at `2879a77` |
+| Art comes only from brand releases, pinned in `brand.lock.json`. | `npm run brand:check` (`scripts/brand/pull.mjs --check`) in `check:push` ([brand decision 10](https://github.com/Colorado-Startups/brand/blob/main/decisions.md)). | Lands with PR #27 |
 
 ## Owned by brand
 

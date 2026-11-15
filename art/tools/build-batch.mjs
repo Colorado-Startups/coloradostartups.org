@@ -87,7 +87,7 @@ export const BRIA = { template: "api_bria_fibo2_t2i", node: "1", maxSeed: 214748
 export const SPACE = { template: "hf_space_fibo2_t2i", space: "briaai/Fibo-2.0-T2I", api: "/generate_image" };
 
 // The fields a still's own prompt file gives; vgl-style.txt gives the rest,
-// the words every still shares (art/direction/fibo-prompts.md).
+// the words every still shares (brand art/direction, now canonical).
 export const VGL_OWN = ["short_description", "objects", "background_setting", "lighting_direction", "composition", "context"];
 const VGL_FIXED = ["lighting_conditions", "lighting_shadows", "color_scheme", "mood_atmosphere", "style_medium", "artistic_style"];
 
