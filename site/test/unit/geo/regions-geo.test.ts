@@ -10,7 +10,7 @@ import YAML from "yaml";
 
 import { buildRegions, findPlace, insideRing, readPlaces, readRegions, ringsOverlap } from "../../../../scripts/geo/build.mjs";
 import { COLORADO, COLORADO_BOUNDS, ZONES } from "../../../src/lib/regions/colorado-geo";
-import { coloradoMapSvg } from "../../../src/lib/regions/colorado-map";
+import { clockwise, coloradoMapSvg, signedArea } from "../../../src/lib/regions/colorado-map";
 
 const ROOT = path.join(__dirname, "../../../..");
 const places = readPlaces(path.join(ROOT, "data/geo/places.csv"));
@@ -81,6 +81,20 @@ describe("coloradoMapSvg", () => {
     for (const z of ZONES.features) expect(text, z.id).toContain(z.properties.name);
     const cities = ZONES.features.flatMap((z) => z.properties.cityPoints).length;
     expect(root.querySelectorAll("circle").length).toBe(cities);
+  });
+
+  // d3-geo needs clockwise exterior rings; a counterclockwise one fills the globe.
+  it("hands Plot clockwise rings, so each shape is the shape and not the globe around it", () => {
+    for (const f of [...COLORADO.features, ...ZONES.features]) {
+      expect(signedArea(clockwise(f).geometry.coordinates[0]!), f.id).toBeLessThan(0);
+    }
+  });
+
+  it("fits the zones inside the drawing, well short of its edges", () => {
+    const paths = [...root.querySelectorAll("path")].map((p) => p.getAttribute("d") ?? "");
+    const xs = paths.flatMap((d) => [...d.matchAll(/[ML]\s*(-?[\d.]+)[ ,](-?[\d.]+)/g)].map((m) => Number(m[1])));
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(640);
   });
 
   it("draws in the region tokens, never a hex", () => {
