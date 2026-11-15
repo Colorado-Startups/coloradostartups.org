@@ -313,6 +313,6 @@ test.describe("a web-font swap moves the first screen by no more than the CLS go
   }
 });
 
-// Body text is a system font since brand v3 (Trebuchet MS, global.css), so no
-// body fallback face stands in for a web font any more; the swap tests above
-// still cover Aileron, the one web font, in h1 and h2.
+// Both web fonts (Aileron in h1 and h2, Atkinson Hyperlegible in text) use
+// Astro's own size-matched Arial fallback; the swap tests above measure what
+// a late font moves on each page.

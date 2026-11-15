@@ -3,10 +3,10 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-// L5a and brand v3 type (Colorado-Startups/brand tokens/type.yaml): Aileron is
-// the one web font, for h1 and h2; body text is Trebuchet MS, a system font the
-// brand never ships. The lab numbers live in e2e/l5a.spec.ts; this holds the
-// wiring, since a misspelled family name fails silently in a browser.
+// L5a and brand v3.1 type (Colorado-Startups/brand dist/brand.json `type`):
+// Aileron for h1 and h2, Atkinson Hyperlegible for text, both web fonts through
+// Fontsource. The lab numbers live in e2e/l5a.spec.ts; this holds the wiring,
+// since a misspelled family name fails silently in a browser.
 
 const SITE = path.join(__dirname, "../../..");
 const read = (file: string) => readFileSync(path.join(SITE, file), "utf8");
@@ -14,23 +14,22 @@ const CONFIG = read("astro.config.mjs");
 const GLOBAL = read("src/styles/global.css");
 
 describe("brand v3 type", () => {
-  it("loads Aileron, and only Aileron, as a web font for --font-display", () => {
-    const names = [...CONFIG.matchAll(/^\s*name:\s*"([^"]+)"/gm)].map((m) => m[1]);
-    expect(names).toEqual(["Aileron"]);
-    expect(CONFIG).toMatch(/provider:\s*fontProviders\.fontsource\(\)/);
-    expect(CONFIG).toMatch(/cssVariable:\s*"--font-display"/);
-    expect(CONFIG).not.toMatch(/cssVariable:\s*"--font-body"/);
+  it("loads Aileron for --font-display and Atkinson Hyperlegible for --font-body, both from Fontsource", () => {
+    const fonts = [...CONFIG.matchAll(/provider:\s*fontProviders\.(\w+)\(\),\s*name:\s*"([^"]+)",\s*cssVariable:\s*"([^"]+)"/g)].map((m) => m.slice(1));
+    expect(fonts).toEqual([
+      ["fontsource", "Aileron", "--font-display"],
+      ["fontsource", "Atkinson Hyperlegible", "--font-body"],
+    ]);
   });
 
-  it("lets Astro size Aileron's fallback, and keeps the swap", () => {
+  it("lets Astro size each font's fallback, and keeps the swap", () => {
     expect(CONFIG).not.toMatch(/optimizedFallbacks:\s*false/);
     expect(CONFIG).not.toMatch(/display:\s*"optional"/);
   });
 
-  it("sets body text in Trebuchet MS, with stand-ins where it is missing", () => {
-    const stack = GLOBAL.match(/--font-body:\s*([^;]+);/)?.[1] ?? "";
-    expect(stack.split(",")[0]!.trim()).toBe('"Trebuchet MS"');
-    expect(stack.trim().endsWith("sans-serif")).toBe(true);
+  it("leaves --font-body to the Astro Fonts API, with no hand-set stack", () => {
+    expect(GLOBAL).not.toMatch(/--font-body:/);
+    expect(GLOBAL).not.toMatch(/Trebuchet/);
   });
 
   it("has no custom fallback faces left from Cinzel and Alegreya Sans", () => {
@@ -41,10 +40,10 @@ describe("brand v3 type", () => {
 });
 
 describe("what every page loads first", () => {
-  it("preloads only Aileron 700, the face h1 and h2 draw", () => {
+  it("preloads only Aileron 700 and Atkinson Hyperlegible 400 and 700, the faces the first screen draws", () => {
     const layout = read("src/layouts/BaseLayout.astro");
     expect(layout).toMatch(/<Font cssVariable="--font-display" preload=\{\[\{ weight: 700, style: "normal" \}\]\} \/>/);
-    expect(layout).not.toMatch(/--font-body/);
+    expect(layout).toMatch(/<Font cssVariable="--font-body" preload=\{\[\{ weight: 400, style: "normal" \}, \{ weight: 700, style: "normal" \}\]\} \/>/);
   });
 
   it("draws the brand emblem at 44 px from its small webps, eagerly", () => {

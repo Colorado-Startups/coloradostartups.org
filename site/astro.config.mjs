@@ -44,11 +44,11 @@ export default defineConfig({
     }),
   ],
   // Self-hosted at build time by the Astro Fonts API.
-  // Brand v3 type (Colorado-Startups/brand tokens/type.yaml): Aileron is the
-  // display face (CC0), self-hosted through Fontsource. Body text is Trebuchet
-  // MS, a system font the brand never ships, so it is a CSS stack in
-  // global.css, not a web font. Astro sizes Aileron's Arial fallback from the
-  // font's own metrics, so the swap moves little.
+  // Brand v3.1 type (Colorado-Startups/brand dist/brand.json `type` roles):
+  // Aileron is the display face (CC0); Atkinson Hyperlegible, the State of
+  // Colorado's recommended web body face, sets body text (SIL OFL 1.1). Both
+  // are self-hosted through Fontsource, and Astro sizes each one's Arial
+  // fallback from the font's own metrics, so the swap moves little.
   fonts: [
     {
       provider: fontProviders.fontsource(),
@@ -56,6 +56,14 @@ export default defineConfig({
       cssVariable: "--font-display",
       weights: [400, 700, 800],
       styles: ["normal"],
+      fallbacks: ["Arial", "sans-serif"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "Atkinson Hyperlegible",
+      cssVariable: "--font-body",
+      weights: [400, 700],
+      styles: ["normal", "italic"],
       fallbacks: ["Arial", "sans-serif"],
     },
   ],
