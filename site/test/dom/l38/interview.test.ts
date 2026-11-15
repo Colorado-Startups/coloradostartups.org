@@ -86,11 +86,11 @@ describe("the four lines that used to promise an interview", () => {
     for (const [where, line] of lines) expect(line, where).toBe(`Paul Foley, our founder, reads every application. ${CONDITIONAL}`);
   });
 
-  it("says it in the How to raise your hand paragraph on /get-involved/", () => {
+  it("says it as step 3 of How it works on /get-involved/", () => {
     const section = doc(readDist("get-involved/index.html")).getElementById("how-title")?.closest("section");
-    expect(text(section?.querySelector("p"))).toBe(
-      `Some seats take an application. Their "Apply for this seat" button opens a short form. First you finish the free Claude Academy courses the seat's card lists, each with its length. Paul Foley, our founder, reads every application. ${CONDITIONAL}`,
-    );
+    const steps = [...(section?.querySelectorAll("ol.steps > li") ?? [])];
+    expect(steps).toHaveLength(3);
+    expect(text(steps[2]?.querySelector("p"))).toBe(CONDITIONAL);
   });
 
   it("says it as step 3 on the form", () => {

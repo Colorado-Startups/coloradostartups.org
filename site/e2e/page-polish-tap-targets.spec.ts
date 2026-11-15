@@ -8,7 +8,8 @@ const STANDALONE = [
   { route: "/code-of-conduct/", selector: "nav.toc a", count: 4 },
   { route: "/contact/", selector: ".doors a", count: 6 },
   { route: "/get-involved/", selector: "ul.jump a", count: 3 },
-  { route: "/get-involved/", selector: ".position p.meta a", count: 7 },
+  { route: "/get-involved/", selector: ".position p.meta a", count: 4 },
+  { route: "/get-involved/", selector: ".position__more summary", count: 9 },
 ];
 
 test.describe("standalone links at phone width", () => {

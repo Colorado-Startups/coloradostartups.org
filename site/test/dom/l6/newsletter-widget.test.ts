@@ -6,7 +6,8 @@ import { describe, expect, it } from "vitest";
 
 import { readDist } from "../pages";
 
-const PAGES = ["newsletter/index.html", "community/index.html"];
+// The form left /community/ on 2026-11-15; its newsletter tile links here.
+const PAGES = ["newsletter/index.html"];
 
 describe.each(PAGES)("%s newsletter form", (file) => {
   const doc = new DOMParser().parseFromString(readDist(file), "text/html");

@@ -1,0 +1,79 @@
+---
+// One channel tile on /community/: an icon, the channel's name, one line and
+// its way in. The Slack tile's button is the page's one gold action, and the
+// note under it says it opens a Google Form (#128).
+import type { Channel } from "../hall/channels";
+import Button from "../ui/Button.astro";
+import Card from "../ui/Card.astro";
+import { communityIcon } from "./icons";
+
+interface Props {
+  channel: Channel;
+}
+
+const { channel } = Astro.props;
+const slack = channel.id === "slack";
+const noteId = `${channel.id}-note`;
+---
+
+<Card element="li" title={channel.name} class="channel" data-channel={channel.id} mediaInset>
+  <span slot="media" class="channel__icon" set:html={communityIcon(channel.icon)} />
+  <p>{channel.expect}</p>
+  <Fragment slot="actions">
+    {
+      slack ? (
+        <Button href={channel.action.href} aria-describedby={noteId}>
+          {channel.action.label}
+        </Button>
+      ) : (
+        <Button variant="secondary" href={channel.action.href}>
+          {channel.action.label}
+        </Button>
+      )
+    }
+  </Fragment>
+  {slack && <span slot="meta" id={noteId}>Join the Slack opens a Google Form.</span>}
+</Card>
+
+<style>
+  .channel__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--c-night);
+    color: var(--c-gold-on-night);
+  }
+  .channel__icon :global(svg) {
+    width: 30px;
+    height: 30px;
+  }
+  /* The meta note sits under the button, not beside it. */
+  .channel :global(.hall-card__foot) {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+  /* On a phone the icon sits beside the words, so four tiles stay short. */
+  @media (max-width: 560px) {
+    .channel {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .channel :global(.hall-card__media--inset) {
+      padding: var(--s-4) 0 0 var(--s-4);
+    }
+    .channel :global(.hall-card__body) {
+      padding: var(--s-4);
+      gap: var(--s-2);
+    }
+    .channel__icon {
+      width: 44px;
+      height: 44px;
+    }
+    .channel__icon :global(svg) {
+      width: 24px;
+      height: 24px;
+    }
+  }
+</style>

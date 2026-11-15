@@ -2,6 +2,7 @@ import { WAYS_IN } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
 import { CHANNELS } from "../../../src/components/hall/channels";
+import { CONDUCT_GROUPS } from "../../../src/components/info/code-of-conduct";
 import {
   ADDRESS,
   GITHUB_ORG,
@@ -127,25 +128,23 @@ describe("the ways in", () => {
 });
 
 describe("the channels on /community/", () => {
-  it("each say what to expect, list at least one norm and offer one action", () => {
+  it("are the four ways in, each with one short line, an icon and one action", () => {
+    expect(CHANNELS.map((c) => c.id)).toEqual(["slack", "linkedin-group", "linkedin-page", "newsletter"]);
     for (const c of CHANNELS) {
       expect(c.expect.length, c.id).toBeGreaterThan(10);
-      expect(c.norms.length, c.id).toBeGreaterThan(0);
+      // One short line per tile (Paul, 2026-11-15: few words).
+      expect(c.expect.split(/\s+/).length, c.id).toBeLessThanOrEqual(10);
+      expect(c.icon, c.id).toBeTruthy();
       expect(c.action.href, c.id).toMatch(/^(\/|https:\/\/)/);
     }
   });
+});
 
-  it("send self-promotion to the Wednesday Asks and Offers thread in both groups", () => {
-    for (const id of ["slack", "linkedin-group"]) {
-      const norms = CHANNELS.find((c) => c.id === id)!.norms.join(" ");
-      expect(norms, id).toMatch(/Wednesday Asks and Offers/);
-    }
-  });
-
-  it("point the founders forum at /founders/ and never give it a date", () => {
-    const forum = CHANNELS.find((c) => c.id === "founders-forum")!;
-    expect(forum.action.href).toBe("/founders/");
-    expect(forum.expect).toMatch(/opens later/);
-    expect(forum.expect).not.toMatch(/\b20\d\d\b|January|February|March|April|May|June|July|August|September|October|November|December/);
+describe("the house rules on /community/", () => {
+  // /community/ shows the Code of Conduct's promotion rules as icons, by title.
+  it("are the Code of Conduct's three promotion rules, and the first sends promotion to one weekly thread", () => {
+    const group = CONDUCT_GROUPS.find((g) => g.id === "promotion-and-limits")!;
+    expect(group.rules.map((r) => r.title)).toEqual(["Promote in One Place", "No Investment Offers", "No Cold Pitches"]);
+    expect(group.rules[0]!.body.join(" ")).toMatch(/Wednesday Asks and Offers/);
   });
 });

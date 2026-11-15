@@ -1,14 +1,12 @@
-// The four seat pages' layouts (lane L38), ported from the volunteer kit's
-// final pages/<seat id>.html. The kit owner marked all four final on
-// 2026-10-18. Words that come from roles.json (titles, one-liners, perks,
-// steps, what you bring, what Paul looks for, ground rules) live in
-// data/positions/ and are never repeated here. layouts/<seat>.ts holds only
-// each page's own headings, captions and tiles, and which facts each figure shows.
-//
-// Every page answers the kit README's five questions in this order: what you
-// get, how it grows your network, how it helps Colorado, who we are looking
-// for, how to apply. SeatLayout keys the sections by question, and SECTION_ORDER
-// fixes the order, so a page cannot skip or swap one.
+// The four seat pages' layouts (lane L38). They began as ports of the
+// volunteer kit's final pages/<seat id>.html (marked final 2026-10-18); on
+// 2026-11-15 Paul asked for visual first and few words, so each page now
+// answers three questions: what you do, why it matters, how to apply. Words
+// that come from roles.json (titles, one-liners, perks, steps, what you
+// bring) live in data/positions/ and are never repeated here.
+// layouts/<seat>.ts holds only each page's own headings, captions and tiles,
+// and which facts each figure shows. SeatLayout keys the sections by
+// question, and SECTION_ORDER fixes the order.
 import { SECTION_ORDER, type Block, type SeatLayout, type SectionKey } from "./layout-types";
 import { FUSION_CANYON_CONNECTOR } from "./layouts/fusion-canyon-connector";
 import { PHOTON_MOUNTAIN_CONNECTOR } from "./layouts/photon-mountain-connector";
@@ -19,12 +17,10 @@ import type { NetworkSeat } from "./viz";
 
 export { SECTION_ORDER, type Block, type SeatLayout, type SectionKey } from "./layout-types";
 
-/** The kicker over each section's heading: the question it answers (kit README, "The job of every page"). */
+/** The kicker over each section's heading: the question it answers. */
 export const SECTION_KICKERS: Readonly<Record<SectionKey, string>> = {
-  get: "What you get",
-  network: "How it grows your network",
-  colorado: "How it helps Colorado",
-  who: "Who we are looking for",
+  what: "What you do",
+  why: "Why it matters",
   apply: "How to apply",
 };
 

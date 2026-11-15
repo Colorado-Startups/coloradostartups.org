@@ -31,9 +31,9 @@ function describe(nodes: readonly DiagramNode[]): string {
 
 const NET_TITLES: Readonly<Record<NetworkSeat, string>> = {
   "photon-mountain-connector": "Diagram: the Photon Mountain Connector links Boulder, Golden and Denver",
-  "fusion-canyon-connector": "Diagram: the Fusion Canyon Connector links Northern Colorado with the other outposts",
-  "space-peak-connector": "Diagram: the Space Peak Connector links the Pikes Peak region with the other outposts",
-  "slack-community-lead": "Diagram: the Slack Community Lead links all three outposts online",
+  "fusion-canyon-connector": "Diagram: the Fusion Canyon Connector links Northern Colorado with the other regions",
+  "space-peak-connector": "Diagram: the Space Peak Connector links the Pikes Peak area with the other regions",
+  "slack-community-lead": "Diagram: the Slack Community Lead links all three regions online",
 };
 
 // One drawing: its size, its nodes and links, and a node by id.

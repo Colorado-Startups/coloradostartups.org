@@ -1,16 +1,19 @@
-import { COURSE_TITLES, courseUrl, type CourseId } from "@cs/shared";
+import { COURSE_TITLES, type CourseId } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
 import { COURSE_MINUTES, courseLength } from "../../../src/components/positions/courses";
 import { readDist } from "../pages";
 
-// L5b (#146): a seat card that takes applications lists its Claude Academy
-// courses above the apply button, linked and timed, and says who Paul is.
-// Built HTML from dist/.
+// L5b (#146): a seat that takes applications shows its Claude Academy
+// courses, linked and timed, and its card says who Paul is. Built HTML from
+// dist/.
 
 const doc = (rel: string) => new DOMParser().parseFromString(readDist(rel), "text/html");
 const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
 
+// On 2026-11-15 the course list left the seat cards (Paul: few words). Each
+// card links its seat page, which lists the courses with their lengths
+// (test/dom/l38/seats.test.ts), and the form lists them again.
 describe("/get-involved/ seat cards that take applications", () => {
   const cards = [...doc("get-involved/index.html").querySelectorAll("main [data-position]")].filter((c) =>
     c.querySelector("a[data-apply]"),
@@ -20,19 +23,12 @@ describe("/get-involved/ seat cards that take applications", () => {
     expect(cards.length).toBeGreaterThan(0);
   });
 
-  it("list each course with its Claude Academy link and length, before the apply button", () => {
+  it("link the seat page, where the courses are, before the apply button", () => {
     for (const card of cards) {
-      const list = card.querySelector("[data-seat-courses]")!;
-      expect(text(list.querySelector("h4"))).toBe("Take these courses first");
-      const items = [...list.querySelectorAll<HTMLElement>("li[data-course-id]")];
-      expect(items.length, card.getAttribute("data-position")!).toBeGreaterThan(0);
-      for (const li of items) {
-        const id = li.dataset.courseId as CourseId;
-        expect(li.querySelector("a")?.getAttribute("href")).toBe(courseUrl(id));
-        expect(text(li)).toBe(`${COURSE_TITLES[id]}, ${courseLength(COURSE_MINUTES[id])}`);
-      }
+      const page = card.querySelector("a[data-seat-page]")!;
+      expect(page.getAttribute("href")).toBe(`/get-involved/${card.getAttribute("data-position")}/`);
       const apply = card.querySelector("a[data-apply]")!;
-      expect(list.compareDocumentPosition(apply) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(page.compareDocumentPosition(apply) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
   });
 

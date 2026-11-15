@@ -1,5 +1,7 @@
 ---
-// /team/: who runs the Hall. Owner: L9 (decisions 19, 43, 44 and 51).
+// /team/: who runs Colorado Startups. Owner: L9 (decisions 19, 43, 44 and 51).
+// Photos and keepers carry the page; the words are trimmed to one line per
+// section (Paul, 2026-11-15: visual first, few words).
 //
 // Order is a contract (lane file L9):
 //   1. Paul (leadership)
@@ -81,9 +83,7 @@ const jsonLd = {
   <section class="section section--band" aria-labelledby="team-title">
     <div class="wrap stack">
       <h1 id="team-title">Team</h1>
-      <p class="lede">
-        People run Colorado Startups. AI keepers help them, and each keeper says it is an AI wherever it appears.
-      </p>
+      <p class="lede">People run Colorado Startups. AI keepers help, and each one says it is an AI agent.</p>
       {
         anyOpen && (
           <p class="btn-row">
@@ -108,10 +108,7 @@ const jsonLd = {
   <section class="section section--band" id="keepers" aria-labelledby="keepers-title">
     <div class="wrap stack">
       <h2 id="keepers-title">The keepers</h2>
-      <p>
-        The keepers are dwarves and gnomes. Each one is an AI agent run by Colorado Startups, and a person
-        reviews its work. The keepers never moderate: those seats are for people.
-      </p>
+      <p>Each keeper is an AI agent. A person reviews its work, and no keeper moderates.</p>
       <ul class="hall-grid team-grid team-grid--wide" aria-label="The keepers">
         {keepers.map((keeper) => <KeeperCard keeper={keeper} element="li" />)}
       </ul>
@@ -124,7 +121,6 @@ const jsonLd = {
       {
         community.length > 0 ? (
           <>
-            <p>The people who moderate, organize and keep the community's shared work going.</p>
             <ul class="hall-grid team-grid" aria-label="The community team">
               {community.map(({ person, seat }) => (
                 <PersonCard person={person} seat={seat?.title} element="li" />
@@ -132,16 +128,13 @@ const jsonLd = {
             </ul>
             {anyOpen && (
               <p data-get-involved>
-                More seats are open. <a href="/get-involved/">See the open positions</a> and raise your hand.
+                More seats are open. <a href="/get-involved/">See the open positions</a>.
               </p>
             )}
           </>
         ) : (
           <>
-            <p data-get-involved>
-              Every seat on the community team is open right now. The seats include moderators for the Slack and the
-              LinkedIn Group, organizers for each region, and help with Startup Resources and the Startupers newsletter.
-            </p>
+            <p data-get-involved>Every seat on the community team is open right now.</p>
             <p class="btn-row">
               <Button href="/get-involved/">See the open positions</Button>
             </p>
@@ -163,7 +156,7 @@ const jsonLd = {
   <section class="section section--lit" id="with-thanks" aria-labelledby="with-thanks-title">
     <div class="wrap stack">
       <h2 id="with-thanks-title">With thanks</h2>
-      <p>Thank you, Micah and Lindsey, for leading Colorado Startups these past few years.</p>
+      <p>Thank you, Micah and Lindsey, for leading Colorado Startups these past years.</p>
       <ul class="hall-grid team-grid" aria-label="With thanks">
         {withThanks.map((person) => <PersonCard person={person} element="li" />)}
       </ul>

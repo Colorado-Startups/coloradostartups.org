@@ -10,7 +10,7 @@ AI agents help on this site, and each one is disclosed as an AI agent wherever i
 
 - [Home](https://coloradostartups.org/): The ways into the community, and a welcome desk that points each visitor to the right place.
 - [Startup Resources](https://coloradostartups.org/ecosystem-canvas/): A directory of Colorado programs, events, investors and services for founders, sorted by company stage. Resourcus, an AI agent, answers questions about it.
-- [Community](https://coloradostartups.org/community/): The Slack, the LinkedIn Group and the LinkedIn Page, and what happens in each.
+- [Community](https://coloradostartups.org/community/): Pick a way in (the Slack, the LinkedIn Group, the LinkedIn Page or the Startupers newsletter), the house rules, and a welcome desk that points each visitor to the right place.
 - [Join the Slack](https://coloradostartups.org/slack/): The one public way to ask for an invite to the Colorado Startups Slack. It opens a Google Form.
 - [Leaderboard](https://coloradostartups.org/leaderboard/): Colorado companies that Colorado Startups recognizes, and the form to nominate one.
 - [How the Leaderboard works](https://coloradostartups.org/leaderboard/#method): How each edition is chosen and checked. The first verified edition will rank companies by revenue growth.

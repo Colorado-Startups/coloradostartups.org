@@ -1,12 +1,12 @@
 ---
-// Links from one seat page to the other three (lane L38), as L12's cards.
+// Links from one seat page to the other three (lane L38), as L12's cards:
+// each seat's picture and title, no more (Paul, 2026-11-15: few words).
 // The kit's pages linked each other through claude.ai artifact links; on the
 // site the seats link to their own pages instead. Each card's picture keeps
 // its seat hero's alt, so the Slack seat's Great Hall, which shows keepers,
 // says they are AI agents here too (#714).
 import ArtImage from "../art/ArtImage.astro";
 import Card from "../ui/Card.astro";
-import { withKeeperDisclosure } from "../../lib/seats/copy";
 import { SEAT_LAYOUTS, hasLayout } from "../../lib/seats/layouts";
 import type { Seat } from "../../lib/seats/load";
 import { seatPagePath } from "../../lib/seats/page";
@@ -36,8 +36,6 @@ const { seats } = Astro.props;
                 motion="none"
               />
             )}
-            <p>{withKeeperDisclosure(s.one_liner)}</p>
-            <span slot="meta">{s.eyebrow}</span>
           </Card>
         ))
       }

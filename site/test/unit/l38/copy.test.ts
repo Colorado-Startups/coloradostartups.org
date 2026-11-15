@@ -84,14 +84,8 @@ describe("each seat page's order, sources and head", () => {
   const common = loadCommon();
   const facts = loadFacts();
 
-  it("answers the kit README's five questions in order", () => {
-    expect(SECTION_ORDER.map((k) => SECTION_KICKERS[k])).toEqual([
-      "What you get",
-      "How it grows your network",
-      "How it helps Colorado",
-      "Who we are looking for",
-      "How to apply",
-    ]);
+  it("answers three questions in order: what, why, apply (Paul, 2026-11-15)", () => {
+    expect(SECTION_ORDER.map((k) => SECTION_KICKERS[k])).toEqual(["What you do", "Why it matters", "How to apply"]);
   });
 
   it.each(seats.map((s) => [s.id, s] as const))("%s cites the course lengths once, after its figures", (id, seat) => {

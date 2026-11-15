@@ -75,11 +75,11 @@ describe("the founders forum after launch", () => {
     expect(files.flatMap((f) => staleForumLines(f.text).map((s) => `${f.route}: ${s}`))).toEqual([]);
   });
 
-  it("says Coming later on the /founders/ kicker and the /community/ card badge", () => {
+  // /community/ shows the four ways in that are open today (2026-11-15), so
+  // the forum's "Coming later" card left it; the welcome desk still says so.
+  it("says Coming later on the /founders/ kicker", () => {
     expect(text(doc("founders/index.html").querySelector("main .kicker"))).toBe("Coming later");
-    const card = doc("community/index.html").querySelector("[data-channel='founders-forum']");
-    expect(text(card?.querySelector(".hall-badge"))).toBe("Coming later");
-    expect(text(card)).toMatch(/opens later/);
+    expect(doc("community/index.html").querySelector("[data-channel='founders-forum']")).toBeNull();
   });
 
   it("says opens later on /links/, the welcome desk and llms.txt", () => {

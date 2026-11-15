@@ -18,9 +18,9 @@ export interface WayIn {
   what: string;
 }
 
-// The four ways in, in the order the home page lists them. Each takes its
-// name, action and copy from its channel in channels.ts, so the home page and
-// /community/ say the same thing.
+// The four ways in, in the order /community/'s tiles show them. Each takes
+// its name, action and copy from its channel in channels.ts, so every page
+// that lists the ways in says the same thing.
 const WAY_KINDS: readonly WayIn["kind"][] = ["slack", "linkedin-group", "linkedin-page", "newsletter"];
 
 export const WAYS: readonly WayIn[] = WAY_KINDS.map((kind) => {

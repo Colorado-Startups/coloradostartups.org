@@ -1,0 +1,145 @@
+---
+// One seat card on /get-involved/ (Paul, 2026-11-15: visual first, few
+// words). Owner: L9. The region pages keep PositionCard, the longer card.
+//
+// A region's seat shows its painted scene (#204). Each card shows the title,
+// an Open or Filled badge, the summary and one action:
+// - a seat that takes applications (L19): UNPAID_VOLUNTEER_LINE (decision
+//   67), "Read about the role" to its seat page, and the gold "Apply for this
+//   seat", with the line that says Paul reads every application;
+// - any other open seat: the stone "Email us about this seat", a mailto: with
+//   the seat in the subject, and the address as text (#139);
+// - a filled seat: its holder, linked to the Team page.
+// "What you do" folds into a closed <details>, so it costs no screen until a
+// reader asks. The button's accessible name adds the seat (WCAG 2.5.3).
+import type { Person, Position } from "@cs/shared";
+
+import { REGIONS } from "../../lib/regions/match";
+import { seatPagePath } from "../../lib/seats/page";
+import RegionArt from "../regions/RegionArt.astro";
+import Badge from "../ui/Badge.astro";
+import Button from "../ui/Button.astro";
+import Card from "../ui/Card.astro";
+import { applyHref, RAISE_HAND_EMAIL, raiseHandHref, takesApplications, UNPAID_VOLUNTEER_LINE } from "./positions";
+
+interface Props {
+  position: Position;
+  holder?: Person;
+}
+
+const { position, holder } = Astro.props;
+const open = position.status === "open";
+const applies = takesApplications(position);
+const region = position.region ? REGIONS.find((r) => r.id === position.region) : undefined;
+
+// The drawn width on /get-involved/'s .seat-grid: 20rem tracks with 24 px
+// gaps in .wrap, inside the card's 2 px borders.
+const SEAT_GRID_SIZES = "(max-width: 711px) calc(100vw - 52px), (max-width: 1055px) calc(50vw - 40px), 380px";
+---
+
+<Card
+  title={position.title}
+  element="li"
+  class="position"
+  data-position={position.id}
+  data-status={position.status}
+  data-area={position.area}
+>
+  {region && <RegionArt slot="media" region={region} sizes={SEAT_GRID_SIZES} />}
+  {open ? <Badge slot="badges" tone="pine">Open seat</Badge> : <Badge slot="badges">Filled</Badge>}
+  <div class="position__text">
+    <p>{position.summary}</p>
+    {
+      applies && (
+        <p class="position__unpaid" data-unpaid-line>
+          {UNPAID_VOLUNTEER_LINE}
+        </p>
+      )
+    }
+    <details class="position__more">
+      <summary>What you do<span class="visually-hidden">: {position.title}</span></summary>
+      <ul class="position__list">
+        {position.what_you_do.map((line) => <li>{line}</li>)}
+      </ul>
+    </details>
+    {
+      applies && (
+        <p class="meta">
+          <a class="tap-target" href={seatPagePath(position.id)} data-seat-page>
+            Read about the role<span class="visually-hidden">: {position.title}</span>
+          </a>
+        </p>
+      )
+    }
+  </div>
+  <Fragment slot="actions">
+    {
+      applies ? (
+        <>
+          <Button href={applyHref(position)} data-apply>
+            Apply for this seat<span class="visually-hidden"> ({position.title})</span>
+          </Button>
+          <span class="meta position__email-line">
+            <a href="/team/">Paul Foley</a>, our founder, reads every application. If it looks like a fit, Paul sets up an
+            interview.
+          </span>
+        </>
+      ) : open ? (
+        <>
+          <Button variant="stone" href={raiseHandHref(position)} data-raise-hand>
+            Email us about this seat<span class="visually-hidden"> ({position.title})</span>
+          </Button>
+          <span class="meta position__email-line">
+            Or write to <span class="position__email">{RAISE_HAND_EMAIL}</span>.
+          </span>
+        </>
+      ) : (
+        <span data-holder={holder?.id}>
+          {holder ? (
+            <>
+              Held by <a href={`/team/#${holder.id}`}>{holder.name}</a>.
+            </>
+          ) : (
+            "This seat is filled."
+          )}
+        </span>
+      )
+    }
+  </Fragment>
+</Card>
+
+<style>
+  /* Card.astro renders the foot, so it takes :global. hall.css pins it to the
+     card's bottom with margin-top: auto; here it follows the text (#230). */
+  .position :global(.hall-card__foot) {
+    margin-top: 0;
+  }
+  .position__text > * + * {
+    margin-top: var(--s-3);
+  }
+  .position__unpaid {
+    font-weight: 700;
+  }
+  /* Padding, not display: flex, so the summary keeps its open/closed marker;
+     the padding makes a 44 px tap target. */
+  .position__more summary {
+    min-height: var(--size-tap);
+    padding-block: 10px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .position__list {
+    margin: 0;
+    padding-left: 1.2em;
+    display: grid;
+    gap: var(--s-1);
+  }
+  .position__email-line {
+    flex-basis: 100%;
+  }
+  .position__email {
+    overflow-wrap: anywhere;
+    color: var(--c-text);
+    font-weight: 500;
+  }
+</style>

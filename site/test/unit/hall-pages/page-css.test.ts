@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 // jsdom has no layout, so these read the CSS source:
 // - #207: .hall-grid collapses empty tracks (auto-fit), so a row of three
 //   spans the row at 1280 px.
-// - #213: /community/'s narrow .pair track is minmax(0, 1fr). A bare 1fr
-//   grows to the newsletter panel's widest content and loses the gutter.
+// - #213: /community/'s grid tracks are minmax(0, 1fr). A bare 1fr grows to
+//   its widest content and loses the gutter.
 // - #215, #216: /data/'s credit text is on the type scale, and its fields
 //   stack on a phone.
 // - #219: /founders/ leaves its h2 size to global.css, so one level has one size.
@@ -58,17 +58,15 @@ describe("hall.css card grid (#207)", () => {
   });
 });
 
-describe("/community/ panels (#213)", () => {
+// The desk and newsletter .pair left /community/ on 2026-11-15; #213's rule
+// holds for the grids that replaced it.
+describe("/community/ grids (#213)", () => {
   const css = styleOf(read("pages/community/index.astro"));
 
-  it("never gives .pair a bare fr track", () => {
-    const tracks = declarations(css, ".pair", "grid-template-columns");
-    expect(tracks.length).toBeGreaterThan(1);
+  it.each([".hero__grid", ".channels", ".rules"])("never gives %s a bare fr track", (selector) => {
+    const tracks = declarations(css, selector, "grid-template-columns");
+    expect(tracks.length).toBeGreaterThan(0);
     for (const t of tracks) expect(hasBareFr(t), t).toBe(false);
-  });
-
-  it("lets the two panels stretch to one height", () => {
-    expect(declarations(css, ".pair", "align-items")).toEqual([]);
   });
 });
 

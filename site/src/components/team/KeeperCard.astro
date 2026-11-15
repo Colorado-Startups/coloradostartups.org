@@ -5,8 +5,10 @@
 // in its framed mode (lane/L7-wiring): one lookup, one placeholder and the
 // idle motion for every keeper image on the site. Every field comes from
 // data/team/dwarves.yaml (L10 owns the copy). The card shows name, title,
-// kind, role, bio, what it can help with, where it works, and the disclosure
-// line in full. Hard constraint 10: a keeper is disclosed as an AI agent
+// kind, role, bio, what it can help with, and the disclosure line in full.
+// On 2026-11-15 (Paul: few words) "Where it works" left the card, since the
+// bio says where each keeper helps, and "What it can help with" folded into
+// a closed <details>. The disclosure stays outside it, always shown. Hard constraint 10: a keeper is disclosed as an AI agent
 // wherever it appears, so the disclosure is never trimmed or hidden, and a
 // DOM test checks it on every card.
 //
@@ -57,20 +59,12 @@ const { keeper, element = "article" } = Astro.props;
       <p>{keeper.bio}</p>
     </div>
     <div class="keeper__side" data-keeper-side>
-      <div class="keeper__lists">
-        <div>
-          <h4>It can help with</h4>
-          <ul>
-            {keeper.can_help_with.map((item) => <li>{item}</li>)}
-          </ul>
-        </div>
-        <div>
-          <h4>Where it works</h4>
-          <ul>
-            {keeper.surfaces.map((item) => <li>{item}</li>)}
-          </ul>
-        </div>
-      </div>
+      <details class="keeper__help">
+        <summary>What it can help with<span class="visually-hidden">: {keeper.name}</span></summary>
+        <ul>
+          {keeper.can_help_with.map((item) => <li>{item}</li>)}
+        </ul>
+      </details>
       <p class="ai-note" data-disclosure>{keeper.disclosure}</p>
     </div>
   </div>
@@ -107,17 +101,16 @@ const { keeper, element = "article" } = Astro.props;
   .keeper__role {
     font-size: var(--t-step-1);
   }
-  .keeper__lists {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-    gap: var(--s-4);
+  /* Padding, not display: flex, so the summary keeps its open/closed marker;
+     the padding makes a 44 px tap target. */
+  .keeper__help summary {
+    min-height: var(--size-tap);
+    padding-block: 10px;
+    cursor: pointer;
+    font-weight: 700;
   }
-  .keeper__lists h4 {
-    font-size: var(--t-step-0);
-    margin: 0 0 var(--s-2);
-  }
-  .keeper__lists ul {
-    margin: 0;
+  .keeper__help ul {
+    margin: var(--s-2) 0 0;
     padding-left: 1.2em;
     display: grid;
     gap: var(--s-1);

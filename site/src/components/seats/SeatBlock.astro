@@ -1,6 +1,6 @@
 ---
 // One block of a seat page (lane L38): a chart, a map, tiles, a list from
-// roles.json, the steps or the apply button. lib/seats/layouts.ts says which
+// roles.json, the steps, the courses or the apply button. lib/seats/layouts.ts says which
 // blocks each page shows; this file says how each kind looks. A split renders
 // its two columns through this same component.
 //
@@ -169,36 +169,6 @@ const COURSE_SHORT = "Claude Academy course pages";
   </div>
 )}
 
-{block.kind === "plaque" && (
-  <div class="seat-plaque">
-    {block.title && (
-      <p>
-        <strong>{block.title}</strong>
-      </p>
-    )}
-    {block.lines.map((line) => <p>{line}</p>)}
-    {block.pills && (
-      <ul class="seat-pills" aria-label="Where it reaches">
-        {block.pills.map((p) => (
-          <li class="hall-badge">{p}</li>
-        ))}
-      </ul>
-    )}
-  </div>
-)}
-
-{block.kind === "leadPlaque" && (
-  <div class="seat-plaque" data-org-lead>
-    <p>
-      {block.before} {common.org.lead}.
-    </p>
-  </div>
-)}
-
-{block.kind === "lede" && <p class="lede">{block.text}</p>}
-
-{block.kind === "note" && <p class="meta">{block.text}</p>}
-
 {block.kind === "split" && (
   <div class:list={["seat-split", figureSplit && "seat-split--figure"]}>
     <div>
@@ -214,23 +184,12 @@ const COURSE_SHORT = "Claude Academy course pages";
   </div>
 )}
 
-{(block.kind === "bring" || block.kind === "lookFor") && (
-  <div>
+{block.kind === "bring" && (
+  <div class="seat-bring">
     <h3>{block.heading}</h3>
-    <ul class="seat-traits" data-traits={block.kind}>
-      {(block.kind === "bring" ? seat.bring : common.look_for).map((line) => (
+    <ul class="seat-traits" data-traits="bring">
+      {seat.bring.map((line) => (
         <li class="seat-trait">{disclose(line)}</li>
-      ))}
-    </ul>
-  </div>
-)}
-
-{block.kind === "rules" && (
-  <div class="seat-plaque" data-rules>
-    <h3>{block.heading}</h3>
-    <ul>
-      {[...common.rules_common, ...seat.rules_extra].map((rule) => (
-        <li>{disclose(rule)}</li>
       ))}
     </ul>
   </div>

@@ -89,6 +89,7 @@ export type Geo = Omit<GeoFile, "cities"> & { cities: GeoCity[] };
 
 function file(name: string): unknown {
   const raw = files[`../../../../data/positions/${name}.yaml`];
+  if (raw === undefined && name === "facts") throw new Error("data/positions/facts.yaml is missing; it is hand-written, so restore it from git");
   if (raw === undefined) throw new Error(`data/positions/${name}.yaml is missing; run scripts/positions/sync-volunteers.mjs`);
   return parse(raw);
 }
@@ -117,7 +118,7 @@ export function loadCommon(): Common {
   return parsed("common", CommonSchema);
 }
 
-/** The facts a seat page may show: facts.yaml holds only facts marked R and not gated. */
+/** The facts a seat page may show. facts.yaml is hand-written: a fact goes in only after its source is read in full, never a gated one. */
 export function loadFacts(): Readonly<Record<string, Fact>> {
   return parsed("facts", z.record(z.string(), FactSchema));
 }

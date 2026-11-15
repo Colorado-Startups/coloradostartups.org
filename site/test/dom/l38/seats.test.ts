@@ -37,7 +37,6 @@ interface Fact {
 const DATA = path.resolve(SITE_DIR, "..", "data", "positions");
 const facts = parse(readFileSync(path.join(DATA, "facts.yaml"), "utf8")) as Record<string, Fact>;
 const common = parse(readFileSync(path.join(DATA, "common.yaml"), "utf8")) as {
-  org: { lead: string };
   courses: Record<string, { title: string; url: string }>;
   steps: { title: string; body: string }[];
 };
@@ -271,22 +270,35 @@ describe.each(SEATS)("/get-involved/%s/", (id) => {
     expect(links[0]!.hasAttribute("data-apply")).toBe(true);
   });
 
-  it("answers the kit's five questions in order, and ends with its Sources", () => {
+  it("answers three questions in order, what, why and apply, and ends with its Sources", () => {
     expect([...main.querySelectorAll<HTMLElement>("[data-question]")].map((s) => s.dataset.question)).toEqual([
-      "get",
-      "network",
-      "colorado",
-      "who",
+      "what",
+      "why",
       "apply",
     ]);
     expect([...main.querySelectorAll("[data-question] > .wrap > .kicker")].map(text)).toEqual([
-      "What you get",
-      "How it grows your network",
-      "How it helps Colorado",
-      "Who we are looking for",
+      "What you do",
+      "Why it matters",
       "How to apply",
     ]);
     expect(main.lastElementChild?.hasAttribute("data-sources")).toBe(true);
+  });
+
+  // Paul, 2026-11-15: visual first, few words. Every word in <main>, the
+  // Sources list and the figures' titles included, counted the way a reader
+  // meets them: each figure once, so its phone drawing is left out.
+  it("keeps <main> to 700 words or fewer", () => {
+    const copy = main.cloneNode(true) as Element;
+    for (const el of copy.querySelectorAll(".seat-figure__narrow")) el.remove();
+    for (const el of copy.querySelectorAll("*")) el.append(" ");
+    const words = text(copy).split(" ").filter((w) => /[A-Za-z0-9]/.test(w));
+    expect(words.length).toBeLessThanOrEqual(700);
+  });
+
+  it("shows the perks, what you bring, and the seat's map", () => {
+    expect(main.querySelector("[data-question='why'] [data-perks]")).not.toBeNull();
+    expect(main.querySelector("[data-question='what'] [data-traits='bring']")).not.toBeNull();
+    expect(main.querySelector("[data-question='why'] figure[data-map]")).not.toBeNull();
   });
 
   it("links the other three seats", () => {
@@ -316,13 +328,6 @@ describe.each(SEATS)("/get-involved/%s/", (id) => {
 
   it("passes axe (structure and ARIA)", async () => {
     expect(await axeViolations(source)).toEqual([]);
-  });
-});
-
-describe("/get-involved/fusion-canyon-connector/", () => {
-  it("names who the seat works with from roles.json's org.lead", () => {
-    const plaque = doc(readDist("get-involved/fusion-canyon-connector/index.html")).querySelector("[data-org-lead]");
-    expect(text(plaque)).toBe(`You work with ${common.org.lead}.`);
   });
 });
 
