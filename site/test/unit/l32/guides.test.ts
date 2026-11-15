@@ -254,21 +254,21 @@ describe("a city guide on fixtures", () => {
     );
   });
 
-  it("says what the chart covers and why the two counts differ", () => {
-    // The two unlisted Denver records are a lawyer and a coding school, so
+  // Step F (2026-11-15): the chart's rows name the needs, so the answer says
+  // only why its count is smaller than the city's.
+  it("says why the two counts differ, and leaves the needs to the chart", () => {
+    // The two uncharted Denver records are a lawyer and a coding school, so
     // service providers are not most of the rest.
-    expect(sentences(plainText(denver.answer))[2]).toBe(
-      "The chart covers accelerators and incubators, meetups and events, coworking spaces, investors, support programs and universities, then towns nearby; service providers are left out.",
-    );
+    expect(sentences(plainText(denver.answer))[2]).toBe("Service providers are left out.");
     const providers = [
       ...FIXTURE,
       rec({ id: "den-accountant", type: "service-provider", stage: "launch", substage: "service-providers" }),
     ];
     expect(plainText(buildGuide("startups-in-denver", { ...fixture, records: providers }).answer)).toMatch(
-      /; most of the rest are service providers\.$/,
+      / Most of the rest are service providers\.$/,
     );
     const none = FIXTURE.filter((r) => r.type !== "service-provider");
-    expect(plainText(buildGuide("startups-in-denver", { ...fixture, records: none }).answer)).toMatch(/then towns nearby\.$/);
+    expect(sentences(plainText(buildGuide("startups-in-denver", { ...fixture, records: none }).answer))).toHaveLength(2);
   });
 
   it("names the nearby towns instead when the city is its region's only core city", () => {
@@ -280,10 +280,9 @@ describe("a city guide on fixtures", () => {
     expect(links(springs.sections.find((s) => s.id === "nearby")!.intro)).toEqual([]);
   });
 
-  it("drops an empty section, and the answer names only the sections the page shows", () => {
+  it("drops an empty section", () => {
     const springs = buildGuide("startups-in-colorado-springs", fixture);
     expect(springs.sections.map((s) => s.id)).toEqual(["meet", "nearby"]);
-    expect(sentences(plainText(springs.answer))[2]).toBe("The chart covers meetups and events, then towns nearby.");
   });
 
   it("drops the nearby section and its mention when no nearby town has a listing", () => {
@@ -292,7 +291,7 @@ describe("a city guide on fixtures", () => {
       records: [rec({ id: "foco-cowork", city: "Fort Collins", type: "coworking" })],
     });
     expect(fortCollins.sections.map((s) => s.id)).toEqual(["coworking"]);
-    expect(plainText(fortCollins.answer)).toMatch(/The chart covers coworking spaces\.$/);
+    expect(plainText(fortCollins.answer)).not.toMatch(/nearby/);
   });
 
   it("reads the region from data/regions/, so a renamed region shows up with no code change", () => {
