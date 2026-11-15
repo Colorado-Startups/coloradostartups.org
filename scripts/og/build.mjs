@@ -1,31 +1,31 @@
 #!/usr/bin/env node
-// Builds the 1200 x 630 Open Graph cards in site/public/og/ from the design
-// tokens, the Hall's art and the card copy.
+// Builds the 1200 x 630 Open Graph cards in site/public/og/ in brand v3's card
+// composition: the art covers the card, a State-red rule sits near the top left,
+// and the card's name sits under it in white Aileron. Nothing else: brand cards
+// show only their name (brand decision 46). A card whose art shows a keeper adds
+// its AI-agent caption under the name (.claude/rules/ai-disclosure.md).
 //
 //   node scripts/og/build.mjs                  every card in art/og/cards.txt
 //   node scripts/og/build.mjs --only home,team  some cards
 //
-// Inputs:
-//   art/og/cards.txt                 card copy (in art/ so the content gate scans it)
-//   data/regions/<id>.yaml           name, tagline and art for the region cards (L8's data)
-//   01_doctrine/brand_tokens.yaml    colors (the one token source)
-//   site/src/assets/art/<key>.*      the card's art (brand/<name>: site/public/art/brand/<name>.jpg);
-//                                    falls back to hero/hall, and exits 3 without it.
-//                                    A picture with keepers (lib.mjs isKeeperArt) gets an AI-agent
-//                                    line above the URL unless the card's words already say so
-//                                    Wide art covers the card; a portrait stands whole at the right
-//   site/public/brand/cs-logo-240.png
-//   Cinzel and Alegreya Sans         the files the Astro Fonts API caches on build
-//                                    (site/node_modules/.astro/fonts); run `npm run build` once first
+// Runs in site's prebuild (CI and Workers Builds), so the cards are never
+// rendered on a laptop and never committed (site/public/og/ is gitignored).
 //
-// Text is set as vector paths from the font files, so the cards never depend on
+// Inputs:
+//   art/og/cards.txt                 card names and art (in art/ so the content gate scans it)
+//   data/regions/<id>.yaml           name and art for the region cards (L8's data)
+//   site/public/art/brand/<name>.jpg brand/<name> art, pulled by scripts/brand/pull.mjs
+//   site/src/assets/art/<key>.*      other art; falls back to brand/golden, and exits 3 without it.
+//                                    Wide art covers the card; a portrait stands whole at the right
+//   @fontsource/aileron              Aileron Regular, the brand's display face (brand tokens/type.yaml, CC0)
+//
+// Text is set as vector paths from the font file, so the cards never depend on
 // the fonts installed on the machine. BaseLayout.astro links /og/<id>.png.
-// Exit codes: 0 built, 1 a card is over the size goal, a keeper card's text
-// lost its AI-agent disclosure, or its subtitle would run into the caption or
-// URL (lib.mjs layoutProblem), 2 usage error, 3 could not build (a font,
+// Exit codes: 0 built, 1 a card is over the size goal or a keeper card's text
+// lost its AI-agent disclosure, 2 usage error, 3 could not build (a font,
 // package or input is missing).
-
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -38,13 +38,10 @@ import {
   coverCrop,
   disclosureCaption,
   disclosureProblem,
-  layoutProblem,
   measure,
   parseCards,
   parseFocus,
-  pickFont,
   portraitPlacement,
-  scrimStops,
   textEl,
   textLayout,
   textPath,
@@ -53,13 +50,14 @@ import {
 } from "./lib.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-// The build's own copy first, as the badge kit reads them: the cache keeps every
-// file any earlier build fetched, so it can hold two Cinzels where dist holds one (#380).
-const FONT_DIRS = ["site/dist/_astro/fonts", "site/node_modules/.astro/fonts"].map((d) => path.join(ROOT, d));
+const AILERON_FILE = "@fontsource/aileron/files/aileron-latin-400-normal.woff2";
+// Brand v3 colors (brand research/color/state.yaml, decision 29): the State
+// palette's Red for the rule and Blue as a portrait card's ground. Replace with
+// the v3 tokens when brand Wave 2 (S12) ships them.
+const BRAND = { red: "#C3002F", blue: "#001970", white: "#FFFFFF" };
 const ART_DIR = path.join(ROOT, "site/src/assets/art");
 const OUT_DIR = path.join(ROOT, "site/public/og");
-const LOGO = path.join(ROOT, "site/public/brand/cs-logo-240.png");
-const FALLBACK_ART = "hero/hall";
+const FALLBACK_ART = "brand/golden";
 const MAX_BYTES = 300 * 1024; // goal per card (orchestrator review of PR #2)
 
 // Truecolor first; palette PNG with dithering only when a card runs over MAX_BYTES.
@@ -89,7 +87,7 @@ function fail(code, msg) {
   process.exit(code);
 }
 
-// Region names, taglines and art keys come from L8's data, so the cards never drift from it.
+// Region names and art keys come from L8's data, so the cards never drift from it.
 function loadRegions() {
   const dir = path.join(ROOT, "data/regions");
   if (!fs.existsSync(dir)) return {};
@@ -101,32 +99,16 @@ function loadRegions() {
   return out;
 }
 
-function loadTokens() {
-  const doc = YAML.parse(fs.readFileSync(path.join(ROOT, "01_doctrine/brand_tokens.yaml"), "utf8"));
-  return doc.color;
-}
-
-// Every cached font fontkitten can read, as { font, file } in FONT_DIRS order,
-// then the three faces the card needs (lib.mjs pickFont).
-function loadFonts(fontkit) {
-  const fonts = [];
-  for (const dir of FONT_DIRS.filter((d) => fs.existsSync(d))) {
-    for (const f of fs.readdirSync(dir).filter((f) => /\.(woff2?|ttf|otf)$/.test(f)).sort()) {
-      const file = path.join(dir, f);
-      try {
-        fonts.push({ font: fontkit.create(fs.readFileSync(file)), file });
-      } catch {
-        // Not a font fontkitten can read; skip it.
-      }
-    }
+// Aileron Regular from @fontsource/aileron, as { font }, the shape lib.mjs's
+// measure and textPath take.
+function loadAileron(fontkit) {
+  let file;
+  try {
+    file = createRequire(import.meta.url).resolve(AILERON_FILE);
+  } catch {
+    return fail(3, `missing ${AILERON_FILE}; run npm ci at the repo root`);
   }
-  const pick = (family, weight) => pickFont(fonts, family, weight);
-  const set = { title: pick("Cinzel", 700), body: pick("Alegreya Sans", 500), strong: pick("Alegreya Sans", 700) };
-  const missing = Object.entries(set).filter(([, f]) => !f).map(([k]) => k);
-  if (missing.length) {
-    fail(3, `could not find the ${missing.join(", ")} font(s) in ${FONT_DIRS.map((d) => path.relative(ROOT, d)).join(" or ")}; run \`npm run build\` once so the Astro Fonts API caches them`);
-  }
-  return set;
+  return { font: fontkit.create(fs.readFileSync(file)), embolden: 0 };
 }
 
 function findArtFile(key) {
@@ -142,7 +124,7 @@ function findArtFile(key) {
   return undefined;
 }
 
-async function background(card, c) {
+async function background(card) {
   const own = card.art ? findArtFile(card.art) : null;
   const artKey = own ? card.art : FALLBACK_ART;
   const file = own ?? findArtFile(FALLBACK_ART);
@@ -152,7 +134,7 @@ async function background(card, c) {
     // A keeper portrait stands at the right on its own ground color (art/finals.json).
     const place = portraitPlacement(meta.width, meta.height, CARD.width, CARD.height);
     const art = await sharp(file).resize(place.resize).toBuffer();
-    const ground = { width: CARD.width, height: CARD.height, channels: 3, background: c.surface };
+    const ground = { width: CARD.width, height: CARD.height, channels: 3, background: BRAND.blue };
     return {
       buffer: await sharp({ create: ground }).composite([{ input: art, left: place.left, top: place.top }]).png().toBuffer(),
       source: path.relative(ROOT, file),
@@ -164,51 +146,38 @@ async function background(card, c) {
   return { buffer: await sharp(file).resize(crop.resize).extract(crop.extract).toBuffer(), source: path.relative(ROOT, file), artKey };
 }
 
-// The text layer as SVG, plus the lines it renders (for the disclosure check)
-// and their layout (for the overlap check). `caption` is the AI-agent line for
-// a picture with keepers, drawn above the URL.
-function overlay(card, c, fonts, portraitLeft, caption) {
+// The text layer as SVG, plus the lines it renders (for the disclosure check).
+// `caption` is the AI-agent line for a picture with keepers. A soft dark fade
+// from the top left keeps the white name readable on any wide art; a portrait
+// card's ground is already the State Blue, so it needs none.
+function overlay(card, font, portraitLeft, caption) {
   const left = 72;
   const T = CARD_TEXT;
-  const titleSpacing = 1.5;
-  const titleLines = wrapText(card.title, 640, measure(fonts.title, T.title, titleSpacing), 2);
-  const bodyLines = wrapText(card.subtitle, 600, measure(fonts.body, T.body), titleLines.length > 1 ? 2 : 3);
-  const at = textLayout(titleLines.length, bodyLines.length, Boolean(caption));
-
-  const title = titleLines.map((line, i) => textPath(fonts.title, line, T.title, left, at.title[i], titleSpacing)).join("");
-  const rule = `<rect x="${left}" y="${at.rule}" width="96" height="6" rx="3" fill="${c.accent}"/>`;
-  const body = bodyLines.map((line, i) => textPath(fonts.body, line, T.body, left, at.body[i])).join("");
-  const url = textPath(fonts.strong, "coloradostartups.org", T.small, left, at.url);
-  const note = caption ? textPath(fonts.body, caption, T.small, left, at.caption) : "";
-
-  // The scrim keeps text on near-ground color, so text contrast stays near the
-  // token pairs in brand_tokens.yaml (text on ground 15.81:1).
-  const scrim = scrimStops(portraitLeft);
+  const maxWidth = (portraitLeft ?? CARD.width) - left - 48;
+  const titleLines = wrapText(card.title, maxWidth, measure(font, T.title), 2);
+  const at = textLayout(titleLines.length, Boolean(caption));
+  const title = titleLines.map((line, i) => textPath(font, line, T.title, left, at.title[i])).join("");
+  const note = caption ? textPath(font, caption, T.small, left, at.caption) : "";
+  const fade =
+    portraitLeft == null
+      ? `<defs><radialGradient id="f" cx="0" cy="0" r="1" gradientTransform="scale(${CARD.width * 0.75} ${CARD.height * 0.7})" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient></defs><rect width="100%" height="100%" fill="url(#f)"/>`
+      : "";
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${CARD.width}" height="${CARD.height}">
-  <defs>
-    <linearGradient id="s" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="${c.ground}" stop-opacity="0.94"/>
-      <stop offset="${scrim.solid.toFixed(4)}" stop-color="${c.ground}" stop-opacity="0.94"/>
-      <stop offset="${scrim.clear.toFixed(4)}" stop-color="${c.ground}" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
   <title>${xmlEscape(card.title)}</title>
-  <rect width="100%" height="100%" fill="url(#s)"/>
-  ${textEl(fonts.title, title, T.title, c.text)}
-  ${rule}
-  ${textEl(fonts.body, body, T.body, c["text-dim"])}
-  ${note ? textEl(fonts.body, note, T.small, c["text-dim"]) : ""}
-  ${textEl(fonts.strong, url, T.small, c.link)}
+  ${fade}
+  <rect x="${left}" y="${at.rule}" width="120" height="6" fill="${BRAND.red}"/>
+  ${textEl(font, title, T.title, BRAND.white)}
+  ${note ? textEl(font, note, T.small, BRAND.white) : ""}
 </svg>`;
-  return { svg, lines: [...titleLines, ...bodyLines, ...(caption ? [caption] : [])], layout: at };
+  return { svg, lines: [...titleLines, ...(caption ? [caption] : [])] };
 }
 
-async function buildCard(card, c, fonts, logo) {
-  const bg = await background(card, c);
-  const { svg, lines, layout } = overlay(card, c, fonts, bg.portraitLeft, disclosureCaption(card, bg.artKey));
-  const { font } = fonts.body;
-  const em = { ascent: font.ascent / font.unitsPerEm, descent: -font.descent / font.unitsPerEm };
-  const problem = disclosureProblem(card, lines, bg.artKey) ?? layoutProblem(card.id, layout, em);
+async function buildCard(card, font) {
+  const bg = await background(card);
+  const { svg, lines } = overlay(card, font, bg.portraitLeft, disclosureCaption(card, bg.artKey));
+  const problem = disclosureProblem(card, lines, bg.artKey);
   if (problem) fail(1, problem);
   const text = Buffer.from(svg);
   let png;
@@ -218,11 +187,8 @@ async function buildCard(card, c, fonts, logo) {
     const art = soften ? await sharp(bg.buffer).blur(soften).toBuffer() : bg.buffer;
     // Social cards are opaque, and an alpha channel only adds bytes.
     const flat = await sharp(art)
-      .composite([
-        { input: text, left: 0, top: 0 },
-        { input: logo, left: 72, top: 52 },
-      ])
-      .flatten({ background: c.ground })
+      .composite([{ input: text, left: 0, top: 0 }])
+      .flatten({ background: BRAND.blue })
       .removeAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
@@ -260,15 +226,11 @@ async function main() {
     if (unknown.length) fail(2, `unknown card id(s): ${unknown.join(", ")}`);
     cards = cards.filter((c) => only.has(c.id));
   }
-  if (!fs.existsSync(LOGO)) fail(3, `missing ${path.relative(ROOT, LOGO)}`);
-
-  const c = loadTokens();
-  const fonts = loadFonts(await loadFontkit());
-  const logo = await sharp(LOGO).resize({ height: 128 }).png().toBuffer();
+  const font = loadAileron(await loadFontkit());
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const over = [];
   for (const card of cards) {
-    const r = await buildCard(card, c, fonts, logo);
+    const r = await buildCard(card, font);
     const kb = Math.round(r.bytes / 1024);
     if (r.bytes > MAX_BYTES) over.push(`${r.id} (${kb} KB)`);
     const notes = [r.palette && `${r.palette}-color palette`, r.soften && `art softened ${r.soften} px`].filter(Boolean);
