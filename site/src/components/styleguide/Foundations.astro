@@ -14,9 +14,19 @@ interface Pairing {
 }
 const tokens = parse(tokensYaml) as {
   color: Record<string, string>;
+  night: Record<string, string>;
   type: Record<string, string>;
   contrast: Pairing[];
+  contrast_night: Pairing[];
 };
+// The dark theme's colors: each night value over its light role.
+const nightColor: Record<string, string> = { ...tokens.color, ...tokens.night };
+// Two contrast tables: the light set, and the same pairings at night. The
+// light table keeps its class, which the page test counts.
+const contrastTables = [
+  { id: "contrast-light", title: "Light", table: "sg-contrast", pairs: tokens.contrast, colors: tokens.color },
+  { id: "contrast-night", title: "Night", table: "sg-contrast-night", pairs: tokens.contrast_night, colors: nightColor },
+];
 const steps = Object.entries(tokens.type).filter(([k]) => k.startsWith("step"));
 
 // Colors by material. Any role not listed lands in "Other", so a new token
@@ -79,6 +89,15 @@ const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string,
                   <strong>{name}</strong>
                   <br />
                   <code>{tokens.color[name]}</code>
+                  {tokens.night[name] && (
+                    <>
+                      <br />
+                      <span class="sg-night">
+                        <span class="chipcolor chipcolor--night" style={`background:${tokens.night[name]}`} />
+                        night <code>{tokens.night[name]}</code>
+                      </span>
+                    </>
+                  )}
                 </span>
               </li>
             ))}
@@ -95,48 +114,56 @@ const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string,
     <p>
       Every text and UI pairing, recomputed from the hex values by test/unit/l12/contrast.test.ts. Body text needs
       4.5:1; borders and focus rings need 3:1 (WCAG 2.2 AA). A text pairing shows as Aa; a border or focus pairing
-      shows as the shape it colors.
+      shows as the shape it colors. The night table checks the same pairings in the dark theme, which follows the
+      reader's system setting.
     </p>
     {/* The table fits a phone; the scroller is a net for narrower screens,
         so it takes focus and a name, as a scrolling region must. */}
-    <div class="sg-scroll" role="region" aria-labelledby="contrast" tabindex="0">
-      <table class="sg-contrast">
-        <thead>
-          <tr><th scope="col">Sample</th><th scope="col">Pairing</th><th scope="col">Ratio</th><th
-              scope="col">Needs</th></tr>
-        </thead>
-        <tbody>
-          {
-            tokens.contrast.map((p) => (
-              <tr>
-                <td>
-                  {p.min === 3 ? (
-                    <span
-                      class:list={["sg-sample", "sg-sample--ui", p.fg.startsWith("focus") && "sg-sample--ring"]}
-                      style={`--fg:${tokens.color[p.fg]};--bg:${tokens.color[p.bg]}`}
-                      data-ui-sample
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <span
-                      class="sg-sample"
-                      style={`color:${tokens.color[p.fg]};background:${tokens.color[p.bg]}`}
-                    >
-                      Aa
-                    </span>
-                  )}
-                </td>
-                <td>
-                  {p.fg} on {p.bg}
-                </td>
-                <td>{p.ratio.toFixed(2)}:1</td>
-                <td>{p.min}:1</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
+    {
+      contrastTables.map(({ id, title, table, pairs, colors }) => (
+        <>
+          <h3 id={id}>{title}</h3>
+          <div class="sg-scroll" role="region" aria-labelledby={id} tabindex="0">
+            <table class={table}>
+              <thead>
+                <tr><th scope="col">Sample</th><th scope="col">Pairing</th><th scope="col">Ratio</th><th
+                    scope="col">Needs</th></tr>
+              </thead>
+              <tbody>
+                {
+                  pairs.map((p) => (
+                    <tr>
+                      <td>
+                        {p.min === 3 ? (
+                          <span
+                            class:list={["sg-sample", "sg-sample--ui", p.fg.startsWith("focus") && "sg-sample--ring"]}
+                            style={`--fg:${colors[p.fg]};--bg:${colors[p.bg]}`}
+                            data-ui-sample
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <span
+                            class="sg-sample"
+                            style={`color:${colors[p.fg]};background:${colors[p.bg]}`}
+                          >
+                            Aa
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        {p.fg} on {p.bg}
+                      </td>
+                      <td>{p.ratio.toFixed(2)}:1</td>
+                      <td>{p.min}:1</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </>
+      ))
+    }
   </div>
 </section>
 
@@ -212,21 +239,30 @@ const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string,
   .sg-scroll {
     overflow-x: auto;
   }
-  .sg-contrast {
+  :is(.sg-contrast, .sg-contrast-night) {
     border-collapse: collapse;
     width: 100%;
     max-width: 48rem;
   }
-  .sg-contrast :is(th, td) {
+  :is(.sg-contrast, .sg-contrast-night) :is(th, td) {
     padding: var(--s-2) var(--s-3);
     border-bottom: var(--line-hair) solid var(--c-rule);
     text-align: left;
   }
   /* On a phone the pairing names get the room the cell padding took. */
   @media (max-width: 40rem) {
-    .sg-contrast :is(th, td) {
+    :is(.sg-contrast, .sg-contrast-night) :is(th, td) {
       padding-inline: var(--s-2);
     }
+  }
+  .sg-night {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+  }
+  .chipcolor.chipcolor--night {
+    width: 1rem;
+    height: 1rem;
   }
   .sg-sample {
     display: inline-block;
