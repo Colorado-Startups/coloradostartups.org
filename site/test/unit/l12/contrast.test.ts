@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
-import { SOURCE } from "../../../scripts/sync-brand.mjs";
+import { SOURCE, TARGET } from "../../../scripts/sync-brand.mjs";
 
 // The contrast block in 01_doctrine/brand_tokens.yaml is the record of every
 // text and UI pairing the Hall uses. This test recomputes each WCAG 2.2 ratio
@@ -16,7 +16,14 @@ interface Pairing {
   min: number;
 }
 
-const doc = parse(readFileSync(SOURCE, "utf8")) as { color: Record<string, string>; contrast: Pairing[] };
+const doc = parse(readFileSync(SOURCE, "utf8")) as {
+  color: Record<string, string>;
+  night: Record<string, string>;
+  contrast: Pairing[];
+  contrast_night: Pairing[];
+};
+// The dark theme's colors: each night value over its light role.
+const nightColor: Record<string, string> = { ...doc.color, ...doc.night };
 
 function luminance(hex: string): number {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
@@ -69,6 +76,43 @@ describe("brand_tokens.yaml contrast block", () => {
   });
 });
 
+describe("brand_tokens.yaml night contrast block", () => {
+  it("is present and names only declared colors", () => {
+    expect(doc.contrast_night.length).toBeGreaterThan(0);
+    for (const { fg, bg } of doc.contrast_night) {
+      expect(doc.color, `unknown color ${fg}`).toHaveProperty(fg);
+      expect(doc.color, `unknown color ${bg}`).toHaveProperty(bg);
+    }
+  });
+
+  it.each(doc.contrast_night.map((p) => [`${p.fg} on ${p.bg}`, p] as const))("%s meets its minimum at night", (_label, p) => {
+    const actual = contrast(nightColor[p.fg], nightColor[p.bg]);
+    expect(actual).toBeGreaterThanOrEqual(p.min);
+    expect(Math.abs(actual - p.ratio)).toBeLessThan(0.006);
+  });
+
+  // Components draw the same pairings in both themes, so every light pairing
+  // is checked at night too.
+  it("covers every pairing the light block lists", () => {
+    const night = new Set(doc.contrast_night.map((p) => `${p.fg}|${p.bg}|${p.min}`));
+    for (const p of doc.contrast) expect(night, `${p.fg} on ${p.bg} has no night entry`).toContain(`${p.fg}|${p.bg}|${p.min}`);
+  });
+
+  it("covers every night pairing the brand records in tokens.json", () => {
+    const brand = JSON.parse(readFileSync(new URL("../../../public/art/brand/tokens.json", import.meta.url), "utf8")) as {
+      $extensions: { "org.coloradostartups.brand": { contrast: { night: Pairing[] } } };
+    };
+    const night = new Set(doc.contrast_night.map((p) => `${p.fg}|${p.bg}`));
+    for (const p of brand.$extensions["org.coloradostartups.brand"].contrast.night) {
+      expect(night, `brand pairs ${p.fg} on ${p.bg} at night`).toContain(`${p.fg}|${p.bg}`);
+    }
+  });
+
+  it("fails a known-bad night pairing: the light link red on the night ground", () => {
+    expect(contrast(doc.color.link, nightColor.ground)).toBeLessThan(4.5);
+  });
+});
+
 // Texture limits: the darkest pixel a light tile may paint (its floor), or the
 // lightest a dark tile may paint (its ceiling), with the CSS veil and then any
 // tint composited over it the way a browser does (per channel, in sRGB).
@@ -79,6 +123,8 @@ interface TextureLimit {
   opacity: number;
   tint?: string;
   tint_opacity?: number;
+  /** "none": the dark theme turns this light tile off. Absent: it paints in both themes. */
+  night?: "none";
   inks: string[];
 }
 const textures = (parse(readFileSync(SOURCE, "utf8")) as { texture: Record<string, TextureLimit> }).texture;
@@ -89,10 +135,13 @@ function composite(top: string, alpha: number, bottom: string): string {
   return `#${mixed.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 }
 
-function worstCase(t: TextureLimit): string {
+// The tile's own pixels never change with the theme (a floor or ceiling is
+// baked into the file at its light value); the veil and tint are CSS colors,
+// so they take the theme's value.
+function worstCase(t: TextureLimit, colors: Record<string, string> = doc.color): string {
   const limit = doc.color[(t.floor ?? t.ceiling) as string];
-  const veiled = composite(doc.color[t.veil], t.opacity, limit);
-  return t.tint ? composite(doc.color[t.tint], t.tint_opacity ?? 0, veiled) : veiled;
+  const veiled = composite(colors[t.veil], t.opacity, limit);
+  return t.tint ? composite(colors[t.tint], t.tint_opacity ?? 0, veiled) : veiled;
 }
 
 // A focus ring is a UI part (3:1); every other ink is text (4.5:1).
@@ -136,6 +185,23 @@ describe("brand_tokens.yaml texture limits", () => {
     for (const ink of t.inks) {
       expect(contrast(doc.color[ink], worst), `${ink} on the ${name} limit`).toBeGreaterThanOrEqual(minimumFor(ink));
     }
+  });
+
+  // In the dark theme a tile that still paints must keep its inks readable
+  // under the night colors; a light tile must be turned off instead.
+  it.each(Object.entries(textures))("%s keeps every ink at its minimum at night, or is off", (name, t) => {
+    if (t.night === "none") {
+      expect(readFileSync(TARGET, "utf8"), `tokens.css does not turn ${name} off at night`).toContain(`--tex-${name}: none;`);
+      return;
+    }
+    const worst = worstCase(t, nightColor);
+    for (const ink of t.inks) {
+      expect(contrast(nightColor[ink], worst), `${ink} on the ${name} limit at night`).toBeGreaterThanOrEqual(minimumFor(ink));
+    }
+  });
+
+  it("fails a known-bad night tile: night text over the light stone floor", () => {
+    expect(contrast(nightColor.text, doc.color[textures.stone.floor as string])).toBeLessThan(4.5);
   });
 
   it.each(Object.entries(textures))("every block that paints %s lays the recorded veil over it", (name, t) => {

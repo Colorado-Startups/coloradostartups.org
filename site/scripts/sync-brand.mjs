@@ -37,6 +37,32 @@ export function renderTokens(yamlText) {
     lines.push(`  --c-${oldName}: var(--c-${newName});`);
   }
   lines.push("}");
+  // The night set, the way the brand's dist/tokens.css writes it: on when the
+  // reader's system is dark, unless <html data-theme="light"> pins light; and
+  // on whenever <html data-theme="dark"> pins it. A light tile with night: none
+  // in the texture block turns off, so the flat night color shows.
+  const night = [];
+  for (const [name, value] of Object.entries(doc.night ?? {})) {
+    if (!(name in (doc.color ?? {}))) throw new Error(`night ${name} is not a color role`);
+    night.push(`--c-${name}: ${value};`);
+  }
+  for (const [name, t] of Object.entries(doc.texture ?? {})) {
+    if (t.night === "none") night.push(`--tex-${name}: none;`);
+    else if (t.night !== undefined) throw new Error(`texture ${name}: night must be none or absent`);
+  }
+  if (night.length) {
+    const block = (indent) => ["color-scheme: dark;", ...night].map((l) => `${indent}${l}`);
+    lines.push(
+      "@media (prefers-color-scheme: dark) {",
+      '  :root:not([data-theme="light"]) {',
+      ...block("    "),
+      "  }",
+      "}",
+      ':root[data-theme="dark"] {',
+      ...block("  "),
+      "}",
+    );
+  }
   return lines.join("\n") + "\n";
 }
 
