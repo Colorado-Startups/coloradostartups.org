@@ -94,7 +94,8 @@ const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string,
                       <br />
                       <span class="sg-night">
                         <span class="chipcolor chipcolor--night" style={`background:${tokens.night[name]}`} />
-                        night <code>{tokens.night[name]}</code>
+                        <span class="visually-hidden">night</span>
+                        <code>{tokens.night[name]}</code>
                       </span>
                     </>
                   )}
@@ -255,10 +256,15 @@ const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string,
       padding-inline: var(--s-2);
     }
   }
+  /* The night value sits under the light one: a small chip in its color, then
+     its hex, kept on one line. The word "night" is for screen readers; the
+     chip says it to the eye. */
   .sg-night {
     display: inline-flex;
     align-items: center;
     gap: var(--s-1);
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
   .chipcolor.chipcolor--night {
     width: 1rem;
