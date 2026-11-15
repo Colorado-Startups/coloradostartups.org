@@ -1,11 +1,17 @@
-/* The Hall: base styles (v2, gold, fire and light). Orchestrator-owned; lanes
+/* The Hall: base styles (v3, the State palette; brand decision 51). Orchestrator-owned; lanes
    style their own components with scoped <style> blocks and the role tokens in
    tokens.css (generated from 01_doctrine/brand_tokens.yaml), and request
    changes here. */
 
 @import "./tokens.css";
-@import "./fonts.css";
 @import "./hall.css";
+
+/* Body text is Trebuchet MS (brand tokens/type.yaml), a system font on macOS
+   and Windows that the brand never ships; Lucida Grande and Tahoma stand in
+   where it is missing. Aileron, the display face, comes from astro.config.mjs. */
+:root {
+  --font-body: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
+}
 
 /* ---------- Reset and ground ---------- */
 *,
@@ -37,8 +43,8 @@ img {
 }
 
 /* ---------- Type ----------
-   Cinzel is an inscription face (capitals by design), reserved for h1 and h2.
-   Everything else, labels included, is sentence case in Alegreya Sans. */
+   Aileron, the brand's display face, is reserved for h1 and h2. Everything
+   else, labels included, is sentence case in Trebuchet MS. */
 h1,
 h2 {
   font-family: var(--font-display);
