@@ -48,7 +48,7 @@
     }
   },
   "fibo_space": {
-    "_README": "FIBO 2.0 Dev sizes on Bria's Space briaai/Fibo-2.0-T2I: width 832 to 1344 in steps of 64, height 768 to 1248 in steps of 32, steps up to 50 (its app.py, read 2026-11-03). 1344 x 768 is the widest it takes; make-finals crops it to 16:9. The model card recommends 50 steps.",
+    "_README": "FIBO 2.0 Dev sizes on Bria's Space briaai/Fibo-2.0-T2I: width 832 to 1344 in steps of 64, height 768 to 1248 in steps of 32, steps up to 50 (its app.py, read 2026-11-03). 1344 x 768 is the widest it takes; the retired make-finals.mjs cropped it to 16:9. The model card recommends 50 steps.",
     "scene": {
       "width": 1344,
       "height": 768,

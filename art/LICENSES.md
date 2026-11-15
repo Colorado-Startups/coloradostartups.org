@@ -4,7 +4,7 @@
 | --- | --- |
 | Written | L7, 2026-10-08. FIBO 2.0 and LTX-2.5 reviewed 2026-11-02 for decision 88. |
 | Scope | Every model or service touching the art has a row; no row means not used. |
-| Precedence | Decision 28 for Anima, 88 for FIBO 2.0 and LTX-2.5. Each [source](licenses/sources.md)'s license text wins over these summaries. A record for Paul, not legal advice. |
+| Precedence | Decision 88 for FIBO 2.0 and LTX-2.5. Each [source](licenses/sources.md)'s license text wins over these summaries. A record for Paul, not legal advice. |
 | Checked | Decision 88: read each license in full before any render. FIBO 2.0 and LTX-2.5 passed. "Not checked" rows await Paul's later review, set 2026-10-18. |
 | Prompts | Plain language, negative prompts and FIBO's captions too: no franchise, character or artist names (decision 29). The content gate scans `art/**/*.md` and `art/**/*.txt`. |
 
@@ -29,7 +29,7 @@ flowchart LR
 | --- | --- | --- | --- | --- |
 | <a id="fibo-20-which-route-works-today"></a>FIBO 2.0 (Bria). | Per route: [routes](licenses/fibo-routes.md), [reasoning](licenses/fibo-reasoning.md) | CC BY-NC 4.0 weights; Bria's terms and plans. | Bria nodes pending Comfy; open weights not allowed. | None stated |
 | <a id="ltx-25-the-verdict"></a>LTX-2.5 (Lightricks), IC-LoRAs. | **Allowed**, [with duties](licenses/ltx.md) | LTX-2.x Community License. | Allowed | None on outputs |
-| <a id="anima-in-detail"></a>Anima (CircleStone Labs), Comfy template `image_anima_base_v1`. | **Superseded for new work** (decision 88). Shipped art stays (decisions 28, 29). | CircleStone Labs Non-Commercial License v1.2, plus upstream ([detail](licenses/anima.md)). | Allowed: §2(e) | None for images; the footer's AI-generated line stays. |
+| <a id="anima-in-detail"></a>Anima (CircleStone Labs), Comfy template `image_anima_base_v1`. | **Retired** (2026-11-15): the site shows no Anima picture; brand releases replaced them. Batch 1 and 2 previews stay in `art/concepts/` as the record. | CircleStone Labs Non-Commercial License v1.2. Its detail page, retired with the art, is at commit `361aec8`. | Allowed: §2(e) | None for images |
 | Comfy Cloud (comfy.org), Standard plan. | **In use** as the runner (decisions 28, 88). | Comfy Terms of Service, effective 2026-05-13. | Allowed: as between Comfy and us, we own Outputs. Bria's Terms of Use are silent on output ownership. | None |
 | Krea 2 | Not used | Commercial use under $1M revenue (source: the Wave 0 L7 lane file, `4e31b7e`). | Allowed under its terms | AI-credit line |
 | Workers AI `@cf/black-forest-labs/flux-1-schnell`. | Fallback only, not used | Apache-2.0 (same lane file). | Allowed | None |

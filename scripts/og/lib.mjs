@@ -107,20 +107,16 @@ export function textLayout(titleCount, hasCaption) {
 // in the text it renders.
 export const DISCLOSURE = "AI agent";
 
-// Scenes that show keepers among the founders: the Great Hall has dwarf and
-// gnome keepers carrying lanterns (HALL_ART_ALT, #707; art/prompts/hero-a.txt).
-// It is also the no-art fallback (build.mjs), so a fallback card discloses too (#744).
-// Each region scene has dwarf and gnome helpers at the founders' benches
-// (art/prompts/region-*.txt), so the region cards disclose too (#761).
-const KEEPER_SCENES = new Set(["hero/hall", "regions/photon-mountain", "regions/space-peak", "regions/fusion-canyon"]);
-
 // The brand keeper portraits (brand dist/website/, decision 53), as art keys.
+// No other brand picture shows a keeper (all viewed 2026-11-15, brand v4.0.0).
+// passage has no figure. guides shows two founders. founders has a hooded
+// dwarf at the bench, who has none of the keepers' marks. The five place
+// paintings show crowds of community folk (keepers.ts PLACE_ART_ALT).
 const BRAND_KEEPER = /^brand\/(communitas|resourcus|publicus)(-small)?$/;
 
-// True for art that shows a keeper: a keeper portrait, or a scene with keepers in it.
+// True for art that shows a keeper: one of the brand keeper portraits.
 export function isKeeperArt(art) {
-  const key = String(art ?? "");
-  return /^agents\//.test(key) || BRAND_KEEPER.test(key) || KEEPER_SCENES.has(key);
+  return BRAND_KEEPER.test(String(art ?? ""));
 }
 
 // The line build.mjs adds under a card whose picture shows keepers when the

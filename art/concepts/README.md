@@ -6,7 +6,7 @@
 | Each image's words; its seed and size. | [`art/prompts/<id>.txt`](../prompts/); the batch plans (private archive) |
 | The requests; every run, in order. | batches 1 to 5 and the run log (private archive) |
 | A 480 px preview per render | `batch-<n>/<id>.webp`, here |
-| Which render ships as which file. | [`art/finals.json`](../finals.json), read by [`make-finals.mjs`](../tools/make-finals.mjs) |
+| Which render shipped as which file. | `art/finals.json` and `make-finals.mjs`, retired 2026-11-15; read them at commit `361aec8` |
 | This record | L7 wrote the plan; L17 recorded the picks and the batch 2 run; all 2026-10-18. |
 | The v2 sidecars (Gate A v2, 2026-10-08), retired with v3. | Commit `da82d0f`; their one run finding is in `LOG.md` |
 
@@ -39,9 +39,11 @@ timeline
 | 3. Do the Flatirons, Pikes Peak and the plains read as Colorado? | [Scenes](scenes.md), Fusion Canyon re-rendered in batch 2. |
 | 4. Are the tiles calm enough for quiet text backgrounds, despite the style line's rich detail? | [Texture tiles](tiles.md) |
 
-| Ships as | Pick | Made |
+Brand releases replaced every file below (brand v3 and v4.0.0), and the site deleted the old files on 2026-11-15. The tiles stay: `make-tiles.mjs` now makes them from the brand's stone.
+
+| Shipped as | Pick | Made |
 | --- | --- | --- |
-| `hero/hall.webp` | [`hero-a`](batch-1/hero-a.webp) | [Finals](finals.md) |
+| `hero/hall.webp` | [`hero-a`](batch-1/hero-a.webp) | `make-finals.mjs` (commit `361aec8`) |
 | `agents/communitas.webp`, `-small.webp` | [`keeper-communitas-3`](batch-1/keeper-communitas-3.webp) | Same |
 | `agents/resourcus.webp`, `-small.webp` | [`keeper-resourcus-1`](batch-1/keeper-resourcus-1.webp) | Same |
 | `agents/publicus.webp`, `-small.webp` | [`keeper-publicus-1`](batch-1/keeper-publicus-1.webp) | Same |

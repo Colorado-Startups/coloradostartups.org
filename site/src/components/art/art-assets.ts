@@ -1,5 +1,6 @@
 // One lookup for every illustration under src/assets/art. Keys are paths
-// without an extension, such as "hero/hall" or "agents/resourcus-small".
+// without an extension, such as "textures/stone". Pictures come from brand
+// releases instead (brandArt, below).
 // A missing file returns undefined, so a component shows its placeholder for
 // any art that has not landed yet.
 import type { ImageMetadata } from "astro";

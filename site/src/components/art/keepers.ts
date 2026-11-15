@@ -16,7 +16,7 @@ export interface KeeperArt {
 /** The kind as its badge reads, on the home page and on /team/. */
 export const KIND_LABELS: Record<KeeperArt["kind"], string> = { dwarf: "Dwarf", gnome: "Gnome" };
 
-// Glow positions are read off the brand v3 portraits (brand dist/hall/, decision
+// Glow positions are read off the brand v3 portraits (brand dist/website/, decision
 // 53, viewed 2026-11-15): the lantern on Communitas's pole, top left. Resourcus
 // (compass and map) and Publicus (broadsheet) hold no light, so they get none.
 export const KEEPERS: Record<KeeperId, KeeperArt> = {

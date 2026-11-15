@@ -1,8 +1,8 @@
 // Build-time image lookups for the Team page.
 //
-// Keeper portraits are not here: KeeperCard uses L7's Portrait, which finds
-// src/assets/art/agents/<id>.(webp|png|jpg) through the one art lookup in
-// src/components/art/art-assets.ts (lane/L7-wiring).
+// Keeper portraits are not here: KeeperCard uses L7's Portrait, which serves
+// the pulled brand file brand/<id> through brandArt in
+// src/components/art/art-assets.ts.
 //
 // People photos: a person's `photo` field is a file name in ./photos/ without
 // the extension, e.g. "paul-foley". The four photos there come from CS's own

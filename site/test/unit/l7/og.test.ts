@@ -131,24 +131,27 @@ describe("keeper disclosure on cards (L17, hard constraint 10)", () => {
     }
   });
 
-  // #744: the Great Hall shows keepers, and it is the no-art fallback.
-  it("counts the Great Hall as keeper art, and captions a Hall card whose words do not disclose", () => {
-    expect(isKeeperArt("hero/hall")).toBe(true);
-    expect(isKeeperArt("agents/publicus")).toBe(true);
-    expect(isKeeperArt("brand/publicus")).toBe(true);
-    expect(isKeeperArt("brand/communitas-small")).toBe(true);
-    expect(isKeeperArt("brand/passage")).toBe(false);
-    expect(isKeeperArt("brand/golden")).toBe(false);
-    expect(isKeeperArt("scenes/founders")).toBe(false);
-    const home = { id: "home", title: "Colorado Startups", art: "hero/hall" };
-    expect(disclosureCaption(home)).toBe(DISCLOSURE_CAPTION);
-    expect(disclosureCaption({ ...home, title: "Our AI agents" })).toBeNull();
-    expect(disclosureCaption({ ...home, art: "scenes/founders" })).toBeNull();
-    expect(disclosureCaption({ ...home, art: "brand/golden" })).toBeNull();
+  // Only the brand keeper portraits show a keeper; every other brand picture
+  // was viewed (2026-11-15) and shows none. The old asset keys are gone.
+  it("counts only the brand keeper portraits as keeper art, and captions a card drawn on one", () => {
+    for (const id of ["communitas", "resourcus", "publicus"]) {
+      expect(isKeeperArt(`brand/${id}`), id).toBe(true);
+      expect(isKeeperArt(`brand/${id}-small`), id).toBe(true);
+    }
+    for (const key of ["passage", "founders", "guides", "stone", "boulder", "golden", "denver", "springs", "fortcollins"]) {
+      expect(isKeeperArt(`brand/${key}`), key).toBe(false);
+    }
+    for (const key of ["hero/hall", "agents/publicus", "regions/space-peak", "brand/communitas-large", undefined]) {
+      expect(isKeeperArt(key), String(key)).toBe(false);
+    }
+    const card = { id: "x", title: "Startup Resources", art: "brand/resourcus" };
+    expect(disclosureCaption(card)).toBe(DISCLOSURE_CAPTION);
+    expect(disclosureCaption({ ...card, title: "Our AI agents" })).toBeNull();
+    expect(disclosureCaption({ ...card, art: "brand/golden" })).toBeNull();
     // The check reads the art a card was drawn on, after any fallback.
-    const guides = { id: "g", title: "Guides", art: "scenes/guides" };
-    expect(disclosureProblem(guides, ["Guides"], "hero/hall")).toMatch(/does not say "AI agent"/);
-    expect(disclosureProblem(guides, ["Guides", DISCLOSURE_CAPTION], "hero/hall")).toBeNull();
+    const guides = { id: "g", title: "Guides", art: "brand/guides" };
+    expect(disclosureProblem(guides, ["Guides"], "brand/publicus")).toMatch(/does not say "AI agent"/);
+    expect(disclosureProblem(guides, ["Guides", DISCLOSURE_CAPTION], "brand/publicus")).toBeNull();
   });
 
   // Brand v3: each region card draws on its brand place painting, whose crowds
@@ -164,14 +167,14 @@ describe("keeper disclosure on cards (L17, hard constraint 10)", () => {
   });
 
   it("passes a keeper card whose rendered lines carry the disclosure whole", () => {
-    const card = { id: "x", art: "agents/resourcus" };
+    const card = { id: "x", art: "brand/resourcus" };
     expect(disclosureProblem(card, ["Startup Resources", DISCLOSURE_CAPTION])).toBeNull();
-    expect(disclosureProblem({ id: "y", art: "hero/hall" }, ["No disclosure here"])).toMatch(/does not say "AI agent"/);
-    expect(disclosureProblem({ id: "z", art: "scenes/passage" }, ["No keeper here"])).toBeNull();
+    expect(disclosureProblem({ id: "y", art: "brand/communitas" }, ["No disclosure here"])).toMatch(/does not say "AI agent"/);
+    expect(disclosureProblem({ id: "z", art: "brand/passage" }, ["No keeper here"])).toBeNull();
   });
 
   it("flags a keeper card that lacks the disclosure or whose text wrapping cut short", () => {
-    const card = { id: "x", art: "agents/publicus" };
+    const card = { id: "x", art: "brand/publicus" };
     expect(disclosureProblem(card, ["Dispatches"])).toMatch(/does not say "AI agent"/);
     expect(disclosureProblem(card, ["Dispatches by our AI agent and…"])).toMatch(/cut short/);
   });

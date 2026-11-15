@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { brandArt } from "../../../src/components/art/art-assets";
 import { PLACE_ART_ALT } from "../../../src/components/art/keepers";
 import { guideArt, GUIDES_SCENE } from "../../../src/components/guides/guide-art";
 import { GUIDE_SLUGS } from "../../../src/lib/guides/core";
@@ -7,8 +8,9 @@ import { readDist } from "../pages";
 
 // L5b: every guide shows one picture under its answer, lazily, since it is
 // below the first screen. The index, the topic guides and the credits guide
-// show L6's guides scene (#713), which has no keeper. Each city guide shows
-// its own city's brand v3 place painting, with the brand caption as alt.
+// show the brand's guides scene (brand/guides), which has no keeper. Each
+// city guide shows its own city's brand place painting, with the brand
+// caption as alt.
 // Built HTML from dist/.
 
 const PAGES = [
@@ -49,7 +51,14 @@ describe("the city guides", () => {
   });
 
   it("are the only guides that show a place painting", () => {
-    const placed = GUIDE_SLUGS.filter((slug) => guideArt(slug).src.startsWith("brand/"));
+    const placed = GUIDE_SLUGS.filter((slug) => guideArt(slug).src !== GUIDES_SCENE.src);
     expect(placed.sort()).toEqual(Object.keys(cities).sort());
+  });
+});
+
+describe("the guides scene", () => {
+  it("is the pulled brand file, so the page serves it as-is", () => {
+    expect(GUIDES_SCENE.src).toBe("brand/guides");
+    expect(brandArt(GUIDES_SCENE.src)).toBeDefined();
   });
 });
