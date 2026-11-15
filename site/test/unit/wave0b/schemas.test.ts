@@ -21,8 +21,8 @@ describe("keepers: dwarves and gnomes", () => {
     expect(keepers.find((k) => k.id === "resourcus")?.kind).toBe("gnome");
   });
 
-  it("points every portrait at the agents art folder", () => {
-    for (const k of keepers) expect(k.portrait).toBe(`agents/${k.id}`);
+  it("points every portrait at its brand v3 picture", () => {
+    for (const k of keepers) expect(k.portrait).toBe(`brand/${k.id}`);
   });
 
   it("refuses a keeper with no kind", () => {
