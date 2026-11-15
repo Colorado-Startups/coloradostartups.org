@@ -63,4 +63,14 @@ describe("what every page loads first", () => {
     expect(manifest.theme_color).toBe("#001970");
     for (const icon of manifest.icons) expect(existsSync(path.join(SITE, "public", icon.src)), icon.src).toBe(true);
   });
+
+  it("names a theme color for each system theme, from the tokens", () => {
+    const layout = read("src/layouts/BaseLayout.astro");
+    expect(layout).toContain('<meta name="color-scheme" content="light dark" />');
+    expect(layout).toContain('<meta name="theme-color" media="(prefers-color-scheme: light)" content={themeLight} />');
+    expect(layout).toContain('<meta name="theme-color" media="(prefers-color-scheme: dark)" content={themeDark} />');
+    expect(layout).toContain("const themeLight = tokens.color.text;");
+    expect(layout).toContain("const themeDark = tokens.night.ground;");
+    expect(layout).not.toMatch(/name="theme-color" content="#/);
+  });
 });

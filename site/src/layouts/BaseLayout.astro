@@ -8,6 +8,8 @@ import SiteFooter from "../components/ui/SiteFooter.astro";
 import SiteHeader from "../components/ui/SiteHeader.astro";
 import "../styles/global.css";
 import { jsonLdText } from "./json-ld";
+import tokensYaml from "../../../01_doctrine/brand_tokens.yaml?raw";
+import { parse } from "yaml";
 
 interface Props {
   title: string;
@@ -22,6 +24,11 @@ const { title, description, ogImage = "default", noindex = false, jsonLd } = Ast
 const site = Astro.site!;
 const canonical = new URL(Astro.url.pathname, site).toString();
 const ogUrl = new URL(`/og/${ogImage}.jpg`, site).toString();
+// The browser bar takes State Blue in the light theme and the night ground in
+// the dark one, both read from the token source (brand_tokens.yaml).
+const tokens = parse(tokensYaml) as { color: Record<string, string>; night: Record<string, string> };
+const themeLight = tokens.color.text;
+const themeDark = tokens.night.ground;
 const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado Startups`;
 ---
 
@@ -45,7 +52,10 @@ const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado S
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogUrl} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#001970" />
+    {/* The page follows the reader's system theme (tokens.css night block); this tells the browser before CSS loads. */}
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content={themeLight} />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content={themeDark} />
     {/* Brand v3 icon tier (brand decisions 50 and 54), pulled by scripts/brand/pull.mjs. */}
     <link rel="icon" href="/art/brand/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/art/brand/icon-192.png" type="image/png" sizes="192x192" />

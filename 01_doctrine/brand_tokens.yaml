@@ -60,6 +60,31 @@ color:
   copper-wash: "#FAEBEE"      # badge ground for link ink
   pine: "#245D38"             # ink for nature and green status
   pine-wash: "#E9EFEB"        # badge ground for pine ink
+# Night: the dark theme (brand v3, Colorado-Startups/brand dist/tokens.css).
+# Each role's night value from the brand's tokens.json, where the brand gives
+# one under $extensions; a role not listed keeps its light value. The page
+# follows the reader's system setting, and data-theme="light" or "dark" on
+# <html> pins one. test/unit/brand-tokens-sync.test.ts fails if a value drifts.
+night:
+  ground: "#000A33"
+  surface: "#061450"
+  surface-2: "#0D1F66"
+  rule: "#26357A"
+  border: "#7482C2"
+  text: "#F4F6FF"
+  text-dim: "#B8C2E8"
+  link: "#FFD100"
+  community: "#86A2B2"
+  fire: "#DE738D"
+  focus: "#FFD100"
+  danger: "#E48CA1"
+  night: "#00061F"
+  stone: "#0A1A5C"
+  stone-edge: "#3A4A8F"
+  sky-wash: "#101E26"
+  copper-wash: "#37000D"
+  pine: "#87A692"
+  pine-wash: "#0B1C11"
 # Old names from the dark v1 palette, kept so lane code written against them
 # still renders. New code uses the names above; these go away after Wave 2.
 alias:
@@ -178,6 +203,55 @@ contrast:
   - { fg: focus, bg: stone, ratio: 12.49, min: 3 }
   - { fg: focus-on-night, bg: night, ratio: 13.17, min: 3 }
 
+# The same pairings under the night colors, plus the night-only pairs the
+# brand records (fire as large text, and night text on the night ceiling).
+# test/unit/l12/contrast.test.ts recomputes each ratio with night over color.
+contrast_night:
+  - { fg: text, bg: ground, ratio: 17.85, min: 4.5 }
+  - { fg: text, bg: surface, ratio: 15.91, min: 4.5 }
+  - { fg: text, bg: surface-2, ratio: 13.86, min: 4.5 }
+  - { fg: text, bg: stone, ratio: 14.81, min: 4.5 }
+  - { fg: text-dim, bg: ground, ratio: 10.92, min: 4.5 }
+  - { fg: text-dim, bg: surface, ratio: 9.74, min: 4.5 }
+  - { fg: text-dim, bg: surface-2, ratio: 8.48, min: 4.5 }
+  - { fg: text-dim, bg: stone, ratio: 9.06, min: 4.5 }
+  - { fg: link, bg: ground, ratio: 13.17, min: 4.5 }
+  - { fg: link, bg: surface, ratio: 11.75, min: 4.5 }
+  - { fg: link, bg: surface-2, ratio: 10.23, min: 4.5 }
+  - { fg: link, bg: stone, ratio: 10.93, min: 4.5 }
+  - { fg: community, bg: ground, ratio: 7.17, min: 4.5 }
+  - { fg: community, bg: surface, ratio: 6.39, min: 4.5 }
+  - { fg: community, bg: surface-2, ratio: 5.57, min: 4.5 }
+  - { fg: community, bg: stone, ratio: 5.95, min: 4.5 }
+  - { fg: danger, bg: surface, ratio: 7.00, min: 4.5 }
+  - { fg: danger, bg: ground, ratio: 7.85, min: 4.5 }
+  - { fg: danger, bg: stone, ratio: 6.51, min: 4.5 }
+  - { fg: on-accent, bg: accent, ratio: 10.47, min: 4.5 }
+  - { fg: on-accent, bg: molten, ratio: 12.25, min: 4.5 }
+  - { fg: on-accent, bg: accent-deep, ratio: 8.03, min: 4.5 }
+  - { fg: on-bronze, bg: bronze, ratio: 8.70, min: 4.5 }
+  - { fg: on-bronze, bg: bronze-deep, ratio: 12.10, min: 4.5 }
+  - { fg: ground, bg: link, ratio: 13.17, min: 4.5 }
+  - { fg: ground, bg: community, ratio: 7.17, min: 4.5 }
+  - { fg: on-night, bg: night, ratio: 20.08, min: 4.5 }
+  - { fg: on-night-dim, bg: night, ratio: 11.40, min: 4.5 }
+  - { fg: gold-on-night, bg: night, ratio: 13.74, min: 4.5 }
+  - { fg: danger-on-night, bg: night, ratio: 8.19, min: 4.5 }
+  - { fg: community, bg: sky-wash, ratio: 6.33, min: 4.5 }
+  - { fg: link, bg: copper-wash, ratio: 12.30, min: 4.5 }
+  - { fg: pine, bg: pine-wash, ratio: 6.65, min: 4.5 }
+  - { fg: border, bg: ground, ratio: 5.24, min: 3 }
+  - { fg: border, bg: surface, ratio: 4.67, min: 3 }
+  - { fg: border, bg: stone, ratio: 4.35, min: 3 }
+  - { fg: focus, bg: ground, ratio: 13.17, min: 3 }
+  - { fg: focus, bg: surface, ratio: 11.75, min: 3 }
+  - { fg: focus, bg: stone, ratio: 10.93, min: 3 }
+  - { fg: focus-on-night, bg: night, ratio: 13.74, min: 3 }
+  - { fg: fire, bg: ground, ratio: 6.36, min: 3 }
+  - { fg: fire, bg: surface, ratio: 5.67, min: 3 }
+  - { fg: on-night, bg: night-ceiling, ratio: 15.29, min: 4.5 }
+  - { fg: on-night-dim, bg: night-ceiling, ratio: 8.68, min: 4.5 }
+
 # Texture limits (L12 and L7 contract, 2026-10-18). A light tile in
 # site/src/assets/art/textures/ never goes darker than its floor color; a dark
 # tile never goes lighter than its ceiling. The CSS lays the veil color over
@@ -188,9 +262,12 @@ contrast:
 # names its floors by token; L12 asked L7 on 2026-10-18 to name the night
 # ceiling by token too. test/unit/l12/contrast.test.ts computes the
 # composites and checks that the CSS uses the same veil and no stronger tint.
+# night: none turns a light tile off in the dark theme, so the flat night
+# color shows: a tile duotoned to a light floor would sit under light text.
+# A dark tile keeps painting, and its inks are checked under the night colors.
 texture:
-  stone: { floor: rule, veil: stone, opacity: 0.5, inks: [text, text-dim, link, community] }
-  parchment: { floor: surface-2, veil: surface, opacity: 0, inks: [text, text-dim, link, community] }
+  stone: { floor: rule, veil: stone, opacity: 0.5, night: none, inks: [text, text-dim, link, community] }
+  parchment: { floor: surface-2, veil: surface, opacity: 0, night: none, inks: [text, text-dim, link, community] }
   night-stone:
     ceiling: night-ceiling
     veil: night
