@@ -69,6 +69,11 @@ const yearSummary =
 // edition's kind and this wording disagree.
 const description = `${edition.title}: companies building in Colorado that we verified from public sources. This edition is unranked, lists them A to Z and links every source.`;
 
+// "Oct 18, 2026": the ISO date broke at its hyphens on a phone.
+const published = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric", year: "numeric" }).format(
+  new Date(`${edition.published}T12:00:00Z`),
+);
+
 const mapText = { label: "Map of Colorado HQ cities", description: mapSummary };
 const sectorText = { label: "Honorees by sector", description: sectorSummary };
 const yearText = { label: "Honorees by founding year", description: yearSummary };
@@ -109,7 +114,8 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
       <h2 id="glance">Who builds here</h2>
       {/* Every figure below is a count of this edition's rows. */}
       <p class="meta lb-source">
-        {total} companies in the {edition.title}, as of {edition.published}. Source: Colorado Startups.
+        {total} companies in the {edition.title}, as of <time datetime={edition.published}>{published}</time>.
+        Source: Colorado Startups.
       </p>
       <ChartFigure
         id="chart-map"
@@ -147,7 +153,8 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
     <div class="wrap">
       <h2 id={edition.id}>{edition.title}</h2>
       <p class="meta">
-        {total} companies, A to Z, as of {edition.published}. Every listing links its sources.{" "}
+        {total} companies, A to Z, as of <time datetime={edition.published}>{published}</time>. Every listing links
+        its sources.{" "}
         <a href="/leaderboard/kit/">Listed? Get the honoree badge.</a>
       </p>
       <HonoreesTable rows={rows} caption={`${edition.title}, A to Z`} notes={COMPANY_NOTES} />

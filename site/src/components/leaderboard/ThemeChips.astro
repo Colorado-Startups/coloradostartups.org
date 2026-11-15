@@ -32,11 +32,13 @@ const chips = [{ id: "", label: "All", color: null, count: total }, ...themes];
 </fieldset>
 
 <style>
+  /* global.css draws a fieldset as a 42rem box; this one is a bare row. */
   .theme-chips {
     margin: 0 0 var(--s-4);
     padding: 0;
     border: 0;
     min-width: 0;
+    max-width: none;
   }
   legend {
     padding: 0;
@@ -92,7 +94,6 @@ const chips = [{ id: "", label: "All", color: null, count: total }, ...themes];
     font-weight: 700;
   }
   .theme-chip__count {
-    font-variant-numeric: tabular-nums;
     color: var(--c-text-dim);
   }
 </style>

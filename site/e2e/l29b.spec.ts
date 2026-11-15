@@ -32,9 +32,9 @@ test.describe(`${KIT} with JavaScript`, () => {
   });
 });
 
-test("/leaderboard/ links to the badge kit under the edition summary", async ({ page }) => {
+test("/leaderboard/ links to the badge kit under the edition heading", async ({ page }) => {
   await page.goto("/leaderboard/");
-  const link = page.getByRole("link", { name: "Listed here? Get the honoree badge for your site." });
+  const link = page.getByRole("link", { name: "Listed? Get the honoree badge." });
   await expect(link).toHaveCount(1);
   await expect(link).toBeVisible();
   await link.click();
