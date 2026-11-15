@@ -100,9 +100,10 @@ export function coloradoMapSvg(text: ChartText, { zone }: MapView = {}): string 
             text: "name",
             textAnchor: anchor,
             dx: focus ? (anchor === "start" ? 10 : -4) : 0,
-            // A west-side name sits above its dot, clear of a name on the
-            // same line to its west (Loveland's, beside Greeley).
-            dy: anchor === "end" ? -8 : 0,
+            // A west-side name sits well above its dot, clear of a name on
+            // the same line to its west: Loveland's, beside Greeley, which
+            // overlapped at -8 (e2e/l8.spec.ts, the label-overlap check).
+            dy: anchor === "end" ? -16 : 0,
             lineAnchor: anchor === "end" ? "bottom" : "middle",
             fontWeight: 700,
             // Plot reads a fontSize string as a field name unless it looks like "18px",
