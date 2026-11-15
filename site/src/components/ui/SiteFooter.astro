@@ -7,7 +7,6 @@ import { getCollection } from "astro:content";
 
 import { GUIDES_INDEX } from "../../lib/guides/guides";
 import { andList } from "../../lib/text";
-import { TAGLINE } from "../hall/org";
 import { POSTAL_ADDRESS } from "../info/links";
 
 const keepers = (await getCollection("dwarves")).map((entry) => entry.data.name);
@@ -18,7 +17,6 @@ const keeperList = andList(keepers);
   <div class="wrap grid">
     <div>
       <p class="name">Colorado Startups</p>
-      <p class="meta">{TAGLINE}</p>
       <p class="meta">{POSTAL_ADDRESS.map((line, i) => (i === 0 ? line : [<br />, line]))}</p>
     </div>
     <nav aria-label="Community">

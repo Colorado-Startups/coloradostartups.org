@@ -61,7 +61,7 @@ describe("cards.txt", () => {
     for (const id of ["photon-mountain", "space-peak", "fusion-canyon"]) {
       const card = cards.find((c: { id: string }) => c.id === id);
       expect(card.title).toBe(REGIONS[id].name);
-      expect(card.subtitle).toBe(REGIONS[id].tagline);
+      expect(card.subtitle).toBe(String(REGIONS[id].summary).trim().split(/(?<=\.)\s/)[0]);
       expect(card.art).toBe(REGIONS[id].art);
     }
   });

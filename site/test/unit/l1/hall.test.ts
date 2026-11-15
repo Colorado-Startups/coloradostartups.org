@@ -8,7 +8,7 @@ import {
   homeJsonLd,
   organizationJsonLd,
   organizationRef,
-  TAGLINE,
+  DESCRIPTOR,
   websiteJsonLd,
 } from "../../../src/components/hall/org";
 import { WAYS } from "../../../src/components/hall/ways";
@@ -26,7 +26,7 @@ describe("organizationJsonLd", () => {
     expect(org["@id"]).toBe("https://coloradostartups.org/#organization");
     expect(org.name).toBe("Colorado Startups");
     expect(org.url).toBe("https://coloradostartups.org/");
-    expect(org.description).toBe(TAGLINE);
+    expect(org.description).toBe(DESCRIPTOR);
   });
 
   it("names Paul as founder with the @id of his Person node on /team/", () => {

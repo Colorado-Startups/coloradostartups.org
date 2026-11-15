@@ -6,8 +6,10 @@
 // @id, so search engines and AI assistants read one Colorado Startups.
 import { WAYS_IN } from "@cs/shared";
 
-// Decision 46. The meta description and the home page lede both open with it.
-export const TAGLINE = "A community of founders building companies in Colorado.";
+// The brand descriptor (Colorado-Startups/brand data/strategy.yaml): for meta
+// descriptions and directory listings only. The brand has no tagline (brand
+// decision 46), so no page shows it as a line of copy.
+export const DESCRIPTOR = "A community of founders building companies in Colorado.";
 
 export const ORG_NAME = "Colorado Startups";
 
@@ -48,7 +50,7 @@ export function organizationJsonLd(site: URL): Record<string, unknown> {
     legalName: "Colorado Startups, Ltd.",
     url: abs("/"),
     logo: abs("/brand/cs-logo-1500.png"),
-    description: TAGLINE,
+    description: DESCRIPTOR,
     // The BRIEF, section 1: founded in 2014 by Paul Foley.
     foundingDate: "2014",
     founder: { "@type": "Person", "@id": personId(site, "paul-foley"), name: "Paul Foley" },
@@ -64,7 +66,7 @@ export function websiteJsonLd(site: URL): Record<string, unknown> {
     "@id": websiteId(site),
     url: new URL("/", site).toString(),
     name: ORG_NAME,
-    description: TAGLINE,
+    description: DESCRIPTOR,
     inLanguage: "en-US",
     publisher: { "@id": orgId(site) },
   };

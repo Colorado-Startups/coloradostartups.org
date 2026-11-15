@@ -26,7 +26,7 @@ const doc = (key: PageKey) => new DOMParser().parseFromString(readDist(PAGES[key
 const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
 const yamlFile = <T>(rel: string) => parse(readFileSync(path.join(SITE_DIR, "..", rel), "utf8")) as T;
 
-const TAGLINE = "A community of founders building companies in Colorado.";
+const DESCRIPTOR = "A community of founders building companies in Colorado.";
 
 // Routes other lanes own and build (00_project_system/lanes/README.md).
 // A link from these pages may point at one before that lane's PR merges.
@@ -57,10 +57,10 @@ describe("home page", () => {
   const home = doc("home");
   const main = home.querySelector("main")!;
 
-  it("leads with the name and the tagline, in the lede and the meta description", () => {
+  it("leads with the name; the descriptor opens only the meta description (brand decision 46)", () => {
     expect(text(home.querySelector("h1"))).toBe("Colorado Startups");
-    expect(text(home.querySelector(".hero .lede")).startsWith(TAGLINE)).toBe(true);
-    expect(home.querySelector('meta[name="description"]')?.getAttribute("content")?.startsWith(TAGLINE)).toBe(true);
+    expect(text(home.querySelector(".hero .lede"))).not.toContain(DESCRIPTOR);
+    expect(home.querySelector('meta[name="description"]')?.getAttribute("content")?.startsWith(DESCRIPTOR)).toBe(true);
   });
 
   it("lists the four ways in, each through WAYS_IN", () => {

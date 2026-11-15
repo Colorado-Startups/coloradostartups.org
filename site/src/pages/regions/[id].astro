@@ -4,7 +4,7 @@
 // honorees headquartered there; and the Slack and events (decision 45). Every
 // city goes through regionForCity(), so a city added to the YAML shows up in
 // both lists. Owner: L8.
-import { WAYS_IN } from "@cs/shared";
+import { regionLede, WAYS_IN } from "@cs/shared";
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
 
@@ -47,7 +47,7 @@ const honorees = honoreesIn(
 const others = regions.filter((r) => r.id !== region.id);
 ---
 
-<BaseLayout title={region.name} description={`${region.tagline} Core cities: ${andList(region.cities)}.`} ogImage={region.id}>
+<BaseLayout title={`${region.name} Outpost`} description={`${regionLede(region)} Core cities: ${andList(region.cities)}.`} ogImage={region.id}>
   <section class="section section--lit" aria-labelledby="region-title" style={`--region-color: ${REGION_COLORS[region.id]}`}>
     <div class="wrap">
       <nav aria-label="Breadcrumb" class="crumbs">
@@ -57,7 +57,7 @@ const others = regions.filter((r) => r.id !== region.id);
         </ol>
       </nav>
       <h1 id="region-title">{region.name}</h1>
-      <p class="lede">{region.tagline}</p>
+      <p class="lede">{regionLede(region)}</p>
       {/* The page's main action, in the first screen at 375 and 1280 px (#218).
           "Meet founders here" below says more and repeats it. Each Slack
           button says where it goes (#128). */}

@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 
-import { REGION_IDS, WAYS_IN } from "@cs/shared";
+import { REGION_IDS, regionLede, WAYS_IN } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
@@ -29,13 +29,13 @@ const positions = parse(readFileSync(path.resolve(SITE_DIR, "..", "data", "team"
 }[];
 
 describe("/regions/", () => {
-  it("lists the three regions in order, each linking to its page with tagline and cities", () => {
+  it("lists the three regions in order, each linking to its page with its lede and cities", () => {
     const cards = [...index.querySelectorAll<HTMLElement>("[data-region]")];
     expect(cards.map((c) => c.dataset.region)).toEqual(REGIONS.map((r) => r.id));
     for (const [i, r] of REGIONS.entries()) {
       const card = cards[i]!;
       expect(card.querySelector("h3 a")?.getAttribute("href")).toBe(`/regions/${r.id}/`);
-      expect(text(card)).toContain(r.tagline);
+      expect(text(card)).toContain(regionLede(r));
       for (const city of r.cities) expect(text(card)).toContain(city);
     }
   });
@@ -59,10 +59,10 @@ describe("/regions/", () => {
 describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, region) => {
   const page = pages[id]!;
 
-  it("has the region's name, tagline, summary and cities", () => {
+  it("has the region's name, lede, summary and cities", () => {
     expect(text(page.querySelector("h1"))).toBe(region.name);
     const intro = text(page.querySelector("section"));
-    expect(intro).toContain(region.tagline);
+    expect(intro).toContain(regionLede(region));
     expect(intro).toContain(region.summary.replace(/\s+/g, " ").trim());
     for (const city of [...region.cities, ...region.nearby]) expect(intro).toContain(city);
   });

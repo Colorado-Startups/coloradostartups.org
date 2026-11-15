@@ -29,7 +29,8 @@ export function parseCards(text, regions = {}) {
       const r = regions[card.region];
       if (!r) throw new Error(`cards.txt: card "${card.id}" names region "${card.region}", which has no data/regions file`);
       card.title ??= r.name;
-      card.subtitle ??= r.tagline;
+      // The brand has no taglines (brand decision 46): the summary's first sentence.
+      card.subtitle ??= String(r.summary ?? "").trim().split(/(?<=\.)\s/)[0];
       card.art ??= r.art;
     }
     for (const key of ["id", "title", "subtitle"]) {
