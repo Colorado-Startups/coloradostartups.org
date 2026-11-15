@@ -5,10 +5,10 @@ import { initHonoreesTables } from "../../../src/components/leaderboard/honorees
 
 // L5b: the honorees table's island, run in jsdom on the markup HonoreesTable
 // renders (trimmed to three rows). It sorts by a column and filters by
-// sector, then a reset shows every row again.
+// sector and by theme chip, then a reset shows every row again.
 
 const row = (id: string, name: string, desc: string, sector: string, city: string) => `
-  <tr id="company-${id}" data-sector="${sector}" data-city="${city}">
+  <tr id="company-${id}" data-sector="${sector}" data-city="${city}" data-theme="${sector === "Space" ? "space" : "other"}">
     <th scope="row" data-sort="${name}"><a href="#">${name}</a><span class="desc">${desc}</span></th>
     <td data-sort="${sector}">${sector}</td><td data-sort="${city}">${city}</td><td data-sort="Overall">Overall</td><td></td>
   </tr>`;
@@ -17,6 +17,8 @@ beforeEach(() => {
   document.body.innerHTML = `
     <div data-sortable-table>
       <form data-honoree-filters hidden>
+        <input type="radio" name="theme" value="" checked /><input type="radio" name="theme" value="space" />
+        <input type="radio" name="theme" value="other" />
         <input name="q" /><select name="sector"><option value="">All</option><option>Software</option><option>Space</option></select>
         <select name="city"><option value="">All</option><option>Boulder</option><option>Denver</option></select>
         <button type="reset">Clear filters</button>
@@ -38,6 +40,8 @@ beforeEach(() => {
 
 const names = () => [...document.querySelectorAll("tbody tr")].map((tr) => tr.querySelector("a")?.textContent);
 const shown = () => [...document.querySelectorAll<HTMLTableRowElement>("tbody tr")].filter((tr) => !tr.hidden).length;
+const visible = () =>
+  [...document.querySelectorAll<HTMLTableRowElement>("tbody tr")].filter((tr) => !tr.hidden).map((tr) => tr.querySelector("a")?.textContent);
 const status = () => document.querySelector("[data-sort-status]")?.textContent;
 
 describe("initHonoreesTables", () => {
@@ -70,5 +74,26 @@ describe("initHonoreesTables", () => {
     await new Promise((r) => setTimeout(r, 0));
     expect(shown()).toBe(3);
     expect(status()).toBe("Showing all 3 companies.");
+  });
+
+  it("filters by theme chip, and a chip and a sector clear each other", () => {
+    const form = document.querySelector<HTMLFormElement>("[data-honoree-filters]")!;
+    const chip = (value: string) => form.querySelector<HTMLInputElement>(`input[name="theme"][value="${value}"]`)!;
+    const sector = form.querySelector<HTMLSelectElement>('select[name="sector"]')!;
+
+    sector.value = "Software";
+    sector.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(shown()).toBe(2);
+
+    chip("space").checked = true;
+    chip("space").dispatchEvent(new Event("input", { bubbles: true }));
+    expect(sector.value).toBe("");
+    expect(visible()).toEqual(["Acme"]);
+    expect(status()).toBe("Showing 1 of 3 companies.");
+
+    sector.value = "Software";
+    sector.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(chip("").checked).toBe(true);
+    expect(shown()).toBe(2);
   });
 });

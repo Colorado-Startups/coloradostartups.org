@@ -1,55 +1,55 @@
-// The /event-calendar/ list hides what has ended since the build (#225):
-// each event, then each month left empty, then the introduction when none
-// remain. An end that does not parse keeps its event shown.
+// The /event-calendar/ cards move along as events end (#225): ended cards
+// hide, the next `count` show, the rest wait hidden, and the empty message
+// shows once none remain. An end that does not parse keeps its card in line.
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
-import { hideEnded } from "../../../src/components/events/prune";
+import { showNext } from "../../../src/components/events/prune";
 
-const LIST = `<div data-upcoming>
-  <p data-events-intro>Startup events coming up.</p>
-  <section data-month id="oct"><ol>
+const CARDS = `<div data-next-events>
+  <ol>
     <li data-ends="2026-10-22T02:00:00.000Z" id="a"></li>
     <li data-ends="2026-10-30T02:00:00.000Z" id="b"></li>
-  </ol></section>
-  <section data-month id="nov"><ol>
-    <li data-ends="2026-11-05T03:00:00.000Z" id="c"></li>
-  </ol></section>
-  <p data-events-empty hidden>No events are listed here right now.</p>
+    <li data-ends="2026-11-05T03:00:00.000Z" id="c" hidden></li>
+    <li data-ends="2026-11-09T03:00:00.000Z" id="d" hidden></li>
+  </ol>
+  <p data-events-empty hidden>No events are listed right now.</p>
 </div>`;
 
-function list(html = LIST) {
+function cards(html = CARDS) {
   const doc = new JSDOM(html).window.document;
-  const hidden = (id: string) => (doc.getElementById(id) as HTMLElement).hidden;
-  const is = (selector: string) => (doc.querySelector(selector) as HTMLElement).hidden;
-  return { root: doc.querySelector("[data-upcoming]")!, hidden, is };
+  const shown = () => [...doc.querySelectorAll<HTMLElement>("li")].filter((li) => !li.hidden).map((li) => li.id);
+  const empty = () => doc.querySelector<HTMLElement>("[data-events-empty]")!.hidden === false;
+  return { root: doc.querySelector("[data-next-events]")!, shown, empty };
 }
 
-describe("hideEnded", () => {
-  it("shows everything before the first event ends", () => {
-    const { root, hidden, is } = list();
-    expect(hideEnded(root, Date.parse("2026-10-21T12:00:00Z"))).toBe(3);
-    expect(["a", "b", "c", "oct", "nov"].map(hidden)).toEqual([false, false, false, false, false]);
-    expect([is("[data-events-intro]"), is("[data-events-empty]")]).toEqual([false, true]);
+describe("showNext", () => {
+  it("shows the first `count` cards before any event ends", () => {
+    const { root, shown, empty } = cards();
+    expect(showNext(root, Date.parse("2026-10-21T12:00:00Z"), 2)).toBe(2);
+    expect(shown()).toEqual(["a", "b"]);
+    expect(empty()).toBe(false);
   });
 
-  it("hides an ended event, and its month once the month is empty", () => {
-    const { root, hidden } = list();
-    expect(hideEnded(root, Date.parse("2026-10-22T02:00:00Z"))).toBe(2);
-    expect(["a", "b", "oct"].map(hidden)).toEqual([true, false, false]);
-    expect(hideEnded(root, Date.parse("2026-11-01T00:00:00Z"))).toBe(1);
-    expect(["b", "oct", "c", "nov"].map(hidden)).toEqual([true, true, false, false]);
+  it("hides an ended card and brings the next one in", () => {
+    const { root, shown } = cards();
+    expect(showNext(root, Date.parse("2026-10-22T02:00:00Z"), 2)).toBe(2);
+    expect(shown()).toEqual(["b", "c"]);
+    expect(showNext(root, Date.parse("2026-11-01T00:00:00Z"), 2)).toBe(2);
+    expect(shown()).toEqual(["c", "d"]);
   });
 
-  it("swaps the introduction for the empty message when every event has ended", () => {
-    const { root, is } = list();
-    expect(hideEnded(root, Date.parse("2026-12-01T00:00:00Z"))).toBe(0);
-    expect([is("[data-events-intro]"), is("[data-events-empty]")]).toEqual([true, false]);
+  it("shows fewer when fewer remain, and the empty message when none do", () => {
+    const { root, shown, empty } = cards();
+    expect(showNext(root, Date.parse("2026-11-06T00:00:00Z"), 2)).toBe(1);
+    expect(shown()).toEqual(["d"]);
+    expect(showNext(root, Date.parse("2026-12-01T00:00:00Z"), 2)).toBe(0);
+    expect(empty()).toBe(true);
   });
 
-  it("keeps an event whose end does not parse", () => {
-    const { root, hidden } = list(LIST.replace("2026-10-22T02:00:00.000Z", "soon"));
-    hideEnded(root, Date.parse("2026-12-01T00:00:00Z"));
-    expect([hidden("a"), hidden("oct")]).toEqual([false, false]);
+  it("keeps a card whose end does not parse", () => {
+    const { root, shown } = cards(CARDS.replace("2026-10-22T02:00:00.000Z", "soon"));
+    showNext(root, Date.parse("2026-12-01T00:00:00Z"), 2);
+    expect(shown()).toEqual(["a"]);
   });
 });

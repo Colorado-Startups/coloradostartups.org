@@ -1,7 +1,9 @@
 // The honorees table's island, moved out of HonoreesTable.astro so the
 // component stays under 300 code lines (code.long_files). Column sorting:
-// buttons in the headers, aria-sort on the active column. The filter: search,
-// sector and HQ city (#145). The component calls it once for the page.
+// buttons in the headers, aria-sort on the active column. The filter: theme
+// chips, search, sector and HQ city (#145). A theme chip and a sector would
+// rarely both match, so picking one clears the other. The component calls it
+// once for the page.
 import { nextDirection, sortedOrder, type SortDirection, type SortKind } from "../../lib/leaderboard/sort";
 import { honoreeCount, matchesHonoree } from "./honorees-filter";
 
@@ -40,11 +42,22 @@ export function initHonoreesTables(doc: Document): void {
           description: tr.cells[0]?.querySelector(".desc")?.textContent ?? "",
           sector: tr.dataset.sector ?? "",
           city: tr.dataset.city ?? "",
+          theme: tr.dataset.theme ?? "",
         },
       }));
-      const apply = () => {
+      const sector = form.querySelector<HTMLSelectElement>('select[name="sector"]');
+      const allThemes = form.querySelector<HTMLInputElement>('input[name="theme"][value=""]');
+      const apply = (event?: Event) => {
+        const changed = event?.target as HTMLInputElement | HTMLSelectElement | null;
+        if (changed?.name === "theme" && sector) sector.value = "";
+        if (changed?.name === "sector" && changed.value && allThemes) allThemes.checked = true;
         const data = new FormData(form);
-        const filters = { q: String(data.get("q") ?? ""), sector: String(data.get("sector") ?? ""), city: String(data.get("city") ?? "") };
+        const filters = {
+          q: String(data.get("q") ?? ""),
+          sector: String(data.get("sector") ?? ""),
+          city: String(data.get("city") ?? ""),
+          theme: String(data.get("theme") ?? ""),
+        };
         let shown = 0;
         for (const { tr, facts } of rows) {
           const show = matchesHonoree(facts, filters);
@@ -56,7 +69,7 @@ export function initHonoreesTables(doc: Document): void {
       form.addEventListener("input", apply);
       form.addEventListener("submit", (e) => e.preventDefault());
       // A reset clears the fields after the event, so read them on the next turn.
-      form.addEventListener("reset", () => setTimeout(apply));
+      form.addEventListener("reset", () => setTimeout(() => apply()));
       form.hidden = false;
     }
   }

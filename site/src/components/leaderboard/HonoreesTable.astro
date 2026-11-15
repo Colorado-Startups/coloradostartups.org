@@ -2,7 +2,7 @@
 // The board: a plain semantic table that reads fully without JavaScript, in
 // A to Z order. A small island (honorees-table-client.ts) adds column sorting
 // (buttons in the headers, aria-sort on the active column) and a filter by
-// search, sector and HQ city.
+// theme chip (ThemeChips), search, sector and HQ city.
 // Rows are never sorted by any outside rank.
 //
 // Below 600 px each row draws as a card: the company, then each fact with its
@@ -11,7 +11,9 @@
 // There is no Founded column: 84 of 115 rows said "Not stated" (2026-11-02),
 // so the year shows under the description only when a source states it.
 import type { BoardRow } from "../../lib/leaderboard/board";
+import { themeCounts, themeOf } from "../../lib/leaderboard/themes";
 import { optionsFrom } from "./honorees-filter";
+import ThemeChips from "./ThemeChips.astro";
 
 interface Props {
   rows: BoardRow[];
@@ -31,10 +33,12 @@ const columns = [
 
 const sectors = optionsFrom(rows.map((r) => r.company.sector));
 const cities = optionsFrom(rows.map((r) => r.company.hq_city));
+const themes = themeCounts(rows.map((r) => r.company.sector));
 ---
 
 <div class="board" data-sortable-table>
   <form class="honoree-filters panel" role="search" aria-label="Filter the honorees" data-honoree-filters hidden>
+    <ThemeChips total={rows.length} themes={themes} />
     <div class="honoree-filters__grid">
       <div class="field">
         <label for="honoree-q">Search</label>
@@ -80,7 +84,13 @@ const cities = optionsFrom(rows.map((r) => r.company.hq_city));
       <tbody role="rowgroup">
         {
           rows.map(({ company, groups }) => (
-            <tr id={`company-${company.id}`} role="row" data-sector={company.sector} data-city={company.hq_city}>
+            <tr
+              id={`company-${company.id}`}
+              role="row"
+              data-sector={company.sector}
+              data-city={company.hq_city}
+              data-theme={themeOf(company.sector)}
+            >
               <th scope="row" role="rowheader" data-sort={company.name}>
                 <a href={company.website} rel="noopener">
                   {company.name}

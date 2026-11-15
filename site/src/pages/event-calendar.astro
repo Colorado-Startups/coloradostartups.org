@@ -2,13 +2,15 @@
 // /event-calendar/: the community's Google Calendar, Luma, and a warm pointer
 // to the Startup Community Project for Hikes and Ski Days (PLAN, Pages and
 // URLs). The path stays because it is in email signatures. Old Squarespace
-// event paths 301 here (public/_redirects). Owner: L13. The upcoming-events
-// list and its Event JSON-LD are L24's (components/events/), built from
-// data/events/upcoming.json so crawlers can read what the iframe hides.
+// event paths 301 here (public/_redirects). Owner: L13. The next-events cards
+// and their Event JSON-LD are L24's (components/events/), built from
+// data/events/upcoming.json so crawlers can read what the iframe hides. The
+// redesign (2026-11-15): no intro, the next six events as cards, then the
+// calendar.
 import ArtImage from "../components/art/ArtImage.astro";
 import { PLACE_ART_ALT } from "../components/art/keepers";
-import { eventsJsonLd, SNAPSHOT, upcomingEvents } from "../components/events/events";
-import UpcomingEvents from "../components/events/UpcomingEvents.astro";
+import { eventsJsonLd, NEXT_COUNT, SNAPSHOT, upcomingEvents } from "../components/events/events";
+import NextEvents from "../components/events/NextEvents.astro";
 import CalendarEmbed from "../components/info/CalendarEmbed.astro";
 import InfoHeader from "../components/info/InfoHeader.astro";
 import { calendarSubscribeUrl, CONTACT_EMAIL, LUMA_CS, LUMA_SCP, mailto } from "../components/info/links";
@@ -20,7 +22,7 @@ const events = upcomingEvents(SNAPSHOT, new Date());
 <BaseLayout
   title="Event calendar"
   description="Startup events across Colorado in one calendar, plus Colorado Startups events on Luma and where to find Startup Hikes and Startup Ski Days."
-  jsonLd={eventsJsonLd(events)}
+  jsonLd={eventsJsonLd(events.slice(0, NEXT_COUNT))}
 >
   {/* The /ask/ search filters by this type (Pagefind). */}
   <span data-pagefind-filter="type:Events"></span>
@@ -28,12 +30,7 @@ const events = upcomingEvents(SNAPSHOT, new Date());
     <div class="wrap">
       <div class="cal-head">
         <InfoHeader kicker="Gatherings across Colorado" title="Event calendar">
-          <p class="lede">
-            Startup events across Colorado, in one calendar. It holds Colorado Startups events and events from across
-            the community.
-          </p>
-          {/* The page's two main actions in the first screen (#225, #723); the
-              cards below say more about each. */}
+          {/* The page's two main actions in the first screen (#225, #723). */}
           <div class="btn-row hero-actions">
             <a class="btn btn--gold" href={LUMA_CS}>See our events on Luma</a>
             <a class="btn btn--stone" href={calendarSubscribeUrl()}>Add to Google Calendar</a>
@@ -49,7 +46,7 @@ const events = upcomingEvents(SNAPSHOT, new Date());
           class="cal-art"
         />
       </div>
-      <UpcomingEvents events={events} />
+      <NextEvents events={events} />
       <h2 id="full-calendar">The full calendar</h2>
       <CalendarEmbed />
     </div>

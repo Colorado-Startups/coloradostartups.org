@@ -1,10 +1,11 @@
-// The upcoming-events list on /event-calendar/: reads the snapshot that
+// The next-events cards on /event-calendar/: reads the snapshot that
 // scripts/events/fetch-ics.mjs writes, keeps what has not ended yet, and
 // formats it in Mountain Time. Also builds the page's Event JSON-LD. Owner: L24.
 //
 // The snapshot already passed the content gate (scripts/events/lib/lint.mjs).
-// The built-HTML gate reads the visible list again, but it never reads
-// <script> text, so the JSON-LD here carries only fields the list shows.
+// The built-HTML gate reads the visible cards again, but it never reads
+// <script> text, so the JSON-LD here carries only events and fields the
+// snapshot holds and the cards are built from.
 import { z } from "zod";
 
 import snapshotRaw from "../../../../data/events/upcoming.json?raw";
@@ -85,24 +86,8 @@ export function upcomingEvents(snapshot: Snapshot | null, now: Date): CalendarEv
     .sort((a, b) => startsAt(a) - startsAt(b) || a.title.localeCompare(b.title));
 }
 
-/** How many days of events the list shows open; later ones fold away (#228). */
-export const SOON_DAYS = 14;
-
-/**
- * Splits a soonest-first list into the events that start within `days` of
- * `now` and the rest. When none start that soon, every event counts as soon,
- * so the list never opens on a folded section alone.
- */
-export function splitSoon(
-  events: readonly CalendarEvent[],
-  now: number,
-  days = SOON_DAYS,
-): { soon: CalendarEvent[]; later: CalendarEvent[] } {
-  const cutoff = now + days * 86_400_000;
-  const soon = events.filter((e) => startsAt(e) < cutoff);
-  if (soon.length === 0) return { soon: [...events], later: [] };
-  return { soon, later: events.filter((e) => startsAt(e) >= cutoff) };
-}
+/** How many cards the page shows: the next six events (the redesign, 2026-11-15). */
+export const NEXT_COUNT = 6;
 
 // A date-only value is read at noon UTC, so its calendar day is the same in
 // every US zone; times carry their own offset.
@@ -115,8 +100,6 @@ const dayFormat = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 const timeFormat = new Intl.DateTimeFormat("en-US", { timeZone: CALENDAR_TIMEZONE, hour: "numeric", minute: "2-digit" });
-const monthFormat = new Intl.DateTimeFormat("en-US", { timeZone: CALENDAR_TIMEZONE, month: "long", year: "numeric" });
-const keyFormat = new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR_TIMEZONE, year: "numeric", month: "2-digit" });
 
 // ICU puts a narrow no-break space before AM and PM. A plain space reads the
 // same and keeps the text searchable.
@@ -140,21 +123,39 @@ export function whenText(e: CalendarEvent): { day: string; time: string } {
   return { day, time: `${startTime} to ${endDay}, ${endTime}` };
 }
 
-/** The location as the list shows it, without a trailing ", USA". */
+/** The full location, without a trailing ", USA": the JSON-LD address. */
 export function shownLocation(e: CalendarEvent): string | null {
   return e.location ? e.location.replace(/,\s*(?:USA|United States)$/i, "") : null;
 }
 
-/** Events grouped by Mountain Time month, in order: "October 2026", ... */
-export function byMonth(events: readonly CalendarEvent[]): { key: string; label: string; events: CalendarEvent[] }[] {
-  const groups = new Map<string, { key: string; label: string; events: CalendarEvent[] }>();
-  for (const e of events) {
-    const at = asDate(e.start);
-    const key = keyFormat.format(at);
-    if (!groups.has(key)) groups.set(key, { key, label: monthFormat.format(at), events: [] });
-    groups.get(key)!.events.push(e);
-  }
-  return [...groups.values()];
+/**
+ * The date block on a card, in Mountain Time: { month: "Nov", day: "17",
+ * weekday: "Tue" }. A multi-day event shows its first day.
+ */
+export function dateParts(e: CalendarEvent): { month: string; day: string; weekday: string } {
+  const parts = dayFormat.formatToParts(asDate(e.start));
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
+  return { month: part("month"), day: part("day"), weekday: part("weekday") };
+}
+
+const STATE_ZIP = /^[A-Z]{2}(?:\s+\d{5}(?:-\d{4})?)?$/;
+
+/**
+ * The place as a card shows it: the venue and the city, without the street
+ * ("ID345, 3960 High St, Denver, CO 80205, USA" reads "ID345, Denver"). A
+ * location with no state, such as "Online", shows as it is.
+ */
+export function cardPlace(location: string): string {
+  const parts = location
+    .replace(/,\s*(?:USA|United States)$/i, "")
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const state = parts.findIndex((p) => STATE_ZIP.test(p));
+  if (state < 1) return parts.join(", ");
+  const city = parts[state - 1]!;
+  const venue = parts[0]!;
+  return state === 1 || /^\d/.test(venue) ? city : `${venue}, ${city}`;
 }
 
 /** The venue name: the location up to its first comma, unless that is a street number. */

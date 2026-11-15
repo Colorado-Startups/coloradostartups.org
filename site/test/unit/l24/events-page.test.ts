@@ -7,8 +7,9 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
-  byMonth,
   type CalendarEvent,
+  cardPlace,
+  dateParts,
   endsAt,
   eventsJsonLd,
   parseSnapshot,
@@ -126,14 +127,20 @@ describe("whenText", () => {
   });
 });
 
-describe("months, places and JSON-LD", () => {
-  it("groups by the month in Denver, not in UTC", () => {
-    const late = event({ id: "halloween", start: "2026-10-31T22:00:00-06:00", end: "2026-10-31T23:00:00-06:00" });
-    const nov = event({ id: "nov", start: "2026-11-02T09:00:00-07:00", end: "2026-11-02T10:00:00-07:00" });
-    expect(byMonth([late, nov]).map((m) => [m.key, m.label, m.events.map((e) => e.id)])).toEqual([
-      ["2026-10", "October 2026", ["halloween"]],
-      ["2026-11", "November 2026", ["nov"]],
-    ]);
+describe("card dates, places and JSON-LD", () => {
+  it("dates a card by its first day in Denver, not in UTC", () => {
+    const late = event({ start: "2026-10-31T22:00:00-06:00", end: "2026-10-31T23:00:00-06:00" });
+    expect(dateParts(late)).toEqual({ month: "Oct", day: "31", weekday: "Sat" });
+    const allDay = event({ start: "2026-11-20", end: "2026-11-22", allDay: true });
+    expect(dateParts(allDay)).toEqual({ month: "Nov", day: "20", weekday: "Fri" });
+  });
+
+  it("shows a card's place as the venue and the city", () => {
+    expect(cardPlace("ID345, 3960 High St, Denver, CO 80205, USA")).toBe("ID345, Denver");
+    expect(cardPlace("The Guild, 3435 S Inca St Apt C, Englewood, CO 80110, USA")).toBe("The Guild, Englewood");
+    expect(cardPlace("1515 Walnut St #200, Boulder, CO 80302")).toBe("Boulder");
+    expect(cardPlace("Golden, CO")).toBe("Golden");
+    expect(cardPlace("Virtual and in person (check registration)")).toBe("Virtual and in person (check registration)");
   });
 
   it("drops a trailing country and names the venue", () => {

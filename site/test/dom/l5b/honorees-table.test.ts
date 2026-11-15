@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { THEMES, themeOf } from "../../../src/lib/leaderboard/themes";
 import { readDist } from "../pages";
 
 // L5b: the Leaderboard's honorees table as built (#145). Run `npm run build`
@@ -38,5 +39,28 @@ describe("/leaderboard/ honorees table", () => {
     const distinct = (key: "sector" | "city") => new Set(rows.map((tr) => (tr as HTMLElement).dataset[key])).size;
     expect(options("sector")).toHaveLength(distinct("sector"));
     expect(options("city")).toHaveLength(distinct("city"));
+  });
+
+  // The redesign (2026-11-15): theme chips over the table, one radio group in
+  // the filter form, each with the count of rows it shows.
+  it("offers All and each theme as a chip, counted from the rows", () => {
+    const form = board.querySelector<HTMLFormElement>("form[data-honoree-filters]")!;
+    const chips = [...form.querySelectorAll<HTMLInputElement>(".theme-chips input[type=radio][name=theme]")];
+    expect(chips.map((c) => c.value)).toEqual(["", ...THEMES.map((t) => t.id)]);
+    expect(chips[0]!.hasAttribute("checked")).toBe(true);
+    const count = (input: HTMLInputElement) => Number(input.closest("label")?.querySelector(".theme-chip__count")?.textContent);
+    expect(count(chips[0]!)).toBe(rows.length);
+    for (const chip of chips.slice(1)) {
+      const matching = rows.filter((tr) => (tr as HTMLElement).dataset.theme === chip.value).length;
+      expect(count(chip), chip.value).toBe(matching);
+      expect(matching, `${chip.value} has honorees`).toBeGreaterThan(0);
+    }
+  });
+
+  it("stamps every row with the theme of its sector", () => {
+    for (const tr of rows) {
+      const el = tr as HTMLElement;
+      expect(el.dataset.theme, tr.id).toBe(themeOf(el.dataset.sector ?? ""));
+    }
   });
 });

@@ -1,8 +1,9 @@
 // L2 over the built site (run `npm run build` first): the order of the rooms
-// on /leaderboard/ (#239). The charts once sat under the whole honorees table,
-// about 9,900 px down at 1280 px (the design review, 2026-11-02), and the page
-// closed on a third band in a row. Now the charts come before the table, and
-// the page closes on "Recruit Series B" in the hearth band.
+// on /leaderboard/ (#239, the redesign of 2026-11-15). The charts come before
+// the honorees table, "How the Leaderboard works" folds into a closed
+// <details> under the table, and the page closes on a short nominate band in
+// the hearth. Nothing on the page ties the Leaderboard to investing
+// (decision 17), so the old "Recruit Series B" band is gone.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -29,8 +30,8 @@ function skippedLevels(levels: number[]): string[] {
 }
 
 describe("/leaderboard/ room order", () => {
-  it("runs hero, charts, honorees, method, recruit", () => {
-    expect(rooms).toEqual(["hero", "glance", "2026-honorees", "method", "recruit"]);
+  it("runs hero, charts, honorees, nominate", () => {
+    expect(rooms).toEqual(["hero", "glance", "2026-honorees", "nominate"]);
   });
 
   it("puts the charts before the honorees table", () => {
@@ -40,13 +41,7 @@ describe("/leaderboard/ room order", () => {
   });
 
   it("alternates lit and band grounds, then closes on the hearth", () => {
-    expect(rooms.map(ground)).toEqual([
-      "section--lit",
-      "section--band",
-      "section--lit",
-      "section--band",
-      "section--hearth",
-    ]);
+    expect(rooms.map(ground)).toEqual(["section--lit", "section--band", "section--lit", "section--hearth"]);
   });
 
   // A class with no rule would draw nothing; the hearth band lives in global.css.
@@ -65,6 +60,23 @@ describe("/leaderboard/ room order", () => {
     const levels = [...main.querySelectorAll("h1, h2, h3, h4, h5, h6")].map((h) => Number(h.tagName[1]));
     expect(levels[0]).toBe(1);
     expect(skippedLevels(levels)).toEqual([]);
+  });
+
+  it("folds the method into a closed details under the table, at the #method anchor", () => {
+    const method = page.getElementById("method")!;
+    expect(method.tagName).toBe("DETAILS");
+    expect(method.hasAttribute("open")).toBe(false);
+    expect(method.querySelector("summary")?.textContent?.trim()).toBe("How the Leaderboard works");
+    const table = main.querySelector("[data-sortable-table]")!;
+    expect(table.compareDocumentPosition(method) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  // Decision 17: the Leaderboard is never tied to investing. The method may
+  // still say the edition leaves investment firms out, so it is read apart.
+  it("says nothing about investing outside the method", () => {
+    const rest = main.cloneNode(true) as HTMLElement;
+    rest.querySelector("#method")?.remove();
+    expect(rest.textContent ?? "").not.toMatch(/\binvest|\bVC\b|\bventure (?:firm|fund|capital)|\bseries [a-z]\b/i);
   });
 
   it("self-test: the level check catches a skip and passes a clean outline", () => {

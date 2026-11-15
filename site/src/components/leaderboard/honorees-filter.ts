@@ -1,19 +1,22 @@
 // The honorees filter's rules, apart from the DOM so a unit test can run
-// them. A row shows when it fits every filter set: the sector and the HQ
-// city exactly, and each search word somewhere in its name or description.
-// Case and accents never matter to the search.
+// them. A row shows when it fits every filter set: the theme chip, the
+// sector and the HQ city exactly, and each search word somewhere in its name
+// or description. Case and accents never matter to the search.
 
 export interface HonoreeFacts {
   name: string;
   description: string;
   sector: string;
   city: string;
+  /** The row's theme id (lib/leaderboard/themes.ts). */
+  theme?: string;
 }
 
 export interface HonoreeFilters {
   q?: string;
   sector?: string;
   city?: string;
+  theme?: string;
 }
 
 const fold = (s: string) =>
@@ -25,6 +28,7 @@ const fold = (s: string) =>
 export function matchesHonoree(row: HonoreeFacts, f: HonoreeFilters): boolean {
   if (f.sector && row.sector !== f.sector) return false;
   if (f.city && row.city !== f.city) return false;
+  if (f.theme && row.theme !== f.theme) return false;
   const hay = fold(`${row.name} ${row.description}`);
   return fold(f.q ?? "")
     .split(/\s+/)

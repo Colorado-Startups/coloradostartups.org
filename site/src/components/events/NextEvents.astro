@@ -1,0 +1,132 @@
+---
+// The next events on /event-calendar/, as cards above the Google Calendar
+// iframe: the date, the title, the place and the event's own link. Dates are
+// in Mountain Time. Every event that had not ended at build time is in the
+// HTML; the first NEXT_COUNT show and the rest wait hidden, and a small script
+// (prune.ts) moves the six along as events end. Owner: L24.
+import { cardPlace, type CalendarEvent, dateParts, endsAt, NEXT_COUNT, whenText } from "./events";
+
+interface Props {
+  events: CalendarEvent[];
+}
+
+const { events } = Astro.props;
+---
+
+<div class="next" data-next-events data-count={NEXT_COUNT}>
+  <h2 id="next-events">Next events</h2>
+  {
+    events.length > 0 && (
+      <ol class="next__cards" role="list">
+        {events.map((event, i) => {
+          const date = dateParts(event);
+          const when = whenText(event);
+          return (
+            <li class="ev-card" data-ends={new Date(endsAt(event)).toISOString()} hidden={i >= NEXT_COUNT}>
+              <time class="ev-card__date" datetime={event.start}>
+                <span class="ev-card__month">{date.month}</span>{" "}
+                <span class="ev-card__day">{date.day}</span>{" "}
+                <span class="ev-card__weekday">{date.weekday}</span>
+              </time>
+              <div class="ev-card__body">
+                <h3 class="ev-card__title">
+                  {event.url ? (
+                    <a href={event.url} rel="nofollow noopener">
+                      {event.title}
+                    </a>
+                  ) : (
+                    event.title
+                  )}
+                </h3>
+                <p class="ev-card__time">{when.time}</p>
+                {event.location && <p class="ev-card__place">{cardPlace(event.location)}</p>}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    )
+  }
+  <p data-events-empty hidden={events.length > 0}>No events are listed right now. The full calendar below has them all.</p>
+  <p class="meta">Times are Mountain Time. Check each host's page before you go. <a href="#full-calendar">Full calendar</a></p>
+</div>
+
+<script>
+  import { showNext } from "./prune";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-next-events]")) {
+    showNext(root, Date.now(), Number(root.dataset.count));
+  }
+</script>
+
+<style>
+  .next {
+    margin-block: var(--s-6);
+  }
+  /* A card grid: the global ol measure would hold it to one column. */
+  .next__cards {
+    list-style: none;
+    max-width: none;
+    margin: 0 0 var(--s-4);
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--s-4);
+  }
+  /* display: grid would beat the hidden attribute's own rule. */
+  .ev-card[hidden] {
+    display: none;
+  }
+  .ev-card {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: var(--s-4);
+    align-items: start;
+    padding: var(--s-4);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+  }
+  .ev-card p {
+    margin: 0;
+  }
+  .ev-card__date {
+    display: grid;
+    justify-items: center;
+    padding: var(--s-2) var(--s-1);
+    border-radius: var(--r-chisel);
+    background: var(--c-ground);
+    border-top: var(--line-bold) solid var(--c-accent);
+    line-height: 1.1;
+  }
+  .ev-card__month,
+  .ev-card__weekday {
+    font-size: var(--t-step--1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--c-text-dim);
+  }
+  .ev-card__day {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-3);
+    color: var(--c-text);
+  }
+  .ev-card__body {
+    display: grid;
+    gap: var(--s-1);
+    min-width: 0;
+  }
+  .ev-card__title {
+    margin: 0;
+    font-size: var(--t-step-0);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .ev-card__time,
+  .ev-card__place {
+    font-size: var(--t-step--1);
+    color: var(--c-text-dim);
+  }
+</style>
