@@ -123,7 +123,7 @@ const mcpUrl = new URL("/mcp", site).toString();
         <h3>Connect your AI</h3>
         <p>Claude and OpenCode can search the site. Free, no key.</p>
         <code>{mcpUrl}</code>
-        <a href="/ask/#connect">How to connect</a>
+        <a class="tap-target" href="/ask/#connect">How to connect</a>
       </div>
     </div>
   </section>
@@ -200,7 +200,7 @@ const mcpUrl = new URL("/mcp", site).toString();
     flex-wrap: wrap;
     align-items: center;
     gap: var(--s-1) var(--s-3);
-    min-height: 44px;
+    min-height: var(--size-tap);
     padding: var(--s-2) var(--s-3);
     border-radius: var(--r-card);
     background: var(--c-surface);
@@ -269,7 +269,7 @@ const mcpUrl = new URL("/mcp", site).toString();
   .ask__row input {
     flex: 1;
     min-width: 0;
-    min-height: 48px;
+    min-height: var(--size-control);
     padding-inline: var(--s-3);
     border: var(--line-edge) solid var(--c-border);
     border-radius: var(--r-chisel);

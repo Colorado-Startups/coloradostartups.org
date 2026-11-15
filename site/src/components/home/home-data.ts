@@ -66,8 +66,8 @@ const SPEC = [
     regionName: "Space Peak",
     place: "springs",
     tiles: [
-      ["guardians-in-colorado", "of all Space Force Guardians serve in Colorado"],
-      ["co-aerospace-jobs-edc", "private aerospace jobs, an industry group's estimate"],
+      ["guardians-in-colorado", "of all uniformed Space Force Guardians are in Colorado"],
+      ["co-aerospace-jobs-edc", "private jobs in Colorado's aerospace cluster, an economic development group's estimate"],
       ["nasa-co-procurement-fy2023", "in NASA purchasing from Colorado"],
     ],
     honorees: "honorees-space-aerospace",

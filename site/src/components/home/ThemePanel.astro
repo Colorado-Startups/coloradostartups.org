@@ -35,8 +35,8 @@ const id = `theme-${theme.region}`;
       {theme.tiles.map((t) => <StatTile {...t} />)}
     </div>
     <p class="theme__links">
-      <a href={`/regions/${theme.region}/`}>Explore {theme.regionName}</a>
-      <a href="/leaderboard/">{theme.honorees} of the 2026 honorees</a>
+      <a class="tap-target" href={`/regions/${theme.region}/`}>Explore {theme.regionName}</a>
+      <a class="tap-target" href="/leaderboard/">{theme.honorees} of the 2026 honorees</a>
     </p>
   </div>
 </article>
