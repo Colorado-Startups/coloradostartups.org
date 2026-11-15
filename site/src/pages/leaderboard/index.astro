@@ -1,10 +1,10 @@
 ---
-// /leaderboard/: three build-time charts with their data, then the latest
-// edition as a sortable table, the method, and the kept "Recruit Series B"
-// section (LinkedIn decision 35). The charts come first so a visitor sees the
-// edition's shape before the long table; the page closes on Recruit in the
-// hearth band, the Hall's room for a closing call to action (#239). Styled
-// with existing tokens only. Owner: L2.
+// /leaderboard/: who builds here. The three build-time charts first, then the
+// latest edition as a searchable, sortable table with theme chips, with "How
+// the Leaderboard works" folded into a <details> under it, and last a short
+// nominate band (the redesign, 2026-11-15: visual first, few words). The page
+// says nothing about investing (decision 17), so the old "Recruit Series B"
+// band is gone. Styled with existing tokens only. Owner: L2.
 //
 // The title is carved in a lintel, and the Great Hall picture sits beside the
 // lede from 64rem (#239, #723). On a phone the picture stays a small seal
@@ -69,6 +69,11 @@ const yearSummary =
 // edition's kind and this wording disagree.
 const description = `${edition.title}: companies building in Colorado that we verified from public sources. This edition is unranked, lists them A to Z and links every source.`;
 
+// "Oct 18, 2026": the ISO date broke at its hyphens on a phone.
+const published = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric", year: "numeric" }).format(
+  new Date(`${edition.published}T12:00:00Z`),
+);
+
 const mapText = { label: "Map of Colorado HQ cities", description: mapSummary };
 const sectorText = { label: "Honorees by sector", description: sectorSummary };
 const yearText = { label: "Honorees by founding year", description: yearSummary };
@@ -85,13 +90,10 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
     <div class="wrap lb-hero">
       <div>
         <Banner as="h1" variant="lintel">The Leaderboard</Banner>
-        <p class="lede">
-          The Leaderboard recognizes companies building in Colorado and their founders. Every listing links to the
-          sources we used.
-        </p>
+        <p class="lede">Companies building in Colorado, each verified from public sources.</p>
         <div class="btn-row">
           <a class="btn btn--gold" href="/leaderboard/nominate/">Nominate your company</a>
-          <a class="btn btn--stone" href="#method">How it works</a>
+          <a class="btn btn--stone" href={`#${edition.id}`}>Find a company</a>
         </div>
       </div>
       <ArtImage
@@ -109,10 +111,15 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
 
   <section class="section section--band" aria-labelledby="glance">
     <div class="wrap">
-      <h2 id="glance">The edition at a glance</h2>
+      <h2 id="glance">Who builds here</h2>
+      {/* Every figure below is a count of this edition's rows. */}
+      <p class="meta lb-source">
+        {total} companies in the {edition.title}, as of <time datetime={edition.published}>{published}</time>.
+        Source: Colorado Startups.
+      </p>
       <ChartFigure
         id="chart-map"
-        title="Where the honorees are"
+        title="Where they are"
         summary={mapSummary}
         svg={hqMap(coloradoCities, mapText)}
         narrowSvg={hqMapNarrow(coloradoCities, mapText)}
@@ -145,46 +152,51 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
   <section class="section section--lit" aria-labelledby={edition.id}>
     <div class="wrap">
       <h2 id={edition.id}>{edition.title}</h2>
-      <p>{edition.summary}</p>
-      <p><a href="/leaderboard/kit/">Listed here? Get the honoree badge for your site.</a></p>
       <p class="meta">
-        As of {edition.published}, this edition lists {total} companies, A to Z. Select a column heading to sort.
+        {total} companies, A to Z, as of <time datetime={edition.published}>{published}</time>. Every listing links
+        its sources.{" "}
+        <a href="/leaderboard/kit/">Listed? Get the honoree badge.</a>
       </p>
       <HonoreesTable rows={rows} caption={`${edition.title}, A to Z`} notes={COMPANY_NOTES} />
+      <details class="lb-method" id="method">
+        <summary>How the Leaderboard works</summary>
+        <h3>This edition</h3>
+        <p>{edition.summary}</p>
+        <p>{edition.method}</p>
+        <h3>Verified editions</h3>
+        <p>
+          From the first verified edition on, we rank companies by how fast their revenue grew over three years. A
+          company needs a minimum revenue in its first year to qualify. That keeps a tiny start from showing a false
+          growth rate. Companies compete in two tiers, Startup and Growth, so a young company is judged against its
+          peers.
+        </p>
+        <p>
+          We publish the minimum and the tier limits before nominations close. We ask each company for documents that
+          prove its numbers. The Leaderboard shows revenue as a range, never an exact figure.
+        </p>
+      </details>
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="method">
+  <section class="section section--hearth" aria-labelledby="nominate">
     <div class="wrap">
-      <h2 id="method">How the Leaderboard works</h2>
-      <h3>This edition</h3>
-      <p>{edition.method}</p>
-      <h3>Verified editions</h3>
-      <p>
-        From the first verified edition on, we rank companies by how fast their revenue grew over three years. A company
-        needs a minimum revenue in its first year to qualify. That keeps a tiny start from showing a false growth rate.
-        Companies compete in two tiers, Startup and Growth, so a young company is judged against its peers.
-      </p>
-      <p>
-        We publish the minimum and the tier limits before nominations close. We ask each company for documents that
-        prove its numbers. The Leaderboard shows revenue as a range, never an exact figure.
-      </p>
-      <p><a href="/leaderboard/nominate/">Nominate your company for the first verified edition.</a></p>
-    </div>
-  </section>
-
-  <section class="section section--hearth" aria-labelledby="recruit">
-    <div class="wrap">
-      <h2 id="recruit">Recruit Series B and bigger VC funds to Colorado</h2>
-      <p>Congratulations to the founders and teams building these companies.</p>
-      <p>
-        As a startup community dedicated to growth, we ask every member to help bring growth-stage venture firms to
-        Colorado, with a main or second office. Show them this Leaderboard. Tell them the next big companies are
-        building here.
-      </p>
+      <h2 id="nominate">Building in Colorado?</h2>
+      <div class="btn-row">
+        <a class="btn btn--gold" href="/leaderboard/nominate/">Nominate your company</a>
+      </div>
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  // A link to #method (llms.txt names it) opens the fold it lands on.
+  const method = document.getElementById("method");
+  const openMethod = () => {
+    if (location.hash === "#method" && method instanceof HTMLDetailsElement) method.open = true;
+  };
+  openMethod();
+  addEventListener("hashchange", openMethod);
+</script>
 
 <style>
   .lb-hero {
@@ -209,5 +221,20 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
       width: min(100%, 26rem);
       justify-self: end;
     }
+  }
+  .lb-source {
+    margin-bottom: var(--s-6);
+  }
+  .lb-method {
+    margin-top: var(--s-5);
+    max-width: var(--t-measure);
+  }
+  /* The summary stays a list item, so it keeps the native marker; the
+     padding makes it a full tap target. */
+  .lb-method summary {
+    min-height: var(--size-tap);
+    padding-block: var(--s-2);
+    font-weight: 700;
+    cursor: pointer;
   }
 </style>

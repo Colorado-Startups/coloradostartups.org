@@ -30,6 +30,14 @@ describe("matchesHonoree", () => {
     expect(matchesHonoree({ ...row, name: "Café Labs" }, { q: "cafe" })).toBe(true);
   });
 
+  it("matches the theme chip exactly", () => {
+    const space = { ...row, sector: "Space and aerospace", theme: "space" };
+    expect(matchesHonoree(space, { theme: "space" })).toBe(true);
+    expect(matchesHonoree(space, { theme: "energy" })).toBe(false);
+    expect(matchesHonoree(space, { theme: "" })).toBe(true);
+    expect(matchesHonoree(row, { theme: "other" })).toBe(false);
+  });
+
   it("combines the search with the selects", () => {
     expect(matchesHonoree(row, { q: "marketing", city: "Denver" })).toBe(true);
     expect(matchesHonoree(row, { q: "marketing", city: "Golden" })).toBe(false);

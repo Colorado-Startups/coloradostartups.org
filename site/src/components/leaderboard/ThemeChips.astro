@@ -1,0 +1,99 @@
+---
+// The theme chips above the honorees table: All, the three Why Colorado
+// themes and Everything else, each with its count. They are radio buttons in
+// the filter form (name="theme"), so the keyboard, a screen reader and the
+// form's reset treat them as one choice. A swatch carries each theme's color
+// from the home page; the name and count carry the meaning. Owner: L2.
+import type { Theme } from "../../lib/leaderboard/themes";
+
+interface Props {
+  total: number;
+  themes: (Theme & { count: number })[];
+}
+
+const { total, themes } = Astro.props;
+const chips = [{ id: "", label: "All", color: null, count: total }, ...themes];
+---
+
+<fieldset class="theme-chips">
+  <legend>Theme</legend>
+  <div class="theme-chips__row">
+    {
+      chips.map((c) => (
+        <label class="theme-chip" style={c.color ? `--chip-color: ${c.color}` : undefined}>
+          <input type="radio" name="theme" value={c.id} checked={c.id === ""} />
+          {c.color && <span class="theme-chip__swatch" aria-hidden="true" />}
+          <span class="theme-chip__name">{c.label}</span>
+          <span class="theme-chip__count">{c.count}</span>
+        </label>
+      ))
+    }
+  </div>
+</fieldset>
+
+<style>
+  /* global.css draws a fieldset as a 42rem box; this one is a bare row. */
+  .theme-chips {
+    margin: 0 0 var(--s-4);
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    max-width: none;
+  }
+  legend {
+    padding: 0;
+    margin-bottom: var(--s-2);
+    font-weight: 700;
+  }
+  .theme-chips__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  .theme-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--size-tap);
+    padding: var(--s-1) var(--s-3);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    color: var(--c-text);
+    cursor: pointer;
+  }
+  /* The input stays in the accessibility tree and takes focus; the chip draws it. */
+  .theme-chip input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .theme-chip:has(input:focus-visible) {
+    outline: var(--line-bold) solid var(--c-focus);
+    outline-offset: var(--size-ring-offset);
+  }
+  .theme-chip:has(input:checked) {
+    border-color: var(--c-text);
+    box-shadow: inset 0 0 0 var(--line-edge) var(--c-text);
+  }
+  .theme-chip:has(input:checked) .theme-chip__name {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .theme-chip__swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--r-chisel);
+    background: var(--chip-color);
+  }
+  .theme-chip__name {
+    font-weight: 700;
+  }
+  .theme-chip__count {
+    color: var(--c-text-dim);
+  }
+</style>

@@ -1,5 +1,6 @@
 // L29b over the built site (run `npm run build` first; test:content does).
-//   - /leaderboard/ links to the badge kit right after the edition summary.
+//   - /leaderboard/ links to the badge kit in the line under the edition
+//     heading (the redesign, 2026-11-15; the summary moved into the method).
 //   - The kit page's CSS keeps a [hidden] copy button hidden. `.btn` sets
 //     display, and an author rule beats the browser's own [hidden] rule, so
 //     without `.kit-copy .btn[hidden] { display: none; }` the button shows
@@ -17,7 +18,7 @@ const doc = (html: string) => new DOMParser().parseFromString(html, "text/html")
 const text = (el: Element | null | undefined) =>
   (el?.textContent ?? "").replace(/[‘’]/g, "'").replace(/\s+/g, " ").trim();
 
-const KIT_LINK_TEXT = "Listed here? Get the honoree badge for your site.";
+const KIT_LINK_TEXT = "Listed? Get the honoree badge.";
 
 /** Every CSS rule the page loads: inline <style> blocks plus /_astro/ stylesheets. */
 function pageCss(html: string): string {
@@ -64,19 +65,18 @@ describe("cssRules, the parser this file relies on", () => {
 describe("/leaderboard/ links to the badge kit", () => {
   const page = doc(readDist("leaderboard/index.html"));
 
-  it("has the kit link, with its exact words, right after the edition summary", () => {
+  it("has the kit link, with its exact words, in the line under the edition heading", () => {
     const links = [...page.querySelectorAll<HTMLAnchorElement>("main a[href='/leaderboard/kit/']")];
     expect(links).toHaveLength(1);
     const link = links[0]!;
     expect(text(link)).toBe(KIT_LINK_TEXT);
     const para = link.parentElement!;
     expect(para.tagName).toBe("P");
-    expect(text(para)).toBe(KIT_LINK_TEXT);
-    // The paragraph before it is the edition summary, under the edition heading.
-    const summary = para.previousElementSibling!;
-    expect(summary.tagName).toBe("P");
-    expect(summary.previousElementSibling?.tagName).toBe("H2");
-    expect(text(summary)).toMatch(/2026 Overall, Startup and Community Picks boards/);
+    expect(text(para).endsWith(KIT_LINK_TEXT)).toBe(true);
+    // The line sits right under the edition heading, before the table.
+    const heading = para.previousElementSibling!;
+    expect(heading.tagName).toBe("H2");
+    expect(text(heading)).toBe("2026 Honorees");
   });
 
   it("points at a page that is in the build", () => {
