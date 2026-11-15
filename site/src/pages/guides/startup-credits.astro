@@ -444,6 +444,7 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
   }
   .tile {
     display: grid;
+    align-content: start;
     gap: var(--s-1);
     height: 100%;
     color: var(--c-text);
@@ -462,6 +463,9 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
   .tile:hover .tile__name,
   .tile:focus-visible .tile__name {
     text-decoration: underline;
+  }
+  .tiles + h2 {
+    margin-top: var(--s-7);
   }
   /* What the programs cover: a name, a bar and a count per row, bars aligned. */
   .covers-chart {
@@ -507,10 +511,13 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
   .steps li {
     margin-bottom: var(--s-2);
   }
-  .traps summary {
+  /* A disclosure keeps the browser's own triangle, so it reads as one, and a
+     44 px row to tap. */
+  .traps summary,
+  td details summary {
+    display: list-item;
     min-height: var(--size-tap);
-    display: flex;
-    align-items: center;
+    padding-block: var(--s-2);
   }
   .traps li {
     margin-bottom: var(--s-3);
@@ -572,9 +579,6 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
     font-weight: 700;
   }
   td details summary {
-    min-height: var(--size-tap);
-    display: flex;
-    align-items: center;
     color: var(--ink-link, var(--c-link));
   }
   details[open] summary {
