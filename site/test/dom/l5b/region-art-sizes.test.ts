@@ -8,7 +8,8 @@ import { readDist } from "../pages";
 // settings), where a region card draws 360 px wide: 412 less two 24 px
 // gutters and the card's two 2 px borders. "100vw" there fetched the 800w
 // file (86 KB) for each of the three cards; the drawn width fetches the 640w
-// (58 KB). Built HTML from dist/ (run `npm run build` first).
+// (58 KB). Brand v3 paintings ship 720w and 1440w webp, so the lab now fetches
+// the 720w (67 to 94 KB). Built HTML from dist/ (run `npm run build` first).
 
 const LAB = { width: 412, dpr: 1.75 };
 
@@ -48,10 +49,10 @@ const cardImages = (file: string) =>
   });
 
 describe("region art sizes (mobile LCP on /regions/)", () => {
-  it.each(["regions/index.html", "index.html"])("%s: each card asks for the 640w file at the lab's 412 px", (file) => {
+  it.each(["regions/index.html", "index.html"])("%s: each card asks for the 720w file at the lab's 412 px", (file) => {
     for (const img of cardImages(file)) {
       expect(drawnWidth(img.getAttribute("sizes")!, LAB.width)).toBe(360);
-      expect(pickedWidth(img)).toBe(640);
+      expect(pickedWidth(img)).toBe(720);
     }
   });
 
@@ -61,10 +62,10 @@ describe("region art sizes (mobile LCP on /regions/)", () => {
     expect(drawnWidth(sizes, 1280)).toBe(380); // three columns, 1180 px wrap
   });
 
-  it.each(REGION_IDS)("/regions/%s/: the hero asks for the 640w file at 412 px", (id) => {
+  it.each(REGION_IDS)("/regions/%s/: the hero asks for the 720w file at 412 px", (id) => {
     const img = doc(`regions/${id}/index.html`).querySelector("main .region-art--hero img");
     expect(img).not.toBeNull();
     expect(drawnWidth(img!.getAttribute("sizes")!, LAB.width)).toBe(364);
-    expect(pickedWidth(img!)).toBe(640);
+    expect(pickedWidth(img!)).toBe(720);
   });
 });

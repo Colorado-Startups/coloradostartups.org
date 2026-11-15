@@ -27,7 +27,7 @@ const rows = Object.entries(PLACE_CREDITS).map(([place, c]) => ({
   <section class="section section--band" aria-labelledby="places-title">
     <div class="wrap">
       <h2 id="places-title">Place paintings</h2>
-      <div class="table-scroll">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Place painting credits">
         <table>
           <thead>
             <tr><th scope="col">Place</th><th scope="col">Region</th><th scope="col">Painting</th><th scope="col">Source photo</th></tr>

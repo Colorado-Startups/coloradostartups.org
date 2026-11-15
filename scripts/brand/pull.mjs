@@ -44,7 +44,9 @@ export function checkFiles(lock, root = ROOT) {
     if (!existsSync(file)) { problems.push(`${basename(path)}: missing; run npm run brand:pull`); continue; }
     const got = sha256(readFileSync(file));
     if (got !== want) problems.push(`${basename(path)}: sha256 ${got.slice(0, 12)} is not the lock's ${want.slice(0, 12)}`);
-    if (!existsSync(join(root, OUT, sizeName(path, WIDTHS[0])))) problems.push(`${sizeName(path, WIDTHS[0])}: missing; run npm run brand:pull`);
+    for (const w of WIDTHS) {
+      if (!existsSync(join(root, OUT, sizeName(path, w)))) problems.push(`${sizeName(path, w)}: missing; run npm run brand:pull`);
+    }
   }
   return problems;
 }
@@ -58,7 +60,10 @@ async function pull(lock) {
     if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
     const buf = Buffer.from(await res.arrayBuffer());
     const got = sha256(buf);
-    if (got !== want) throw new Error(`${path}: sha256 ${got} is not the lock's ${want}`);
+    if (got !== want) {
+      console.error(`brand: ${path}: sha256 ${got} is not the lock's ${want}`);
+      process.exit(1);
+    }
     writeFileSync(join(ROOT, OUT, basename(path)), buf);
     const { width } = await sharp(buf).metadata();
     for (const w of WIDTHS.filter((w) => w <= width)) {
@@ -74,7 +79,7 @@ function selfTest() {
     mkdirSync(join(dir, OUT), { recursive: true });
     const clean = Buffer.from("clean");
     writeFileSync(join(dir, OUT, "a.jpg"), clean);
-    writeFileSync(join(dir, OUT, sizeName("a.jpg", WIDTHS[0])), "x");
+    for (const w of WIDTHS) writeFileSync(join(dir, OUT, sizeName("a.jpg", w)), "x");
     const lock = { repo: "o/r", tag: "t", files: { "dist/a.jpg": sha256(clean) } };
     const ok = checkFiles(lock, dir).length === 0;
     writeFileSync(join(dir, OUT, "a.jpg"), "tampered");
