@@ -140,7 +140,7 @@ describe("Fusion Canyon copy", () => {
   const fc = yamlOf("fusion-canyon");
 
   it("never places the region inside a canyon", () => {
-    for (const field of ["tagline", "summary"]) expect(String(fc[field]), field).not.toMatch(INSIDE_A_CANYON);
+    for (const field of ["summary"]) expect(String(fc[field]), field).not.toMatch(INSIDE_A_CANYON);
   });
 
   it("says it is named for the canyon and built on the plain", () => {

@@ -1,7 +1,7 @@
 // The four topic guides (lane L23): start a company, accelerators and
 // incubators, where founders meet, and funding programs. guides.ts routes to
 // them through BUILDERS.
-import { type ResourceCard, WAYS_IN } from "@cs/shared";
+import { regionLede, type ResourceCard, WAYS_IN } from "@cs/shared";
 import { ELSEWHERE, NOT_CITIES, regionForCity } from "../regions/match";
 import { andList } from "../regions/page";
 
@@ -138,7 +138,7 @@ export function whereFoundersMeet({ records, regions, date }: GuideInput): Guide
       id: region.id,
       heading: region.name,
       intro: [
-        `${region.tagline} Startup Resources lists ${count(items.length, "place", "places")} around ${andList(region.cities)}. `,
+        `${regionLede(region)} Startup Resources lists ${count(items.length, "place", "places")} around ${andList(region.cities)}. `,
         { text: `Visit the ${region.name} page`, href: `/regions/${region.id}/` },
         " for the region's Connector seat and its full list of resources.",
       ],

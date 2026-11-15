@@ -32,12 +32,12 @@ describe("one source for small pieces", () => {
     expect(grep(String.raw`0 4px 0 var\(--c-`)).toEqual([]);
   });
 
-  it("has the footer read the address, the tagline and the list join from their one home (#706)", () => {
+  it("has the footer read the address and the list join from their one home (#706)", () => {
     const footer = readFileSync(path.join(SITE, "src/components/ui/SiteFooter.astro"), "utf8");
     for (const copy of ["951 20th Street", "A community of founders building companies in Colorado", 'join(", ")']) {
       expect(footer, copy).not.toContain(copy);
     }
-    for (const helper of ["andList(", "{TAGLINE}", "POSTAL_ADDRESS.map("]) expect(footer, helper).toContain(helper);
+    for (const helper of ["andList(", "POSTAL_ADDRESS.map("]) expect(footer, helper).toContain(helper);
   });
 });
 

@@ -1,10 +1,10 @@
 ---
-// One region on /regions/, on L12's Card: art, name, tagline, core cities and
+// One region on /regions/, on L12's Card: art, name, lede (summary first sentence), core cities and
 // the Connector seat's state. A seat that takes applications adds the apply
 // link and the unpaid line (decision 67). The swatch beside the cities
 // matches the region's color on the Front Range map, so the cards double as
 // its legend. Lay these out in a <ul class="hall-grid">. Owner: L8.
-import type { Region } from "@cs/shared";
+import { type Region, regionLede } from "@cs/shared";
 
 import { REGION_COLORS } from "../../lib/regions/map";
 import { andList, type Organizer, seatRole } from "../../lib/regions/page";
@@ -38,7 +38,7 @@ const role = seatRole(position, region.name);
       </Badge>
     )
   }
-  <p>{region.tagline}</p>
+  <p>{regionLede(region)}</p>
   <span slot="meta" class="cities">
     <span class="swatch" style={`--swatch: ${REGION_COLORS[region.id]}`} aria-hidden="true"></span>
     {andList(region.cities)}

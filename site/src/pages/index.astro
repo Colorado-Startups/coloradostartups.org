@@ -19,7 +19,7 @@ import WelcomeDesk from "../components/communitas/WelcomeDesk.astro";
 import { HALL_ART_ALT } from "../components/art/keepers";
 import HeroArt from "../components/hall/HeroArt.astro";
 import KeeperTeasers from "../components/hall/KeeperTeasers.astro";
-import { homeJsonLd, TAGLINE } from "../components/hall/org";
+import { DESCRIPTOR, homeJsonLd } from "../components/hall/org";
 import RegionTeasers from "../components/hall/RegionTeasers.astro";
 import WaysIn from "../components/hall/WaysIn.astro";
 import Badge from "../components/ui/Badge.astro";
@@ -31,7 +31,7 @@ import ResourcusPanel from "../components/resourcus/ResourcusPanel.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const site = Astro.site!;
-const description = `${TAGLINE} Join the Slack and the LinkedIn Group, find startup resources and meet the founders building here.`;
+const description = `${DESCRIPTOR} Join the Slack and the LinkedIn Group, find startup resources and meet the founders building here.`;
 ---
 
 <BaseLayout title="Colorado Startups" description={description} ogImage="home" jsonLd={homeJsonLd(site)}>
@@ -39,7 +39,7 @@ const description = `${TAGLINE} Join the Slack and the LinkedIn Group, find star
     <div class="wrap hero-copy">
       <h1 id="hall-title">Colorado Startups</h1>
       <p class="lede">
-        {TAGLINE} Come in, meet the founders already building here and find what your company needs next.
+        Meet the founders building companies in Colorado, and find what your company needs next.
       </p>
       <p class="welcome-too">Talent, investors, lenders and service providers who back founders are welcome too.</p>
       <div class="btn-row">
