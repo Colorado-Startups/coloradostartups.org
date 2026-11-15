@@ -100,7 +100,7 @@ describe("coloradoMapSvg", () => {
   it("draws in the region tokens, never a hex", () => {
     expect(svg).toMatch(/var\(--c-accent-deep\)/);
     expect(svg).toMatch(/var\(--c-community\)/);
-    expect(svg).toMatch(/var\(--c-link\)/);
+    expect(svg).toMatch(/var\(--c-fire\)/);
     expect(svg).not.toMatch(/#[0-9a-fA-F]{6}\b/);
   });
 });

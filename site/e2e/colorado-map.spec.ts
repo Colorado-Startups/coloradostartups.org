@@ -27,6 +27,8 @@ for (const width of [1280, 375]) {
     await expect(map).toHaveClass(/is-live/, { timeout: 30_000 });
     await expect(map.locator("canvas")).toBeVisible();
     await expect(map.locator(".colorado-map__label")).toHaveCount(3);
+    // Idle means the basemap tiles came in too; a blocked tile logs an error first.
+    await expect(map).toHaveAttribute("data-map", "idle", { timeout: 30_000 });
     expect(errors).toEqual([]);
   });
 }

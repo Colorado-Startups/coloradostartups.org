@@ -25,7 +25,7 @@ const STYLES = {
 const ZONE_TOKEN = {
   "photon-mountain": "--c-accent-deep",
   "space-peak": "--c-community",
-  "fusion-canyon": "--c-link",
+  "fusion-canyon": "--c-fire",
 } as const;
 
 function scheme(): keyof typeof STYLES {
@@ -78,6 +78,7 @@ const hasWebGl2 = () => Boolean(document.createElement("canvas").getContext("web
 async function mount(figure: HTMLElement) {
   const host = figure.querySelector<HTMLElement>("[data-map-canvas]");
   if (!host || !hasWebGl2()) return;
+  figure.dataset.map = "loading";
   const [maplibregl, { default: workerUrl }] = await Promise.all([
     import("maplibre-gl"),
     import("maplibre-gl/dist/maplibre-gl-worker.mjs?url"),
@@ -106,6 +107,8 @@ async function mount(figure: HTMLElement) {
     new maplibregl.Marker({ element: el, anchor: "left" }).setLngLat(zoneLabelPoint(z)).addTo(map);
   }
   map.once("load", () => figure.classList.add("is-live"));
+  // "idle": every tile in view has loaded and drawn. Tests and screenshots wait for it.
+  map.once("idle", () => (figure.dataset.map = "idle"));
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => map.setStyle(STYLES[scheme()], { diff: false }));
 }
 
@@ -119,7 +122,7 @@ export function mountColoradoMaps() {
         if (!e.isIntersecting) continue;
         io.unobserve(e.target);
         // A failed load leaves the drawing in place, which is the whole map without the basemap.
-        mount(e.target as HTMLElement).catch(() => undefined);
+        mount(e.target as HTMLElement).catch(() => ((e.target as HTMLElement).dataset.map = "failed"));
       }
     },
     { rootMargin: "200px" },

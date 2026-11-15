@@ -18,7 +18,8 @@ import { loadGeo } from "../seats/load";
 export const REGION_COLORS: Readonly<Record<RegionId, string>> = {
   "photon-mountain": "var(--c-accent-deep)",
   "space-peak": "var(--c-community)",
-  "fusion-canyon": "var(--c-link)",
+  // Fire, not link: the night theme turns links gold, the same as Photon Mountain.
+  "fusion-canyon": "var(--c-fire)",
 };
 
 const TEXT = "var(--c-text)";
