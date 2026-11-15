@@ -1,6 +1,7 @@
 // L4 Resourcus panel in a real browser (OWASP LLM05, improper output
-// handling). /api/ask and Turnstile are mocked, so this runs against the
-// static build with no Worker, no model and no network.
+// handling), on /ask/, where the panel sits in full since the home redesign.
+// /api/ask and Turnstile are mocked, so this runs against the static build
+// with no Worker, no model and no network.
 //
 // The static counterpart is test/unit/l4/panel-sinks.test.ts.
 
@@ -68,7 +69,7 @@ const TEST_SITE_KEY = "1x00000000000000000000AA";
 
 test.beforeEach(async ({ page }) => {
   await page.route(
-    (url) => url.pathname === "/",
+    (url) => url.pathname === "/ask/",
     async (route) => {
       const res = await route.fetch();
       const body = (await res.text()).replace(/data-sitekey(="[^"]*")?(?=[\s>])/g, `data-sitekey="${TEST_SITE_KEY}"`);
@@ -85,7 +86,7 @@ test.beforeEach(async ({ page }) => {
 
 test("model text and card fields render as text, never as HTML", async ({ page }) => {
   await mockApi(page, [{ status: 200, body: HOSTILE }]);
-  await page.goto("/");
+  await page.goto("/ask/");
   const panel = await ask(page, "Where can I cowork?");
   const thread = panel.locator("[data-thread]");
 
@@ -102,7 +103,7 @@ test("Turnstile runs on the first question of a session only", async ({ page }) 
     { status: 200, body: FALLBACK },
     { status: 200, body: FALLBACK },
   ]);
-  await page.goto("/");
+  await page.goto("/ask/");
   const panel = await ask(page, "Where can I cowork?");
   await expect(panel.locator(".resourcus__turn")).toHaveCount(1);
   await ask(page, "And in Boulder?");
@@ -119,7 +120,7 @@ test("Turnstile runs on the first question of a session only", async ({ page }) 
 });
 
 test("a 403 runs Turnstile again and retries once", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/ask/");
   await page.evaluate(() => sessionStorage.setItem("resourcus.verified", "yes"));
   const seen = await mockApi(page, [
     { status: 403, body: { error: "verification" } },
@@ -134,7 +135,7 @@ test("a 403 runs Turnstile again and retries once", async ({ page }) => {
 
 test("a fallback answer explains itself and offers keyword search of the site", async ({ page }) => {
   await mockApi(page, [{ status: 200, body: FALLBACK }]);
-  await page.goto("/");
+  await page.goto("/ask/");
   const panel = await ask(page, "Colorado Startups");
   await expect(panel.getByText("used this month's budget")).toBeVisible();
   await panel.getByRole("button", { name: "Search the site for these words" }).click();
@@ -148,13 +149,13 @@ test("a fallback answer explains itself and offers keyword search of the site", 
 
 test("rate limits and errors show a plain message", async ({ page }) => {
   await mockApi(page, [{ status: 429, body: { error: "rate-limit" } }]);
-  await page.goto("/");
+  await page.goto("/ask/");
   const panel = await ask(page, "Where can I cowork?");
   await expect(panel.locator("[data-status]")).toHaveText("You are asking quickly. Wait a minute, then ask again.");
 });
 
 test("the panel discloses that Resourcus is an AI agent", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/ask/");
   await expect(page.locator("[data-resourcus] .ai-note")).toContainText(
     "Resourcus is an AI agent run by Colorado Startups",
   );

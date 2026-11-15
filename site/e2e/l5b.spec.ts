@@ -44,19 +44,3 @@ test("/get-involved/apply/: Start your application lands on the form", async ({ 
   await expect(page).toHaveURL(/#form-title$/);
   await expect(page.locator("#form-title")).toBeInViewport();
 });
-
-// #723: the home page's Start here pair, the welcome desk and Ask Resourcus,
-// stretches to one height, so both panels end on one line at 1280 px.
-test.describe("home Start here pair at 1280 px", () => {
-  test.use({ viewport: { width: 1280, height: 900 } });
-
-  test("ends both panels on one line", async ({ page }) => {
-    await page.goto("/");
-    await page.evaluate(() => document.fonts.ready);
-    const pair = page.locator(".pair").first();
-    const [desk, ask] = await Promise.all([pair.locator(".welcome-desk").boundingBox(), pair.locator("[data-resourcus]").boundingBox()]);
-    expect(desk && ask).toBeTruthy();
-    expect(Math.abs(desk!.y - ask!.y)).toBeLessThanOrEqual(1);
-    expect(Math.abs(desk!.y + desk!.height - (ask!.y + ask!.height))).toBeLessThanOrEqual(1);
-  });
-});

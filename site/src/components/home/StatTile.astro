@@ -1,0 +1,42 @@
+---
+// One sourced figure: the number, what it counts, and where it comes from.
+// The source line is the fact's own `short` (data/positions/facts.yaml), so a
+// figure never shows without its source.
+import type { StatTileData } from "./home-data";
+
+type Props = StatTileData;
+const { value, label, source } = Astro.props;
+---
+
+<div class="stat">
+  <p class="stat__value">{value}</p>
+  <p class="stat__label">{label}</p>
+  <p class="stat__source">{source}</p>
+</div>
+
+<style>
+  .stat {
+    display: grid;
+    align-content: start;
+    gap: var(--s-1);
+  }
+  .stat p {
+    margin: 0;
+  }
+  .stat__value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-2);
+    line-height: 1.1;
+    color: var(--c-text);
+  }
+  .stat__label {
+    font-size: var(--t-step--1);
+    line-height: 1.35;
+  }
+  .stat__source {
+    font-size: var(--t-step--1);
+    line-height: 1.35;
+    color: var(--c-text-dim);
+  }
+</style>

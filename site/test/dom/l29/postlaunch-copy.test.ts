@@ -82,11 +82,9 @@ describe("the founders forum after launch", () => {
     expect(text(card)).toMatch(/opens later/);
   });
 
-  it("says opens later on the home page, /links/, the welcome desk and llms.txt", () => {
-    const home = doc("index.html");
-    expect(text(home.querySelector(".forum-note"))).toMatch(/^Coming later: a private forum for founders only\./);
+  it("says opens later on /links/, the welcome desk and llms.txt", () => {
     expect(text(doc("links/index.html").querySelector("main"))).toMatch(/A private forum for founders\. It opens later\./);
-    expect(text(home.querySelector("main"))).toMatch(/A private forum for Colorado founders opens later\./);
+    expect(text(doc("community/index.html").querySelector("main"))).toMatch(/A private forum for Colorado founders opens later\./);
     expect(readDist("llms.txt")).toMatch(/^- \[Founders forum\]\([^)]+\): .*It opens later\.$/m);
   });
 });

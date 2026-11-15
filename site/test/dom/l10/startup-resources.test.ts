@@ -15,6 +15,7 @@ const doc = (html: string) => new DOMParser().parseFromString(html, "text/html")
 const canvas = doc(readDist("ecosystem-canvas/index.html"));
 const home = doc(readDist("index.html"));
 const team = doc(readDist("team/index.html"));
+const askPage = doc(readDist("ask/index.html"));
 const STAGE_IDS = ["idea", "launch", "growth", "support"];
 const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 
@@ -106,14 +107,14 @@ describe("one name, Startup Resources, for the directory (#141)", () => {
     expect(text).not.toMatch(/Map Room/);
   });
 
-  it("badges the home page's directory card without a second name", () => {
-    const teaser = home.querySelector('[data-teaser="resources"]');
-    expect(teaser?.textContent).not.toMatch(/Map Room|Canvas/);
-    expect(teaser?.querySelector(".hall-badge")?.textContent?.trim()).toBe("Directory");
+  it("names the home page's directory tile Startup Resources, with no second name", () => {
+    const tile = home.querySelector('a.explore[href="/ecosystem-canvas/"]');
+    expect(tile?.textContent).toMatch(/Startup Resources/);
+    expect(tile?.textContent).not.toMatch(/Map Room|Canvas/);
   });
 
   it("says Startup Resources in the Resourcus panel on both pages that place it", () => {
-    for (const page of [home, canvas]) {
+    for (const page of [askPage, canvas]) {
       const panel = page.querySelector("main [data-resourcus]");
       expect(panel?.textContent).toMatch(/Resourcus searches Startup Resources/);
       expect(panel?.textContent).not.toMatch(/Canvas/);
@@ -126,9 +127,6 @@ describe("one name, Startup Resources, for the directory (#141)", () => {
     expect(card?.textContent).not.toMatch(/Canvas/);
     expect(card?.querySelector("[data-disclosure]")?.textContent).toMatch(/^Resourcus is an AI agent run by Colorado Startups/);
     expect(card?.querySelector("img")?.getAttribute("alt")).toMatch(/Keeper of Startup Resources: an AI agent/);
-    const teaser = home.querySelector("[data-keeper='resourcus']");
-    expect(teaser?.textContent).toMatch(/Keeper of Startup Resources\./);
-    expect(teaser?.textContent).not.toMatch(/Canvas/);
   });
 });
 

@@ -77,6 +77,24 @@ const openCode = JSON.stringify(
 </BaseLayout>
 
 <script>
+  // A search from another page (the home page's Ask box) arrives as ?q=.
+  // Put the words in Pagefind's box and fire an input event, so it searches.
+  // Pagefind draws its box after the page loads, so look for it a few times.
+  const q = new URLSearchParams(location.search).get("q")?.trim();
+  if (q) {
+    void customElements.whenDefined("pagefind-input").then(() => {
+      const fill = (tries: number) => {
+        const host = document.querySelector("[data-ask-search] pagefind-input");
+        const input = host?.querySelector("input") ?? host?.shadowRoot?.querySelector("input");
+        if (input) {
+          input.value = q;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        } else if (tries > 0) setTimeout(() => fill(tries - 1), 100);
+      };
+      fill(30);
+    });
+  }
+
   // Each copy button copies the code block in its own card.
   for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
     const label = button.textContent ?? "";

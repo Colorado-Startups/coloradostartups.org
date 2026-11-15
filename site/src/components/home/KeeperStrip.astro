@@ -1,0 +1,65 @@
+---
+// The keepers on the home page: one slim strip, last on the page. It is an AI
+// disclosure surface (.claude/rules/ai-disclosure.md): the line names each
+// keeper as an AI agent, and each portrait's alt text, from portraitAlt(),
+// says "AI agent" too. Keepers come from data/team/dwarves.yaml in file order.
+import { getCollection } from "astro:content";
+
+import { portraitAlt } from "../art/keepers";
+import Portrait from "../art/Portrait.astro";
+import { inFileOrder } from "../team/order";
+
+const keepers = inFileOrder("dwarves", (await getCollection("dwarves")).map((k) => k.data));
+const names = keepers.map((k) => k.name);
+const list = `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+---
+
+<div class="keeper-strip" data-keeper-strip>
+  <ul class="keeper-strip__faces" role="list">
+    {
+      keepers.map((k) => (
+        <li data-face={k.id}>
+          <Portrait id={k.id} size="small" alt={portraitAlt(k.id, k.name, k.title)} sizes="56px" />
+        </li>
+      ))
+    }
+  </ul>
+  <p><strong>{list} are AI agents.</strong> They welcome, map resources and draft the news. People run the community.</p>
+  <a href="/team/">Meet the team</a>
+</div>
+
+<style>
+  .keeper-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-5);
+  }
+  .keeper-strip p {
+    flex: 1 1 24rem;
+    margin: 0;
+  }
+  .keeper-strip__faces {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .keeper-strip__faces li {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: var(--line-edge) solid var(--c-accent);
+    background: var(--c-surface);
+  }
+  .keeper-strip__faces li + li {
+    margin-left: calc(-1 * var(--s-2));
+  }
+  .keeper-strip__faces :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

@@ -1,5 +1,4 @@
-// The four ways into the community, as the home page's WaysIn cards show
-// them, and the outside links /links/ lists. Owner: L1. Every href comes from
+// The four ways into the community, and the outside links /links/ lists. Owner: L1. Every href comes from
 // WAYS_IN in @cs/shared, so a way in cannot point somewhere new without a
 // reviewed change there. The Slack sign-up form's URL lives only in
 // ops/redirects/map.csv, behind WAYS_IN.slack (#128).

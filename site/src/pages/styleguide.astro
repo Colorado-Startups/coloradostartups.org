@@ -5,6 +5,7 @@
 import Foundations from "../components/styleguide/Foundations.astro";
 import Primitives from "../components/styleguide/Primitives.astro";
 import ColoradoMap from "../components/map/ColoradoMap.astro";
+import LiveMaps from "../components/map/LiveMaps.astro";
 import Rooms from "../components/styleguide/Rooms.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import "../components/styleguide/styleguide.css";
@@ -19,6 +20,7 @@ import "../components/styleguide/styleguide.css";
       <h2 id="map">Map</h2>
       <p>The statewide map: the drawing shows first, and the live map loads over it near the screen.</p>
       <ColoradoMap id="sg-colorado-map" />
+      <LiveMaps />
     </div>
   </section>
 </BaseLayout>

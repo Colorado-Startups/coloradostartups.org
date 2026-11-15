@@ -7,13 +7,15 @@ import { isCurrent, NAV, type NavItem } from "../../../src/components/ui/nav";
 import { GUIDE_SLUGS } from "../../../src/lib/guides/guides";
 import { contentPages, readDist } from "../pages";
 
-const LABELS = ["Community", "Startup Resources", "Leaderboard", "Regions", "Team", "Get involved"];
+const LABELS = ["Regions", "Startup Resources", "Leaderboard", "Events", "Community", "Ask"];
 const RESOURCES = NAV.find((item) => item.label === "Startup Resources")!;
 
 describe("NAV", () => {
-  it("lists six items, Get involved last", () => {
+  // The redesign's order (2026-11-15): where, what to use, who builds here,
+  // when to meet, the people, then asking the data.
+  it("lists six items, Ask last", () => {
     expect(NAV.map((item) => item.label)).toEqual(LABELS);
-    expect(NAV.at(-1)?.href).toBe("/get-involved/");
+    expect(NAV.at(-1)?.href).toBe("/ask/");
   });
 
   it('calls the directory "Startup Resources" and keeps its URL', () => {
@@ -62,8 +64,11 @@ describe("the built header", () => {
     ["guides/index.html", ["Startup Resources"]],
     ...GUIDE_SLUGS.map((slug): [string, string[]] => [`guides/${slug}/index.html`, ["Startup Resources"]]),
     ["guides/startup-credits/index.html", ["Startup Resources"]],
-    ["get-involved/index.html", ["Get involved"]],
-    ["team/index.html", ["Team"]],
+    ["get-involved/index.html", ["Community"]],
+    ["team/index.html", ["Community"]],
+    ["community/index.html", ["Community"]],
+    ["event-calendar/index.html", ["Events"]],
+    ["ask/index.html", ["Ask"]],
   ];
   it.each(cases)("%s marks %j as the current page", (file, expected) => {
     expect(current(parse(readDist(file)))).toEqual(expected);
