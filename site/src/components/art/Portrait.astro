@@ -1,19 +1,21 @@
 ---
 // A keeper's portrait: Communitas, Resourcus or Publicus, all three AI agents.
-// Files live at src/assets/art/agents/<id>.webp (large, half body, 4:5) and
-// <id>-small.webp (head and shoulders, 1:1), matching Wave 0b's
-// `portrait: agents/<id>` field in data/team/dwarves.yaml. Each size shows its
+// The pictures are brand v3's (brand dist/hall/, decision 53), pulled into
+// site/public/art/brand/ by scripts/brand/pull.mjs: <id> (large, half body, 4:5)
+// and <id>-small (head and shoulders, 1:1). They are served as-is, so their
+// AI-made label stays in the file (art-assets.ts brandArt). Each size shows its
 // own file; with none, it shows a placeholder in the keeper's color.
 // test/unit/l7/art-components.test.ts checks both files exist for every keeper.
-// Idle motion: the lantern glow flickers on both sizes, and embers rise on the
-// large one; both stop under prefers-reduced-motion.
+// Idle motion: a lantern glow flickers where the keeper holds a light, embers
+// rise on the large one, and a halo rings the small one; all stop under
+// prefers-reduced-motion.
 // Use portraitAlt() from ./keepers for alt text that says it is an AI agent.
 // The large portrait goes inside L12's Frame (for example shape="arch"
 // ratio="4 / 5"): pass `framed`, and the portrait renders a plain
 // .hall-frame__art box while the Frame draws the bevel. Owned by L7; see
 // art/DIRECTION.md.
 import { Image } from "astro:assets";
-import { findArt, fitWidths } from "./art-assets";
+import { brandArt, findArt, fitWidths } from "./art-assets";
 import { EMBERS, emberStyle } from "./embers";
 import { KEEPERS, portraitKeys, type KeeperId } from "./keepers";
 import "./idle-motion.css";
@@ -37,13 +39,16 @@ const { id, alt, size = "large", sizes, widths: widthsProp, framed = false, load
 
 const keeper = KEEPERS[id];
 const keys = portraitKeys(id);
-const art = findArt(size === "small" ? keys.small : keys.large);
+const key = size === "small" ? keys.small : keys.large;
+const brand = brandArt(key);
+const art = brand ? undefined : findArt(key);
 const widths = widthsProp ?? (size === "small" ? [96, 160, 320] : [480, 720, 960]);
 // The sizes attribute cannot read CSS variables, so it uses rem: 6rem is the
 // 96 px avatar, 30rem the 480 px card, 40rem the 640 px breakpoint.
 const defaultSizes = size === "small" ? "6rem" : "(max-width: 40rem) 90vw, 30rem";
 const initial = id.charAt(0).toUpperCase();
-const style = `--anchor:${keeper.anchor};--glow-x:${keeper.glow.x};--glow-y:${keeper.glow.y}`;
+const glow = keeper.glow ?? { x: "50%", y: "30%" };
+const style = `--anchor:${keeper.anchor};--glow-x:${glow.x};--glow-y:${glow.y}`;
 // A Frame is already the <figure>; inside one, this is just the picture box.
 const Root = framed ? "div" : "figure";
 ---
@@ -54,7 +59,19 @@ const Root = framed ? "div" : "figure";
   data-portrait={id}
 >
   {
-    art ? (
+    brand ? (
+      <img
+        src={brand.src}
+        srcset={brand.srcset}
+        sizes={sizes ?? defaultSizes}
+        width={brand.width}
+        height={brand.height}
+        alt={alt}
+        loading={loading}
+        decoding="async"
+        fetchpriority={loading === "eager" ? "high" : "auto"}
+      />
+    ) : art ? (
       <Image
         src={art}
         alt={alt}
@@ -73,7 +90,7 @@ const Root = framed ? "div" : "figure";
       </div>
     )
   }
-  {size === "large" && <span class="art-glow" aria-hidden="true" />}
+  {size === "large" && keeper.glow && <span class="art-glow" aria-hidden="true" />}
   {
     size === "large" && (
       <span class="art-embers" aria-hidden="true">

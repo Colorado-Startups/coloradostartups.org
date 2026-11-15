@@ -1,0 +1,116 @@
+{
+  "boulder": {
+    "file": "boulder.jpg",
+    "width": 1440,
+    "height": 720,
+    "widths": [
+      720,
+      1440
+    ]
+  },
+  "golden": {
+    "file": "golden.jpg",
+    "width": 1440,
+    "height": 720,
+    "widths": [
+      720,
+      1440
+    ]
+  },
+  "denver": {
+    "file": "denver.jpg",
+    "width": 1440,
+    "height": 720,
+    "widths": [
+      720,
+      1440
+    ]
+  },
+  "springs": {
+    "file": "springs.jpg",
+    "width": 1440,
+    "height": 720,
+    "widths": [
+      720,
+      1440
+    ]
+  },
+  "fortcollins": {
+    "file": "fortcollins.jpg",
+    "width": 1440,
+    "height": 720,
+    "widths": [
+      720,
+      1440
+    ]
+  },
+  "communitas": {
+    "file": "communitas.png",
+    "width": 960,
+    "height": 1200,
+    "widths": [
+      720,
+      960
+    ]
+  },
+  "communitas-small": {
+    "file": "communitas-small.png",
+    "width": 320,
+    "height": 320,
+    "widths": [
+      320
+    ]
+  },
+  "resourcus": {
+    "file": "resourcus.png",
+    "width": 960,
+    "height": 1200,
+    "widths": [
+      720,
+      960
+    ]
+  },
+  "resourcus-small": {
+    "file": "resourcus-small.png",
+    "width": 320,
+    "height": 320,
+    "widths": [
+      320
+    ]
+  },
+  "publicus": {
+    "file": "publicus.png",
+    "width": 960,
+    "height": 1200,
+    "widths": [
+      720,
+      960
+    ]
+  },
+  "publicus-small": {
+    "file": "publicus-small.png",
+    "width": 320,
+    "height": 320,
+    "widths": [
+      320
+    ]
+  },
+  "passage": {
+    "file": "passage.jpg",
+    "width": 1344,
+    "height": 756,
+    "widths": [
+      720,
+      1344
+    ]
+  },
+  "founders": {
+    "file": "founders.jpg",
+    "width": 1344,
+    "height": 756,
+    "widths": [
+      720,
+      1344
+    ]
+  }
+}

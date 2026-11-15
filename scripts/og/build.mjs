@@ -14,7 +14,7 @@
 // Inputs:
 //   art/og/cards.txt                 card names and art (in art/ so the content gate scans it)
 //   data/regions/<id>.yaml           name and art for the region cards (L8's data)
-//   site/public/art/brand/<name>.jpg brand/<name> art, pulled by scripts/brand/pull.mjs
+//   site/public/art/brand/<name>.*   brand/<name> art (jpg or png), pulled by scripts/brand/pull.mjs
 //   site/src/assets/art/<key>.*      other art; falls back to brand/golden, and exits 3 without it.
 //                                    Wide art covers the card; a portrait stands whole at the right
 //   @fontsource/aileron              Aileron Regular, the brand's display face (brand tokens/type.yaml, CC0)
@@ -109,8 +109,8 @@ function loadAileron(fontkit) {
 function findArtFile(key) {
   // Brand v3 art (brand/<name>) is pulled by scripts/brand/pull.mjs; draw on the original.
   if (key.startsWith("brand/")) {
-    const file = path.join(ROOT, "site/public/art/brand", `${key.slice("brand/".length)}.jpg`);
-    return fs.existsSync(file) ? file : undefined;
+    const base = path.join(ROOT, "site/public/art/brand", key.slice("brand/".length));
+    return ["jpg", "png"].map((ext) => `${base}.${ext}`).find((file) => fs.existsSync(file));
   }
   for (const ext of ["webp", "png", "jpg"]) {
     const file = path.join(ART_DIR, `${key}.${ext}`);

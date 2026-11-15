@@ -1,6 +1,6 @@
 # coloradostartups.org
 
-The [Colorado Startups](https://coloradostartups.org) website, for entrepreneurs building companies in Colorado. Founders come first. It is "the Hall", a golden forge-kingdom carved into the Front Range. Anyone can improve it: see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+The [Colorado Startups](https://coloradostartups.org) website, for founders building companies in Colorado. It is "the Hall", a golden forge-kingdom carved into the Front Range. Anyone can improve it: see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 Brand: [Colorado Startups brand guide](https://colorado-startups.github.io/brand/)
 

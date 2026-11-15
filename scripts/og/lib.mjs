@@ -115,9 +115,13 @@ export const DISCLOSURE = "AI agent";
 // (art/prompts/region-*.txt), so the region cards disclose too (#761).
 const KEEPER_SCENES = new Set(["hero/hall", "regions/photon-mountain", "regions/space-peak", "regions/fusion-canyon"]);
 
+// The brand v3 keeper portraits (brand dist/hall/, decision 53), as art keys.
+const BRAND_KEEPER = /^brand\/(communitas|resourcus|publicus)(-small)?$/;
+
 // True for art that shows a keeper: a keeper portrait, or a scene with keepers in it.
 export function isKeeperArt(art) {
-  return /^agents\//.test(String(art ?? "")) || KEEPER_SCENES.has(String(art ?? ""));
+  const key = String(art ?? "");
+  return /^agents\//.test(key) || BRAND_KEEPER.test(key) || KEEPER_SCENES.has(key);
 }
 
 // The line build.mjs adds under a card whose picture shows keepers when the

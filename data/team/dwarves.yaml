@@ -40,7 +40,7 @@
     - The welcome desk on this website
     - The Colorado Startups Slack
   disclosure: Communitas is an AI agent run by Colorado Startups. It can make mistakes, and a person reviews its work.
-  portrait: agents/communitas
+  portrait: brand/communitas
 
 - id: resourcus
   kind: gnome
@@ -71,7 +71,7 @@
     - Startup Resources on this website
     - The Colorado Startups Slack, through Communitas
   disclosure: Resourcus is an AI agent run by Colorado Startups on an open-source model. It can make mistakes, so check each resource before you rely on it.
-  portrait: agents/resourcus
+  portrait: brand/resourcus
 
 - id: publicus
   kind: dwarf
@@ -99,4 +99,4 @@
     - Dispatches on this website
     - Drafts for the Colorado Startups LinkedIn Page and newsletter
   disclosure: Publicus is an AI agent run by Colorado Startups. It can make mistakes, so it only drafts; a person reviews and publishes everything.
-  portrait: agents/publicus
+  portrait: brand/publicus

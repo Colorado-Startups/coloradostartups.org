@@ -9,10 +9,14 @@ import { contentPages } from "../pages";
 
 type Place = keyof typeof PLACE_ART_ALT;
 
+const isPlace = (name: string): name is Place => Object.hasOwn(PLACE_ART_ALT, name);
+
+// Only the place paintings: the brand's hall scenes (brand/passage,
+// brand/founders) carry their own alts, checked in page-polish/founders-404.test.ts.
 const shown = contentPages().flatMap((p) =>
-  [...new DOMParser().parseFromString(p.html, "text/html").querySelectorAll<HTMLElement>('[data-art^="brand/"]')].map(
-    (fig) => [p.route, fig.dataset.art!.slice("brand/".length) as Place, fig.querySelector("img")?.getAttribute("alt")] as const,
-  ),
+  [...new DOMParser().parseFromString(p.html, "text/html").querySelectorAll<HTMLElement>('[data-art^="brand/"]')]
+    .map((fig) => [p.route, fig.dataset.art!.slice("brand/".length), fig.querySelector("img")?.getAttribute("alt")] as const)
+    .filter((row): row is readonly [string, Place, string | null | undefined] => isPlace(row[1])),
 );
 
 describe("the brand place paintings", () => {

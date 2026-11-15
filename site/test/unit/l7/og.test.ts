@@ -135,6 +135,10 @@ describe("keeper disclosure on cards (L17, hard constraint 10)", () => {
   it("counts the Great Hall as keeper art, and captions a Hall card whose words do not disclose", () => {
     expect(isKeeperArt("hero/hall")).toBe(true);
     expect(isKeeperArt("agents/publicus")).toBe(true);
+    expect(isKeeperArt("brand/publicus")).toBe(true);
+    expect(isKeeperArt("brand/communitas-small")).toBe(true);
+    expect(isKeeperArt("brand/passage")).toBe(false);
+    expect(isKeeperArt("brand/golden")).toBe(false);
     expect(isKeeperArt("scenes/founders")).toBe(false);
     const home = { id: "home", title: "Colorado Startups", art: "hero/hall" };
     expect(disclosureCaption(home)).toBe(DISCLOSURE_CAPTION);

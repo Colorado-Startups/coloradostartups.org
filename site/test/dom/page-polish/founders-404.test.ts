@@ -55,7 +55,7 @@ describe("/founders/ first screen (#218, #212)", () => {
   it("shows the founders scene in the first section, after the button", () => {
     const art = artOf(doc);
     // L6's scene made for this page (#713), in place of the Great Hall.
-    expect(art.map((a) => a.key)).toEqual(["scenes/founders"]);
+    expect(art.map((a) => a.key)).toEqual(["brand/founders"]);
     const [{ figure, img, section }] = art;
     expect(section).toBe(hero);
     expect(img, "the art file exists, so no placeholder").not.toBeNull();
@@ -83,7 +83,7 @@ describe("404 art (#212)", () => {
     expect(art).toHaveLength(1);
     const [{ figure, key, img }] = art;
     // L6's passage to a blank wall (#711), made for this page; no keeper in it.
-    expect(key).toBe("scenes/passage");
+    expect(key).toBe("brand/passage");
     expect(img, "the art file exists, so no placeholder").not.toBeNull();
     expect(img!.getAttribute("alt")?.length).toBeGreaterThan(20);
     const home = doc.querySelector('main a[href="/"]')!;
