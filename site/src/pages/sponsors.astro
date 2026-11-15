@@ -1,0 +1,89 @@
+---
+// /sponsors/: the rewards the GitHub Sponsors tiers promise (Paul, 2026-11-13).
+// lib/sponsors.ts parses data/sponsors/sponsors.yaml; this page renders it.
+// Logos and names sit under a plain "Sponsors" heading, the endorsement
+// disclosure GitHub's Sponsors Additional Terms 2.3.3 ask for.
+import sponsorsRaw from "../../../data/sponsors/sponsors.yaml?raw";
+import InfoHeader from "../components/info/InfoHeader.astro";
+import Button from "../components/ui/Button.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { parseSponsors, shownSponsors, SPONSORS_URL } from "../lib/sponsors";
+
+const sponsors = shownSponsors(parseSponsors(sponsorsRaw), new Date().toISOString().slice(0, 10));
+const logos = sponsors.filter((s) => s.logo);
+---
+
+<BaseLayout
+  title="Sponsors"
+  description="The people and companies who sponsor Colorado Startups through GitHub Sponsors, and how to join them."
+>
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <InfoHeader kicker="Keep the forge lit" title="Sponsor Colorado Startups">
+        <p class="lede">Sponsors back Colorado Startups through GitHub Sponsors.</p>
+        <p>Every tier puts your name on this page. Each tier's rewards are listed on GitHub.</p>
+      </InfoHeader>
+      <Button href={SPONSORS_URL}>Sponsor us</Button>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="sponsors-title">
+    <div class="wrap">
+      <h2 id="sponsors-title">Sponsors</h2>
+      {
+        logos.length > 0 && (
+          <ul class="wall">
+            {logos.map((s) => (
+              <li class="panel">
+                <a href={s.url} rel="sponsored">
+                  <img src={s.logo} alt={s.name} loading="lazy" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      {
+        sponsors.length > 0 ? (
+          <ul class="names">
+            {sponsors.map((s) => (
+              <li>
+                <a href={s.url} rel="sponsored">
+                  {s.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No sponsors yet. Yours could be the first name here.</p>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .wall,
+  .names {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    max-width: none;
+  }
+  .wall {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    margin-bottom: var(--s-6);
+  }
+  .wall a {
+    display: grid;
+    place-items: center;
+    min-height: var(--size-tap);
+  }
+  .names {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .names a {
+    font-weight: 700;
+  }
+</style>

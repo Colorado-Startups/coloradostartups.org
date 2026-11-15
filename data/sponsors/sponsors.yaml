@@ -1,0 +1,15 @@
+# GitHub Sponsors of Colorado Startups (github.com/sponsors/Colorado-Startups).
+# Empty until the first sponsor. Add a row when a sponsor joins. The build
+# checks every row (site/src/lib/sponsors.ts) and the content gate lints the
+# text. /sponsors/ lists every name; a one-time sponsor shows for a year.
+#
+#   - name: The name the sponsor asked us to show
+#     url: https://their-site.example       # https only
+#     tier: trail-supporter                  # or basecamp-backer, summit-sponsor,
+#                                            # peak-partner, one-time-25, one-time-100
+#     logo: /sponsor-logos/their-id.svg      # peak-partner only; file in site/public/sponsor-logos/
+#     since: "2026-11-13"                    # the first payment's date
+#
+# Summit, Peak and one-time-100 sponsors also go in README.md under Sponsors,
+# by hand; test/unit/sponsors/ fails when one is missing.
+[]
