@@ -50,10 +50,8 @@ const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado S
     <link rel="apple-touch-icon" href="/brand/cs-logo-240.png" />
     <link rel="alternate" type="application/feed+json" title="Colorado Startups dispatches" href="/feed.json" />
     <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="Colorado Startups dispatches" />
-    {/* Cinzel's 600, 700 and 800 faces are one variable file, so this is one preload; a weight filter saves nothing. */}
-    <Font cssVariable="--font-display" preload />
-    {/* Only the two faces the first screen draws. 500 and italic load when a page uses them. */}
-    <Font cssVariable="--font-body" preload={[{ weight: 400, style: "normal" }, { weight: 700, style: "normal" }]} />
+    {/* Only Aileron 700, the face h1 and h2 draw in the first screen; body text is a system font (global.css). */}
+    <Font cssVariable="--font-display" preload={[{ weight: 700, style: "normal" }]} />
     <HallTextures />
     {jsonLd && <script type="application/ld+json" set:html={jsonLdText(jsonLd)} />}
     {/* Cloudflare Web Analytics sets no cookies, as privacy.md promises. The edge's automatic injection did not

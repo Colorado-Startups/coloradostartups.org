@@ -313,57 +313,6 @@ test.describe("a web-font swap moves the first screen by no more than the CLS go
   }
 });
 
-// Each fallback face draws text about as wide as the Alegreya face it stands
-// in for, in every weight and style the site loads (#762, and its italic
-// follow-up). One sample sentence per face, measured with the web fonts
-// blocked and loaded. Average-width sizing lands the regular and medium faces
-// within 4 percent here, but Chrome draws the bold ones 4 to 9 percent off
-// (glyph advances alone say 2), so the bound is 10 percent: it catches a
-// missing or misfiled face, as main's italic was (13 percent wide at 400).
-const SAMPLE = "Founders building companies in Colorado find programs, investors and each other here.";
-
-async function sampleWidths(browser: Browser, blockFonts: boolean): Promise<{ widths: Record<string, number>; faces: string }> {
-  const context = await browser.newContext({ viewport: LAB.viewport, deviceScaleFactor: LAB.deviceScaleFactor });
-  try {
-    if (blockFonts) await context.route(/\/_astro\/fonts\/.+\.woff2$/, (route) => route.abort());
-    const page = await context.newPage();
-    await page.goto("/");
-    return await page.evaluate(async (sample) => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--font-body").split(",")[0]!.trim();
-      const spans: [string, HTMLSpanElement][] = [];
-      for (const weight of [400, 500, 700]) {
-        for (const style of ["normal", "italic"]) {
-          // A blocked file rejects; the fallback then draws, which is the point.
-          await document.fonts.load(`${style} ${weight} 18px ${family}`).catch(() => []);
-          const span = document.createElement("span");
-          span.textContent = sample;
-          span.style.cssText = `position:absolute;left:0;top:0;white-space:nowrap;font-family:var(--font-body);font-size:18px;font-weight:${weight};font-style:${style}`;
-          document.body.append(span);
-          spans.push([`${weight} ${style}`, span]);
-        }
-      }
-      // Laying the spans out starts their local() fallback loads; measure only
-      // once those have settled, or a face still loading draws as another font.
-      for (const [, span] of spans) span.getBoundingClientRect();
-      await document.fonts.ready;
-      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
-      // Which fallback faces drew: a local() font the system lacks reads "error".
-      const faces = [...document.fonts]
-        .filter((f) => f.family.includes("Fallback"))
-        .map((f) => `${f.family.replace(/"/g, "")} ${f.weight} ${f.style}: ${f.status}`)
-        .join("; ");
-      return { widths: Object.fromEntries(spans.map(([key, span]) => [key, span.getBoundingClientRect().width])), faces };
-    }, SAMPLE);
-  } finally {
-    await context.close();
-  }
-}
-
-test("each body fallback face draws within 10 percent of Alegreya's width", async ({ browser }) => {
-  const { widths: fallback, faces } = await sampleWidths(browser, true);
-  const { widths: loaded } = await sampleWidths(browser, false);
-  const ratios = Object.keys(loaded).map((key) => [key, fallback[key]! / loaded[key]!] as const);
-  const report = `${ratios.map(([key, r]) => `${key} ${r.toFixed(3)}`).join(", ")} (faces: ${faces})`;
-  console.log(`fallback / Alegreya width: ${report}`);
-  for (const [key, r] of ratios) expect(Math.abs(r - 1), `${key}: ${report}`).toBeLessThanOrEqual(0.1);
-});
+// Body text is a system font since brand v3 (Trebuchet MS, global.css), so no
+// body fallback face stands in for a web font any more; the swap tests above
+// still cover Aileron, the one web font, in h1 and h2.

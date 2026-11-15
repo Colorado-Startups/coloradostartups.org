@@ -43,31 +43,20 @@ export default defineConfig({
       serialize: lastmodSerializer(dataDates()),
     }),
   ],
-  // Self-hosted at build time by the Astro Fonts API. Both are OFL.
-  // Display: Cinzel, all caps by design, headings only. Body: Alegreya Sans.
-  // Cinzel 800 is the chunky carved weight for h1 and banners (L12, decided
-  // 2026-10-18). Google serves Cinzel as one variable file, so it adds no file.
+  // Self-hosted at build time by the Astro Fonts API.
+  // Brand v3 type (Colorado-Startups/brand tokens/type.yaml): Aileron is the
+  // display face (CC0), self-hosted through Fontsource. Body text is Trebuchet
+  // MS, a system font the brand never ships, so it is a CSS stack in
+  // global.css, not a web font. Astro sizes Aileron's Arial fallback from the
+  // font's own metrics, so the swap moves little.
   fonts: [
     {
-      provider: fontProviders.google(),
-      name: "Cinzel",
+      provider: fontProviders.fontsource(),
+      name: "Aileron",
       cssVariable: "--font-display",
-      weights: [600, 700, 800],
+      weights: [400, 700, 800],
       styles: ["normal"],
-      // The Liberation face (fonts.css) is size-matched for Linux.
-      fallbacks: ["Cinzel Fallback Liberation", "Georgia", "Cambria", "serif"],
-    },
-    {
-      provider: fontProviders.google(),
-      name: "Alegreya Sans",
-      cssVariable: "--font-body",
-      weights: [400, 500, 700],
-      styles: ["normal", "italic"],
-      // Astro's own fallback measured the italic file and drew upright text
-      // 9 to 11 percent narrow (#762); fonts.css sizes the Arial, Liberation,
-      // Arimo and Roboto fallbacks from the upright files instead.
-      optimizedFallbacks: false,
-      fallbacks: ["Alegreya Sans Fallback Arial", "Alegreya Sans Fallback Roboto", "system-ui", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+      fallbacks: ["Arial", "sans-serif"],
     },
   ],
 });

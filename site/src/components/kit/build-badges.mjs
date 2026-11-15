@@ -8,17 +8,16 @@
 // Inputs:
 //   site/src/components/kit/badges.ts   the words, ids and size of each badge
 //   01_doctrine/brand_tokens.yaml       every color (the one token source)
-//   Cinzel and Alegreya Sans            the files the Astro Fonts API fetched on build
-//                                       (site/dist/_astro/fonts, then the cache in
-//                                       site/node_modules/.astro/fonts); run `npm run build` once first
+//   @fontsource/aileron                 Aileron, the brand's display face (brand
+//                                       tokens/type.yaml, CC0), pinned by package-lock.json
 //
 // Output besides the badges: badge-fonts.json, beside this file, records the
-// sha256 of each font file the badges were drawn with. Google Fonts does not
-// always serve the same Cinzel for the same request: most builds get the
-// variable file (wght 400 to 900), some get an instanced one (wght 600 to
-// 700) with other outlines (#268). So --check and the badge test in
-// site/test/dom/l26/kit.test.ts compare the SVGs only when the fonts they
-// find are the recorded ones; otherwise they report "could not check".
+// sha256 of each font file the badges were drawn with. --check and the badge
+// test in site/test/dom/l26/kit.test.ts compare the SVGs only when the fonts
+// they find are the recorded ones (a font package update reports "could not
+// check", never a stale badge). Trebuchet MS, the brand's text face, is a
+// system font the brand never ships, so every badge line is Aileron (#268
+// came from Google serving two Cinzels; npm serves one file per version).
 //
 // Text is set as vector paths from the font files, the way scripts/og/build.mjs
 // sets the Open Graph cards. A badge loaded on someone else's site through
@@ -31,19 +30,20 @@
 
 import crypto from "node:crypto";
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import YAML from "yaml";
 
-import { measure, pickFont, textEl as pathEl, textPath as glyphPath, xmlEscape } from "../../../../scripts/og/lib.mjs";
+import { measure, textEl as pathEl, textPath as glyphPath, xmlEscape } from "../../../../scripts/og/lib.mjs";
 import { BADGE_SIZE, KIT_BADGES } from "./badges.ts";
 
 const SITE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const ROOT = path.resolve(SITE, "..");
-// The build's own copy first: the cache keeps every file any earlier build
-// fetched, so it can hold two Cinzels where dist holds one.
-const FONT_DIRS = ["dist/_astro/fonts", "node_modules/.astro/fonts"].map((d) => path.join(SITE, d));
+// Each role's Aileron file: the chunky 800 for the title, 700 for the kicker, 400 for the status.
+const aileron = (weight) => `@fontsource/aileron/files/aileron-latin-${weight}-normal.woff2`;
+const FONT_FILES = { title: aileron(800), kicker: aileron(700), status: aileron(400) };
 export const OUT_DIR = path.join(SITE, "public/badges");
 export const FONT_RECORD = path.join(path.dirname(fileURLToPath(import.meta.url)), "badge-fonts.json");
 
@@ -54,8 +54,6 @@ export function loadTokens() {
 }
 
 // Returns { title, kicker, status }, each { font, embolden, file, sha256 }.
-// Candidates are read in FONT_DIRS order, then by file name, so the same
-// folders always give the same pick (scripts/og/lib.mjs pickFont).
 export async function loadFonts() {
   let fontkit;
   try {
@@ -63,23 +61,17 @@ export async function loadFonts() {
   } catch {
     throw new CannotBuild("the fontkitten package is not installed; run npm ci at the repo root");
   }
-  const fonts = [];
-  for (const dir of FONT_DIRS.filter((d) => fs.existsSync(d))) {
-    for (const f of fs.readdirSync(dir).filter((f) => /\.(woff2?|ttf|otf)$/.test(f)).sort()) {
-      const bytes = fs.readFileSync(path.join(dir, f));
-      try {
-        const font = fontkit.create(bytes);
-        fonts.push({ font, file: path.relative(SITE, path.join(dir, f)), sha256: crypto.createHash("sha256").update(bytes).digest("hex") });
-      } catch {
-        // Not a font fontkitten can read; skip it.
-      }
+  const require = createRequire(import.meta.url);
+  const set = {};
+  for (const [role, spec] of Object.entries(FONT_FILES)) {
+    let file;
+    try {
+      file = require.resolve(spec);
+    } catch {
+      throw new CannotBuild(`could not find ${spec}; run npm ci at the repo root`);
     }
-  }
-  const pick = (family, weight) => pickFont(fonts, family, weight);
-  const set = { title: pick("Cinzel", 700), kicker: pick("Alegreya Sans", 700), status: pick("Alegreya Sans", 500) };
-  const missing = Object.entries(set).filter(([, f]) => !f).map(([k]) => k);
-  if (missing.length) {
-    throw new CannotBuild(`could not find the ${missing.join(", ")} font(s); run \`npm run build\` once so the Astro Fonts API caches them`);
+    const bytes = fs.readFileSync(file);
+    set[role] = { font: fontkit.create(bytes), embolden: 0, file: spec, sha256: crypto.createHash("sha256").update(bytes).digest("hex") };
   }
   return set;
 }

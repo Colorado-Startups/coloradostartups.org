@@ -1,14 +1,14 @@
 {
   "title": {
-    "family": "Cinzel",
-    "sha256": "ef95296c778719c3d658a8284d65078100450948851b9114485ada01d9d3d3f8"
+    "family": "Aileron Heavy",
+    "sha256": "b48d698e4cbbf63d1179a1a907d30c8c5045e9b4cbd83dcaf4247f97b6ba9edd"
   },
   "kicker": {
-    "family": "Alegreya Sans",
-    "sha256": "1a2f3006ecc704345bd35be43341c07b2bc33ff25955d70f47980cffb3099c48"
+    "family": "Aileron Bold",
+    "sha256": "ae42e2a95d57e8a443feeec4066b9e341931864b7b88b58394548508603a5480"
   },
   "status": {
-    "family": "Alegreya Sans Medium",
-    "sha256": "dedb7e4dce28b07cdbebb5de4f5e31a0706c7595916c2eb195a08d097e9070d1"
+    "family": "Aileron",
+    "sha256": "28fe877c9628f72cf370d0f3d2e3f8e826193684fa40c416f5867c2480e118f7"
   }
 }
