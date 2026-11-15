@@ -29,8 +29,18 @@ export const SIZES = "sizes.json";
 export const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 export const stem = (path) => basename(path).replace(/\.[a-z]+$/i, "");
 export const sizeName = (path, w) => `${stem(path)}-${w}.webp`;
-// Pictures get webp sizes and a sizes.json entry; any other file (tokens.json) is copied as it is.
-export const isPicture = (path) => /\.(png|jpe?g|webp)$/i.test(path);
+export const LOGO_WIDTHS = [48, 96, 144];
+
+// The webp widths a pulled file gets, or null to copy it as it is. Place and
+// hall pictures get widthsFor(); the header emblem gets 1x to 3x of its 48 px
+// slot. Favicons, app icons, the large emblem and tokens.json keep their own
+// format for the platforms and tools that read them.
+export function sizesFor(path, width) {
+  if (!/\.(png|jpe?g|webp)$/i.test(path)) return null;
+  if (path.startsWith("dist/logo/")) return path.endsWith("/emblem-512.png") ? LOGO_WIDTHS : null;
+  return widthsFor(width);
+}
+const asIs = (path) => sizesFor(path, Infinity) === null;
 
 // The webp widths for an original `width` px wide: each of WIDTHS it can fill,
 // plus its own width when it falls short of the widest, so a 960 px keeper gets
@@ -59,7 +69,7 @@ export function checkFiles(lock, root = ROOT) {
     if (!existsSync(file)) { problems.push(`${basename(path)}: missing; run npm run brand:pull`); continue; }
     const got = sha256(readFileSync(file));
     if (got !== want) problems.push(`${basename(path)}: sha256 ${got.slice(0, 12)} is not the lock's ${want.slice(0, 12)}`);
-    if (!isPicture(path)) continue;
+    if (asIs(path)) continue;
     const entry = sizes[stem(path)];
     if (!entry || entry.file !== basename(path)) { problems.push(`${SIZES}: no entry for ${basename(path)}; run npm run brand:pull`); continue; }
     for (const w of entry.widths) {
@@ -84,9 +94,9 @@ async function pull(lock) {
       process.exit(1);
     }
     writeFileSync(join(ROOT, OUT, basename(path)), buf);
-    if (!isPicture(path)) { console.log(`brand: ${basename(path)} ok (${lock.tag})`); continue; }
+    if (asIs(path)) { console.log(`brand: ${basename(path)} ok (${lock.tag})`); continue; }
     const { width, height } = await sharp(buf).metadata();
-    const widths = widthsFor(width);
+    const widths = sizesFor(path, width);
     for (const w of widths) {
       await sharp(buf).resize({ width: w }).keepMetadata().webp({ quality: 80 }).toFile(join(ROOT, OUT, sizeName(path, w)));
     }
@@ -107,7 +117,11 @@ function selfTest() {
     writeFileSync(join(dir, OUT, "t.json"), "{}");
     const lock = { repo: "o/r", tag: "t", files: { "dist/a.jpg": sha256(clean), "dist/t.json": sha256(Buffer.from("{}")) } };
     const ok = checkFiles(lock, dir).length === 0;
-    const widthsOk = JSON.stringify([widthsFor(1440), widthsFor(960), widthsFor(320)]) === "[[720,1440],[720,960],[320]]";
+    const widthsOk =
+      JSON.stringify([widthsFor(1440), widthsFor(960), widthsFor(320)]) === "[[720,1440],[720,960],[320]]" &&
+      sizesFor("dist/logo/emblem-512.png", 512) === LOGO_WIDTHS &&
+      sizesFor("dist/logo/favicon.ico", 48) === null &&
+      sizesFor("dist/logo/icon-192.png", 192) === null;
     rmSync(join(dir, OUT, sizeName("a.jpg", 960)));
     const missing = checkFiles(lock, dir).some((p) => p.includes("a-960.webp"));
     writeFileSync(join(dir, OUT, "a.jpg"), "tampered");

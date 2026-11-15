@@ -47,14 +47,20 @@ describe("what every page loads first", () => {
     expect(layout).not.toMatch(/--font-body/);
   });
 
-  it("keeps both logo copies, the same bytes: <Image> imports src/assets, public/ serves the touch icon and feed", () => {
-    const asset = readFileSync(path.join(SITE, "src/assets/brand/cs-logo-240.png"));
-    expect(asset.equals(readFileSync(path.join(SITE, "public/brand/cs-logo-240.png")))).toBe(true);
+  it("draws the brand emblem at 44 px from its small webps, eagerly", () => {
+    const header = read("src/components/ui/SiteHeader.astro");
+    expect(header).toMatch(/brandArt\("brand\/emblem-512"\)/);
+    expect(header).toMatch(/<img src=\{emblem\.src\} srcset=\{emblem\.srcset\} sizes="44px" width="44" height="44"[^>]*loading="eager"/);
+    expect(header).not.toMatch(/cs-logo/);
   });
 
-  it("draws the header logo through <Image> at 44 px, not the 240 px PNG", () => {
-    const header = read("src/components/ui/SiteHeader.astro");
-    expect(header).not.toMatch(/<img[^>]*cs-logo-240\.png/);
-    expect(header).toMatch(/<Image src=\{logo\}[^>]*width=\{44\}[^>]*loading="eager"/);
+  it("links the brand icon set and the manifest", () => {
+    const layout = read("src/layouts/BaseLayout.astro");
+    for (const href of ["/art/brand/favicon.ico", "/art/brand/icon-192.png", "/art/brand/apple-touch-icon.png", "/site.webmanifest"]) {
+      expect(layout, href).toContain(`href="${href}"`);
+    }
+    const manifest = JSON.parse(read("public/site.webmanifest")) as { icons: { src: string }[]; theme_color: string };
+    expect(manifest.theme_color).toBe("#001970");
+    for (const icon of manifest.icons) expect(existsSync(path.join(SITE, "public", icon.src)), icon.src).toBe(true);
   });
 });

@@ -155,8 +155,8 @@ export function buildFeed(entries: readonly FeedEntry[], site: URL): CsFeed {
     feed_url: new URL(FEED_PATH, site).toString(),
     description: FEED_DESCRIPTION,
     language: "en-US",
-    icon: new URL("/brand/cs-logo-240.png", site).toString(),
-    favicon: new URL("/favicon.ico", site).toString(),
+    icon: new URL("/art/brand/icon-512.png", site).toString(),
+    favicon: new URL("/art/brand/favicon.ico", site).toString(),
     authors: [{ name: "Colorado Startups", url: new URL("/", site).toString() }],
     items,
   };

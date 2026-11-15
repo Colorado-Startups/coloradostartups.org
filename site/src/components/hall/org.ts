@@ -49,7 +49,7 @@ export function organizationJsonLd(site: URL): Record<string, unknown> {
     name: ORG_NAME,
     legalName: "Colorado Startups, Ltd.",
     url: abs("/"),
-    logo: abs("/brand/cs-logo-1500.png"),
+    logo: abs("/art/brand/emblem-512.png"),
     description: DESCRIPTOR,
     // The BRIEF, section 1: founded in 2014 by Paul Foley.
     foundingDate: "2014",

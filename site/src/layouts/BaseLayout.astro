@@ -46,8 +46,11 @@ const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado S
     <meta property="og:image" content={ogUrl} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#001970" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="apple-touch-icon" href="/brand/cs-logo-240.png" />
+    {/* Brand v3 icon tier (brand decisions 50 and 54), pulled by scripts/brand/pull.mjs. */}
+    <link rel="icon" href="/art/brand/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/art/brand/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/art/brand/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/feed+json" title="Colorado Startups dispatches" href="/feed.json" />
     <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="Colorado Startups dispatches" />
     {/* Only Aileron 700, the face h1 and h2 draw in the first screen; body text is a system font (global.css). */}

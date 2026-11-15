@@ -38,7 +38,7 @@ describe("organizationJsonLd", () => {
   });
 
   it("gives an absolute logo URL on the same origin", () => {
-    expect(org.logo).toBe("https://coloradostartups.org/brand/cs-logo-1500.png");
+    expect(org.logo).toBe("https://coloradostartups.org/art/brand/emblem-512.png");
   });
 
   it("gives a PostalAddress with every field", () => {
@@ -60,7 +60,7 @@ describe("organizationJsonLd", () => {
     const staging = organizationJsonLd(new URL(origin));
     expect(staging["@id"]).toBe(`${origin}/#organization`);
     expect(staging.url).toBe(`${origin}/`);
-    expect(staging.logo).toBe(`${origin}/brand/cs-logo-1500.png`);
+    expect(staging.logo).toBe(`${origin}/art/brand/emblem-512.png`);
     expect((staging.founder as Record<string, string>)["@id"]).toBe(`${origin}/team/#paul-foley`);
     expect(websiteJsonLd(new URL(origin))["@id"]).toBe(`${origin}/#website`);
   });

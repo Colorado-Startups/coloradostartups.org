@@ -1,0 +1,12 @@
+{
+  "name": "Colorado Startups",
+  "short_name": "CO Startups",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#FFFFFF",
+  "theme_color": "#001970",
+  "icons": [
+    { "src": "/art/brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/art/brand/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

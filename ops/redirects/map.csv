@@ -34,3 +34,4 @@ old_path,new_path,reason
 /startup-resources,/ecosystem-canvas/,Short link: the directory's name is Startup Resources (#141 and #142)
 /request-help,/contact/,Old Squarespace page; asking for help now goes through the contact page (#394)
 /celebrate-wins,/community/,Old Squarespace page; celebrating wins now lives in the community hub (#394)
+/favicon.ico,/art/brand/favicon.ico,Brand v3 favicon (brand decision 54); browsers and feed readers still ask for /favicon.ico

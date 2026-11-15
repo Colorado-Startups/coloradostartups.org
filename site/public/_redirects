@@ -66,3 +66,5 @@
 /request-help/ /contact/ 301
 /celebrate-wins /community/ 301
 /celebrate-wins/ /community/ 301
+/favicon.ico /art/brand/favicon.ico 301
+/favicon.ico/ /art/brand/favicon.ico 301

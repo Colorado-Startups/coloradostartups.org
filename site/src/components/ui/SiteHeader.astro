@@ -7,21 +7,22 @@
 // <noscript> style shows the nav open and hides the toggle. The items and the
 // current-page test live in nav.ts.
 import { WAYS_IN } from "@cs/shared";
-import { Image } from "astro:assets";
 
-// A copy of public/brand/cs-logo-240.png: astro:assets cannot import from public/,
-// and the public file stays for the touch icon and the feed. Keep both.
-import logo from "../../assets/brand/cs-logo-240.png";
+import { brandArt } from "../art/art-assets";
 import { isCurrent, NAV } from "./nav";
 
+// Brand v3 logo tiers (brand decision 50): the emblem at 40 to 48 px beside the
+// name set as the wordmark, Aileron under a State Red rule. The emblem is
+// pulled by scripts/brand/pull.mjs with 48, 96 and 144 px webps.
+const emblem = brandArt("brand/emblem-512")!;
 const here = Astro.url.pathname;
 ---
 
 <header class="site-header">
   <div class="wrap bar">
     <a class="brand" href="/">
-      {/* 44 px drawn: WebP at 1x to 3x, not the 240 px PNG (41 KB) on every page. */}
-      <Image src={logo} alt="" width={44} height={44} densities={[1, 2, 3]} format="webp" loading="eager" />
+      {/* 44 px drawn: WebP at 1x to 3x (2 to 6 KB), not the 512 px PNG. */}
+      <img src={emblem.src} srcset={emblem.srcset} sizes="44px" width="44" height="44" alt="" loading="eager" decoding="async" />
       <span>Colorado Startups</span>
     </a>
     <button class="menu-toggle btn btn--stone" type="button" aria-expanded="false" aria-controls="site-nav">
@@ -95,12 +96,22 @@ const here = Astro.url.pathname;
     color: var(--c-text);
     text-decoration: none;
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 400;
     font-size: var(--t-step-1);
-    letter-spacing: 0.02em;
+    line-height: 1.1;
   }
-  .brand :global(img) {
-    filter: drop-shadow(0 2px 0 color-mix(in oklab, var(--c-stone-edge) 70%, transparent));
+  .brand img {
+    border-radius: var(--r-chisel);
+  }
+  /* The wordmark: the name in Aileron Regular under a short State Red rule,
+     as in the brand's wordmark-blue.png. */
+  .brand span::before {
+    content: "";
+    display: block;
+    width: 1.75em;
+    height: var(--line-bold);
+    margin-bottom: 0.2em;
+    background: var(--c-fire);
   }
   nav {
     display: flex;
