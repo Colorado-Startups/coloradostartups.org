@@ -87,12 +87,19 @@ describe("/ecosystem-canvas/", () => {
   });
 
   // The brief's first screen: the title, the search and the chips, in 40
-  // words or fewer. Resourcus's panel waits closed in its disclosure, and
-  // visually hidden words are for screen readers.
+  // words or fewer (36 on 2026-11-15). Resourcus's panel waits closed in its
+  // disclosure, a closed menu shows only its first option, and visually
+  // hidden words are for screen readers. Text nodes are joined with spaces,
+  // so two chips side by side count as two words.
   it("keeps the first section to 40 words or fewer", () => {
     const top = canvas.querySelector("section[aria-labelledby='canvas-title']")!.cloneNode(true) as Element;
-    for (const el of top.querySelectorAll(".visually-hidden, noscript, details > :not(summary), [data-stage-count]")) el.remove();
-    const words = (top.textContent ?? "").split(/\s+/).filter((w) => /[A-Za-z]/.test(w));
+    const unseen = ".visually-hidden, noscript, details > :not(summary), [data-stage-count], select option:not(:first-child)";
+    for (const el of top.querySelectorAll(unseen)) el.remove();
+    const parts: string[] = [];
+    const walk = canvas.createTreeWalker(top, NodeFilter.SHOW_TEXT);
+    while (walk.nextNode()) parts.push(walk.currentNode.nodeValue ?? "");
+    const words = parts.join(" ").split(/\s+/).filter((w) => /[A-Za-z]/.test(w));
+    expect(words.length, words.join(" ")).toBeGreaterThan(20);
     expect(words.length, words.join(" ")).toBeLessThanOrEqual(40);
   });
 
