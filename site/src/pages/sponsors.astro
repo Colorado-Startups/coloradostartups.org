@@ -36,7 +36,7 @@ const logos = sponsors.filter((s) => s.logo);
             {logos.map((s) => (
               <li class="panel">
                 <a href={s.url} rel="sponsored">
-                  <img src={s.logo} alt={s.name} loading="lazy" />
+                  <img src={s.logo} alt={s.name} width="240" height="120" loading="lazy" decoding="async" />
                 </a>
               </li>
             ))}
@@ -79,6 +79,13 @@ const logos = sponsors.filter((s) => s.logo);
     display: grid;
     place-items: center;
     min-height: var(--size-tap);
+  }
+  /* A fixed 2:1 box, so a logo of any shape reserves its space before it loads. */
+  .wall img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+    object-fit: contain;
   }
   .names {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
