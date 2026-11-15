@@ -4,7 +4,13 @@
 //
 // One source for the license words. The /data/ page, its Dataset JSON-LD and
 // the attribution text people copy all read from here, so they cannot drift.
-import { RESOURCES_JSON_PATH } from "@cs/shared";
+import {
+  COMPANIES_JSON_PATH,
+  EVENTS_JSON_PATH,
+  GUIDES_JSON_PATH,
+  REGIONS_JSON_PATH,
+  RESOURCES_JSON_PATH,
+} from "@cs/shared";
 
 import { ORG_NAME, organizationRef } from "../../components/hall/org";
 
@@ -20,6 +26,15 @@ export const LICENSE = {
   title: "Creative Commons Attribution 4.0 International",
   url: "https://creativecommons.org/licenses/by/4.0/",
 } as const;
+
+/** Every file under /data/, resources.json first. The /mcp Worker reads them all. */
+export const DATA_FILES = [
+  { path: RESOURCES_JSON_PATH, what: "Startup Resources listings, the fields below" },
+  { path: COMPANIES_JSON_PATH, what: "Leaderboard honorees, with sector, city and region" },
+  { path: EVENTS_JSON_PATH, what: "upcoming calendar events, with time, place and region" },
+  { path: GUIDES_JSON_PATH, what: "the guides for founders, each answer as plain text" },
+  { path: REGIONS_JSON_PATH, what: "the three regions, their cities and their listings" },
+] as const;
 
 /** The fields every listing in /data/resources.json carries, in toCard's order. */
 export const CARD_FIELDS = [
@@ -65,8 +80,10 @@ export function datasetJsonLd(site: URL, opts: { dateModified: string }): Record
     publisher: organizationRef(site),
     spatialCoverage: { "@type": "Place", name: "Colorado" },
     dateModified: opts.dateModified,
-    distribution: [
-      { "@type": "DataDownload", encodingFormat: "application/json", contentUrl: abs(RESOURCES_JSON_PATH) },
-    ],
+    distribution: DATA_FILES.map((f) => ({
+      "@type": "DataDownload",
+      encodingFormat: "application/json",
+      contentUrl: abs(f.path),
+    })),
   };
 }

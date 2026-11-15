@@ -1,7 +1,7 @@
 // The site Worker. Small on purpose: static pages are served straight from
-// assets (wrangler.jsonc sets run_worker_first to ["/api/*"]), so this file
-// only routes /api/* to one handler per file, adds security headers, and runs
-// the weekly retention jobs.
+// assets (wrangler.jsonc sets run_worker_first to ["/api/*", "/mcp"]), so this
+// file only routes /api/* to one handler per file and /mcp to the MCP server
+// (worker/mcp/), adds security headers, and runs the weekly retention jobs.
 //
 // It also exports ResourcusRPC, the named entrypoint the Communitas Worker
 // binds to for Slack answers.
@@ -9,6 +9,7 @@
 import { errText } from "./lib/errors";
 import { json } from "./lib/forms";
 import { applySecurityHeaders } from "./lib/security-headers";
+import { handleMcp, MCP_PATH } from "./mcp";
 import { purgeResourcusData } from "./resourcus/logs";
 import { findRoute } from "./routes";
 import { sweepApplications } from "./routes/apply";
@@ -50,6 +51,14 @@ function withSecurityHeaders(response: Response): Response {
 export default {
   async fetch(request, env, ctx): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === MCP_PATH) {
+      try {
+        return withSecurityHeaders(await handleMcp(request, env));
+      } catch (err) {
+        console.error(`${MCP_PATH} failed:`, errText(err));
+        return withSecurityHeaders(json({ error: "unavailable" }, 503));
+      }
+    }
     const route = findRoute(url.pathname);
     if (!route) {
       if (url.pathname.startsWith("/api/")) {

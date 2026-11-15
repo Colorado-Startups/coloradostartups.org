@@ -18,5 +18,7 @@ const site = Astro.site!;
 ---
 
 <BaseLayout title={guide.title} description={guide.description} jsonLd={guideJsonLd(guide, site)}>
+  {/* The /ask/ search filters by this type (Pagefind). */}
+  <span data-pagefind-filter="type:Guides"></span>
   <GuidePage guide={guide} others={otherGuides(slug)} />
 </BaseLayout>

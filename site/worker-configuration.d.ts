@@ -6,6 +6,7 @@ interface __BaseEnv_Env {
 	FORM_EMAIL: SendEmail;
 	FORM_RATE_LIMIT: RateLimit;
 	ASK_RATE_LIMIT: RateLimit;
+	MCP_RATE_LIMIT: RateLimit;
 	AI: Ai;
 	RESOURCUS_SEARCH: AiSearchInstance;
 	ASSETS: Fetcher;
@@ -21,6 +22,7 @@ declare namespace Cloudflare {
 		FORM_EMAIL: SendEmail;
 		FORM_RATE_LIMIT: RateLimit;
 		ASK_RATE_LIMIT: RateLimit;
+		MCP_RATE_LIMIT: RateLimit;
 		AI: Ai;
 		RESOURCUS_SEARCH: AiSearchInstance;
 		ASSETS: Fetcher;

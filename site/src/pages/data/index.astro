@@ -13,6 +13,7 @@ import {
   attributionHtml,
   attributionText,
   CARD_FIELDS,
+  DATA_FILES,
   DATASET_NAME,
   datasetJsonLd,
   LICENSE,
@@ -49,6 +50,21 @@ const date = asOf(new Date());
   <section class="section section--lit" aria-labelledby="get-title">
     <div class="wrap stack">
       <h2 id="get-title">Get the data</h2>
+      <ul class="data-files" data-data-files>
+        {
+          DATA_FILES.map((f) => (
+            <li>
+              <a href={f.path}>
+                <code>{f.path}</code>
+              </a>
+              : {f.what}
+            </li>
+          ))
+        }
+      </ul>
+      <p>
+        AI clients can read the same files through the site's <a href="/mcp">MCP server</a>.
+      </p>
       <p>
         <a href={RESOURCES_JSON_PATH}>{RESOURCES_JSON_PATH}</a> is one JSON array, sorted by id. It is rebuilt each time
         the site is published, and it lists active resources only. Each listing has these fields:
@@ -88,6 +104,9 @@ const date = asOf(new Date());
           The listings as Colorado Startups compiled them, and the descriptions it wrote. The full terms are the <a
             href={LICENSE.url}>{LICENSE.title}</a
           > license.
+        </li>
+        <li>
+          Not event titles and details, which each host writes on the calendar.
         </li>
         <li>
           Not the names, logos or trademarks of the organizations listed. The license grants no trademark or patent
@@ -136,6 +155,10 @@ const date = asOf(new Date());
     .data-fields div {
       flex-direction: column;
     }
+  }
+  .data-files {
+    margin: 0;
+    padding-left: var(--s-4);
   }
   .data-credit {
     margin: 0;

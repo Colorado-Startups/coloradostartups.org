@@ -36,6 +36,8 @@ const answer: Part[] = [
   description={GUIDES_INDEX.description}
   jsonLd={guidesIndexJsonLd([...groups.flatMap((g) => g.guides), CREDITS_GUIDE], site)}
 >
+  {/* The /ask/ search filters by this type (Pagefind). */}
+  <span data-pagefind-filter="type:Guides"></span>
   <section class="section section--band" aria-labelledby="guides-title">
     <div class="wrap stack">
       <h1 id="guides-title">{GUIDES_INDEX.title}</h1>

@@ -45,7 +45,9 @@ AI agents help on this site, and each one is disclosed as an AI agent wherever i
 ## Data and feeds
 
 - [Startup Resources data](https://coloradostartups.org/data/resources.json): Every active Startup Resources listing as JSON, with its stage, type, city, website and a short description. Free to reuse under CC BY 4.0, with credit to Colorado Startups.
-- [Data license](https://coloradostartups.org/data/): The CC BY 4.0 license on Startup Resources data, its fields and a credit line to copy.
+- [Open data](https://coloradostartups.org/data/): Every /data/ file (resources, companies, events, guides and regions as JSON), the CC BY 4.0 license, the fields and a credit line to copy.
+- [Ask](https://coloradostartups.org/ask/): Search the whole site by type, ask Resourcus, an AI agent, or connect an AI client to the MCP server.
+- [MCP server](https://coloradostartups.org/mcp): A free, read-only, keyless MCP server (Streamable HTTP). Its tools search, events and region read the /data/ files and return at most 25 results each.
 - [Dispatches JSON Feed](https://coloradostartups.org/feed.json): News from Colorado Startups as a JSON Feed.
 - [Dispatches RSS](https://coloradostartups.org/rss.xml): The same news as an RSS feed.
 
