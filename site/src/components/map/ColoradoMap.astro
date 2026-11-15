@@ -34,6 +34,7 @@ const svg = coloradoMapSvg({ label, description });
     <div class="colorado-map__drawing" set:html={svg} />
     <div class="colorado-map__live" data-map-canvas data-label={label}></div>
   </div>
+  <p class="colorado-map__desc visually-hidden">{description}</p>
   <figcaption>
     <span>{caption}</span>
     <small>Zones from US Census places, a proposal, not a legal line. Basemap © OpenMapTiles, data © OpenStreetMap contributors.</small>
@@ -69,6 +70,10 @@ const svg = coloradoMapSvg({ label, description });
   }
   .colorado-map.is-live .colorado-map__drawing {
     visibility: hidden;
+  }
+  /* The drawing carries the description until the live map hides it; then this does. */
+  .colorado-map:not(.is-live) .colorado-map__desc {
+    display: none;
   }
   figcaption {
     display: grid;

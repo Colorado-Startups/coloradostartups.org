@@ -100,11 +100,13 @@ async function mount(figure: HTMLElement) {
   map.getCanvas().setAttribute("aria-label", host.dataset.label ?? "Map of Colorado");
   map.on("style.load", () => addOverlay(map));
   // The zone names are HTML, in the site's own type, and survive a style swap.
+  // On a phone-width map they sit west of the zones, or the plains clip them.
+  const west = host.clientWidth < 480;
   for (const z of ZONES.features) {
     const el = document.createElement("span");
     el.className = "colorado-map__label";
     el.textContent = z.properties.name;
-    new maplibregl.Marker({ element: el, anchor: "left" }).setLngLat(zoneLabelPoint(z)).addTo(map);
+    new maplibregl.Marker({ element: el, anchor: west ? "right" : "left" }).setLngLat(zoneLabelPoint(z, west ? "west" : "east")).addTo(map);
   }
   map.once("load", () => figure.classList.add("is-live"));
   // "idle": every tile in view has loaded and drawn. Tests and screenshots wait for it.

@@ -60,10 +60,15 @@ export const COLORADO_BOUNDS: [LonLat, LonLat] = (() => {
   ];
 })();
 
-/** Where a zone's name sits: just east of the zone, at its middle latitude, on the open plains. */
-export function zoneLabelPoint(zone: ZoneFeature): LonLat {
+/**
+ * Where a zone's name sits: 0.12° off the zone at its middle latitude. East, on
+ * the open plains, by default; west, over the mountains, on a narrow map, where
+ * the plains run out before the name does.
+ */
+export function zoneLabelPoint(zone: ZoneFeature, side: "east" | "west" = "east"): LonLat {
   const ring = zone.geometry.coordinates[0]!;
-  const east = Math.max(...ring.map((p) => p[0]));
+  const lons = ring.map((p) => p[0]);
   const lats = ring.map((p) => p[1]);
-  return [east + 0.12, (Math.min(...lats) + Math.max(...lats)) / 2];
+  const lon = side === "east" ? Math.max(...lons) + 0.12 : Math.min(...lons) - 0.12;
+  return [lon, (Math.min(...lats) + Math.max(...lats)) / 2];
 }
