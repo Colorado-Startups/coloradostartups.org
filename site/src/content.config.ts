@@ -17,7 +17,7 @@
 // These are read directly, not as collections:
 //   regions/<id>.yaml                lib/regions/match.ts (REGIONS, validated with RegionSchema)
 //   leaderboard/notes.yaml           lib/leaderboard/notes.ts
-//   positions/*.yaml                 lib/seats/load.ts; scripts/positions/sync-volunteers.mjs writes them
+//   positions/*.yaml                 lib/seats/load.ts; scripts/positions/sync-volunteers.mjs writes all but facts.yaml
 //   events/upcoming.json             components/events/events.ts; scripts/events/fetch-ics.mjs writes it
 //   credits/startup-programs.json    lib/guides/credits.ts
 //   communitas/slack.yaml            workers/communitas/scripts/library.mjs
