@@ -15,6 +15,8 @@
     "dist/hall/publicus.png": "3896c098e1681a11367b76f8539846fb378a490f87644705eb36b2bc673fe46f",
     "dist/hall/publicus-small.png": "ad7b7970fd2d0875aac1e426ac19b21823258631b2713ee817ade6b0212b2c3d",
     "dist/hall/passage.jpg": "3903c4088c98c7b75bdbdec71778c034aa4907b703172bf6b2df94c8f90fd00b",
-    "dist/hall/founders.jpg": "139f695a3e1494d5050ee5cabd8356e2c911d3da85d7285fe8dcad45df9c485a"
+    "dist/hall/founders.jpg": "139f695a3e1494d5050ee5cabd8356e2c911d3da85d7285fe8dcad45df9c485a",
+    "dist/hall/stone.png": "7cd3171af6b20b0392822977ec708fefe32df081ed0af374e8c16e041eb8392a",
+    "dist/tokens.json": "7250ba54a7415e30b43676e87537bc82db51f12d9e54d54cac97b574f1d13d65"
   }
 }
