@@ -113,6 +113,15 @@
       1344
     ]
   },
+  "guides": {
+    "file": "guides.jpg",
+    "width": 1344,
+    "height": 756,
+    "widths": [
+      720,
+      1344
+    ]
+  },
   "stone": {
     "file": "stone.png",
     "width": 1024,
