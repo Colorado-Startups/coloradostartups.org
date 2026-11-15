@@ -12,8 +12,8 @@
 # gradio_client signs each call with this Mac account's saved Hugging Face
 # login (`hf auth login`), so ZeroGPU counts the call against that account's
 # quota. This script never reads the token. Each output is checked for its
-# maker's provenance (C2PA, EXIF or XMP), then saved as <inbox>/batch-<n>/<id>.png
-# for make-finals.mjs. An output that carries provenance is kept as it came and
+# maker's provenance (C2PA, EXIF or XMP), then saved as <inbox>/batch-<n>/<id>.png.
+# An output that carries provenance is kept as it came and
 # the run stops, since a re-encode would drop it (art/LICENSES.md, Duties).
 # Exit 0 every item saved, 1 a call failed or timed out, 2 usage error or a
 # refused batch, 3 an output carries provenance.

@@ -1,7 +1,9 @@
 // L7: the texture tiles L12 asked for (art/tools/make-tiles.mjs).
-import { existsSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
+import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import YAML from "yaml";
 
@@ -11,12 +13,18 @@ import {
   checkTile,
   crossfade,
   encodeTile,
+  optionValue,
+  parsePicks,
   seamRatio,
+  sourceFile,
 } from "../../../../art/tools/make-tiles.mjs";
 
 const tempDir = tempDirs();
+const tmp = () => tempDir("l7-tiles-");
 
 const ROOT = path.join(__dirname, "../../../..");
+const MAKE_TILES = path.join(ROOT, "art/tools/make-tiles.mjs");
+const run = (script: string, args: string[], cwd = tmp()) => spawnSync(process.execPath, [script, ...args], { cwd, encoding: "utf8" });
 const tokens = YAML.parse(readFileSync(path.join(ROOT, "01_doctrine/brand_tokens.yaml"), "utf8"));
 const colors = tokens.color as Record<string, string>;
 
@@ -104,4 +112,55 @@ describe("delivered tiles", () => {
       expect(result.problems).toEqual([]);
     });
   }
+});
+
+describe("make-tiles picks", () => {
+  it("reads a render id from the inbox folder or a .png by path", () => {
+    expect(parsePicks(["--from", "x", "--pick", "stone=tile-stone-2"])).toEqual({ stone: "tile-stone-2" });
+    expect(sourceFile("/inbox/batch-2", "tile-stone-2")).toBe("/inbox/batch-2/tile-stone-2.png");
+    expect(sourceFile("/inbox/batch-2", "/inbox/batch-1/tile-night-stone.png")).toBe("/inbox/batch-1/tile-night-stone.png");
+  });
+
+  it("refuses a tile that is not in the contract", () => {
+    expect(() => parsePicks(["--pick", "marble=tile-marble-1"])).toThrow(/stone, parchment, night-stone/);
+  });
+});
+
+describe("make-tiles option values", () => {
+  it("reads a value, and reads nothing when the flag is absent", () => {
+    expect(optionValue(["--from", "inbox", "--out", "dir"], "--out")).toBe("dir");
+    expect(optionValue(["--from", "inbox"], "--out")).toBeUndefined();
+  });
+
+  it("refuses a flag with no value, or with another flag where its value should be", () => {
+    expect(() => optionValue(["--from", "x", "--out"], "--out")).toThrow(/--out needs a value/);
+    expect(() => optionValue(["--out", "--pick", "stone=a"], "--out")).toThrow(/--out needs a value/);
+  });
+
+  it("make-tiles exits 2 on --out with no value and writes nothing", () => {
+    const cwd = tmp();
+    for (const args of [["--from", "x", "--out"], ["--from", "x", "--out", "--pick", "stone=a"]]) {
+      const r = run(MAKE_TILES, args, cwd);
+      expect(r.status, args.join(" ")).toBe(2);
+    }
+    expect(readdirSync(cwd)).toEqual([]);
+  });
+
+  it("make-tiles writes to the --out folder it is given", async () => {
+    const from = tmp();
+    const out = path.join(tmp(), "tiles");
+    // A smooth seeded field, the same kind field() feeds the method above.
+    let seed = 11;
+    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const raw = Buffer.alloc(1024 * 1024);
+    for (let y = 0; y < 1024; y++) {
+      for (let x = 0; x < 1024; x++) raw[y * 1024 + x] = 128 + 30 * Math.sin(x / 37 + y / 53) + (rand() - 0.5) * 10;
+    }
+    for (const spec of Object.values(TILES)) {
+      await sharp(raw, { raw: { width: 1024, height: 1024, channels: 1 } }).png().toFile(path.join(from, `${spec.source}.png`));
+    }
+    const r = run(MAKE_TILES, ["--from", from, "--out", out]);
+    expect(r.status, r.stderr + r.stdout).toBe(0);
+    expect(readdirSync(out).sort()).toEqual(Object.keys(TILES).map((t) => `${t}.webp`).sort());
+  }, 60_000);
 });

@@ -1,24 +1,20 @@
 // L6: FIBO 2.0 batches on Comfy Cloud's Bria node (art/tools/build-batch.mjs,
-// build-api.mjs) and make-finals' one-batch mode.
+// build-api.mjs).
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
 import { IN_ARCHIVE } from "../../archive";
 
 import { buildApi } from "../../../../art/tools/build-api.mjs";
 import { BRIA, SPACE, VGL_OWN, briaModeration, build, parseVglFile, spaceModeration, vglCaption } from "../../../../art/tools/build-batch.mjs";
-import { batchPlan, checkFinal } from "../../../../art/tools/make-finals.mjs";
-import { PROMPT_READERS, setWebpXmp } from "../../../../art/tools/provenance.mjs";
+import { PROMPT_READERS } from "../../../../art/tools/provenance.mjs";
 
 const ROOT = path.join(__dirname, "../../../..");
-const MAKE_FINALS = path.join(ROOT, "art/tools/make-finals.mjs");
 const RUN_SPACE = path.join(ROOT, "art/tools/run-space.py");
-const plan = JSON.parse(readFileSync(path.join(ROOT, "art/finals.json"), "utf8"));
 const fixed = JSON.parse(readFileSync(path.join(ROOT, "art/prompts/vgl-style.txt"), "utf8"));
 
 const own = {
@@ -170,37 +166,5 @@ describe("Bria's content filter", () => {
     });
     expect(briaModeration({ moderation: "false" })).toEqual({ moderation: "false" });
     expect(() => briaModeration({ moderation: "off" })).toThrow(/"true" or "false"/);
-  });
-});
-
-describe("scene weight", () => {
-  it("flags a scene over the 400 KB limit", async () => {
-    const dir = mkdtempSync(path.join(tmpdir(), "l6-"));
-    try {
-      let seed = 7;
-      const noise = Buffer.alloc(1344 * 756 * 3).map(() => ((seed = (seed * 16807) % 2147483647) % 256));
-      const file = path.join(dir, "heavy.webp");
-      const webp = await sharp(noise, { raw: { width: 1344, height: 756, channels: 3 } }).webp({ quality: 100 }).toBuffer();
-      writeFileSync(file, setWebpXmp(webp, "<x/>"));
-      expect((await checkFinal(file, "scene", "<x/>")).problems.join()).toMatch(/over the 400 KB limit/);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-});
-
-describe("make-finals one batch", () => {
-  it("keeps only that batch's finals and tiles", () => {
-    const two = batchPlan(plan, 2);
-    expect(two.finals.map((e: { out: string }) => e.out)).toEqual(["regions/fusion-canyon"]);
-    expect(Object.keys(two.tiles).filter((k) => !k.startsWith("_")).sort()).toEqual(["parchment", "stone"]);
-  });
-
-  // Outside the archive make-finals has no art/runs inputs, so it exits 3 first.
-  it.skipIf(!IN_ARCHIVE)("exits 2 on a batch that ships nothing, a bad number, or --batch with --stamp", () => {
-    const run = (args: string[]) => spawnSync(process.execPath, [MAKE_FINALS, ...args], { encoding: "utf8" });
-    expect(run(["--from", ROOT, "--batch", "99"]).status).toBe(2);
-    expect(run(["--from", ROOT, "--batch", "x"]).status).toBe(2);
-    expect(run(["--stamp", "--batch", "3"]).status).toBe(2);
   });
 });

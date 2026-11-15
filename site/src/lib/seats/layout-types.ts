@@ -56,7 +56,7 @@ interface Section {
 
 export interface SeatLayout {
   hero: {
-    /** Asset key under src/assets/art: art the site already ships. */
+    /** Art key for ArtImage, e.g. "brand/boulder": art the site already ships. */
     art: string;
     alt: string;
     kicker: string;

@@ -87,6 +87,6 @@ Not ours to give away; each keeps its own license.
 | The Code of Conduct's Covenant text | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | CC BY-SA 4.0, from the Contributor Covenant |
 | gitleaks, the secret scanner | CI downloads the release binary | MIT |
 | Other companies' names and marks | `data/` | Theirs |
-| AI-made art and clips, and Open Graph cards built from them | `art/`, `site/src/assets/art/`, `site/public/og/` | CC0 for our part; the model makers' terms still apply ([`art/LICENSES.md`](art/LICENSES.md)) |
+| AI-made art and clips, and Open Graph cards built from them | `art/`, `site/src/assets/art/`, `site/public/art/brand/`, `site/public/og/` | CC0 for our part; the model makers' terms still apply ([`art/LICENSES.md`](art/LICENSES.md)) |
 
-Three duties follow ([`duties.md`](art/licenses/duties.md) cites each clause): never train a model or LoRA on the art, keep its watermarks and provenance metadata, and label it AI-made. Older art used Anima, whose CircleStone Labs Non-Commercial License v1.2 limits running the model; its §2(e) allows outputs for any purpose.
+Three duties follow ([`duties.md`](art/licenses/duties.md) cites each clause): never train a model or LoRA on the art, keep its watermarks and provenance metadata, and label it AI-made. The site's pictures come from Colorado-Startups/brand releases (`brand.lock.json`).

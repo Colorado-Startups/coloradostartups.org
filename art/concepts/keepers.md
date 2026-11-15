@@ -22,7 +22,7 @@ Goal ([DIRECTION](https://github.com/Colorado-Startups/coloradostartups.org/blob
 
 ```mermaid
 flowchart LR
-  C("Small crop") -->|"scaled to 64 px, in the site's circle"| M("Mechanical pass: clearly colored pixels per anchor hue range, from art/finals.json")
+  C("Small crop") -->|"scaled to 64 px, in the site's circle"| M("Mechanical pass: clearly colored pixels per anchor hue range, from the finals plan, retired 2026-11-15")
   C --> J("Judgment pass")
 ```
 

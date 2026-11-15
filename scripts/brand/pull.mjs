@@ -32,7 +32,7 @@ export const sizeName = (path, w) => `${stem(path)}-${w}.webp`;
 export const LOGO_WIDTHS = [48, 96, 144];
 
 // The webp widths a pulled file gets, or null to copy it as it is. Place and
-// hall pictures get widthsFor(); the header emblem gets 1x to 3x of its 48 px
+// website pictures get widthsFor(); the header crest gets 1x to 3x of its 48 px
 // slot. Favicons, app icons, the large emblem and tokens.json keep their own
 // format for the platforms and tools that read them.
 export function sizesFor(path, width) {
