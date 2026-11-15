@@ -3,7 +3,7 @@
 //
 // Each tile says one short thing (Paul, 2026-11-15: visual first, few
 // words). The norms live in the Code of Conduct; /community/ shows its three
-// promotion rules as icons (conduct.ts). If a line here and the Code of
+// promotion rules as icons (components/info/code-of-conduct.ts). If a line here and the Code of
 // Conduct page ever disagree, the Code of Conduct wins; fix this file in the
 // same session.
 import { WAYS_IN } from "@cs/shared";
