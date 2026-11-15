@@ -134,16 +134,6 @@ const answer: Part[] = [
     list-style: none;
     max-width: none;
   }
-  /* Two tiles to a row on a phone, so the ten guides fit a few screens. */
-  @media (max-width: 40rem) {
-    .guides {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--s-3);
-    }
-    .guide-tile h3 {
-      font-size: var(--t-step-0);
-    }
-  }
   /* A tile: the count large, then the question it answers. */
   .guide-tile {
     display: grid;
@@ -164,5 +154,24 @@ const answer: Part[] = [
     font-size: var(--t-step-4);
     line-height: 1;
     font-variant-numeric: tabular-nums;
+  }
+  /* On a phone the count sits beside the title, so each tile takes a
+     short row. */
+  @media (max-width: 40rem) {
+    .guides {
+      gap: var(--s-3);
+    }
+    .guide-tile {
+      grid-template-columns: 4.5rem minmax(0, 1fr);
+      column-gap: var(--s-3);
+    }
+    .guide-tile__n {
+      grid-row: span 2;
+      align-self: center;
+      font-size: var(--t-step-3);
+    }
+    .guide-tile h3 {
+      font-size: var(--t-step-0);
+    }
   }
 </style>
