@@ -609,7 +609,7 @@ colorado-quantum-state-match:
   short: per the State of Colorado, 2024
 colorado-quantum-workers:
   value: 3,000
-  label: workers in Colorado's commercial quantum industry (per the State of Colorado, 2024)
+  label: workers already in the commercial quantum ecosystem (per the State of Colorado, 2024)
   source: Colorado Office of Economic Development and International Trade, Governor Polis Announces Major Win for Colorado's Future, Celebrates Tech Hub Funding for Quantum, July 2, 2024
   url: https://oedit.colorado.gov/press-release/governor-polis-announces-major-win-for-colorados-future-celebrates-tech-hub-funding
   read: "2026-11-15"
@@ -658,11 +658,11 @@ nist-boulder-cleanroom:
   short: per NIST
 cpia-photonics-companies:
   value: 250+
-  label: photonics companies in Colorado (per a Colorado Photonics Industry Association report, 2016)
-  source: Colorado Photonics Industry Association, home page; Front Range Community College's blog dates the figure to the association's 2016 report (October 30, 2018)
+  label: photonics companies in Colorado (per the Colorado Photonics Industry Association)
+  source: Colorado Photonics Industry Association, home page
   url: https://coloradophotonics.org/
   read: "2026-11-15"
-  short: per the Colorado Photonics Industry Association, 2016
+  short: per the Colorado Photonics Industry Association
 honorees-quantum-photonics:
   value: "4"
   label: of the 115 Colorado Startups 2026 Honorees work in quantum and photonics, a count of honorees, not of the market (per Colorado Startups, 2026)
@@ -814,7 +814,7 @@ peterson-personnel-fy2025:
   short: per the US Space Force, fiscal 2025
 buckley-personnel-2024:
   value: 12,000+
-  label: personnel at Buckley Space Force Base in Aurora, counting Guard, Reserve and contractors (per the US Space Force, 2024)
+  label: base personnel at Buckley Space Force Base in Aurora (per the US Space Force, 2024)
   source: Buckley Space Force Base, Buckley annual State of the Base 2024, January 24, 2024
   url: https://www.buckley.spaceforce.mil/News/Article-Display/Article/3655452/buckley-annual-state-of-the-base-2024/
   read: "2026-11-15"
