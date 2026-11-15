@@ -24,8 +24,17 @@ const nightColor: Record<string, string> = { ...tokens.color, ...tokens.night };
 // Two contrast tables: the light set, and the same pairings at night. The
 // light table keeps its class, which the page test counts.
 const contrastTables = [
-  { id: "contrast-light", title: "Light", table: "sg-contrast", pairs: tokens.contrast, colors: tokens.color },
-  { id: "contrast-night", title: "Night", table: "sg-contrast-night", pairs: tokens.contrast_night, colors: nightColor },
+  // Each scroller is named by a heading: the light one by the Contrast h2, as
+  // before, and the night one by its own h3.
+  { id: "contrast-light", label: "contrast", title: "Light", table: "sg-contrast", pairs: tokens.contrast, colors: tokens.color },
+  {
+    id: "contrast-night",
+    label: "contrast-night",
+    title: "Night",
+    table: "sg-contrast-night",
+    pairs: tokens.contrast_night,
+    colors: nightColor,
+  },
 ];
 const steps = Object.entries(tokens.type).filter(([k]) => k.startsWith("step"));
 
@@ -121,10 +130,10 @@ const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string,
     {/* The table fits a phone; the scroller is a net for narrower screens,
         so it takes focus and a name, as a scrolling region must. */}
     {
-      contrastTables.map(({ id, title, table, pairs, colors }) => (
+      contrastTables.map(({ id, label, title, table, pairs, colors }) => (
         <>
           <h3 id={id}>{title}</h3>
-          <div class="sg-scroll" role="region" aria-labelledby={id} tabindex="0">
+          <div class="sg-scroll" role="region" aria-labelledby={label} tabindex="0">
             <table class={table}>
               <thead>
                 <tr><th scope="col">Sample</th><th scope="col">Pairing</th><th scope="col">Ratio</th><th
@@ -240,19 +249,22 @@ const colorGroups = [...GROUPS, ...(other.length ? [["Other", other] as [string,
   .sg-scroll {
     overflow-x: auto;
   }
-  :is(.sg-contrast, .sg-contrast-night) {
+  .sg-contrast,
+  .sg-contrast-night {
     border-collapse: collapse;
     width: 100%;
     max-width: 48rem;
   }
-  :is(.sg-contrast, .sg-contrast-night) :is(th, td) {
+  .sg-contrast :is(th, td),
+  .sg-contrast-night :is(th, td) {
     padding: var(--s-2) var(--s-3);
     border-bottom: var(--line-hair) solid var(--c-rule);
     text-align: left;
   }
   /* On a phone the pairing names get the room the cell padding took. */
   @media (max-width: 40rem) {
-    :is(.sg-contrast, .sg-contrast-night) :is(th, td) {
+    .sg-contrast :is(th, td),
+    .sg-contrast-night :is(th, td) {
       padding-inline: var(--s-2);
     }
   }
