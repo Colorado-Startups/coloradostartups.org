@@ -288,7 +288,8 @@ describe("brand guide fills from art/DIRECTION.md", () => {
     const real = readFileSync(path.join(ROOT, "art/DIRECTION.md"), "utf8");
     const section = mdSection(real, "The vocabulary of the Hall");
     expect(section).not.toBeNull();
-    expect(mdTableHtml(section ?? "")).toContain("Town main streets");
+    // The table now points at brand's data/world.yaml, which owns the world.
+    expect(mdTableHtml(section ?? "")).toContain("<code>rooms</code>");
   });
 });
 

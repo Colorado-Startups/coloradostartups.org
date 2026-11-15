@@ -1,58 +1,48 @@
-# Lore: the Hall and its keepers
+# Lore: the Hall on this site
 
-*[`data/team/dwarves.yaml`](../data/team/dwarves.yaml) is the one source for each keeper's name, kind, title, role, voice and disclosure; [`data/regions/*.yaml`](../data/regions/) for the regions. This file explains their world; the YAML wins.*
-
-## The Hall
+*Brand owns the world, and wins wherever this file differs ([brand decision 6](https://github.com/Colorado-Startups/brand/blob/main/decisions.md), "One home"). This file maps it onto the site: which page is which room, and who the keepers are. [`dwarves.yaml`](../data/team/dwarves.yaml) is the one source for each keeper, and brand defers to it. The art side and the site rules: [`art/DIRECTION.md`](../art/DIRECTION.md).*
 
 ```mermaid
 flowchart LR
-  F["Forge"] --- H["Hall"] --- D["Doors"] --- T["Towns"]
-  H --- O["Outposts"]
+  W("Brand world.yaml") --> R("Rooms: site pages")
+  W --> O("Outposts: data/regions")
+  V("Brand voice, words, architecture") --> N("Names and plain labels")
+  K("dwarves.yaml") --> P("Keepers")
 ```
 
-*The founders' community as a forge-kingdom in the Front Range: bright and golden, never a dungeon. Halls, forges, molten gold, bronze doors, gnome clockwork and lifts, a warm heart safe and contained; outside, plains and peaks. Looks: [the vocabulary](../art/DIRECTION.md#the-vocabulary-of-the-hall).*
+## Owned by brand
 
-| Room | What happens there |
+| Topic | Brand source |
 | --- | --- |
-| [The Great Hall of the Community](https://coloradostartups.org/community/) | Inside the doors, founders meet people already building |
-| [The Map Room](https://coloradostartups.org/ecosystem-canvas/) | Startup Resources, charted for every stage |
-| [The Leaderboard gallery](https://coloradostartups.org/leaderboard/) | Colorado companies, sources checked |
-| [The forge](https://coloradostartups.org/team/) | Deepest in the mountain: Paul and the keepers |
+| Places, peoples, creatures and machines: rooms, towns, outposts, real places, characters | [data/world.yaml](https://github.com/Colorado-Startups/brand/blob/main/data/world.yaml) |
+| Voice, tone, keeper voices, vocabulary | [data/voice.yaml](https://github.com/Colorado-Startups/brand/blob/main/data/voice.yaml) |
+| Banned words and AI tells | [data/words.yaml](https://github.com/Colorado-Startups/brand/blob/main/data/words.yaml) |
+| Naming, lockups and the brand tree | [data/architecture.yaml](https://github.com/Colorado-Startups/brand/blob/main/data/architecture.yaml) |
+| Audiences | [data/strategy.yaml](https://github.com/Colorado-Startups/brand/blob/main/data/strategy.yaml) |
 
-*Founders are its heart; talent, capital and service providers are welcome too.*
+## The rooms
 
-## The three outposts
-
-*A person organizes each outpost; the keepers never do. The towns are real.*
-
-| Outpost | Towns |
+| Room, from world.yaml `rooms` | Page |
 | --- | --- |
-| [Photon Mountain](../data/regions/photon-mountain.yaml) | Boulder under the Flatirons, Golden on Clear Creek, Arvada, and Denver's city lights on the plain |
-| [Space Peak](../data/regions/space-peak.yaml) | Colorado Springs and Manitou Springs, under Pikes Peak |
-| [Fusion Canyon](../data/regions/fusion-canyon.yaml) | Old Town Fort Collins by the Poudre, Loveland, Windsor, Greeley. Named for the canyon, built on the plain |
+| The Great Hall of the Community | [/community/](https://coloradostartups.org/community/) |
+| The Map Room | [/ecosystem-canvas/](https://coloradostartups.org/ecosystem-canvas/) |
+| The Leaderboard gallery | [/leaderboard/](https://coloradostartups.org/leaderboard/) |
+| The forge | [/team/](https://coloradostartups.org/team/) |
 
-## Outside the doors: the towns
+## The outposts
 
-*The doors open onto real towns (decision 90) and a town square, where founders meet neighbors, trade help and set out again.*
-
-| Rule | What it means |
+| Outpost, from world.yaml `outposts` | Site data |
 | --- | --- |
-| They look like Colorado | Main streets, cottages, headframes, windpumps, footbridges and aspens, as [the vocabulary](../art/DIRECTION.md#the-vocabulary-of-the-hall) paints them |
-| The townsfolk | Founders and neighbors. Dwarves and gnomes visit from the Hall; each keeper keeps its one job |
-| People, not scores | No points, levels or ranks for people. The Leaderboard ranks companies, from verified data (decision 6) |
+| Photon Mountain | [`photon-mountain.yaml`](../data/regions/photon-mountain.yaml) |
+| Space Peak | [`space-peak.yaml`](../data/regions/space-peak.yaml) |
+| Fusion Canyon | [`fusion-canyon.yaml`](../data/regions/fusion-canyon.yaml) |
 
 ## The keepers
-
-*Dwarves are the stonecutters and smiths; gnomes, the tinkerers who build lanterns, lifts and map engines. Three are keepers, each an AI agent.*
 
 | Keeper | Kind | Job |
 | --- | --- | --- |
 | [Communitas, Keeper of the Doors](../data/team/dwarves.yaml#L11) | Dwarf | Meets every newcomer and points them to the right room |
-| [Resourcus, Keeper of the Canvas](../data/team/dwarves.yaml#L45) | Gnome | Tinkers in the Map Room; answers from Startup Resources, citing only the map |
+| [Resourcus, Keeper of Startup Resources](../data/team/dwarves.yaml#L45) | Gnome | In the Map Room, answers from Startup Resources, citing only the map |
 | [Publicus, Herald of the Hall](../data/team/dwarves.yaml#L76) | Dwarf | Drafts the Hall's news for people to review and publish |
 
-*Colorado Startups runs each, and each says so wherever it appears. Helpers, not authorities: a person reviews their work. They point to people and resources; they never speak for the community or moderate.*
-
-## Made here, borrowed from no one
-
-*The look is original: Front Range stone, Colorado mining heritage, forge light, the folk's own costumes and tools. It borrows no name, character, design, rune, font or reference picture from any game or film; the gate enforces names. Places that matter to the Ute and other tribes, such as Garden of the Gods, are never fantasy decoration ([rules](../art/direction/look.md)).*
+*Each is an AI agent run by Colorado Startups, and says so wherever it appears ([surfaces](../.claude/rules/ai-disclosure.md)). Helpers, not authorities: a person reviews their work and organizes each outpost. They point to people and resources; they never speak for the community or moderate.*

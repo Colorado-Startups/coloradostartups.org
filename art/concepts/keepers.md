@@ -18,7 +18,7 @@
 
 ## Keepers at 64 px
 
-Goal ([DIRECTION](../DIRECTION.md#the-keepers)): tell the keepers apart at 64 px by color anchor and prop. Two passes, as the house rules ask.
+Goal ([DIRECTION](https://github.com/Colorado-Startups/coloradostartups.org/blob/2879a77/art/direction/cast.md#the-keepers)): tell the keepers apart at 64 px by color anchor and prop. Two passes, as the house rules ask.
 
 ```mermaid
 flowchart LR
