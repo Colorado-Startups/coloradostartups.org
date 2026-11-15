@@ -23,7 +23,7 @@ flowchart LR
 
 | Step | What |
 | --- | --- |
-| Rule (orchestrator) | Re-render any tile that fails its check or lacks the look in [DIRECTION's tile settings](../DIRECTION.md#settings-edits-and-upscales) |
+| Rule (orchestrator) | Re-render any tile that fails its check or lacks the look in [DIRECTION's tile settings](https://github.com/Colorado-Startups/coloradostartups.org/blob/2879a77/art/direction/settings.md#settings-edits-and-upscales) |
 | Batch 1 cause | Both failures lit the surface with a top-to-bottom gradient and left little fine texture. |
 | Batch 2 fix | `tile-stone-v2.txt` and `tile-parchment-v2.txt` ask for an even all-over pattern, "like a sample swatch", and add gradient, light falloff and banding to the negative prompt. |
 | Result | All six v2 renders carry real texture. Every seam measured 1.03 to 1.06 against the 1.5 limit (source: make-tiles) |

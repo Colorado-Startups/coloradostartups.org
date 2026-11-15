@@ -24,8 +24,8 @@ timeline
 | Done | Batch 1: 18 images from `batch-1.json`, rendered by L14 (PR #31). The orchestrator picked; L17 made the shipped files. |
 | Done | Batch 2: Fusion Canyon at three seeds, the stone and parchment tiles at three each, by L17. |
 | Done | Decision 88 moves new stills to FIBO 2.0 and motion to LTX-2.5. Batches 1 and 2 are Anima's; their picks stand. |
-| Open | `hero-b` waits for a slot. The 2x upscale of the hero, regions and keepers waits for an upscale workflow ([models](../direction/models.md)) |
-| Done | Batch 3: 11 FIBO 2.0 stills from JSON captions ([prompts](../direction/fibo-prompts.md)), on Comfy Cloud's Bria node, by L6. They are the 404, founders forum and guides scenes ([scenes](scenes.md)). Route and 144-credit cap: Paul, in L6's chat; 133 credits spent (`LOG.md`). |
+| Open | `hero-b` waits for a slot. The 2x upscale of the hero, regions and keepers waits for an upscale workflow ([models](https://github.com/Colorado-Startups/coloradostartups.org/blob/2879a77/art/direction/models.md)) |
+| Done | Batch 3: 11 FIBO 2.0 stills from JSON captions ([prompts](https://github.com/Colorado-Startups/coloradostartups.org/blob/2879a77/art/direction/fibo-prompts.md)), on Comfy Cloud's Bria node, by L6. They are the 404, founders forum and guides scenes ([scenes](scenes.md)). Route and 144-credit cap: Paul, in L6's chat; 133 credits spent (`LOG.md`). |
 | Done | Batch 4: 6 Colorado-first stills of the founders forum and the guides, on Bria's Hugging Face Space at 0 credits, by L6. Their picks replace batch 3's for those two pages. |
 | Done | Batch 5: the 404 passage, Colorado first (Pikes Peak granite, a cog railway), 5 stills on the Space at 0 credits, by L6. Its pick replaces batch 3's. |
 | Rule | Content filters. Bria's node filters prompts and outputs in every new Bria plan; batch 3 ran with it off (`batch-3.plan.json`). Bria's Space has no filter, so a Space plan must set `moderation` to "none" and say why in `moderation_why` (`batch-4.plan.json`). A person views every take before it ships. |
