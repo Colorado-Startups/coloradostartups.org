@@ -9,8 +9,9 @@ import { describe, expect, it } from "vitest";
 import YAML from "yaml";
 
 import { buildRegions, findPlace, insideRing, readPlaces, readRegions, ringsOverlap } from "../../../../scripts/geo/build.mjs";
-import { COLORADO, COLORADO_BOUNDS, ZONES } from "../../../src/lib/regions/colorado-geo";
+import { COLORADO, COLORADO_BOUNDS, DIM, ZONES, zoneBounds, zoneById } from "../../../src/lib/regions/colorado-geo";
 import { clockwise, coloradoMapSvg, signedArea } from "../../../src/lib/regions/colorado-map";
+import { REGION_COLORS as REGION_COLOR } from "../../../src/lib/regions/map";
 
 const ROOT = path.join(__dirname, "../../../..");
 const places = readPlaces(path.join(ROOT, "data/geo/places.csv"));
@@ -102,5 +103,51 @@ describe("coloradoMapSvg", () => {
     expect(svg).toMatch(/var\(--c-community\)/);
     expect(svg).toMatch(/var\(--c-fire\)/);
     expect(svg).not.toMatch(/#[0-9a-fA-F]{6}\b/);
+  });
+});
+
+// A region page's map: the drawing zoomed to one zone, the other two dimmed,
+// as the live map does it (colorado-map.client.ts reads the same DIM).
+describe.each(REGION_IDS)("coloradoMapSvg zoomed to %s", (id) => {
+  const zone = zoneById(id);
+  const svg = coloradoMapSvg({ label: "Zone label", description: "Zone description" }, { zone: id });
+  const root = new JSDOM(svg, { contentType: "image/svg+xml" }).window.document.documentElement;
+  const text = [...root.querySelectorAll("text")].map((t) => t.textContent);
+
+  it("is one labelled image", () => {
+    expect(root.getAttribute("role")).toBe("img");
+    expect(svg).toContain("Zone label");
+  });
+
+  it("dots and names only the zone's core cities", () => {
+    expect(root.querySelectorAll("circle").length).toBe(zone.properties.cityPoints.length);
+    expect(text.sort()).toEqual(zone.properties.cityPoints.map((c) => c.name).sort());
+  });
+
+  it("dims the other two zones and draws this one at full strength", () => {
+    expect(svg.match(new RegExp(`fill-opacity="${DIM.fill}"`, "g"))).toHaveLength(2);
+    expect(svg.match(new RegExp(`stroke-opacity="${DIM.line}"`, "g"))).toHaveLength(2);
+    expect(svg).toContain(`fill="${REGION_COLOR[id]}" fill-opacity="0.18"`);
+  });
+
+  it("fits the zone's bounds, which hold every core city", () => {
+    const [[west, south], [east, north]] = zoneBounds(id);
+    for (const c of zone.properties.cityPoints) {
+      expect(c.lon).toBeGreaterThan(west);
+      expect(c.lon).toBeLessThan(east);
+      expect(c.lat).toBeGreaterThan(south);
+      expect(c.lat).toBeLessThan(north);
+    }
+    const [[sw, ss], [se, sn]] = COLORADO_BOUNDS;
+    expect(west).toBeGreaterThan(sw);
+    expect(east).toBeLessThan(se);
+    expect(south).toBeGreaterThan(ss);
+    expect(north).toBeLessThan(sn);
+  });
+});
+
+describe("zoneById", () => {
+  it("throws for a zone the data lacks, so a page never draws an empty map", () => {
+    expect(() => zoneById("nowhere" as never)).toThrow(/no zone "nowhere"/);
   });
 });

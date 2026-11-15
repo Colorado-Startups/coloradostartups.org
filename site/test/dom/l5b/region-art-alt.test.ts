@@ -20,9 +20,9 @@ const shown = contentPages().flatMap((p) =>
 );
 
 describe("the brand place paintings", () => {
-  it("appear on /regions/, each region page, /get-involved/ and the seat pages, at least", () => {
+  it("appear on each region page, /get-involved/ and the seat pages, at least", () => {
     const routes = new Set(shown.map(([route]) => route));
-    for (const r of ["/regions/", "/regions/photon-mountain/", "/get-involved/", "/get-involved/space-peak-connector/"]) {
+    for (const r of ["/regions/photon-mountain/", "/regions/fusion-canyon/", "/regions/space-peak/", "/get-involved/", "/get-involved/space-peak-connector/"]) {
       expect(routes.has(r), r).toBe(true);
     }
     for (const place of ["boulder", "springs", "fortcollins", "golden"] as const) {

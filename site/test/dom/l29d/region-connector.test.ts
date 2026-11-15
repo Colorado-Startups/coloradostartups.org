@@ -1,8 +1,10 @@
 // Post-launch item 12 over the built site (run `npm run build` first;
-// test:content does). The region pages and /regions/
-// teasers call each regional seat by its title from positions.yaml (decision
-// 67), never "organizer". An open seat that takes applications links to
-// /get-involved/apply/?role=<id> with the unpaid line beside it.
+// test:content does). The region pages and the /regions/ chips call each
+// regional seat by its title from positions.yaml (decision 67), never
+// "organizer". On a region page, an open seat that takes applications links
+// to /get-involved/apply/?role=<id> with the unpaid line beside it (the
+// PositionCard tests cover that card); a /regions/ chip links to the region
+// page, where the seat and its apply link are.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -45,31 +47,31 @@ describe("the regional seats are Connector seats", () => {
       expect(text(heading?.closest("section"))).not.toMatch(/organizer/i);
       const meet = text(page.getElementById("meet")?.closest("section"));
       expect(meet).not.toMatch(/organizer/i);
-      expect(meet).toContain(`Startup events in ${region.name} and across Colorado go on the event calendar.`);
+      expect(meet).toContain("One Slack and one event calendar for all of Colorado.");
+      expect(page.querySelector(`.organizer [data-position='${seat.id}']`), `${region.name} seat card`).not.toBeNull();
     });
   });
 
   describe("/regions/", () => {
     const index = doc(readDist("regions/index.html"));
 
-    it.each(REGIONS.map((r) => [r.id, r] as const))("the %s card shows the Connector seat", (id) => {
+    it.each(REGIONS.map((r) => [r.id, r] as const))("the %s chip shows the Connector seat and links to the region page", (id) => {
       const seat = seatOf(id);
-      const card = index.querySelector<HTMLElement>(`[data-region='${id}']`);
-      expect(text(card)).not.toMatch(/organizer/i);
-      if (seat.status === "open") expect(text(card)).toContain("Connector seat open");
-      const apply = card?.querySelector<HTMLAnchorElement>("a[data-apply]");
+      const chip = index.querySelector<HTMLElement>(`.region-chips [data-region='${id}']`);
+      expect(text(chip)).not.toMatch(/organizer/i);
+      if (seat.status === "open") expect(text(chip)).toContain("Connector seat open");
+      expect(chip?.querySelector("a")?.getAttribute("href")).toBe(`/regions/${id}/`);
+      // The apply link lives on the region page, beside the unpaid line.
+      expect(chip?.querySelector("a[data-apply]")).toBeNull();
       if (applies(seat)) {
+        const apply = doc(readDist(`regions/${id}/index.html`)).querySelector<HTMLAnchorElement>(".organizer a[data-apply]");
         expect(apply?.getAttribute("href")).toBe(`/get-involved/apply/?role=${seat.id}`);
-        expect(text(apply)).toBe(`Apply to be the ${seat.title}`);
-        expect(text(card?.querySelector("[data-unpaid-line]"))).toBe(UNPAID_VOLUNTEER_LINE);
-      } else {
-        expect(apply).toBeNull();
       }
     });
 
     it("says how the Connector seats work", () => {
       const how = text(index.getElementById("how-title")?.parentElement);
-      expect(how).toContain("Each region has one Connector seat, for a person.");
+      expect(how).toContain("1 Connector per region. A person, never an AI keeper.");
       expect(how).not.toMatch(/organizer/i);
     });
   });

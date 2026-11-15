@@ -7,17 +7,26 @@
 //      loaded when the figure nears the screen. It hides the drawing once it
 //      has drawn.
 // Zones come from data/geo/regions.geojson (US Census places). The region
-// cards beside the map are its list alternative.
+// chips or links beside the map are its list alternative.
+//
+// `zone` zooms both layers to one region and dims the other two: the drawing
+// at build time, the live map when it fits to the zone's bounds.
 //
 // `live` (default true) marks the figure for the live map. The loader itself
 // is <LiveMaps /> (LiveMaps.astro), which a page adds once: MapLibre is far
 // past a page's 75 KB JavaScript goal, so a page that shows only the drawing,
 // such as the home page, ships none of it.
+import type { RegionId } from "@cs/shared";
+
+import { zoneById } from "../../lib/regions/colorado-geo";
 import { coloradoMapSvg, MAP_HEIGHT, MAP_WIDTH } from "../../lib/regions/colorado-map";
+import { andList } from "../../lib/text";
 
 interface Props {
   /** Unique on the page. */
   id: string;
+  /** Zoom to one region and dim the other two. Omit for the whole state. */
+  zone?: RegionId;
   /** Accessible name for the map. */
   label?: string;
   /** One short line under the map; empty for none. */
@@ -26,18 +35,27 @@ interface Props {
   live?: boolean;
 }
 
+const { id, zone, live = true } = Astro.props;
+const focus = zone ? zoneById(zone).properties : undefined;
 const {
-  id,
-  label = "Map of Colorado with the three Colorado Startups regions outlined",
-  caption = "Photon Mountain, Fusion Canyon and Space Peak along the Front Range.",
-  live = true,
+  label = focus
+    ? `Map of ${focus.name}, one of the three Colorado Startups regions`
+    : "Map of Colorado with the three Colorado Startups regions outlined",
+  caption = focus ? `${focus.name} on the Front Range.` : "Photon Mountain, Fusion Canyon and Space Peak along the Front Range.",
 } = Astro.props;
-const description =
-  "Photon Mountain covers Boulder, Golden, Arvada and Denver. Fusion Canyon covers Fort Collins, Loveland, Windsor and Greeley. Space Peak covers Colorado Springs.";
-const svg = coloradoMapSvg({ label, description });
+const description = focus
+  ? `${focus.name} covers ${andList(focus.cities)}. The other two regions are dimmed.`
+  : "Photon Mountain covers Boulder, Golden, Arvada and Denver. Fusion Canyon covers Fort Collins, Loveland, Windsor and Greeley. Space Peak covers Colorado Springs.";
+const svg = coloradoMapSvg({ label, description }, { zone });
 ---
 
-<figure class="colorado-map" id={id} data-colorado-map={live ? "" : undefined} style={`--map-ratio: ${MAP_WIDTH} / ${MAP_HEIGHT}`}>
+<figure
+  class="colorado-map"
+  id={id}
+  data-colorado-map={live ? "" : undefined}
+  data-zone={zone}
+  style={`--map-ratio: ${MAP_WIDTH} / ${MAP_HEIGHT}`}
+>
   <div class="colorado-map__box">
     <div class="colorado-map__drawing" set:html={svg} />
     {live && <div class="colorado-map__live" data-map-canvas data-label={label} />}

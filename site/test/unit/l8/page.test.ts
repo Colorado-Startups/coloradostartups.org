@@ -10,7 +10,16 @@ import {
   takesApplications,
 } from "../../../src/components/positions/positions";
 import { REGIONS } from "../../../src/lib/regions/match";
-import { andList, canvasCityHref, honoreesIn, inRegion, organizerFor } from "../../../src/lib/regions/page";
+import {
+  andList,
+  canvasCityHref,
+  honoreesIn,
+  inRegion,
+  organizerFor,
+  regionFilterHref,
+  spread,
+  summaryAfterLede,
+} from "../../../src/lib/regions/page";
 
 const seat = (over: Partial<Position> = {}): Position => ({
   id: "space-peak-connector",
@@ -132,5 +141,41 @@ describe("canvasCityHref", () => {
     expect(canvasCityHref("Fort Collins")).toBe("/ecosystem-canvas/?city=Fort%20Collins");
     expect(new URLSearchParams(canvasCityHref("Fort Collins").split("?")[1]).get("city")).toBe("Fort Collins");
     expect(canvasCityHref("statewide")).toBe("/ecosystem-canvas/?city=statewide");
+  });
+});
+
+// A region page shows six resources and six honorees, spread across groups.
+describe("spread", () => {
+  const items = ["a1", "a2", "a3", "b1", "c1", "c2"];
+  const group = (x: string) => x[0]!;
+
+  it("takes one per group in turn, then a second each, up to n", () => {
+    expect(spread(items, group, 4)).toEqual(["a1", "b1", "c1", "a2"]);
+    expect(spread(items, group, 6)).toEqual(["a1", "b1", "c1", "a2", "c2", "a3"]);
+  });
+
+  it("puts groups in the given order, then any others in order of first appearance", () => {
+    expect(spread(items, group, 3, ["c", "x"])).toEqual(["c1", "a1", "b1"]);
+  });
+
+  it("returns every item when there are fewer than n, and none from none", () => {
+    expect(spread(["a1", "b1"], group, 6)).toEqual(["a1", "b1"]);
+    expect(spread([], group, 6)).toEqual([]);
+  });
+});
+
+describe("regionFilterHref", () => {
+  it("opens the directory or the Leaderboard filtered to one region", () => {
+    expect(regionFilterHref("/ecosystem-canvas/", "photon-mountain")).toBe("/ecosystem-canvas/?region=photon-mountain");
+    expect(regionFilterHref("/leaderboard/", "space-peak")).toBe("/leaderboard/?region=space-peak");
+  });
+});
+
+describe("summaryAfterLede", () => {
+  it.each(REGIONS.map((r) => [r.id, r] as const))("%s: the summary less its first sentence, so a caption never repeats the lede", (_id, r) => {
+    const rest = summaryAfterLede(r);
+    expect(rest.length).toBeGreaterThan(0);
+    expect(r.summary.replace(/\s+/g, " ")).toContain(rest.replace(/\s+/g, " "));
+    expect(rest).not.toContain(r.summary.trim().split(/(?<=\.)\s/)[0]);
   });
 });

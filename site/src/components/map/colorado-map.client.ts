@@ -12,9 +12,13 @@
 // - cooperativeGestures: the page scrolls past the map; a pinch or a held
 //   key zooms it. Zoom buttons cover single-pointer use (WCAG 2.5.1).
 // - Zone colors are read off the site's tokens, so they follow the theme.
-import type { GeoJSONSourceSpecification, Map as MlMap } from "maplibre-gl";
+// - A figure with data-zone (ColoradoMap's `zone`) fits that zone's bounds and
+//   dims the other two, as the drawing does. The basemap names its towns, and
+//   the zone fills the frame, so it draws no zone names.
+import type { RegionId } from "@cs/shared";
+import type { ExpressionSpecification, GeoJSONSourceSpecification, Map as MlMap } from "maplibre-gl";
 
-import { COLORADO, COLORADO_BOUNDS, ZONES, zoneLabelPoint } from "../../lib/regions/colorado-geo";
+import { COLORADO, COLORADO_BOUNDS, DIM, ZONES, zoneBounds, zoneLabelPoint } from "../../lib/regions/colorado-geo";
 
 const STYLES = {
   light: "https://tiles.openfreemap.org/styles/positron",
@@ -41,29 +45,47 @@ function firstSymbolId(map: MlMap): string | undefined {
   return map.getStyle().layers?.find((l) => l.type === "symbol")?.id;
 }
 
-function addOverlay(map: MlMap) {
+/** A zone paint value: `on` for the focused zone, or every zone on the statewide map; `off` for a dimmed one. */
+function byFocus(zone: RegionId | undefined, on: number, off: number): number | ExpressionSpecification {
+  return zone ? ["case", ["==", ["get", "id"], zone], on, off] : on;
+}
+
+function addOverlay(map: MlMap, zone: RegionId | undefined) {
   if (map.getSource("cs-zones")) return;
   const below = firstSymbolId(map);
   const zones = {
     type: "FeatureCollection" as const,
-    features: ZONES.features.map((z) => ({ ...z, properties: { ...z.properties, color: token(ZONE_TOKEN[z.id]) } })),
+    features: ZONES.features.map((z) => ({ ...z, properties: { id: z.id, color: token(ZONE_TOKEN[z.id]) } })),
   };
   const cities = {
     type: "FeatureCollection" as const,
-    features: ZONES.features.flatMap((z) =>
-      z.properties.cityPoints.map((c) => ({
-        type: "Feature" as const,
-        properties: { name: c.name },
-        geometry: { type: "Point" as const, coordinates: [c.lon, c.lat] },
-      })),
-    ),
+    features: ZONES.features
+      .filter((z) => !zone || z.id === zone)
+      .flatMap((z) =>
+        z.properties.cityPoints.map((c) => ({
+          type: "Feature" as const,
+          properties: { name: c.name },
+          geometry: { type: "Point" as const, coordinates: [c.lon, c.lat] },
+        })),
+      ),
   };
   map.addSource("cs-state", { type: "geojson", data: COLORADO as unknown as GeoJSONSourceSpecification["data"] });
   map.addSource("cs-zones", { type: "geojson", data: zones as unknown as GeoJSONSourceSpecification["data"] });
   map.addSource("cs-cities", { type: "geojson", data: cities });
   map.addLayer({ id: "cs-state-line", type: "line", source: "cs-state", paint: { "line-color": token("--c-border"), "line-width": 1.5 } }, below);
-  map.addLayer({ id: "cs-zones-fill", type: "fill", source: "cs-zones", paint: { "fill-color": ["get", "color"], "fill-opacity": 0.16 } }, below);
-  map.addLayer({ id: "cs-zones-line", type: "line", source: "cs-zones", paint: { "line-color": ["get", "color"], "line-width": 2.5 } }, below);
+  map.addLayer(
+    { id: "cs-zones-fill", type: "fill", source: "cs-zones", paint: { "fill-color": ["get", "color"], "fill-opacity": byFocus(zone, 0.16, DIM.fill) } },
+    below,
+  );
+  map.addLayer(
+    {
+      id: "cs-zones-line",
+      type: "line",
+      source: "cs-zones",
+      paint: { "line-color": ["get", "color"], "line-width": byFocus(zone, zone ? 3 : 2.5, 1.5), "line-opacity": byFocus(zone, 1, DIM.line) },
+    },
+    below,
+  );
   map.addLayer({
     id: "cs-cities",
     type: "circle",
@@ -85,11 +107,12 @@ async function mount(figure: HTMLElement) {
     import("maplibre-gl/dist/maplibre-gl.css"),
   ]);
   maplibregl.setWorkerUrl(workerUrl);
+  const zone = figure.dataset.zone as RegionId | undefined;
   const map = new maplibregl.Map({
     container: host,
     style: STYLES[scheme()],
-    bounds: COLORADO_BOUNDS,
-    fitBoundsOptions: { padding: 16 },
+    bounds: zone ? zoneBounds(zone) : COLORADO_BOUNDS,
+    fitBoundsOptions: { padding: zone ? 32 : 16 },
     cooperativeGestures: true,
     attributionControl: { compact: true },
     dragRotate: false,
@@ -98,11 +121,11 @@ async function mount(figure: HTMLElement) {
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
   map.getCanvas().setAttribute("aria-label", host.dataset.label ?? "Map of Colorado");
-  map.on("style.load", () => addOverlay(map));
+  map.on("style.load", () => addOverlay(map, zone));
   // The zone names are HTML, in the site's own type, and survive a style swap.
   // On a phone-width map they sit west of the zones, or the plains clip them.
   const west = host.clientWidth < 480;
-  for (const z of ZONES.features) {
+  for (const z of zone ? [] : ZONES.features) {
     const el = document.createElement("span");
     el.className = "colorado-map__label";
     el.textContent = z.properties.name;

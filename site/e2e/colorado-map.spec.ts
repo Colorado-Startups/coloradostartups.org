@@ -45,3 +45,28 @@ test("/styleguide/ map with no JavaScript is the whole drawing", async ({ browse
     await context.close();
   }
 });
+
+// A region page's map (ColoradoMap with `zone`): the drawing zoomed to the
+// zone with its core cities named, then, where WebGL2 exists, the live map
+// fitted to the same zone, with no zone names over it (the basemap names the
+// towns) and no console error.
+test("/regions/fusion-canyon/ map: zoomed to the zone, drawing then live map", async ({ page }) => {
+  await page.route("https://static.cloudflareinsights.com/**", (r) => r.fulfill({ contentType: "text/javascript", body: "" }));
+  const errors: string[] = [];
+  page.on("console", (m) => {
+    if (m.type() === "error") errors.push(m.text());
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/regions/fusion-canyon/");
+  const map = page.locator("#region-map");
+  await expect(map).toHaveAttribute("data-zone", "fusion-canyon");
+  for (const city of ["Fort Collins", "Loveland", "Windsor", "Greeley"]) await expect(map.locator(".colorado-map__drawing")).toContainText(city);
+  const webgl2 = await page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")));
+  test.skip(!webgl2, "no WebGL2 in this browser: the drawing is the map");
+  await map.scrollIntoViewIfNeeded();
+  await expect(map).toHaveClass(/is-live/, { timeout: 30_000 });
+  await expect(map.locator("canvas")).toBeVisible();
+  await expect(map.locator(".colorado-map__label")).toHaveCount(0);
+  await expect(map).toHaveAttribute("data-map", "idle", { timeout: 30_000 });
+  expect(errors).toEqual([]);
+});
