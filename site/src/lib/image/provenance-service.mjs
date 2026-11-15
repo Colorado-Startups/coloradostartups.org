@@ -5,7 +5,7 @@
 // provenance XMP"). This service writes the source WebP's provenance record
 // into each WebP it makes. It splices the RIFF chunk (art/tools/provenance.mjs),
 // so no picture is encoded twice. It never copies the source's bytes: it reads
-// the nine fields make-finals.mjs writes and rebuilds the packet from them.
+// the nine fields xmpPacket() writes and rebuilds the packet from them.
 import sharpService from "astro/assets/services/sharp";
 
 import { readWebpXmp, setWebpXmp, xmpPacket } from "../../../../art/tools/provenance.mjs";

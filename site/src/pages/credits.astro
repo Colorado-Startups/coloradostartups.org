@@ -1,12 +1,14 @@
 ---
-// /credits/: where each picture on the site comes from. The brand v3 place
-// paintings are AI-made with FIBO 2.0 from real photos (lib/brand-credits.ts).
+// /credits/: where each picture on the site comes from. The brand place
+// paintings are AI-made with FIBO 2.0 from real photos; the brand's website
+// art (keepers, scenes, the stone tile, the crest) is AI-made with no photo
+// (lib/brand-credits.ts).
 // CC BY asks for credit "in any reasonable manner"; this page is that credit,
 // beside the photo credit kept in each file's metadata.
 import InfoHeader from "../components/info/InfoHeader.astro";
 import { PLACE_ART_ALT } from "../components/art/keepers";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { BRAND_CREDITS_URL, PLACE_CREDITS } from "../lib/brand-credits";
+import { BRAND_CREDITS_URL, PLACE_CREDITS, WEBSITE_ART_CREDITS } from "../lib/brand-credits";
 
 const rows = Object.entries(PLACE_CREDITS).map(([place, c]) => ({
   ...c,
@@ -18,7 +20,7 @@ const rows = Object.entries(PLACE_CREDITS).map(([place, c]) => ({
   <section class="section section--lit" aria-labelledby="page-title">
     <div class="wrap">
       <InfoHeader kicker="Where the pictures come from" title="Image credits">
-        <p class="lede">Each place painting is AI-made with FIBO 2.0 from a real photo of that place.</p>
+        <p class="lede">Every picture here is AI-made with FIBO 2.0. Each place painting starts from a real photo of that place.</p>
         <p>The brand keeps the full record: <a href={BRAND_CREDITS_URL}>image credits in the brand repo</a>.</p>
       </InfoHeader>
     </div>
@@ -40,6 +42,29 @@ const rows = Object.entries(PLACE_CREDITS).map(([place, c]) => ({
                   <td>{r.region}</td>
                   <td>{r.caption} AI-made with FIBO 2.0.</td>
                   <td>{r.credit}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="website-art-title">
+    <div class="wrap">
+      <h2 id="website-art-title">Website art</h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Website art credits">
+        <table>
+          <thead>
+            <tr><th scope="col">Picture</th><th scope="col">How it was made</th></tr>
+          </thead>
+          <tbody>
+            {
+              WEBSITE_ART_CREDITS.map((w) => (
+                <tr>
+                  <th scope="row">{w.picture}</th>
+                  <td>{w.made}</td>
                 </tr>
               ))
             }

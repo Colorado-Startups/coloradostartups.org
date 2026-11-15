@@ -8,11 +8,24 @@ import path from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
-import { readWebpXmp, setWebpXmp, webpChunks } from "../../../../art/tools/provenance.mjs";
+import { readWebpXmp, setWebpXmp, webpChunks, xmpPacket } from "../../../../art/tools/provenance.mjs";
 import service, { provenanceXmp } from "../../../src/lib/image/provenance-service.mjs";
 
 const SITE = path.join(__dirname, "../../..");
-const hall = readFileSync(path.join(SITE, "src/assets/art/hero/hall.webp"));
+// A pulled brand picture, stamped with the nine-field record the service
+// rebuilds. The brand's own packet uses other fields, so the test writes one.
+const RECORD = {
+  model: "FIBO 2.0",
+  maker: "Bria",
+  version: "briaai/Fibo-2.0-dev",
+  prompt: "Two founders mark a hand-drawn map of the Front Range.",
+  negative: "text, watermark",
+  seed: 12,
+  license: "Bria FIBO 2 Free plan",
+  license_url: "https://example.org/license",
+  source: "brand dist/website/guides.jpg",
+};
+const art = setWebpXmp(readFileSync(path.join(SITE, "public/art/brand/guides-720.webp")), xmpPacket(RECORD));
 // Team photos are personal data, so the public export leaves them out.
 const PHOTO = path.join(SITE, "src/components/team/photos/paul-foley.webp");
 const HAS_PHOTO = existsSync(PHOTO);
@@ -20,7 +33,7 @@ const photo = HAS_PHOTO ? readFileSync(PHOTO) : Buffer.alloc(0);
 // A plain PNG with no packet. The OG cards are built at prebuild, after the
 // unit tests run, so the test makes its own.
 const png = await sharp({ create: { width: 8, height: 8, channels: 3, background: "#001970" } }).png().toBuffer();
-const packet = readWebpXmp(hall) ?? "";
+const packet = readWebpXmp(art) ?? "";
 
 // Astro passes its image config; the sharp service reads only these two.
 const config = { service: { entrypoint: "", config: {} } } as never;
@@ -32,13 +45,13 @@ async function variant(source: Buffer, format: "webp" | "png" = "webp") {
   return { data: Buffer.from(out.data), format: out.format, warnings };
 }
 
-/** The hero with its packet edited by `edit`. */
-const withPacket = (edit: (p: string) => string) => setWebpXmp(hall, edit(packet));
+/** The fixture with its packet edited by `edit`. */
+const withPacket = (edit: (p: string) => string) => setWebpXmp(art, edit(packet));
 
 describe("provenanceXmp", () => {
   it("rebuilds the art's own packet, byte for byte (known clean)", () => {
     expect(packet).toContain("Iptc4xmpExt:DigitalSourceType");
-    expect(provenanceXmp(hall)).toBe(packet);
+    expect(provenanceXmp(art)).toBe(packet);
   });
 
   it("refuses any field outside the nine, and any place (known bad)", () => {
@@ -61,7 +74,7 @@ describe("provenanceXmp", () => {
 
 describe("the image service", () => {
   it("writes the record into a WebP variant, as a valid extended WebP with no EXIF or ICC profile", async () => {
-    const { data, format, warnings } = await variant(hall);
+    const { data, format, warnings } = await variant(art);
     expect(format).toBe("webp");
     expect(readWebpXmp(data)).toBe(packet);
     expect(data.readUInt32LE(4)).toBe(data.length - 8);
@@ -74,7 +87,7 @@ describe("the image service", () => {
   });
 
   it("makes the same bytes every time", async () => {
-    expect((await variant(hall)).data.equals((await variant(hall)).data)).toBe(true);
+    expect((await variant(art)).data.equals((await variant(art)).data)).toBe(true);
   });
 
   it.skipIf(!HAS_PHOTO)("leaves a variant without XMP for a photo, a PNG source, a PNG variant or a refused packet", async () => {
@@ -83,13 +96,13 @@ describe("the image service", () => {
       expect(format).toBe("webp");
       expect(webpChunks(data)).not.toContain("XMP ");
     }
-    const { data, format } = await variant(hall, "png");
+    const { data, format } = await variant(art, "png");
     expect(format).toBe("png");
     expect(data.includes("x:xmpmeta")).toBe(false);
   });
 
   it("warns and still returns a variant when the source WebP is corrupt", async () => {
-    const corrupt = hall.subarray(0, hall.length - 4000);
+    const corrupt = art.subarray(0, art.length - 4000);
     const { data, warnings } = await variant(corrupt);
     expect(data.length).toBeGreaterThan(0);
     expect(warnings.some((w) => w.includes("no provenance XMP"))).toBe(true);

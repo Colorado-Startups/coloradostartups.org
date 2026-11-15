@@ -1,16 +1,13 @@
-// L6: provenance for the shipped art (art/tools/provenance.mjs). Every shipped
-// WebP carries its model, version, license, prompt and seed as XMP, written
-// without re-encoding, and make-finals refuses a source whose maker's
-// provenance a re-encode would drop.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+// L6: provenance records (art/tools/provenance.mjs): a WebP carries its
+// model, version, license, prompt and seed as XMP, written without
+// re-encoding, and a source's own C2PA, EXIF or XMP is found before any
+// re-encode would drop it.
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
-import { IN_ARCHIVE } from "../../archive";
-import { tempDirs } from "../temp-dirs";
-import { provenancePackets, shippedFiles, sourcePath, sourcesWithProvenance, stampShipped } from "../../../../art/tools/make-finals.mjs";
 import {
   AI_SOURCE,
   PROMPT_READERS,
@@ -23,8 +20,6 @@ import {
 } from "../../../../art/tools/provenance.mjs";
 
 const ROOT = path.join(__dirname, "../../../..");
-const plan = JSON.parse(readFileSync(path.join(ROOT, "art/finals.json"), "utf8"));
-const tmp = tempDirs();
 
 const MODELS = {
   image_anima_base_v1: { name: "Anima Base", maker: "CircleStone Labs", version: "v1.0", license: "Anima license v1.2", license_url: "https://example.org/l" },
@@ -52,13 +47,6 @@ describe("records", () => {
     const node = (o: object) => ({ input_overrides: { "1": o } });
     expect(PROMPT_READERS.api_bria_fibo2_t2i(node({ structured_prompt: '{"a":1}', prompt: "", seed: 9 }))).toEqual({ prompt: '{"a":1}', seed: 9 });
     expect(PROMPT_READERS.api_bria_fibo2_t2i(node({ structured_prompt: "", prompt: "a passage", seed: 9 }))).toEqual({ prompt: "a passage", seed: 9 });
-  });
-
-  // provenancePackets reads art/runs, which the public export leaves out.
-  it.skipIf(!IN_ARCHIVE)("builds a record for every file art/finals.json ships, finals and tiles", () => {
-    const { packets, problems } = provenancePackets(plan);
-    expect(problems).toEqual([]);
-    expect(Object.keys(packets).sort()).toEqual(shippedFiles(plan).map((s: { out: string }) => s.out).sort());
   });
 });
 
@@ -129,31 +117,5 @@ describe("source provenance", () => {
     expect(pngProvenance(withChunk(png, chunk("caBX", Buffer.from("jumb"))))).toEqual(["caBX"]);
     expect(pngProvenance(withChunk(png, chunk("eXIf", Buffer.from("MM\0*"))))).toEqual(["eXIf"]);
     expect(pngProvenance(withChunk(png, chunk("iTXt", Buffer.from("XML:com.adobe.xmp\0\0\0\0\0<x/>"))))).toEqual(["XMP"]);
-  });
-
-  it("make-finals lists every source that carries provenance", async () => {
-    const inbox = tmp("l6-");
-    const png = await sharp({ create: { width: 4, height: 4, channels: 3, background: "#000" } }).png().toBuffer();
-    for (const s of shippedFiles(plan)) {
-      const file = sourcePath(inbox, s.batch, s.from);
-      mkdirSync(path.dirname(file), { recursive: true });
-      writeFileSync(file, s.from === "hero-a" ? withChunk(png, chunk("caBX", Buffer.from("jumb"))) : png);
-    }
-    expect(sourcesWithProvenance(plan, inbox)).toEqual([{ file: sourcePath(inbox, 1, "hero-a"), found: ["caBX"] }]);
-  });
-});
-
-describe("delivered art", () => {
-  const { packets } = provenancePackets(plan);
-  for (const s of shippedFiles(plan)) {
-    // The packets come from art/runs, which the public export leaves out.
-    it.skipIf(!IN_ARCHIVE || !existsSync(s.file))(`${s.out}.webp carries its own provenance record`, () => {
-      expect(readWebpXmp(readFileSync(s.file))).toBe(packets[s.out]);
-    });
-  }
-
-  it("--stamp finds every file before it writes any", () => {
-    const dir = tmp("l6-");
-    expect(stampShipped(plan, packets, dir)).toBe(3);
   });
 });

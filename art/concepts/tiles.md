@@ -27,5 +27,6 @@ flowchart LR
 | Batch 1 cause | Both failures lit the surface with a top-to-bottom gradient and left little fine texture. |
 | Batch 2 fix | `tile-stone-v2.txt` and `tile-parchment-v2.txt` ask for an even all-over pattern, "like a sample swatch", and add gradient, light falloff and banding to the negative prompt. |
 | Result | All six v2 renders carry real texture. Every seam measured 1.03 to 1.06 against the 1.5 limit (source: make-tiles) |
-| Picks (L17, under the rule) | Both pass their checks and match DIRECTION's look. `art/finals.json` records them, and `make-finals.mjs` builds them with make-tiles' method. |
+| Picks (L17, under the rule) | Both pass their checks and match DIRECTION's look. `make-finals.mjs` built them with make-tiles' method. |
+| Since brand v3 | `make-tiles.mjs` makes all three tiles from the brand's FIBO stone; `make-finals.mjs` retired 2026-11-15. |
 

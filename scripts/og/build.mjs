@@ -127,7 +127,7 @@ async function background(card) {
   const meta = await sharp(file).metadata();
   const xmp = meta.xmp ? meta.xmp.toString("utf8") : null;
   if (meta.height > meta.width) {
-    // A keeper portrait stands at the right on its own ground color (art/finals.json).
+    // A keeper portrait stands at the right on the brand's blue ground.
     const place = portraitPlacement(meta.width, meta.height, CARD.width, CARD.height);
     const art = await sharp(file).resize(place.resize).toBuffer();
     const ground = { width: CARD.width, height: CARD.height, channels: 3, background: BRAND.blue };

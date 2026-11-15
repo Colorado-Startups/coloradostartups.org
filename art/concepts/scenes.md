@@ -2,7 +2,9 @@
 
 *Part of the [v3 concepts record](README.md). Previews sit in `batch-<n>/` here; every other take's verdict is a QC line in the run log (private archive).*
 
-## What ships
+## What shipped
+
+Brand releases replaced every file below; the site deleted them on 2026-11-15 and now shows the brand's own scenes.
 
 ```mermaid
 flowchart LR

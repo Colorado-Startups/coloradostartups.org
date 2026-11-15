@@ -1,13 +1,13 @@
-// Provenance for every shipped art file: the model that made it, its version
-// and license, and the prompt and seed it ran with. make-finals.mjs writes it
-// into each WebP as XMP, in IPTC's fields where IPTC has one (Photo Metadata
-// 2025.1: DigitalSourceType, AISystemUsed, AISystemVersionUsed,
-// AIPromptInformation) and in the cs: namespace for the rest.
+// Provenance for an art file: the model that made it, its version and
+// license, and the prompt and seed it ran with, written into a WebP as XMP,
+// in IPTC's fields where IPTC has one (Photo Metadata 2025.1:
+// DigitalSourceType, AISystemUsed, AISystemVersionUsed, AIPromptInformation)
+// and in the cs: namespace for the rest.
 //
-// The record comes from art/finals.json (which render ships as which file and
-// the models block) and art/runs/batch-<n>.json (each render's prompt and
-// seed). Writing it edits the WebP's RIFF chunks and never re-encodes, so the
-// pixels stay byte for byte the same.
+// provenanceFor builds the record from a models block and
+// art/runs/batch-<n>.json (each render's prompt and seed). Writing it edits
+// the WebP's RIFF chunks and never re-encodes, so the pixels stay byte for
+// byte the same.
 //
 // The site's image service (site/src/lib/image/provenance-service.mjs, #668)
 // rebuilds this packet from its fields and writes it into every <Image>
@@ -55,7 +55,7 @@ export function provenanceFor({ batch, from }, batchFile, models) {
   const reader = PROMPT_READERS[batchFile.template];
   const model = models?.[batchFile.template];
   if (!reader) return `batch ${batch}: no prompt reader for template ${batchFile.template}`;
-  if (!model) return `batch ${batch}: art/finals.json models has no ${batchFile.template}`;
+  if (!model) return `batch ${batch}: models has no ${batchFile.template}`;
   const item = batchFile.items?.find((i) => i.description === from);
   if (!item) return `batch ${batch} has no render ${from}`;
   const { prompt, negative, seed } = reader(item);
@@ -181,8 +181,8 @@ const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0
 
 // Provenance a render's PNG carries from its maker: a C2PA manifest (caBX),
 // EXIF (eXIf) or an XMP packet (iTXt "XML:com.adobe.xmp"). A re-encode drops
-// all three, and the LTX and Bria terms forbid removing them, so make-finals
-// refuses such a source. ComfyUI's own tEXt chunks ("prompt", "workflow") are
+// all three, and the LTX and Bria terms forbid removing them, so a source
+// that carries one is never re-encoded. ComfyUI's own tEXt chunks ("prompt", "workflow") are
 // not provenance and never ship.
 export function pngProvenance(buf) {
   if (!buf.subarray(0, 8).equals(PNG_SIGNATURE)) return [];

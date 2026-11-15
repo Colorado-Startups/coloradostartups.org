@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Makes the page-background texture tiles for L12 from a texture render (brand v3:
-// the brand's FIBO stone, dist/hall/stone.png, for all three tiles).
+// the brand's FIBO stone, dist/website/stone.png, for all three tiles).
 //
 //   node art/tools/make-tiles.mjs --from <dir>   read <dir>/tile-<name>.png, write the WebP tiles
 //   --pick stone=tile-stone-2                     read <dir>/tile-stone-2.png for the stone tile instead
@@ -225,7 +225,7 @@ export async function checkTile(file, spec, colors) {
 }
 
 // px sigma, tried in order until a tile fits its size goal. The brand's FIBO stone
-// (brand dist/hall/stone.png) carries finer grain than the old renders and needs
+// (brand dist/website/stone.png) carries finer grain than the old renders and needs
 // up to 3.8; three sigma (about 11 px at 512) stays inside the 16 px crop margin.
 export const BLURS = [0, 0.7, 1.2, 1.8, 2.5, 3.2, 3.8];
 
@@ -273,7 +273,7 @@ export function sourceFile(from, value) {
   return value.endsWith(".png") ? path.resolve(value) : path.join(from, `${value}.png`);
 }
 
-// One render PNG to one delivered tile; make-finals.mjs calls this too. The
+// One render PNG to one delivered tile. The
 // render's XMP rides into the tile, so an AI-made label survives (brand
 // decision 46).
 export async function tileFromPng(src, out, spec, colors) {

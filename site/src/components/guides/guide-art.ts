@@ -1,19 +1,20 @@
 // The picture under each guide's answer. The index, the topic guides and the
-// startup credits guide show L6's guides scene and its alt text (2026-11-04,
-// art/finals.json); no keeper is in it. Each city guide shows its own city's
-// brand v3 place painting (brand/<place>) with the brand's caption as alt
-// (PLACE_ART_ALT). All are 16:9 boxes below the first screen, so they load lazily.
+// startup credits guide show the brand's guides scene (brand/guides, from
+// brand v4.0.0 dist/website/guides.jpg, viewed 2026-11-15); no keeper is in
+// it. Each city guide shows its own city's brand place painting
+// (brand/<place>) with the brand's caption as alt (PLACE_ART_ALT). All are
+// 16:9 boxes below the first screen, so they load lazily.
 import type { GuideSlug } from "../../lib/guides/core";
 import { PLACE_ART_ALT } from "../art/keepers";
 
 export interface GuideArt {
-  /** Asset key under src/assets/art. */
+  /** Art key for ArtImage: brand/<name>, a pulled brand file (art-assets.ts brandArt). */
   src: string;
   alt: string;
 }
 
 export const GUIDES_SCENE: GuideArt = {
-  src: "scenes/guides",
+  src: "brand/guides",
   alt: "Two founders mark a hand-drawn map of the Front Range beside a copper rocket and a satellite, with snowy peaks above the Denver skyline through the window.",
 };
 
