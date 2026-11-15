@@ -1,6 +1,6 @@
 # coloradostartups.org
 
-The [Colorado Startups](https://coloradostartups.org) website, for founders building companies in Colorado. It is "the Hall", a golden forge-kingdom carved into the Front Range. Anyone can improve it: see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+The [Colorado Startups](https://coloradostartups.org) website, for founders building companies in Colorado. Its art paints real Colorado places, Boulder, Golden, Denver, Colorado Springs and Fort Collins, as a fantasy world. Anyone can improve it: see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 Brand: [Colorado Startups brand guide](https://colorado-startups.github.io/brand/)
 
@@ -66,7 +66,7 @@ Use anything here for anything, except the Exceptions below. You need not ask, c
 
 | What | License |
 | --- | --- |
-| Everything we own here: code, docs, data, the name, the logo, the Hall art, the keepers, `01_doctrine/` | [CC0 1.0](LICENSE), in the public domain |
+| Everything we own here: code, docs, data, the name, the logo, the art, the keepers, `01_doctrine/` | [CC0 1.0](LICENSE), in the public domain |
 | Code, as you choose | `CC0-1.0 OR 0BSD`. [0BSD](LICENSES/0BSD.txt), the second choice, is OSI-approved and asks for no notice |
 
 CC0 waives no trademark or patent rights (its section 4(a)). We will not enforce ours against you.
@@ -83,6 +83,6 @@ Not ours to give away; each keeps its own license.
 | The Code of Conduct's Covenant text | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | CC BY-SA 4.0, from the Contributor Covenant |
 | gitleaks, the secret scanner | CI downloads the release binary | MIT |
 | Other companies' names and marks | `data/` | Theirs |
-| AI-made Hall art and clips, and Open Graph cards built from them | `art/`, `site/src/assets/art/`, `site/public/og/` | CC0 for our part; the model makers' terms still apply ([`art/LICENSES.md`](art/LICENSES.md)) |
+| AI-made art and clips, and Open Graph cards built from them | `art/`, `site/src/assets/art/`, `site/public/og/` | CC0 for our part; the model makers' terms still apply ([`art/LICENSES.md`](art/LICENSES.md)) |
 
 Three duties follow ([`duties.md`](art/licenses/duties.md) cites each clause): never train a model or LoRA on the art, keep its watermarks and provenance metadata, and label it AI-made. Older art used Anima, whose CircleStone Labs Non-Commercial License v1.2 limits running the model; its §2(e) allows outputs for any purpose.

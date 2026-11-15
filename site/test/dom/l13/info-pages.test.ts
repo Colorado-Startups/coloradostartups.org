@@ -99,7 +99,7 @@ describe("/newsletter/thanks/", () => {
     expect(text(main(d).querySelector("p.lede"))).toBe(
       "We sent a confirmation link to your email. Click it to start getting Startupers, the Colorado Startups newsletter, every other Tuesday from Nov 17, 2026. Already subscribed? You are all set, and no second email is coming.",
     );
-    const back = [...main(d).querySelectorAll("a")].find((a) => text(a) === "Back to the Hall");
+    const back = [...main(d).querySelectorAll("a")].find((a) => text(a) === "Back to the home page");
     expect(back?.getAttribute("href")).toBe("/");
   });
 

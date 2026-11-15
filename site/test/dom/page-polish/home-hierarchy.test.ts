@@ -25,7 +25,7 @@ describe("home hero actions", () => {
 });
 
 describe("home section titles", () => {
-  it("sets Ways in and Inside the Hall as banners, each still an h2 that names its section", () => {
+  it("sets Ways in and Where to start as banners, each still an h2 that names its section", () => {
     for (const id of ["ways-in", "rooms"]) {
       const heading = home.getElementById(id);
       expect(heading?.tagName, id).toBe("H2");

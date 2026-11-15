@@ -66,7 +66,7 @@ export const CHANNELS: readonly Channel[] = [
   {
     id: "newsletter",
     name: "The Startupers newsletter",
-    expect: "News from the Hall in your inbox: founder wins, new resources and Leaderboard editions.",
+    expect: "News from Colorado Startups in your inbox: founder wins, new resources and Leaderboard editions.",
     norms: ["Every email has a link to unsubscribe."],
     action: { label: "Get the newsletter", href: WAYS_IN.newsletter },
   },
