@@ -65,6 +65,9 @@ const NARROW_LABEL: Readonly<Record<string, readonly [number, number, Anchor]>> 
 const NARROW_LABEL_ALL: Readonly<Record<string, readonly [number, number, Anchor]>> = {
   // Below its dot, so the column east of Photon Mountain is free for the name.
   Denver: [0, 24, "middle"],
+  // West of its dot: in the brand v3 text stack the name ran past the east
+  // edge at 360 to 729 px (e2e/l38.spec.ts, PR #33).
+  "Colorado Springs": [-11, 5, "end"],
 };
 // Which drawing a label is for: the wide one, an outpost's phone map or the statewide phone map.
 type NarrowKind = "outpost" | "all" | false;
