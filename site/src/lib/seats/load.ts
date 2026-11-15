@@ -1,6 +1,7 @@
 // The volunteer seat pages' data (lane L38), read from data/positions/.
-// scripts/positions/sync-volunteers.mjs copies those files from the volunteer
-// kit when someone runs it, never in a build; nothing here reads the kit.
+// scripts/positions/sync-volunteers.mjs copies the seat files, common.yaml and
+// geo.yaml from the volunteer kit when someone runs it, never in a build.
+// facts.yaml is hand-written. Nothing here reads the kit.
 // Local zod schemas parse every file, so a bad sync stops the build instead
 // of shipping a broken page.
 // data/team/positions.yaml stays the source for /get-involved/ and the form;
@@ -116,7 +117,7 @@ export function loadCommon(): Common {
   return parsed("common", CommonSchema);
 }
 
-/** The facts a seat page may show: the sync kept only those marked R and not gated. */
+/** The facts a seat page may show: facts.yaml holds only facts marked R and not gated. */
 export function loadFacts(): Readonly<Record<string, Fact>> {
   return parsed("facts", z.record(z.string(), FactSchema));
 }
@@ -135,10 +136,10 @@ export function loadGeo(): Geo {
   return { ...geo, cities: geo.cities.map((c) => ({ ...c, core: core.has(cityKey(c.name)), hub: c.core })) };
 }
 
-/** One fact by id. A missing id stops the build, so a page can never show a gated or unsynced figure. */
+/** One fact by id. A missing id stops the build, so a page can never show a gated or unlisted figure. */
 export function factById(facts: Readonly<Record<string, Fact>>, id: string): Fact {
   const found = facts[id];
-  if (!found) throw new Error(`fact "${id}" is not in data/positions/facts.yaml (gated, S-marked or not synced)`);
+  if (!found) throw new Error(`fact "${id}" is not in data/positions/facts.yaml (gated, S-marked or not added)`);
   return found;
 }
 

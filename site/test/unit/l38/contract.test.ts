@@ -102,7 +102,7 @@ describe("the layouts and the synced data", () => {
     for (const seat of seats) expect(hasLayout(seat.id)).toBe(true);
   });
 
-  it("cites only facts the sync kept, so no layout can show a gated or S-marked figure", () => {
+  it("cites only facts in facts.yaml, so no layout can show a gated or S-marked figure", () => {
     for (const [id, layout] of Object.entries(SEAT_LAYOUTS)) {
       for (const ref of layoutRefs(layout).filter((r) => r !== "courses")) expect(facts, `${id} cites ${ref}`).toHaveProperty(ref);
     }
