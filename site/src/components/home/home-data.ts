@@ -33,6 +33,8 @@ export interface Theme {
   tiles: StatTileData[];
   /** How many 2026 Leaderboard honorees work in this theme. */
   honorees: string;
+  /** A brand clip (brand/<clip>.webm and .mp4) that plays over the painting, when the brand has one. */
+  clip?: "photonics";
 }
 
 const SPEC = [
@@ -47,6 +49,7 @@ const SPEC = [
       ["cpia-photonics-companies", "photonics companies in Colorado"],
     ],
     honorees: "honorees-quantum-photonics",
+    clip: "photonics",
   },
   {
     title: "Fusion & energy",
@@ -86,6 +89,7 @@ export function themes(): Theme[] {
       return { value: String(fact.value), label, source: fact.short };
     }),
     honorees: String(factById(facts, t.honorees).value),
+    clip: "clip" in t ? t.clip : undefined,
   }));
 }
 
