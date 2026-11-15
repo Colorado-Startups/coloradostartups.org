@@ -39,11 +39,14 @@ const mcpUrl = new URL("/mcp", site).toString();
 
 <BaseLayout title="Colorado Startups" description={description} ogImage="home" jsonLd={homeJsonLd(site)}>
   <section class="hero" aria-labelledby="home-title">
+    {/* sizes caps phones at the 720 px file up to 2.6x screens (270 x 2.625 =
+         709 device px): the painting sits under a night veil, so the 1440 px
+         file (267 KB) would cost the LCP and show nothing more. */}
     <div class="hero__art" data-art="brand/golden">
       <img
       src={hero.src}
       srcset={hero.srcset}
-      sizes="(max-width: 760px) 720px, 100vw"
+      sizes="(max-width: 760px) 270px, 100vw"
       width={hero.width}
       height={hero.height}
       alt={HALL_ART_ALT}
