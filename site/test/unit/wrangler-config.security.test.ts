@@ -7,8 +7,8 @@ const cfg = parseJsonc(readFileSync(new URL("../../wrangler.jsonc", import.meta.
 const staging = cfg.env?.staging ?? {};
 
 describe("wrangler.jsonc", () => {
-  it("runs the Worker only for /api/*", () => {
-    expect(cfg.assets.run_worker_first).toEqual(["/api/*"]);
+  it("runs the Worker only for /api/* and /mcp", () => {
+    expect(cfg.assets.run_worker_first).toEqual(["/api/*", "/mcp"]);
   });
 
   it("minifies the Worker, which keeps its gzipped bundle under the 150 KB goal", () => {
@@ -25,7 +25,7 @@ describe("wrangler.jsonc", () => {
       expect(env.ai?.binding).toBe("AI");
       expect(env.ai_search?.[0]?.binding).toBe("RESOURCUS_SEARCH");
       expect(env.d1_databases?.[0]?.binding).toBe("DB");
-      expect(env.ratelimits?.map((r: { name: string }) => r.name).sort()).toEqual(["ASK_RATE_LIMIT", "FORM_RATE_LIMIT"]);
+      expect(env.ratelimits?.map((r: { name: string }) => r.name).sort()).toEqual(["ASK_RATE_LIMIT", "FORM_RATE_LIMIT", "MCP_RATE_LIMIT"]);
       expect(env.send_email?.[0]?.name).toBe("FORM_EMAIL");
     }
   });

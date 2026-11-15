@@ -86,9 +86,17 @@ describe("the Dataset JSON-LD", () => {
     expect(ld["@type"]).toBe("Dataset");
     expect(ld.license).toBe(LICENSE.url);
     expect(ld.dateModified).toBe("2026-10-18");
-    expect(ld.distribution).toEqual([
-      { "@type": "DataDownload", encodingFormat: "application/json", contentUrl: `https://coloradostartups.org${RESOURCES_JSON_PATH}` },
-    ]);
+    const files = ["resources", "companies", "events", "guides", "regions"];
+    expect(ld.distribution).toEqual(
+      files.map((f) => ({
+        "@type": "DataDownload",
+        encodingFormat: "application/json",
+        contentUrl: `https://coloradostartups.org/data/${f}.json`,
+      })),
+    );
+    expect((ld.distribution as { contentUrl: string }[])[0]!.contentUrl).toBe(
+      `https://coloradostartups.org${RESOURCES_JSON_PATH}`,
+    );
   });
 
   it("names Colorado Startups only by the home page's @id", () => {

@@ -22,6 +22,8 @@ const events = upcomingEvents(SNAPSHOT, new Date());
   description="Startup events across Colorado in one calendar, plus Colorado Startups events on Luma and where to find Startup Hikes and Startup Ski Days."
   jsonLd={eventsJsonLd(events)}
 >
+  {/* The /ask/ search filters by this type (Pagefind). */}
+  <span data-pagefind-filter="type:Events"></span>
   <section class="section section--lit" aria-labelledby="page-title">
     <div class="wrap">
       <div class="cal-head">

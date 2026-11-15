@@ -9,3 +9,4 @@ export * from "./communitas";
 export * from "./feed";
 export * from "./regions";
 export * from "./apply";
+export * from "./open-data";

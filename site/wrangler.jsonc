@@ -1,6 +1,6 @@
 {
   // coloradostartups.org: static Astro build served from Workers static assets,
-  // plus one small Worker for /api/* and the ResourcusRPC entrypoint.
+  // plus one small Worker for /api/*, the /mcp server and the ResourcusRPC entrypoint.
   // Orchestrator-owned. Lanes request binding changes.
   //
   // Environments (bindings do not inherit, so each block declares its own):
@@ -34,7 +34,7 @@
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": ["/api/*", "/mcp"]
   },
   "observability": { "enabled": true },
   // Weekly retention, Mondays 09:17 UTC (worker/index.ts scheduled): the Resourcus
@@ -56,7 +56,9 @@
     // Forms: 10 posts per 60 s per IP per route. Fails open (worker/lib/ratelimit.ts).
     { "name": "FORM_RATE_LIMIT", "namespace_id": "3101", "simple": { "limit": 10, "period": 60 } },
     // Resourcus web: 20 questions per 60 s per IP. The budget guard is the spending stop.
-    { "name": "ASK_RATE_LIMIT", "namespace_id": "3102", "simple": { "limit": 20, "period": 60 } }
+    { "name": "ASK_RATE_LIMIT", "namespace_id": "3102", "simple": { "limit": 20, "period": 60 } },
+    // MCP: 60 requests per 60 s per IP. Read-only and free; fails open (worker/mcp/index.ts).
+    { "name": "MCP_RATE_LIMIT", "namespace_id": "3103", "simple": { "limit": 60, "period": 60 } }
   ],
   "send_email": [
     {
@@ -91,7 +93,8 @@
       ],
       "ratelimits": [
         { "name": "FORM_RATE_LIMIT", "namespace_id": "3201", "simple": { "limit": 10, "period": 60 } },
-        { "name": "ASK_RATE_LIMIT", "namespace_id": "3202", "simple": { "limit": 20, "period": 60 } }
+        { "name": "ASK_RATE_LIMIT", "namespace_id": "3202", "simple": { "limit": 20, "period": 60 } },
+        { "name": "MCP_RATE_LIMIT", "namespace_id": "3203", "simple": { "limit": 60, "period": 60 } }
       ],
       "send_email": [
         { "name": "FORM_EMAIL", "allowed_sender_addresses": ["forms@email.coloradostartups.org"] }

@@ -56,6 +56,8 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
   description={CREDITS_GUIDE.description}
   jsonLd={creditsJsonLd(credits, site)}
 >
+  {/* The /ask/ search filters by this type (Pagefind). */}
+  <span data-pagefind-filter="type:Guides"></span>
   <section class="section section--band" aria-labelledby="credits-title">
     <div class="wrap stack">
       <nav aria-label="Breadcrumb" class="crumbs">
