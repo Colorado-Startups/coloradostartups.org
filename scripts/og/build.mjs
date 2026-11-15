@@ -155,10 +155,13 @@ function overlay(card, font, portraitLeft, caption) {
   const at = textLayout(titleLines.length, Boolean(caption));
   const title = titleLines.map((line, i) => textPath(font, line, T.title, left, at.title[i])).join("");
   const note = caption ? textPath(font, caption, T.small, left, at.caption) : "";
+  // The fade is an ellipse centered on the text block, so every glyph sits on at
+  // least about 50% shade. Centered at the corner, it left the name on 17% shade
+  // and white on bright sky (PR #31's first renders, Founders and Space Peak).
   const fade =
     portraitLeft == null
-      ? `<defs><radialGradient id="f" cx="0" cy="0" r="1" gradientTransform="scale(${CARD.width * 0.75} ${CARD.height * 0.7})" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+      ? `<defs><radialGradient id="f" cx="0" cy="0" r="1" gradientTransform="translate(330 180) scale(720 360)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#000" stop-opacity="0.65"/><stop offset="0.5" stop-color="#000" stop-opacity="0.5"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
     </radialGradient></defs><rect width="100%" height="100%" fill="url(#f)"/>`
       : "";
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${CARD.width}" height="${CARD.height}">
