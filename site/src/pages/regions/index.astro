@@ -1,42 +1,31 @@
 ---
-// /regions/: the three regions in `order`, each with art, lede, cities and
-// its Connector seat; a build-time Front Range map with a text alternative;
-// and a line for founders elsewhere in Colorado (decision 45). Cards and the
-// panel are L12's primitives. Owner: L8.
+// /regions/: the three zones, map first (step H of the 2026-11-15 redesign).
+//   1. The big live map (ColoradoMap and LiveMaps): MapLibre loads only when
+//      the map nears the screen, so the page's entry script stays small; the
+//      drawing is the whole map without JavaScript. The chips under it are its
+//      legend and list alternative: color, cities and the Connector seat.
+//   2. What each region builds: the home page's three theme panels
+//      (ThemePanel and themes()), each figure with its source.
+//   3. How the regions work, in captions, and a line for founders elsewhere in
+//      Colorado (decision 45).
+// Each region's Connector seat is a person's; the keepers, AI agents, never
+// take it (decision 43). Owner: L8.
 import { WAYS_IN } from "@cs/shared";
 import { getCollection } from "astro:content";
 
-import ChartFigure from "../../components/leaderboard/ChartFigure.astro";
-import RegionCard from "../../components/regions/RegionCard.astro";
-import Panel from "../../components/ui/Panel.astro";
+import { themes } from "../../components/home/home-data";
+import ThemePanel from "../../components/home/ThemePanel.astro";
+import ColoradoMap from "../../components/map/ColoradoMap.astro";
+import LiveMaps from "../../components/map/LiveMaps.astro";
+import RegionChip from "../../components/regions/RegionChip.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { frontRangeMap } from "../../lib/regions/map";
 import { REGIONS } from "../../lib/regions/match";
-import { andList, organizerFor } from "../../lib/regions/page";
+import { organizerFor } from "../../lib/regions/page";
 
-const regions = [...REGIONS];
 const positions = (await getCollection("positions")).map((e) => e.data);
 const people = (await getCollection("people")).map((e) => e.data);
 // The statewide seat (decision 44), for the line to founders outside the regions.
 const statewideSeat = positions.find((p) => p.id === "community-organizer");
-// Only the first card is in the first screen at every width, so only its art
-// loads eagerly, which ArtImage pairs with fetchpriority="high" (#258). At
-// 375 px the first screen holds that card alone, and three columns start at
-// 912 px. Eager, cards 2 and 3 would download below a phone's fold at high
-// priority, against card 1. They stay lazy: a lazy image inside the first
-// screen still loads without waiting for a scroll.
-const FIRST_SCREEN = 1;
-
-const byId = Object.fromEntries(regions.map((r) => [r.id, r]));
-const pm = byId["photon-mountain"]!;
-const sp = byId["space-peak"]!;
-const fc = byId["fusion-canyon"]!;
-
-const mapSummary =
-  `Fusion Canyon is the northern region: ${andList(fc.cities)}. ` +
-  `Photon Mountain runs along the foothills in the middle: ${andList(pm.cities)}. ` +
-  `Space Peak is the southern region: ${andList(sp.cities)}, under Pikes Peak.`;
-const mapSvg = frontRangeMap(regions, { label: "Map of the three Colorado Startups regions", description: mapSummary });
 ---
 
 <BaseLayout
@@ -48,129 +37,116 @@ const mapSvg = frontRangeMap(regions, { label: "Map of the three Colorado Startu
     <div class="wrap">
       <p class="kicker">Three regions along the Front Range</p>
       <h1 id="regions-title">Regions</h1>
-      <p class="lede">
-        Colorado Startups gathers founders in three regions along the Front Range. Find yours, and meet the founders
-        building near you.
-      </p>
-      <h2 class="visually-hidden">The three regions</h2>
-      <ul class="hall-grid region-grid">
-        {
-          regions.map((r, i) => (
-            <RegionCard
-              region={r}
-              organizer={organizerFor(r.id, positions, people)}
-              loading={i < FIRST_SCREEN ? "eager" : "lazy"}
-            />
-          ))
-        }
-      </ul>
+      <p class="lede">Find your region. Meet the founders building near you.</p>
+      <div class="hub">
+        <ColoradoMap id="regions-map" />
+        <LiveMaps />
+        <div>
+          <h2 class="visually-hidden">The three regions</h2>
+          <ul class="region-chips" role="list">
+            {REGIONS.map((r) => <RegionChip region={r} organizer={organizerFor(r.id, positions, people)} />)}
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="map-title">
-    <h2 id="map-title" class="wrap">On the Front Range</h2>
-    <div class="wrap map-layout">
-      <div>
-        <ChartFigure
-          id="regions-map"
-          title="North to south: Fusion Canyon, Photon Mountain, Space Peak"
-          summary={mapSummary}
-          svg={mapSvg}
-          columns={["Region", "Core cities"]}
-          rows={regions.map((r) => [r.name, andList(r.cities)])}
-          note="Each region page also lists the nearby towns that belong to it."
-        />
+  <section class="section section--band" aria-labelledby="builds">
+    <div class="wrap">
+      <h2 id="builds">What each region builds</h2>
+      <div class="themes">
+        {themes().map((theme) => <ThemePanel theme={theme} />)}
       </div>
-      <div class="side">
-        <Panel as="aside" class="how" aria-labelledby="how-title">
-          <h2 id="how-title">How the regions work</h2>
-          <ul>
-            <li>Each region has one Connector seat, for a person. The AI keepers never take it.</li>
-            <li>The Connector goes to local startup events and introduces founders to the people they need.</li>
-            <li>Every region page gathers its Startup Resources and its Leaderboard honorees.</li>
-            <li>The Slack and the event calendar are shared by the whole state.</li>
-          </ul>
-          <div class="btn-row">
-            <a class="btn btn--gold" href={WAYS_IN.slack}>Join the Slack</a>
-            <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
-          </div>
-        </Panel>
+    </div>
+  </section>
 
-        <div class="elsewhere">
-          <h2 id="elsewhere">Elsewhere in Colorado</h2>
-          <p>
-            Building in Durango, Grand Junction, Pueblo or anywhere else in Colorado? You are part of this community
-            too. Join the Slack to meet founders across the state, and use{" "}
-            <a href="/ecosystem-canvas/">Startup Resources</a> to find help near you.
-          </p>
-          {
-            statewideSeat?.status === "open" && (
-              <p>
-                Want to connect founders statewide? The statewide community organizer seat is open.{" "}
-                <a href="/get-involved/">See every open seat</a>.
-              </p>
-            )
-          }
+  <section class="section section--lit" aria-labelledby="how-title">
+    <div class="wrap how">
+      <div>
+        <h2 id="how-title">How the regions work</h2>
+        <ul class="how__list" role="list">
+          <li><strong>1 Connector</strong> per region. A person, never an AI keeper.</li>
+          <li><strong>1 Slack</strong> and <strong>1 event calendar</strong> for all of Colorado.</li>
+        </ul>
+        <div class="btn-row">
+          <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note">Join the Slack</a>
+          <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
         </div>
+        <p class="meta" id="slack-note">Join the Slack opens a Google Form.</p>
+      </div>
+      <div class="elsewhere">
+        <h2 id="elsewhere">Elsewhere in Colorado</h2>
+        <p>
+          Building in Durango, Grand Junction, Pueblo or anywhere else in Colorado? You are part of this community too.
+          Find help near you in <a href="/ecosystem-canvas/">Startup Resources</a>.
+        </p>
+        {
+          statewideSeat?.status === "open" && (
+            <p>
+              The statewide community organizer seat is open. <a href="/get-involved/">See every open seat</a>.
+            </p>
+          )
+        }
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .region-grid {
+  /* The map takes two thirds of the row, so at 1280 px it stands about 560 px
+     tall, inside one screen; the chips beside it are its legend. */
+  .hub {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: var(--s-6);
+    align-items: start;
     margin-top: var(--s-6);
   }
-  .map-layout {
+  /* A list gets the reading measure by default (global.css); these are grids. */
+  .region-chips,
+  .how__list {
+    max-width: none;
+    padding: 0;
+    list-style: none;
+  }
+  .region-chips {
     display: grid;
-    grid-template-columns: minmax(0, 28rem) minmax(0, 1fr);
+    gap: var(--s-4);
+    margin: 0;
+  }
+  .themes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
+    margin-top: var(--s-5);
+  }
+  .how {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-7);
     align-items: start;
   }
-  .map-layout :global(.plot) {
-    max-width: 420px;
-  }
-  .map-layout :global(.plot svg) {
-    width: 100%;
-    height: auto;
-  }
-  .side {
+  .how__list {
     display: grid;
-    gap: var(--s-7);
+    gap: var(--s-2);
+    margin: var(--s-4) 0 var(--s-5);
   }
-  .how ul {
-    padding-left: var(--s-5);
+  .how__list strong {
+    font-family: var(--font-display);
+    font-size: var(--t-step-1);
   }
-  .how li + li {
-    margin-top: var(--s-2);
+  .how .meta {
+    margin: var(--s-3) 0 0;
   }
-  @media (max-width: 860px) {
-    .map-layout {
+  @media (max-width: 960px) {
+    .themes,
+    .hub {
       grid-template-columns: minmax(0, 1fr);
     }
   }
-  /* The side column is 461 px shorter than the map column at 1280 px
-     (measured 2026-11-02), so it rides down with the map instead of leaving
-     an empty block beside the map's lower half (#246). Two columns only: on a
-     phone the side column stacks under the map. 53.8125rem is 861 px, the
-     first two-column width. */
-  @media (min-width: 53.8125rem) {
-    .side {
-      position: sticky;
-      top: var(--s-6);
-    }
-  }
-  /* Below 468 px the 420-unit map draws narrower than 420 px: 327 px on a
-     375 px phone and 312 px on a 360 px one. Its labels step up the scale so
-     they draw at 16.4 and 15.6 px, and the region names at 18.7 and 17.8 px
-     (#248, #329). A region name carries its own font-size, so it needs the
-     second rule. */
-  @media (max-width: 30rem) {
-    .map-layout :global(.plot text) {
-      font-size: var(--t-step-1);
-    }
-    .map-layout :global(.plot text[font-size]) {
-      font-size: var(--t-step-2);
+  @media (max-width: 760px) {
+    .how {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

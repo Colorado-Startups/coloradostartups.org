@@ -1,8 +1,9 @@
 // Pure shaping for /regions/ and /regions/<id>/. Owner: L8. No Astro imports:
 // the pages load the collections and pass the data in, and
-// test/unit/l8/page.test.ts covers the open and filled organizer cases.
+// test/unit/l8/page.test.ts covers the open and filled organizer cases and
+// the six-item spread the region pages show.
 
-import type { Company, Person, Position, Region, RegionId } from "@cs/shared";
+import { type Company, type Person, type Position, type Region, type RegionId, regionLede } from "@cs/shared";
 
 import { holderOf } from "../../components/positions/positions";
 import { regionForCity } from "./match";
@@ -57,4 +58,36 @@ export function honoreesIn(region: RegionId, companies: readonly Company[], regi
 /** A Startup Resources link that opens filtered to one city (L3 reads ?city=). */
 export function canvasCityHref(city: string): string {
   return `/ecosystem-canvas/?city=${encodeURIComponent(city)}`;
+}
+
+/**
+ * Up to `n` items, a spread across groups: the first item of each group in
+ * turn, then the second of each, until there are `n`. Groups go in `order`
+ * (any group missing from it follows, in order of first appearance); items
+ * keep their input order inside a group. A region page shows six resources
+ * across the founder journey this way, and six honorees across sectors.
+ */
+export function spread<T>(items: readonly T[], groupOf: (item: T) => string, n: number, order: readonly string[] = []): T[] {
+  const groups = new Map<string, T[]>(order.map((key) => [key, []]));
+  for (const item of items) {
+    const key = groupOf(item);
+    groups.set(key, [...(groups.get(key) ?? []), item]);
+  }
+  const queues = [...groups.values()].filter((g) => g.length > 0);
+  const out: T[] = [];
+  for (let round = 0; out.length < n && queues.some((q) => q.length > round); round++) {
+    for (const q of queues) if (q[round] !== undefined && out.length < n) out.push(q[round]!);
+  }
+  return out;
+}
+
+/** The directory or the Leaderboard filtered to one region: each reads ?region=<id>. */
+export function regionFilterHref(page: "/ecosystem-canvas/" | "/leaderboard/", region: RegionId): string {
+  return `${page}?region=${encodeURIComponent(region)}`;
+}
+
+/** A region's summary after its lede (its first sentence), for a caption that does not repeat the lede. */
+export function summaryAfterLede(region: Pick<Region, "summary">): string {
+  const summary = region.summary.trim();
+  return summary.slice(regionLede(region).length).trim();
 }

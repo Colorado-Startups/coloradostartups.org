@@ -1,0 +1,75 @@
+---
+// One region as a chip: its map color, name, core cities and the Connector
+// seat's state, linking to the region page. Under the /regions/ map the chips
+// are the map's legend and its list alternative; on a region page they are
+// the other two regions. Lay them out in a <ul class="region-chips">. The
+// seat is a person's (decision 43): the chip names the holder or says it is
+// open. Owner: L8.
+import type { Region } from "@cs/shared";
+
+import { REGION_COLORS } from "../../lib/regions/map";
+import { andList, type Organizer, seatRole } from "../../lib/regions/page";
+
+interface Props {
+  region: Region;
+  organizer: Organizer;
+}
+
+const { region, organizer } = Astro.props;
+const { position, holder } = organizer;
+const role = seatRole(position, region.name);
+---
+
+<li class="region-chip" data-region={region.id} style={`--region-color: ${REGION_COLORS[region.id]}`}>
+  <a href={`/regions/${region.id}/`}>
+    <span class="region-chip__swatch" aria-hidden="true"></span>
+    <span class="region-chip__name">{region.name}</span>
+    <span class="region-chip__cities">{andList(region.cities)}</span>
+    <span class:list={["hall-badge", !holder && "hall-badge--pine", "region-chip__seat"]}>
+      {holder ? `${role}: ${holder.name}` : `${role} seat open`}
+    </span>
+  </a>
+</li>
+
+<style>
+  .region-chip a {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--s-1) var(--s-3);
+    height: 100%;
+    min-height: var(--size-tap);
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-card);
+    border-left: var(--line-bold) solid var(--region-color);
+    background: var(--c-surface);
+    box-shadow: 0 0 0 var(--line-hair) var(--c-border);
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .region-chip__swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--r-chisel);
+    background: var(--region-color);
+  }
+  .region-chip__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--t-step-1);
+  }
+  .region-chip__cities,
+  .region-chip__seat {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .region-chip__cities {
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+  }
+  .region-chip a:hover .region-chip__name,
+  .region-chip a:focus-visible .region-chip__name {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+</style>

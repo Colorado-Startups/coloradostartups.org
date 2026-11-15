@@ -5,11 +5,11 @@ import { readDist } from "../pages";
 
 // L5b: region art asks for a file no wider than it draws. The Quality page's
 // mobile lab loads each page at 412 px and 1.75x (Lighthouse's mobile
-// settings), where a region card draws 360 px wide: 412 less two 24 px
-// gutters and the card's two 2 px borders. "100vw" there fetched the 800w
-// file (86 KB) for each of the three cards; the drawn width fetches the 640w
-// (58 KB). Brand v3 paintings ship 720w and 1440w webp, so the lab now fetches
-// the 720w (67 to 94 KB). Built HTML from dist/ (run `npm run build` first).
+// settings), where a region page's hero draws 364 px wide: 412 less two 24 px
+// gutters. Brand v3 paintings ship 720w and 1440w webp, so the lab fetches the
+// 720w. /regions/ shows the regions as chips and the home page's theme panels
+// since step H (2026-11-15), so it has no region cards to size. Built HTML
+// from dist/ (run `npm run build` first).
 
 const LAB = { width: 412, dpr: 1.75 };
 
@@ -41,27 +41,8 @@ function pickedWidth(img: Element, viewport = LAB.width, dpr = LAB.dpr): number 
 }
 
 const doc = (file: string) => new DOMParser().parseFromString(readDist(file), "text/html");
-const cardImages = (file: string) =>
-  REGION_IDS.map((id) => {
-    const img = doc(file).querySelector(`main [data-region='${id}'] img`);
-    expect(img, `${file}: ${id} card art`).not.toBeNull();
-    return img!;
-  });
 
-describe("region art sizes (mobile LCP on /regions/)", () => {
-  it.each(["regions/index.html"])("%s: each card asks for the 720w file at the lab's 412 px", (file) => {
-    for (const img of cardImages(file)) {
-      expect(drawnWidth(img.getAttribute("sizes")!, LAB.width)).toBe(360);
-      expect(pickedWidth(img)).toBe(720);
-    }
-  });
-
-  it("matches the grid's columns on wider screens", () => {
-    const sizes = cardImages("regions/index.html")[0]!.getAttribute("sizes")!;
-    expect(drawnWidth(sizes, 768)).toBe(344); // two columns
-    expect(drawnWidth(sizes, 1280)).toBe(380); // three columns, 1180 px wrap
-  });
-
+describe("region art sizes (mobile LCP on the region pages)", () => {
   it.each(REGION_IDS)("/regions/%s/: the hero asks for the 720w file at 412 px", (id) => {
     const img = doc(`regions/${id}/index.html`).querySelector("main .region-art--hero img");
     expect(img).not.toBeNull();

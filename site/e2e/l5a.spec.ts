@@ -189,7 +189,12 @@ function provenanceBytes(webp: Buffer): number | null {
 
 // Card "Served art keeps its provenance XMP" (#668): a visitor's copy of each
 // Hall picture carries its record. Phone size, no throttle; every lazy
-// picture is loaded, so the byte count is the whole page's.
+// picture is loaded, so the byte count is the whole page's. The theme panels'
+// paintings (home/ThemePanel.astro) are the brand's own files (brandArt), not
+// .art-frame pictures, so the selector names them too: since step H they are
+// the only art on /regions/.
+const ART = ".art-frame img, img.theme__art";
+
 test.describe("served art carries its provenance", () => {
   for (const path of ["/", "/regions/", "/team/"]) {
     test(`${path} art images carry their XMP record`, async ({ browser }) => {
@@ -201,9 +206,9 @@ test.describe("served art carries its provenance", () => {
           if (r.url().endsWith(".webp")) bodies.set(r.url(), r.body());
         });
         await page.goto(path);
-        await page.locator(".art-frame img").evaluateAll((imgs) => imgs.forEach((i) => ((i as HTMLImageElement).loading = "eager")));
-        await page.waitForFunction(() => [...document.querySelectorAll<HTMLImageElement>(".art-frame img")].every((i) => i.complete));
-        const urls = await page.locator(".art-frame img").evaluateAll((imgs) => imgs.map((i) => (i as HTMLImageElement).currentSrc));
+        await page.locator(ART).evaluateAll((imgs) => imgs.forEach((i) => ((i as HTMLImageElement).loading = "eager")));
+        await page.waitForFunction((sel) => [...document.querySelectorAll<HTMLImageElement>(sel)].every((i) => i.complete), ART);
+        const urls = await page.locator(ART).evaluateAll((imgs) => imgs.map((i) => (i as HTMLImageElement).currentSrc));
         expect(urls.length).toBeGreaterThan(0);
         let total = 0;
         let added = 0;
