@@ -80,6 +80,9 @@ Not ours to give away; each keeps its own license.
 | npm packages | `package.json`, `package-lock.json`; `npm install` downloads them | Each package's own |
 | Aileron, the display font | The build downloads it from Fontsource (`site/astro.config.mjs`); the OG cards and badges read `@fontsource/aileron`; the repo holds none | CC0 1.0 |
 | Atkinson Hyperlegible, the body font | The build downloads it from Fontsource (`site/astro.config.mjs`); the repo holds none | SIL Open Font License 1.1 |
+| MapLibre GL JS, the map engine | npm `maplibre-gl` 5.24.0, loaded only when a map nears the screen | BSD-3-Clause |
+| Map tiles | OpenFreeMap, fetched in the browser and credited on each map; the repo stores none | © OpenMapTiles, data © OpenStreetMap contributors (ODbL) |
+| Colorado places, outline and zones | `data/geo/`, built from US Census TIGERweb by `scripts/geo/build.mjs` | Census data is not copyrighted (17 U.S.C. §105); our derived files are CC0 1.0 |
 | `04_tools/voice_lint.py` | Vendored from `SoulCraft-Org/git-crafter` | Apache 2.0 ([`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt)) |
 | The Code of Conduct's Covenant text | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | CC BY-SA 4.0, from the Contributor Covenant |
 | gitleaks, the secret scanner | CI downloads the release binary | MIT |
