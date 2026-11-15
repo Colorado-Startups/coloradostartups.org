@@ -180,11 +180,11 @@ export function cityGuide(slug: CitySlug, { records, regions, date }: GuideInput
     [
       `Startup Resources lists ${count(own.length, "resource", "resources")} for founders in ${city}, as of `,
       dated(date),
-      shown > 0 ? `, and the lists below show ${shown} of them by need. ` : ". ",
+      shown > 0 ? `, and the chart below counts ${shown} of them by need. ` : ". ",
       `${city} is in `,
       { text: region.name, href: `/regions/${region.id}/` },
       around.length > 0 ? `, the Colorado Startups region that also takes in ${andList(around)}.` : ", a Colorado Startups region.",
-      nouns.length > 0 ? ` The lists cover ${andList(nouns)}${then}${leftOut}.` : "",
+      nouns.length > 0 ? ` The chart covers ${andList(nouns)}${then}${leftOut}.` : "",
     ],
     [...needs, nearby],
   );

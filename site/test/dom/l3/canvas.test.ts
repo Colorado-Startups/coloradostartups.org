@@ -29,10 +29,10 @@ describe("/ecosystem-canvas/", () => {
     expect(notActive.filter((r) => shown.has(r.id)).map((r) => r.id)).toEqual([]);
   });
 
-  it("gives each card a heading anchor r-<id> that links to the resource", () => {
+  it("gives each row a heading anchor r-<id> that links to the resource", () => {
     const byId = new Map(active.map((r) => [r.id, r]));
     for (const card of cards) {
-      const h = card.querySelector("h4");
+      const h = card.querySelector("h3");
       expect(h?.id).toBe(`r-${card.dataset.id}`);
       expect(h?.querySelector("a")?.getAttribute("href")).toBe(byId.get(card.dataset.id ?? "")?.url);
     }
@@ -47,15 +47,53 @@ describe("/ecosystem-canvas/", () => {
   });
 
   it("keeps Founder Institute's credit", () => {
-    const intro = canvas.querySelector("section[aria-labelledby='canvas-title']");
-    expect(intro?.textContent).toMatch(/created by\s+Founder Institute and Colorado Startups/);
+    const closing = canvas.querySelector("section[aria-labelledby='missing-title']");
+    expect(closing?.textContent).toMatch(/created by\s+Founder Institute and Colorado Startups/);
   });
 
-  it("ships the filter form hidden, for the island to reveal, and keeps it out of the search index", () => {
+  // Step F (2026-11-15): the form is in the first paint, so the island moves
+  // nothing in the first screen (CLS); a noscript style hides it without
+  // JavaScript, when it could not filter.
+  it("ships the filter form shown, hidden only without JavaScript, and keeps it out of the search index", () => {
     const form = canvas.querySelector("form[data-canvas-filters]");
-    expect(form?.hasAttribute("hidden")).toBe(true);
+    expect(form?.hasAttribute("hidden")).toBe(false);
     expect(form?.getAttribute("role")).toBe("search");
     expect(form?.closest("[data-pagefind-ignore]")).not.toBeNull();
+    const noscript = [...canvas.querySelectorAll("noscript")].map((n) => n.textContent ?? "").join(" ");
+    expect(noscript).toMatch(/\.canvas-filters\s*\{\s*display:\s*none/);
+  });
+
+  it("offers stage and type as radio chips, with the journey's stage counts, and the city as a menu", () => {
+    const form = canvas.querySelector("form[data-canvas-filters]")!;
+    const values = (name: string) => [...form.querySelectorAll<HTMLInputElement>(`input[type=radio][name=${name}]`)].map((i) => i.value);
+    expect(values("stage")).toEqual(["idea", "launch", "growth", "support", ""]);
+    expect(values("type")[0]).toBe("");
+    expect(new Set(values("type").slice(1))).toEqual(new Set(active.map((r) => r.type)));
+    for (const name of ["stage", "type"]) {
+      expect(form.querySelector<HTMLInputElement>(`input[name=${name}][value=""]`)?.hasAttribute("checked"), name).toBe(true);
+    }
+    const count = (stage: string) => Number(form.querySelector(`[data-stage-count="${stage}"]`)?.textContent);
+    for (const stage of ["idea", "launch", "growth", "support"]) {
+      expect(count(stage), stage).toBe(active.filter((r) => r.stage === stage).length);
+    }
+    expect(count("")).toBe(active.length);
+    expect(form.querySelector("select[name=city]")).not.toBeNull();
+  });
+
+  it("ships every row shown, and the Show more row hidden for the island", () => {
+    expect(cards.filter((c) => c.hasAttribute("hidden"))).toEqual([]);
+    expect(canvas.querySelector("[data-canvas-more-row]")?.hasAttribute("hidden")).toBe(true);
+    expect(canvas.querySelector("[data-canvas-count]")?.textContent?.trim()).toBe(`All ${active.length} resources.`);
+  });
+
+  // The brief's first screen: the title, the search and the chips, in 40
+  // words or fewer. Resourcus's panel waits closed in its disclosure, and
+  // visually hidden words are for screen readers.
+  it("keeps the first section to 40 words or fewer", () => {
+    const top = canvas.querySelector("section[aria-labelledby='canvas-title']")!.cloneNode(true) as Element;
+    for (const el of top.querySelectorAll(".visually-hidden, noscript, details > :not(summary), [data-stage-count]")) el.remove();
+    const words = (top.textContent ?? "").split(/\s+/).filter((w) => /[A-Za-z]/.test(w));
+    expect(words.length, words.join(" ")).toBeLessThanOrEqual(40);
   });
 
   it("orders headings without skipping a level", () => {

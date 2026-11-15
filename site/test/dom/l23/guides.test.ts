@@ -163,87 +163,67 @@ describe.each(GUIDE_SLUGS)("/guides/%s/ items", (slug) => {
   });
 });
 
-// #236: the start-a-company guide's two long lists run under h3 subheads.
-describe("/guides/start-a-company-in-colorado/ groups", () => {
-  const main = doc("guides/start-a-company-in-colorado/index.html").querySelector("main")!;
-  const h3s = (id: string) => [...main.querySelectorAll(`section#${id} h3`)].map((h) => text(h));
-  const tocCount = (id: string) =>
-    Number(text(main.querySelector(`nav[aria-label='On this page'] a[href='#${id}'] + .meta`)).match(/\d+/)?.[0]);
+// Step F (2026-11-15): each guide answers with a chart, one row per part of
+// the answer, in place of its long lists. Each row counts its listings and
+// links the Startup Resources view, or the region page, that holds them.
+describe.each(GUIDE_SLUGS)("/guides/%s/ chart", (slug) => {
+  const page = doc(`guides/${slug}/index.html`);
+  const main = page.querySelector("main")!;
+  const chart = main.querySelector("[data-guide-diagram]");
+  const rows = [...main.querySelectorAll<HTMLElement>("[data-guide-row]")];
 
-  it("splits 'Test the idea' by meeting type and the advisers into lawyers, accountants and banks, in that order", () => {
-    const test = h3s("test");
-    const want = ["Meetups and communities", "Events, pitch nights and hackathons", "Coworking spaces", "Other resources"];
-    expect(test.length).toBeGreaterThan(1);
-    expect(test).toEqual(want.filter((h) => test.includes(h)));
-    const advisers = h3s("advisers");
-    expect(advisers.length).toBeGreaterThan(1);
-    const lawyers = ["Lawyers in Denver", "Lawyers in Boulder", "Lawyers in other Colorado towns", "Lawyers statewide and online"];
-    expect(advisers).toEqual([...lawyers, "Accountants", "Banks"].filter((h) => advisers.includes(h)));
+  it("follows the answer in the first section, with its source and date in the caption", () => {
+    expect(chart?.closest("section")).toBe(main.querySelector("section"));
+    const answer = main.querySelector("[data-guide-answer]")!;
+    expect(answer.compareDocumentPosition(chart!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const caption = chart!.querySelector("figcaption");
+    expect(text(caption)).toMatch(/^Listings in Startup Resources, as of .+\.$/);
+    expect(caption?.querySelector("time")?.getAttribute("datetime")).toBe(answer.querySelector("time")?.getAttribute("datetime"));
   });
 
-  it("puts a list under every subhead, and keeps the two short sections as one list with no h3", () => {
-    for (const id of ["test", "advisers"]) {
-      for (const h of main.querySelectorAll(`section#${id} h3`)) {
-        const list = h.nextElementSibling;
-        expect(list?.matches("ul[data-guide-list]"), text(h)).toBe(true);
-        expect(list?.querySelectorAll(":scope > [data-guide-item]").length, text(h)).toBeGreaterThan(0);
-      }
+  it("gives every row a name, a count and a bar, and links it to Startup Resources or a region page", () => {
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      const n = Number(text(row.querySelector("[data-guide-count]")).match(/^\d+/)?.[0]);
+      expect(n, row.dataset.guideRow).toBeGreaterThan(0);
+      expect(text(row.querySelector("[data-guide-count] .visually-hidden")), row.dataset.guideRow).toBe(n === 1 ? "listing" : "listings");
+      expect(row.querySelector(".guide-chart__bar")?.getAttribute("style"), row.dataset.guideRow).toMatch(/--share: (0|1)\.\d{4}/);
+      const href = row.querySelector("a")?.getAttribute("href");
+      if (href) expect(href, row.dataset.guideRow).toMatch(/^\/(ecosystem-canvas\/\?[a-z]+=|regions\/[a-z-]+\/$)/);
     }
-    for (const id of ["learn", "local-help"]) {
-      expect(h3s(id), id).toEqual([]);
-      expect(main.querySelectorAll(`section#${id} ul[data-guide-list]`), id).toHaveLength(1);
-    }
+    expect(rows.some((r) => r.querySelector("a")), "at least one row links").toBe(true);
   });
 
-  it("counts every group in the contents list, and lists each record once", () => {
-    for (const id of ["learn", "test", "local-help", "advisers"]) {
-      const lists = [...main.querySelectorAll(`section#${id} ul[data-guide-list]`)];
-      const n = lists.reduce((sum, ul) => sum + ul.querySelectorAll(":scope > [data-guide-item]").length, 0);
-      expect(tocCount(id), id).toBe(n);
-    }
-    const ids = [...main.querySelectorAll<HTMLElement>("[data-guide-item]")].map((li) => li.dataset.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  it("lists no long list: five records at most, and a link to see more in Startup Resources", () => {
+    expect(main.querySelectorAll("[data-guide-item]").length).toBeLessThanOrEqual(5);
+    const more = [...main.querySelectorAll("section[data-guide-start] a")].find((a) => text(a) === "See more in Startup Resources");
+    expect(more?.getAttribute("href")).toMatch(/^\/ecosystem-canvas\//);
   });
 });
 
-// #238: every listing section ends with a way back to the contents list.
-describe.each(GUIDE_SLUGS)("/guides/%s/ back links", (slug) => {
-  const page = doc(`guides/${slug}/index.html`);
-  const main = page.querySelector("main")!;
-  const toc = main.querySelector("nav[aria-label='On this page']");
-  const sections = [...main.querySelectorAll("section[data-guide-section]")];
+describe("/guides/start-a-company-in-colorado/ chart", () => {
+  const main = doc("guides/start-a-company-in-colorado/index.html").querySelector("main")!;
 
-  it("gives the contents list an id that only it carries", () => {
-    expect(toc?.id).toBe("guide-contents");
-    expect(page.querySelectorAll("#guide-contents")).toHaveLength(1);
-  });
-
-  it("ends every listing section with one 'Back to contents' link to the contents list", () => {
-    expect(sections.length).toBe(toc?.querySelectorAll("li").length);
-    for (const s of sections) {
-      const back = [...s.querySelectorAll("[data-guide-back] a")];
-      expect(back, s.id).toHaveLength(1);
-      expect(back[0]!.getAttribute("href"), s.id).toBe("#guide-contents");
-      expect(text(back[0]), s.id).toBe("Back to contents");
-      // The last thing in the section, after every list.
-      expect(s.querySelector(".wrap")?.lastElementChild, s.id).toBe(back[0]!.closest("[data-guide-back]"));
-      expect(back[0]!.closest("[data-pagefind-ignore]"), s.id).not.toBeNull();
-    }
-  });
-
-  it("adds no back link outside the listing sections", () => {
-    expect(main.querySelectorAll("[data-guide-back]")).toHaveLength(sections.length);
+  it("numbers its rows as steps, in the answer's order", () => {
+    const list = main.querySelector("[data-guide-diagram] ol");
+    expect(list).not.toBeNull();
+    expect([...list!.querySelectorAll<HTMLElement>("[data-guide-row]")].map((r) => r.dataset.guideRow)).toEqual([
+      "learn",
+      "test",
+      "local-help",
+      "advisers",
+    ]);
   });
 });
 
 describe("/guides/where-founders-meet/", () => {
   const main = doc("guides/where-founders-meet/index.html").querySelector("main")!;
 
-  it("groups the places by region and links each region page", () => {
+  it("charts the places by region and links each region page", () => {
     for (const r of REGIONS) {
-      const section = main.querySelector(`section#${r.id}`);
-      expect(text(section?.querySelector("h2")), r.id).toBe(r.name);
-      expect(section?.querySelector(`a[href='/regions/${r.id}/']`), r.id).not.toBeNull();
+      const row = main.querySelector(`[data-guide-row='${r.id}']`);
+      const link = row?.querySelector(`a[href='/regions/${r.id}/']`);
+      expect(text(link), r.id).toBe(r.name);
     }
   });
 });
@@ -259,8 +239,8 @@ describe("/guides/funding-programs/ (hard constraints 2 and 8)", () => {
 });
 
 describe("/ecosystem-canvas/ links the guides", () => {
-  it("from its intro", () => {
-    const intro = doc("ecosystem-canvas/index.html").querySelector("section[aria-labelledby='canvas-title']");
-    expect(intro?.querySelector("a[href='/guides/']")).not.toBeNull();
+  it("from its closing section", () => {
+    const closing = doc("ecosystem-canvas/index.html").querySelector("section[aria-labelledby='missing-title']");
+    expect(closing?.querySelector("a[href='/guides/']")).not.toBeNull();
   });
 });

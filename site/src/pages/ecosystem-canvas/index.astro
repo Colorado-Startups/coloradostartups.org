@@ -3,34 +3,27 @@
 // Canvas. Owner: L3. Decision 46 retitled the page; the URL, the anchors and
 // the dataset's name (the Ecosystem Canvas) stay.
 //
-// The sections alternate band and lit grounds, so a stage change reads at a
-// glance; "Missing something?" is lit to keep the alternation going. When a
-// filter hides stages, the filter island deals the grounds again over the
-// sections still showing, so a filtered view alternates too.
-// Each substage heading is a labeled divider with a stone Badge that counts
-// its resources, and the filter island keeps that count in step.
-//
-// Order: what Startup Resources is and who built it; the journey as levels of
-// the mountain (Idea, Launch, Growth, with Support alongside); the filter
-// form; then every active resource, grouped by stage and substage (#143).
-// Resourcus waits behind an "Ask a question instead" disclosure under the
-// filters, so the first result follows the filters. Each stage ends with a
-// "Back to filters" link, which the filter island reveals with the form.
+// One job: find a resource. The first screen is the title, the search box
+// and the chips (step F of the redesign, 2026-11-15: 40 words or fewer). The
+// stage chips are the journey, Idea to Launch to Growth with Support
+// alongside, each with its count. Resourcus waits behind an "Ask a question
+// instead" disclosure under the count. Then the rows, by stage, A to Z within
+// each substage: the island shows the first 24 matches and a "Show more"
+// button, and every row stays in the HTML for crawlers and for a visitor
+// without JavaScript. The credit to Founder Institute and the links to the
+// guides close the page.
 //
 // Anchors other lanes rely on: each stage section is id="idea", "launch",
-// "growth" or "support" (decision 33; Communitas's welcome desk links there).
-// Substages are plain groups, not landmarks: Launch and Growth both have
-// "Investors", and two regions with one name fail axe's landmark-unique.
-// Each resource heading is id="r-<resource id>", which Pagefind indexes as a
-// sub-result and Resourcus can link to. The "r-" prefix keeps a resource id
-// from ever colliding with a stage anchor.
-import { STAGES } from "@cs/shared";
-
+// "growth" or "support" (decision 33; Communitas's welcome desk links there,
+// and the island chooses that stage). Each resource heading is
+// id="r-<resource id>", which Pagefind indexes as a sub-result and Resourcus
+// and the guides link to; the island shows that row even past the first
+// page. The "r-" prefix keeps a resource id from colliding with a stage anchor.
 import CanvasFilters from "../../components/canvas/CanvasFilters.astro";
 import { activeCards, groupByStage } from "../../components/canvas/canvas-data";
-import { groupCountText } from "../../components/canvas/filter-logic";
-import { STAGE_LABELS, STAGE_SUMMARIES, SUBSTAGE_LABELS } from "../../components/canvas/labels";
-import ResourceCard from "../../components/canvas/ResourceCard.astro";
+import { groupCountText, moreText, PAGE_SIZE, shownText } from "../../components/canvas/filter-logic";
+import { STAGE_LABELS, STAGE_SUMMARIES } from "../../components/canvas/labels";
+import ResourceRow from "../../components/canvas/ResourceRow.astro";
 import ResourcusPanel from "../../components/resourcus/ResourcusPanel.astro";
 import Badge from "../../components/ui/Badge.astro";
 import Button from "../../components/ui/Button.astro";
@@ -38,7 +31,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const cards = await activeCards();
 const groups = groupByStage(cards);
-const LEVELS = STAGES.filter((s) => s !== "support");
 ---
 
 <BaseLayout
@@ -49,112 +41,66 @@ const LEVELS = STAGES.filter((s) => s !== "support");
   {/* The /ask/ search filters by this type (Pagefind). */}
   <span data-pagefind-filter="type:Resources"></span>
   <div data-canvas-root>
-    <section class="section section--band" aria-labelledby="canvas-title">
+    <section class="section section--band canvas-top" aria-labelledby="canvas-title">
       <div class="wrap stack">
         <h1 id="canvas-title">Startup Resources</h1>
-        <p class="lede">
-          The Colorado startup resources a founder needs, in the order you need them: from a first idea to a growing
-          company.
-        </p>
-        {/* Finding a resource is the page's main task, so its jump link sits under
-            the lede, in the first screen on a phone (#143, #724). */}
-        <p class="btn-row">
-          <a class="btn btn--gold" href="#find-title">Find a resource</a>
-          <a class="btn btn--stone" href="/ecosystem-canvas/suggest/">Suggest a resource</a>
-        </p>
-        <p>
-          Startup Resources is built on the Ecosystem Canvas, created by <a href="https://fi.co/">Founder Institute</a> and
-          Colorado Startups. The community keeps it current, and this page lists {cards.length} resources from it.
-        </p>
-        <p>
-          Short on time? The <a href="/guides/">guides for founders</a> answer common questions, such as how to start a
-          company in Colorado, with lists drawn from this directory.
-        </p>
-        <p>
-          Building software? The <a href="/guides/startup-credits/">startup credits guide</a> shows which cloud and AI
-          credit programs you can claim at each stage.
-        </p>
+        <div class="stack" data-pagefind-ignore>
+          <h2 id="find-title" class="visually-hidden">Find a resource</h2>
+          <CanvasFilters cards={cards} />
+          <details class="canvas-ask" data-canvas-ask>
+            <summary>Ask a question instead</summary>
+            <ResourcusPanel heading="Ask Resourcus" />
+          </details>
+        </div>
       </div>
     </section>
 
-    <section class="section section--lit" aria-labelledby="journey-title">
-      <div class="wrap stack">
-        <h2 id="journey-title">The journey</h2>
-        <p>Three levels of the mountain, with support at every step.</p>
-        <ol class="canvas-journey">
-          {
-            LEVELS.map((stage, i) => (
-              <li>
-                <a href={`#${stage}`}>
-                  <span class="meta">Level {i + 1}</span>
-                  <strong>{STAGE_LABELS[stage]}</strong>
-                </a>
-                <span>{STAGE_SUMMARIES[stage]}</span>
-              </li>
-            ))
-          }
-        </ol>
-        <p>
-          <a href="#support"><strong>{STAGE_LABELS.support}</strong></a>, alongside every level: {
-            STAGE_SUMMARIES.support
-          }
-        </p>
-      </div>
-    </section>
-
-    <section class="section section--band" aria-labelledby="find-title" data-pagefind-ignore>
-      <div class="wrap stack">
-        <h2 id="find-title">Find a resource</h2>
-        <CanvasFilters cards={cards} />
-        <details class="canvas-ask" data-canvas-ask>
-          <summary>Ask a question instead</summary>
-          <ResourcusPanel heading="Ask Resourcus" />
-        </details>
-      </div>
-    </section>
-
-    {
-      groups.map((g, i) => (
-        <section
-          class:list={["section", i % 2 === 0 ? "section--lit" : "section--band"]}
-          id={g.stage}
-          aria-labelledby={`${g.stage}-title`}
-          data-canvas-group
-        >
-          <div class="wrap stack">
-            <h2 id={`${g.stage}-title`}>{STAGE_LABELS[g.stage]}</h2>
-            <p>{STAGE_SUMMARIES[g.stage]}</p>
-            {g.substages.map((s) => (
-              <div class="canvas-substage" data-canvas-group>
-                <div class="canvas-substage__head">
-                  <h3 id={`${g.stage}-${s.substage}`}>{SUBSTAGE_LABELS[s.substage] ?? s.substage}</h3>
-                  <Badge data-group-count data-pagefind-ignore>
-                    {groupCountText(s.cards.length)}
-                  </Badge>
-                </div>
-                <ul class="canvas-list">
-                  {s.cards.map((card) => (
-                    <ResourceCard card={card} />
-                  ))}
-                </ul>
+    <div class="section section--lit canvas-results">
+      <div class="wrap">
+        {
+          groups.map((g) => (
+            <section class="canvas-stage" id={g.stage} aria-labelledby={`${g.stage}-title`} data-canvas-group>
+              <div class="canvas-stage__head">
+                <h2 id={`${g.stage}-title`}>{STAGE_LABELS[g.stage]}</h2>
+                <Badge data-group-count data-pagefind-ignore>
+                  {groupCountText(g.total)}
+                </Badge>
               </div>
-            ))}
-            <p class="canvas-back" data-canvas-back data-pagefind-ignore hidden>
-              <Button variant="quiet" href="#find-title">Back to filters</Button>
-            </p>
-          </div>
-        </section>
-      ))
-    }
+              <p class="meta">{STAGE_SUMMARIES[g.stage]}</p>
+              <ul class="canvas-rows">
+                {g.substages
+                  .flatMap((s) => s.cards)
+                  .map((card) => (
+                    <ResourceRow card={card} />
+                  ))}
+              </ul>
+            </section>
+          ))
+        }
+        <div class="canvas-more" data-canvas-more-row data-pagefind-ignore hidden>
+          <p class="meta" data-canvas-shown>{shownText(Math.min(PAGE_SIZE, cards.length), cards.length)}</p>
+          <button class="btn btn--gold" type="button" data-canvas-more>{moreText(cards.length - PAGE_SIZE)}</button>
+        </div>
+        <p class="canvas-back" data-canvas-back data-pagefind-ignore hidden>
+          <Button variant="quiet" href="#find-title">Back to filters</Button>
+        </p>
+      </div>
+    </div>
 
-    <section class="section section--lit" aria-labelledby="missing-title">
+    <section class="section section--band" aria-labelledby="missing-title">
       <div class="wrap stack">
         <h2 id="missing-title">Missing something?</h2>
-        <p>
-          If a Colorado resource for founders is not here, tell us. A person reviews every suggestion before it goes in.
-        </p>
+        <p>A person reviews every suggestion before it goes in.</p>
         <p class="btn-row">
           <a class="btn btn--gold" href="/ecosystem-canvas/suggest/">Suggest a resource</a>
+        </p>
+        <ul class="canvas-also">
+          <li><a href="/guides/">Guides for founders</a>: short answers drawn from this directory.</li>
+          <li><a href="/guides/startup-credits/">Startup credits</a>: cloud and AI credits, by stage.</li>
+        </ul>
+        <p class="meta">
+          Startup Resources is built on the Ecosystem Canvas, created by <a href="https://fi.co/">Founder Institute</a> and
+          Colorado Startups. The community keeps it current.
         </p>
       </div>
     </section>
@@ -162,46 +108,53 @@ const LEVELS = STAGES.filter((s) => s !== "support");
 </BaseLayout>
 
 <style>
-  .canvas-journey {
-    display: grid;
-    gap: var(--s-4);
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-    max-width: none;
-    padding: 0;
-    list-style: none;
+  /* The first screen holds the title, the search and the chips, so the band
+     is shorter than the site's other sections. */
+  .canvas-top {
+    padding-block: var(--s-6) var(--s-5);
   }
-  .canvas-journey li {
-    display: grid;
-    gap: var(--s-1);
+  .canvas-results {
+    padding-block: var(--s-5) var(--s-7);
   }
-  .canvas-journey a {
-    display: grid;
+  .canvas-stage + .canvas-stage {
+    margin-top: var(--s-7);
   }
-  /* Two columns of cards at 1280, one on a phone. */
-  .canvas-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
-    column-gap: var(--s-6);
-    max-width: none;
-    margin: 0;
-    padding: 0;
-  }
-  /* A labeled divider, so a substage heading stands apart from the card
-     titles under it. No border-width token exists; 2px matches the other
-     accent rules in the site's CSS. */
-  .canvas-substage {
-    margin-top: var(--s-6);
-    padding-top: var(--s-4);
-    border-top: var(--line-edge) solid var(--c-accent);
-  }
-  .canvas-substage__head {
+  .canvas-stage__head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--s-2) var(--s-3);
   }
-  .canvas-substage__head h3 {
+  .canvas-stage__head h2 {
     margin: 0;
+  }
+  .canvas-stage > .meta {
+    margin: var(--s-1) 0 var(--s-3);
+  }
+  /* Two columns of rows at 1280, one on a phone. */
+  .canvas-rows {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+    column-gap: var(--s-6);
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  .canvas-more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-4);
+    margin-top: var(--s-5);
+  }
+  .canvas-more p {
+    margin: 0;
+  }
+  .canvas-back {
+    margin-top: var(--s-5);
+  }
+  .canvas-also {
+    padding-left: var(--s-5);
   }
   /* The disclosure that holds Resourcus. Its summary is a 44 px tap target,
      and a flex summary drops the native triangle, so a chevron turns in its
@@ -237,8 +190,5 @@ const LEVELS = STAGES.filter((s) => s !== "support");
   }
   .canvas-ask[open] summary {
     margin-bottom: var(--s-3);
-  }
-  .canvas-back {
-    margin-top: var(--s-6);
   }
 </style>

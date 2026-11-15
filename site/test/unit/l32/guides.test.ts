@@ -241,7 +241,7 @@ describe("a city guide on fixtures", () => {
     const answer = plainText(denver.answer);
     // 13 records spell their city Denver, one of them "denver " with a stray space.
     expect(sentences(answer)[0]).toBe(
-      `Startup Resources lists 13 resources for founders in Denver, as of ${DATE.label}, and the lists below show 11 of them by need.`,
+      `Startup Resources lists 13 resources for founders in Denver, as of ${DATE.label}, and the chart below counts 11 of them by need.`,
     );
     expect(unsourcedCounts(answer, [DATE.label])).toEqual([]);
     expect(dates(denver.answer)).toEqual([{ text: DATE.label, datetime: DATE.iso }]);
@@ -254,11 +254,11 @@ describe("a city guide on fixtures", () => {
     );
   });
 
-  it("says what the lists cover and why the two counts differ", () => {
+  it("says what the chart covers and why the two counts differ", () => {
     // The two unlisted Denver records are a lawyer and a coding school, so
     // service providers are not most of the rest.
     expect(sentences(plainText(denver.answer))[2]).toBe(
-      "The lists cover accelerators and incubators, meetups and events, coworking spaces, investors, support programs and universities, then towns nearby; service providers are left out.",
+      "The chart covers accelerators and incubators, meetups and events, coworking spaces, investors, support programs and universities, then towns nearby; service providers are left out.",
     );
     const providers = [
       ...FIXTURE,
@@ -283,7 +283,7 @@ describe("a city guide on fixtures", () => {
   it("drops an empty section, and the answer names only the sections the page shows", () => {
     const springs = buildGuide("startups-in-colorado-springs", fixture);
     expect(springs.sections.map((s) => s.id)).toEqual(["meet", "nearby"]);
-    expect(sentences(plainText(springs.answer))[2]).toBe("The lists cover meetups and events, then towns nearby.");
+    expect(sentences(plainText(springs.answer))[2]).toBe("The chart covers meetups and events, then towns nearby.");
   });
 
   it("drops the nearby section and its mention when no nearby town has a listing", () => {
@@ -292,7 +292,7 @@ describe("a city guide on fixtures", () => {
       records: [rec({ id: "foco-cowork", city: "Fort Collins", type: "coworking" })],
     });
     expect(fortCollins.sections.map((s) => s.id)).toEqual(["coworking"]);
-    expect(plainText(fortCollins.answer)).toMatch(/The lists cover coworking spaces\.$/);
+    expect(plainText(fortCollins.answer)).toMatch(/The chart covers coworking spaces\.$/);
   });
 
   it("reads the region from data/regions/, so a renamed region shows up with no code change", () => {
@@ -324,7 +324,7 @@ describe.each(CITY_SLUGS)("the %s guide on the real data", (slug: CitySlug) => {
     const shown = guideItems({ sections: guide.sections.filter((s) => s.id !== "nearby") }).length;
     expect(shown).toBeLessThan(own.length);
     expect(sentences(answer)[0]).toBe(
-      `Startup Resources lists ${own.length} resources for founders in ${city}, as of ${DATE.label}, and the lists below show ${shown} of them by need.`,
+      `Startup Resources lists ${own.length} resources for founders in ${city}, as of ${DATE.label}, and the chart below counts ${shown} of them by need.`,
     );
     expect(unsourcedCounts(answer, [DATE.label])).toEqual([]);
     for (const s of guide.sections) expect(unsourcedCounts(plainText(s.intro), [DATE.label]), s.id).toEqual([]);
@@ -500,7 +500,7 @@ describe("the events guide", () => {
     const text = plainText(empty.answer);
     expect(sentences(text)).toHaveLength(2);
     expect(sentences(text)[1]).toBe(
-      `Below, by city, are the ${series.length} events, groups and maker spaces that Startup Resources lists as events, as of ${DATE.label}.`,
+      `The chart below counts, by city, the ${series.length} events, groups and maker spaces that Startup Resources lists as events, as of ${DATE.label}.`,
     );
     expect(unsourcedCounts(text, [DATE.label])).toEqual([]);
   });
@@ -511,7 +511,7 @@ describe("the events guide", () => {
     expect(empty.sections[0]?.heading).toBe("Events and groups by city");
   });
 
-  it("with calendar events, adds them ahead of the lists and says so in the answer", () => {
+  it("with calendar events, adds them after the chart and says so in the answer", () => {
     expect(withEvents.upcoming?.events.map((e) => e.id)).toEqual(["a"]);
     expect(sentences(plainText(withEvents.answer))).toHaveLength(3);
     expect(plainText(withEvents.answer)).toMatch(/Mountain Time\.$/);

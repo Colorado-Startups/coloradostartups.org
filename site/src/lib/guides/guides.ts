@@ -20,7 +20,7 @@
 // and re-exports what the pages import.
 
 import { cityGuide } from "./cities";
-import { type Guide, type GuideInput, guideItems, GUIDES_INDEX, type GuideSlug } from "./core";
+import { type Guide, type GuideInput, guideItems, GUIDES_INDEX, type GuideRecord, type GuideSlug } from "./core";
 import { startupEvents } from "./events";
 import { acceleratorsAndIncubators, fundingPrograms, startACompany, whereFoundersMeet } from "./topics";
 
@@ -46,9 +46,12 @@ const BUILDERS: Record<GuideSlug, (input: GuideInput) => Guide> = {
   "colorado-startup-events": startupEvents,
 };
 
-/** The schema.org ItemList for a guide: every listed record, in page order. */
-export function guideJsonLd(guide: Guide, site: URL): Record<string, unknown> {
-  const items = guideItems(guide);
+/**
+ * The schema.org ItemList for a guide: the records the page lists, in page
+ * order. The guide page lists five (browse.ts startWith) and links the rest in
+ * Startup Resources, so it passes those five; with no list, every record.
+ */
+export function guideJsonLd(guide: Guide, site: URL, items: readonly GuideRecord[] = guideItems(guide)): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",

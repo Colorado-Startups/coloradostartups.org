@@ -7,6 +7,10 @@ import { expect, test, type Page } from "@playwright/test";
 
 const visibleCards = (page: Page) => page.locator("[data-resource]:not([hidden])");
 
+// Step F (2026-11-15): stage and type are radio chips, the stage chips drawn
+// as the journey with their counts; the list shows 24 matches at a time.
+const chip = (page: Page, name: "stage" | "type", value: string) => page.locator(`input[name="${name}"][value="${value}"]`);
+
 test.describe("/ecosystem-canvas/", () => {
   test("shows every stage, with the anchors other lanes link to", async ({ page }) => {
     await page.goto("/ecosystem-canvas/");
@@ -14,40 +18,51 @@ test.describe("/ecosystem-canvas/", () => {
     for (const stage of ["idea", "launch", "growth", "support"]) {
       await expect(page.locator(`section#${stage}`)).toHaveCount(1);
     }
-    const intro = page.getByRole("region", { name: "Startup Resources" });
-    await expect(intro.getByRole("link", { name: "Founder Institute" })).toHaveAttribute("href", "https://fi.co/");
-    await expect(page.getByRole("status")).toHaveText(/^Showing all \d+ resources\.$/);
+    const closing = page.getByRole("region", { name: "Missing something?" });
+    await expect(closing.getByRole("link", { name: "Founder Institute" })).toHaveAttribute("href", "https://fi.co/");
+    await expect(page.getByRole("status")).toHaveText(/^All \d+ resources\.$/);
+    await expect(visibleCards(page)).toHaveCount(24);
   });
 
   test("filters by stage and type in place, and keeps the filters in the URL", async ({ page }) => {
     await page.goto("/ecosystem-canvas/");
-    const total = await visibleCards(page).count();
-    await page.getByLabel("Stage").selectOption("launch");
-    await page.getByLabel("Type").selectOption("investor");
+    const total = Number((await page.getByRole("status").textContent())?.match(/\d+/)?.[0]);
+    await chip(page, "stage", "launch").check();
+    await chip(page, "type", "investor").check();
     await expect(page).toHaveURL(/\?stage=launch&type=investor$/);
+    await expect(page.getByRole("status")).toHaveText(/^\d+ of \d+ resources match\.$/);
     const shown = visibleCards(page);
     expect(await shown.count()).toBeGreaterThan(0);
-    expect(await shown.count()).toBeLessThan(total);
+    expect(await shown.count()).toBeLessThanOrEqual(24);
     // Support sits alongside every level, so it shows under Launch too (#134).
     for (const el of await shown.all()) {
       await expect(el).toHaveAttribute("data-stage", /^(launch|support)$/);
       await expect(el).toHaveAttribute("data-type", "investor");
     }
     await expect(page.locator("section#growth")).toBeHidden();
-    await page.getByRole("button", { name: "Clear filters" }).click();
-    await expect(page.getByRole("status")).toHaveText(`Showing all ${total} resources.`);
+    await page.getByRole("button", { name: "Clear", exact: true }).click();
+    await expect(page.getByRole("status")).toHaveText(`All ${total} resources.`);
   });
 
-  test("opens with the filters a link carries", async ({ page }) => {
+  test("shows 24 more on Show more", async ({ page }) => {
+    await page.goto("/ecosystem-canvas/");
+    await page.getByRole("button", { name: "Show 24 more" }).click();
+    await expect(visibleCards(page)).toHaveCount(48);
+  });
+
+  test("opens with the filters a link carries, and a stage anchor chooses its stage", async ({ page }) => {
     await page.goto("/ecosystem-canvas/?stage=growth&city=Denver");
-    await expect(page.getByLabel("Stage")).toHaveValue("growth");
+    await expect(chip(page, "stage", "growth")).toBeChecked();
     for (const el of await visibleCards(page).all()) await expect(el).toHaveAttribute("data-city", "Denver");
+    await page.goto("/ecosystem-canvas/#launch");
+    await expect(chip(page, "stage", "launch")).toBeChecked();
+    await expect(page).toHaveURL(/\?stage=launch#launch$/);
   });
 
   test("searches with Pagefind and treats several words as all of them", async ({ page }) => {
     await page.goto("/ecosystem-canvas/");
     await page.getByLabel("Search").fill("coworking boulder");
-    await expect(page.getByRole("status")).toHaveText(/^Showing \d+ of \d+ resources\.$/);
+    await expect(page.getByRole("status")).toHaveText(/^\d+ of \d+ resources match\.$/);
     const shown = visibleCards(page);
     expect(await shown.count()).toBeGreaterThan(0);
     for (const el of await shown.all()) await expect(el).toContainText(/coworking/i);

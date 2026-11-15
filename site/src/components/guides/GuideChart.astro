@@ -1,0 +1,134 @@
+---
+// A guide's answer as a chart: one row per part of the answer, each with its
+// name, a bar and its count of Startup Resources listings, and a link to the
+// Startup Resources view (or region page) that holds them (lib/guides/
+// browse.ts). The caption names the source and the date, so every count on
+// the chart carries both. A row list with bars, not an image, so the words and
+// numbers are the text alternative. One hue for the bars: they compare one
+// measure, so color carries no meaning of its own.
+import type { GuideRow } from "../../lib/guides/browse";
+import type { AsOf } from "../../lib/guides/guides";
+
+interface Props {
+  rows: readonly GuideRow[];
+  date: AsOf;
+  /** Rows are steps in order (a numbered list), not parts side by side. */
+  ordered?: boolean;
+}
+
+const { rows, date, ordered = false } = Astro.props;
+const max = Math.max(1, ...rows.map((r) => r.items.length));
+const Tag = ordered ? "ol" : "ul";
+---
+
+<figure class="guide-chart" data-guide-diagram>
+  <figcaption class="meta">
+    Listings in Startup Resources, as of <time datetime={date.iso}>{date.label}</time>.
+  </figcaption>
+  <Tag class:list={["guide-chart__rows", ordered && "guide-chart__rows--ordered"]}>
+    {
+      rows.map((row, i) => (
+        <li class="guide-chart__row" data-guide-row={row.id}>
+          <span class="guide-chart__label">
+            {ordered && (
+              <span class="guide-chart__step" aria-hidden="true">
+                {i + 1}
+              </span>
+            )}
+            {row.href ? (
+              <a class="tap-target" href={row.href}>
+                {row.label}
+              </a>
+            ) : (
+              <span>{row.label}</span>
+            )}
+          </span>
+          <span class="guide-chart__track" aria-hidden="true">
+            <span class="guide-chart__bar" style={`--share: ${(row.items.length / max).toFixed(4)}`} />
+          </span>
+          <span class="guide-chart__n" data-guide-count>
+            {row.items.length}
+            <span class="visually-hidden">{row.items.length === 1 ? " listing" : " listings"}</span>
+          </span>
+        </li>
+      ))
+    }
+  </Tag>
+</figure>
+
+<style>
+  .guide-chart {
+    margin: 0;
+    max-width: 48rem;
+  }
+  .guide-chart figcaption {
+    margin-bottom: var(--s-2);
+  }
+  .guide-chart__rows {
+    display: grid;
+    gap: var(--s-1);
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* The name, then the bar and the count, on one line: names line up on the
+     left and bars share one baseline. */
+  .guide-chart__row {
+    display: grid;
+    grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr) 3.5ch;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: var(--size-tap);
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .guide-chart__label {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .guide-chart__step {
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--c-text);
+    color: var(--c-ground);
+    font-size: var(--t-step--1);
+  }
+  /* The track is the bar's full length, one step off the surface; the bar
+     grows from the left edge, square there and rounded at its end. */
+  .guide-chart__track {
+    height: 0.75rem;
+    border-radius: var(--r-chisel);
+    background: var(--c-surface-2);
+  }
+  .guide-chart__bar {
+    display: block;
+    width: max(var(--line-bold), calc(var(--share) * 100%));
+    height: 100%;
+    border-radius: 0 var(--r-chisel) var(--r-chisel) 0;
+    background: var(--c-text-dim);
+  }
+  .guide-chart__n {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  /* On a phone the name takes its own line, with the bar and count under it. */
+  @media (max-width: 40rem) {
+    .guide-chart__row {
+      grid-template-columns: minmax(0, 1fr) 3.5ch;
+      gap: 0 var(--s-3);
+      padding-block: var(--s-1) var(--s-2);
+    }
+    .guide-chart__label {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

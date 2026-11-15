@@ -22,6 +22,9 @@ const KEYS = ["stage", "type", "city", "q"] as const;
 // shows the Support group. Choosing Support itself shows only that group.
 const ALONGSIDE = "support";
 
+/** Rows the list shows at first, and how many more each "Show more" adds. */
+export const PAGE_SIZE = 24;
+
 /** Reads a filter state from a query string, keeping only allowed values. */
 export function readState(search: string, allowed: { stage: Set<string>; type: Set<string>; city: Set<string> }): FilterState {
   const params = new URLSearchParams(search);
@@ -64,31 +67,61 @@ export function matches(card: CardFacts, state: FilterState, searchHits: Set<str
   return terms(state.q).every((t) => hay.includes(t));
 }
 
-/** "Showing 12 of 548 resources." */
-export function countText(shown: number, total: number): string {
-  const noun = total === 1 ? "resource" : "resources";
-  return shown === total ? `Showing all ${total} ${noun}.` : `Showing ${shown} of ${total} ${noun}.`;
+/**
+ * Each stage's count under the other filters, for the journey's stage
+ * chips: what a visitor would see in that stage after choosing it. The empty
+ * key counts every stage, for the "All" chip.
+ */
+export function stageCounts(
+  cards: readonly CardFacts[],
+  state: FilterState,
+  searchHits: Set<string> | null,
+): Record<string, number> {
+  const others = { ...state, stage: "" };
+  const counts: Record<string, number> = { "": 0 };
+  for (const card of cards) {
+    if (!matches(card, others, searchHits)) continue;
+    counts[""] += 1;
+    counts[card.stage] = (counts[card.stage] ?? 0) + 1;
+  }
+  return counts;
 }
 
-/** "12 resources", the badge beside a substage heading. */
-export function groupCountText(n: number): string {
-  return `${n} ${n === 1 ? "resource" : "resources"}`;
+/** Which rows show: the first `limit` matches, in page order. */
+export function pageOf(matched: readonly boolean[], limit: number): boolean[] {
+  let n = 0;
+  return matched.map((m) => m && n++ < limit);
 }
-
-export type Ground = "band" | "lit";
 
 /**
- * A ground for each section, alternating over the sections still showing and
- * starting from the first section's ground. A hidden section gets null and
- * keeps the class it has.
+ * The limit that shows the match at `index` (a row a link points to), in
+ * whole pages and never below `limit`. A row that does not match keeps the limit.
  */
-export function grounds(visible: boolean[], first: Ground): (Ground | null)[] {
-  let n = 0;
-  return visible.map((shown) => {
-    if (!shown) return null;
-    const likeFirst = n++ % 2 === 0;
-    return likeFirst === (first === "band") ? "band" : "lit";
-  });
+export function limitFor(matched: readonly boolean[], index: number, limit: number): number {
+  if (!matched[index]) return limit;
+  const rank = matched.slice(0, index + 1).filter(Boolean).length;
+  return Math.max(limit, Math.ceil(rank / PAGE_SIZE) * PAGE_SIZE);
+}
+
+/** "All 501 resources." or "37 of 501 resources match." */
+export function countText(matched: number, total: number): string {
+  const noun = total === 1 ? "resource" : "resources";
+  return matched === total ? `All ${total} ${noun}.` : `${matched} of ${total} ${noun} match.`;
+}
+
+/** "Showing 24 of 245." under the list. */
+export function shownText(shown: number, matched: number): string {
+  return `Showing ${shown} of ${matched}.`;
+}
+
+/** "Show 24 more", or fewer when fewer are left. */
+export function moreText(left: number): string {
+  return `Show ${Math.min(left, PAGE_SIZE)} more`;
+}
+
+/** "12 resources", the badge beside a stage heading. */
+export function groupCountText(n: number): string {
+  return `${n} ${n === 1 ? "resource" : "resources"}`;
 }
 
 /** Ids from Pagefind sub-results that point into this page ("/ecosystem-canvas/#acme"). */
