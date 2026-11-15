@@ -36,12 +36,15 @@ const PLAN_OLD_PATHS = [
 ];
 
 // A redirect may only land on a path the new site serves: a page file renders
-// /team/ from src/pages/team.astro or src/pages/team/index.astro, and
-// @astrojs/sitemap writes /sitemap-index.xml at build time.
+// /team/ from src/pages/team.astro or src/pages/team/index.astro,
+// @astrojs/sitemap writes /sitemap-index.xml at build time, and public/ serves
+// its files as they are (the brand favicon, /art/brand/favicon.ico).
 const PAGES_DIR = path.join(__dirname, "../../../src/pages");
+const PUBLIC_DIR = path.join(__dirname, "../../../public");
 const BUILD_FILES = new Set(["/sitemap-index.xml"]);
 function isRealTarget(page: string): boolean {
   if (BUILD_FILES.has(page)) return true;
+  if (!page.endsWith("/") && existsSync(path.join(PUBLIC_DIR, page))) return true;
   if (!page.endsWith("/")) return false;
   const stem = page === "/" ? "index" : page.slice(1, -1);
   return [`${stem}.astro`, `${stem}/index.astro`].some((file) => existsSync(path.join(PAGES_DIR, file)));

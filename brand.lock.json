@@ -17,6 +17,11 @@
     "dist/hall/passage.jpg": "3903c4088c98c7b75bdbdec71778c034aa4907b703172bf6b2df94c8f90fd00b",
     "dist/hall/founders.jpg": "139f695a3e1494d5050ee5cabd8356e2c911d3da85d7285fe8dcad45df9c485a",
     "dist/hall/stone.png": "7cd3171af6b20b0392822977ec708fefe32df081ed0af374e8c16e041eb8392a",
-    "dist/tokens.json": "7250ba54a7415e30b43676e87537bc82db51f12d9e54d54cac97b574f1d13d65"
+    "dist/tokens.json": "7250ba54a7415e30b43676e87537bc82db51f12d9e54d54cac97b574f1d13d65",
+    "dist/logo/emblem-512.png": "77a946cafef2a90dcdd191067c74bf6af3f8535fe1e0922218a4172891f606ab",
+    "dist/logo/favicon.ico": "238da7a1fb8cfa6bb0b860b0a4dc519ba453c6581bf2f882898f14d6516d4dda",
+    "dist/logo/apple-touch-icon.png": "23c0d573706e87b3f474902fabbccc4a00bf61f44e5c3213d6442f86aff184bc",
+    "dist/logo/icon-192.png": "d38bb081b7cb827dd37c281646c0d78e78b0abc643737fd6a617747bc0b90674",
+    "dist/logo/icon-512.png": "cbdbe869187b8eb86e3a0da7ecc71d8a43bd35e46f10fe663764537ad0b33485"
   }
 }

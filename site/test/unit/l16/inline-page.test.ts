@@ -62,7 +62,7 @@ describe("routes", () => {
   it("normalizes a link's path the way the site's trailing-slash rule does", () => {
     expect(normalizeRoute("/community")).toBe("/community/");
     expect(normalizeRoute("/ecosystem-canvas/?stage=idea#launch")).toBe("/ecosystem-canvas/");
-    expect(normalizeRoute("/brand/cs-logo-240.png")).toBe("/brand/cs-logo-240.png");
+    expect(normalizeRoute("/art/brand/icon-192.png")).toBe("/art/brand/icon-192.png");
     expect(normalizeRoute("#main")).toBe("/");
   });
 });
@@ -196,7 +196,7 @@ describe("guide images", () => {
 
   it("accepts the logo the brand guide actually uses", () => {
     const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
-    expect(docImageFile("../../site/public/brand/cs-logo-240.png", path.join(repo, "ops/artifacts")).file).not.toBeNull();
+    expect(docImageFile("../../site/public/art/brand/icon-192.png", path.join(repo, "ops/artifacts")).file).not.toBeNull();
   });
 });
 
