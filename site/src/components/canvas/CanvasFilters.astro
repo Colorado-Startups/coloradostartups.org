@@ -91,13 +91,13 @@ const LEVELS = STAGES.filter((s) => s !== "support");
   <fieldset class="chips">
     <legend>Type</legend>
     <div class="chips__row">
-      <label class="chip">
+      <label class="pick">
         <input type="radio" name="type" value="" checked />
         <span>All</span>
       </label>
       {
         types.map((t) => (
-          <label class="chip">
+          <label class="pick">
             <input type="radio" name="type" value={t} />
             <span>{TYPE_LABELS[t]}</span>
           </label>
@@ -168,12 +168,12 @@ const LEVELS = STAGES.filter((s) => s !== "support");
   /* Each chip and node is a label over its own radio: the radio fills the
      label, unseen, so a tap anywhere on it chooses it and the browser's own
      keyboard and screen reader behavior stays. */
-  .chip,
+  .pick,
   .journey__node {
     position: relative;
     cursor: pointer;
   }
-  .chip input,
+  .pick input,
   .journey__node input {
     position: absolute;
     inset: 0;
@@ -183,7 +183,7 @@ const LEVELS = STAGES.filter((s) => s !== "support");
     opacity: 0;
     cursor: pointer;
   }
-  .chip:has(input:focus-visible),
+  .pick:has(input:focus-visible),
   .journey__node:has(input:focus-visible) {
     outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
     outline-offset: var(--line-edge);
@@ -305,7 +305,7 @@ const LEVELS = STAGES.filter((s) => s !== "support");
       scrollbar-width: thin;
     }
   }
-  .chip {
+  .pick {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
@@ -318,7 +318,7 @@ const LEVELS = STAGES.filter((s) => s !== "support");
     font-weight: 700;
     white-space: nowrap;
   }
-  .chip:has(input:checked) {
+  .pick:has(input:checked) {
     border-color: var(--c-text);
     background: var(--c-text);
     color: var(--c-ground);
