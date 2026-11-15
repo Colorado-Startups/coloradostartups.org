@@ -34,7 +34,7 @@ describe("keepers", () => {
       expect(portraitAlt(id, "Name", "Title")).toMatch(/an AI agent/);
     }
     expect(portraitAlt("resourcus", "Resourcus", "Keeper of Startup Resources")).toBe(
-      "Resourcus, Keeper of Startup Resources: an AI agent, painted as a gnome of the Hall.",
+      "Resourcus, Keeper of Startup Resources: an AI agent, painted as a gnome.",
     );
   });
 

@@ -27,7 +27,7 @@ export const KEEPERS: Record<KeeperId, KeeperArt> = {
 
 /** Alt text that names the keeper and says it is an AI agent. */
 export function portraitAlt(id: KeeperId, name: string, title: string): string {
-  return `${name}, ${title}: an AI agent, painted as a ${KEEPERS[id].kind} of the Hall.`;
+  return `${name}, ${title}: an AI agent, painted as a ${KEEPERS[id].kind}.`;
 }
 
 /**

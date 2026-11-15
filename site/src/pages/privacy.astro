@@ -33,7 +33,7 @@ const [intro, rest] = split > 0 ? [body.slice(0, split), body.slice(split)] : [b
 <BaseLayout title={entry.data.title} description={entry.data.summary}>
   <section class="section section--lit" aria-labelledby="page-title">
     <div class="wrap">
-      <InfoHeader kicker="What the Hall keeps" title={entry.data.title}>
+      <InfoHeader kicker="What we keep" title={entry.data.title}>
         <p class="meta">Updated <time datetime={updated.toISOString().slice(0, 10)}>{formatUpdated(updated)}</time></p>
       </InfoHeader>
       {

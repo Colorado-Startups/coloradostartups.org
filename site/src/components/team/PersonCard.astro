@@ -102,8 +102,7 @@ const widths = photo ? photoWidths(person.photo, [176, 352], photo.width) : [];
     object-fit: cover;
   }
   /* One treatment for every photo (#256). Paul's photo is black and white, so
-     the color photos show in black and white too, warmed toward the Hall's
-     bronze. A crop from photo-crops.ts zooms the photo from its top-left
+     the color photos show in black and white too, warmed a little. A crop from photo-crops.ts zooms the photo from its top-left
      corner: --photo-x and --photo-y move the crop's corner to the frame's,
      then --photo-zoom scales the crop to fill the frame. */
   :global(.hall-card__media--inset img.person__photo) {

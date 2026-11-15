@@ -57,7 +57,7 @@ export const SPACE_PEAK_CONNECTOR: SeatLayout = {
       ],
     },
     colorado: {
-      heading: "Bring the Springs into the Hall",
+      heading: "Connect the Springs to the rest of Colorado",
       blocks: [
         {
           kind: "split",
