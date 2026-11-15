@@ -62,8 +62,8 @@ export function coloradoMapSvg(text: ChartText, { zone }: MapView = {}): string 
   const [[west], [east]] = focus ? zoneBounds(focus.id) : STATE_CENTRE;
   const lit = (id: RegionId) => !focus || focus.id === id;
   // A zone's view names its cities; a city within 0.15° of the zone's east
-  // edge (Greeley, Colorado Springs) takes its name on the west side, or the
-  // name runs past the frame.
+  // edge (Greeley, Colorado Springs) takes its name above it, on the west
+  // side, or the name runs past the frame.
   const eastSide = (p: { lon: number }) => !focus || p.lon < east - 0.15;
   return renderPlot({
     width: MAP_WIDTH,
@@ -99,7 +99,11 @@ export function coloradoMapSvg(text: ChartText, { zone }: MapView = {}): string 
             y: "lat",
             text: "name",
             textAnchor: anchor,
-            dx: focus ? (anchor === "start" ? 10 : -10) : 0,
+            dx: focus ? (anchor === "start" ? 10 : -4) : 0,
+            // A west-side name sits above its dot, clear of a name on the
+            // same line to its west (Loveland's, beside Greeley).
+            dy: anchor === "end" ? -8 : 0,
+            lineAnchor: anchor === "end" ? "bottom" : "middle",
             fontWeight: 700,
             // Plot reads a fontSize string as a field name unless it looks like "18px",
             // so the token goes in as a constant channel (as lib/regions/map.ts does).
