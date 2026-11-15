@@ -20,7 +20,9 @@
 //   @fontsource/aileron              Aileron Regular, the brand's display face (brand tokens/type.yaml, CC0)
 //
 // Text is set as vector paths from the font file, so the cards never depend on
-// the fonts installed on the machine. BaseLayout.astro links /og/<id>.png.
+// the fonts installed on the machine. Cards are JPEG, since the art is painted,
+// and carry their art's XMP, so the AI-made label survives (brand decision 46).
+// BaseLayout.astro links /og/<id>.jpg.
 // Exit codes: 0 built, 1 a card is over the size goal or a keeper card's text
 // lost its AI-agent disclosure, 2 usage error, 3 could not build (a font,
 // package or input is missing).
@@ -60,16 +62,9 @@ const OUT_DIR = path.join(ROOT, "site/public/og");
 const FALLBACK_ART = "brand/golden";
 const MAX_BYTES = 300 * 1024; // goal per card (orchestrator review of PR #2)
 
-// Truecolor first; palette PNG with dithering only when a card runs over MAX_BYTES.
-// If no encoding fits, the art behind the scrim is softened a little and the
-// ladder runs again. Text is composited after the blur, so it stays sharp.
-const SOFTEN = [0, 0.8, 1.5]; // px sigma on the background art only
-const ENCODINGS = [
-  { compressionLevel: 9, adaptiveFiltering: true },
-  { compressionLevel: 9, palette: true, colors: 256, dither: 1 },
-  { compressionLevel: 9, palette: true, colors: 192, dither: 1 },
-  { compressionLevel: 9, palette: true, colors: 128, dither: 1 },
-];
+// The first quality that fits MAX_BYTES wins. PNG ran 350 to 410 KB on the
+// brand paintings even blurred and palettized (PR #31's first CI run).
+const QUALITIES = [82, 74, 66];
 
 // fontkitten reaches this repo through Astro's font packages; the orchestrator
 // declares it in site devDependencies. Load it here so a missing package reads
@@ -130,6 +125,7 @@ async function background(card) {
   const file = own ?? findArtFile(FALLBACK_ART);
   if (!file) return fail(3, `no art for card "${card.id}" and no ${FALLBACK_ART} art to fall back on`);
   const meta = await sharp(file).metadata();
+  const xmp = meta.xmp ? meta.xmp.toString("utf8") : null;
   if (meta.height > meta.width) {
     // A keeper portrait stands at the right on its own ground color (art/finals.json).
     const place = portraitPlacement(meta.width, meta.height, CARD.width, CARD.height);
@@ -139,11 +135,12 @@ async function background(card) {
       buffer: await sharp({ create: ground }).composite([{ input: art, left: place.left, top: place.top }]).png().toBuffer(),
       source: path.relative(ROOT, file),
       artKey,
+      xmp,
       portraitLeft: place.left,
     };
   }
   const crop = coverCrop(meta.width, meta.height, CARD.width, CARD.height, parseFocus(card.focus));
-  return { buffer: await sharp(file).resize(crop.resize).extract(crop.extract).toBuffer(), source: path.relative(ROOT, file), artKey };
+  return { buffer: await sharp(file).resize(crop.resize).extract(crop.extract).toBuffer(), source: path.relative(ROOT, file), artKey, xmp };
 }
 
 // The text layer as SVG, plus the lines it renders (for the disclosure check).
@@ -179,34 +176,22 @@ async function buildCard(card, font) {
   const { svg, lines } = overlay(card, font, bg.portraitLeft, disclosureCaption(card, bg.artKey));
   const problem = disclosureProblem(card, lines, bg.artKey);
   if (problem) fail(1, problem);
-  const text = Buffer.from(svg);
-  let png;
-  let encoding;
-  let soften;
-  search: for (soften of SOFTEN) {
-    const art = soften ? await sharp(bg.buffer).blur(soften).toBuffer() : bg.buffer;
-    // Social cards are opaque, and an alpha channel only adds bytes.
-    const flat = await sharp(art)
-      .composite([{ input: text, left: 0, top: 0 }])
-      .flatten({ background: BRAND.blue })
-      .removeAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    for (encoding of ENCODINGS) {
-      png = await sharp(flat.data, { raw: flat.info }).png(encoding).toBuffer();
-      if (png.length <= MAX_BYTES) break search;
-    }
+  const flat = await sharp(bg.buffer)
+    .composite([{ input: Buffer.from(svg), left: 0, top: 0 }])
+    .flatten({ background: BRAND.blue })
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  let jpg;
+  let quality;
+  for (quality of QUALITIES) {
+    const enc = sharp(flat.data, { raw: flat.info }).jpeg({ quality, mozjpeg: true });
+    jpg = await (bg.xmp ? enc.withXmp(bg.xmp) : enc).toBuffer();
+    if (jpg.length <= MAX_BYTES) break;
   }
-  const out = path.join(OUT_DIR, `${card.id}.png`);
-  fs.writeFileSync(out, png);
-  return {
-    id: card.id,
-    out: path.relative(ROOT, out),
-    bytes: png.length,
-    art: bg.source,
-    palette: encoding.palette ? encoding.colors : null,
-    soften,
-  };
+  const out = path.join(OUT_DIR, `${card.id}.jpg`);
+  fs.writeFileSync(out, jpg);
+  return { id: card.id, out: path.relative(ROOT, out), bytes: jpg.length, art: bg.source, quality, xmp: Boolean(bg.xmp) };
 }
 
 async function main() {
@@ -233,10 +218,9 @@ async function main() {
     const r = await buildCard(card, font);
     const kb = Math.round(r.bytes / 1024);
     if (r.bytes > MAX_BYTES) over.push(`${r.id} (${kb} KB)`);
-    const notes = [r.palette && `${r.palette}-color palette`, r.soften && `art softened ${r.soften} px`].filter(Boolean);
-    console.log(`og: ${r.out} ${kb} KB (art: ${r.art}${notes.length ? `, ${notes.join(", ")}` : ""})`);
+    console.log(`og: ${r.out} ${kb} KB (art: ${r.art}, quality ${r.quality}${r.xmp ? ", XMP kept" : ""})`);
   }
-  if (over.length) fail(1, `over the ${MAX_BYTES / 1024} KB goal even softened and as a 128-color palette: ${over.join(", ")}`);
+  if (over.length) fail(1, `over the ${MAX_BYTES / 1024} KB goal even at quality ${QUALITIES.at(-1)}: ${over.join(", ")}`);
 }
 
 await main();

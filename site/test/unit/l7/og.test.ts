@@ -31,7 +31,7 @@ const REGIONS = Object.fromEntries(
       return [r.id, r];
     }),
 );
-// BaseLayout.astro links /og/<id>.png; these are the ids the orchestrator asked L7 for.
+// BaseLayout.astro links /og/<id>.jpg; these are the ids the orchestrator asked L7 for.
 const REQUIRED = [
   "home",
   "community",

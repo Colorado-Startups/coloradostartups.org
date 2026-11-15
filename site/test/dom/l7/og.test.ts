@@ -45,7 +45,7 @@ describe("og:image on every built page", () => {
       const url = ogImage(page.html);
       expect(url, "og:image meta").not.toBeNull();
       const name = new URL(url as string).pathname;
-      expect(name).toMatch(/^\/og\/[a-z0-9-]+\.png$/);
+      expect(name).toMatch(/^\/og\/[a-z0-9-]+\.jpg$/);
       expect(existsSync(path.join(OG_DIR, path.basename(name))), `site/public/og${name.slice(3)}`).toBe(true);
       expect(existsSync(path.join(DIST_DIR, name)), `dist${name}`).toBe(true);
     });
@@ -55,7 +55,7 @@ describe("og:image on every built page", () => {
     it(`${route} uses the ${card} card`, () => {
       const page = pages.find((p) => p.route === route);
       expect(page, route).toBeDefined();
-      expect(new URL(ogImage(page!.html) as string).pathname).toBe(`/og/${card}.png`);
+      expect(new URL(ogImage(page!.html) as string).pathname).toBe(`/og/${card}.jpg`);
     });
   }
 });
