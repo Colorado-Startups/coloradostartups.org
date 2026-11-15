@@ -9,6 +9,9 @@ const MAP = "#sg-colorado-map";
 
 for (const width of [1280, 375]) {
   test(`/styleguide/ map at ${width} px: the drawing, then the live map where WebGL2 exists`, async ({ page }) => {
+    // The Cloudflare Web Analytics beacon (BaseLayout) posts to cloudflareinsights.com,
+    // which refuses a 127.0.0.1 origin; served empty here, so any console error left is the map's.
+    await page.route("https://static.cloudflareinsights.com/**", (r) => r.fulfill({ contentType: "text/javascript", body: "" }));
     const errors: string[] = [];
     page.on("console", (m) => {
       if (m.type() === "error") errors.push(m.text());

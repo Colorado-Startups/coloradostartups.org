@@ -4,8 +4,9 @@
 //
 // - Loads only when a map scrolls near the screen, so the first screen pays
 //   nothing (MapLibre is about 250 KB compressed).
-// - The CSP build with a same-origin worker (maplibre.org CSP docs), so
-//   script-src stays 'self' and no blob: worker is needed.
+// - MapLibre 6 is ES modules only. Its worker is one self-contained file, and
+//   setWorkerUrl points at our same-origin copy, which MapLibre 6 starts as a
+//   module worker directly: script-src and worker-src stay 'self', no blob:.
 // - Light or dark basemap from the page's theme; switching themes swaps the
 //   style, and `style.load` re-adds the zones, which setStyle wipes.
 // - cooperativeGestures: the page scrolls past the map; a pinch or a held
@@ -71,15 +72,15 @@ function addOverlay(map: MlMap) {
   });
 }
 
-/** MapLibre 5 needs WebGL2; without it the drawing stays, and nothing downloads. */
+/** MapLibre needs WebGL2; without it the drawing stays, and nothing downloads. */
 const hasWebGl2 = () => Boolean(document.createElement("canvas").getContext("webgl2"));
 
 async function mount(figure: HTMLElement) {
   const host = figure.querySelector<HTMLElement>("[data-map-canvas]");
   if (!host || !hasWebGl2()) return;
-  const [{ default: maplibregl }, { default: workerUrl }] = await Promise.all([
-    import("maplibre-gl/dist/maplibre-gl-csp.js"),
-    import("maplibre-gl/dist/maplibre-gl-csp-worker.js?url"),
+  const [maplibregl, { default: workerUrl }] = await Promise.all([
+    import("maplibre-gl"),
+    import("maplibre-gl/dist/maplibre-gl-worker.mjs?url"),
     import("maplibre-gl/dist/maplibre-gl.css"),
   ]);
   maplibregl.setWorkerUrl(workerUrl);

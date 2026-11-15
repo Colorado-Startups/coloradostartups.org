@@ -1,0 +1,486 @@
+geoid,name,basename,kind,lat,lon
+0800320,Acres Green CDP,Acres Green,cdp,39.5559935,-104.8964095
+0800620,Aetna Estates CDP,Aetna Estates,cdp,39.738127,-104.6732209
+0800760,Aguilar town,Aguilar,place,37.4036257,-104.6550363
+0800870,Air Force Academy CDP,Air Force Academy,cdp,38.9941855,-104.8639219
+0800925,Akron town,Akron,place,40.1634664,-103.220274
+0801090,Alamosa city,Alamosa,place,37.4745281,-105.8769557
+0801145,Alamosa East CDP,Alamosa East,cdp,37.4766543,-105.8397457
+0801420,Allenspark CDP,Allenspark,cdp,40.2312815,-105.5179861
+0801530,Alma town,Alma,place,39.2860838,-106.0689868
+0801640,Alpine CDP,Alpine,cdp,37.6878053,-106.5860972
+0801740,Altona CDP,Altona,cdp,40.1219295,-105.296167
+0801915,Amherst CDP,Amherst,cdp,40.6831608,-102.1725958
+0802355,Antonito town,Antonito,place,37.0762463,-106.0103317
+0802575,Applewood CDP,Applewood,cdp,39.7474807,-105.1729652
+0802850,Arapahoe CDP,Arapahoe,cdp,38.8529187,-102.1788968
+0802905,Arboles CDP,Arboles,cdp,37.0208607,-107.4217441
+0803015,Aristocrat Ranchettes CDP,Aristocrat Ranchettes,cdp,40.1084964,-104.7605754
+0803235,Arriba town,Arriba,place,39.2843261,-103.2740321
+0803455,Arvada city,Arvada,place,39.8337667,-105.1502698
+0803620,Aspen city,Aspen,place,39.1951539,-106.8368071
+0803730,Aspen Park CDP,Aspen Park,cdp,39.5426537,-105.2963075
+0803840,Atwood CDP,Atwood,cdp,40.5504848,-103.274631
+0803950,Ault town,Ault,place,40.5892081,-104.7394299
+0804000,Aurora city,Aurora,place,39.6882958,-104.6894
+0804110,Avon town,Avon,place,39.6418914,-106.5158096
+0804165,Avondale CDP,Avondale,cdp,38.2351827,-104.3482323
+0804620,Bar-K Ranch CDP,Bar-K Ranch,cdp,40.1178027,-105.4407183
+0804935,Basalt town,Basalt,place,39.3685849,-107.0487598
+0805120,Battlement Mesa CDP,Battlement Mesa,cdp,39.4527675,-108.0039402
+0805265,Bayfield town,Bayfield,place,37.2346153,-107.5937437
+0806090,Bennett town,Bennett,place,39.7419998,-104.4287068
+0806172,Berkley CDP,Berkley,cdp,39.8065948,-105.0287748
+0806255,Berthoud town,Berthoud,place,40.2898383,-104.966988
+0806530,Bethune town,Bethune,place,39.3038224,-102.4234144
+0806602,Beulah Valley CDP,Beulah Valley,cdp,38.0727103,-104.9817004
+0806970,Black Forest CDP,Black Forest,cdp,39.0636481,-104.6796135
+0807025,Black Hawk city,Black Hawk,place,39.8016491,-105.493494
+0807190,Blanca town,Blanca,place,37.4392677,-105.5135437
+0807245,Blende CDP,Blende,cdp,38.2496337,-104.5690184
+0807410,Blue River town,Blue River,place,39.4489129,-106.0366424
+0807420,Blue Sky CDP,Blue Sky,cdp,40.3000945,-103.8055283
+0807455,Blue Valley CDP,Blue Valley,cdp,39.6996875,-105.4921075
+0807571,Bonanza town,Bonanza,place,38.2966175,-106.1418689
+0807580,Bonanza Mountain Estates CDP,Bonanza Mountain Estates,cdp,39.9768904,-105.4795771
+0807795,Boone town,Boone,place,38.2506113,-104.2609482
+0807850,Boulder city,Boulder,place,40.0244306,-105.251251
+0808070,Bow Mar town,Bow Mar,place,39.6265942,-105.0509145
+0808290,Brandon CDP,Brandon,cdp,38.4463995,-102.4411549
+0808345,Branson town,Branson,place,37.0154927,-103.8837771
+0808400,Breckenridge town,Breckenridge,place,39.4994795,-106.0432471
+0808530,Brick Center CDP,Brick Center,cdp,39.5912407,-104.4608062
+0808620,Briggsdale CDP,Briggsdale,cdp,40.6360054,-104.3242723
+0808675,Brighton city,Brighton,place,39.965676,-104.7940562
+0808950,Brook Forest CDP,Brook Forest,cdp,39.5738792,-105.3943962
+0809115,Brookside town,Brookside,place,38.4134948,-105.1909453
+0809280,Broomfield city,Broomfield,place,39.953877,-105.0508975
+0809555,Brush city,Brush,place,40.2592092,-103.636283
+0810105,Buena Vista town,Buena Vista,place,38.8299032,-106.1407291
+0810600,Burlington city,Burlington,place,39.3040881,-102.2714177
+0810985,Byers CDP,Byers,cdp,39.709435,-104.2128484
+0811260,Calhan town,Calhan,place,39.0340312,-104.30021
+0811645,Campo town,Campo,place,37.1047115,-102.5787984
+0811810,Cañon City city,Cañon City,place,38.4418862,-105.2208995
+0811975,Capulin CDP,Capulin,cdp,37.2818857,-106.1049463
+0812030,Carbonate town,Carbonate,place,39.7464619,-107.3401267
+0812045,Carbondale town,Carbondale,place,39.3955593,-107.2150201
+0812325,Cascade-Chipita Park CDP,Cascade-Chipita Park,cdp,38.9434882,-104.9951805
+0812387,Castle Pines city,Castle Pines,place,39.4624955,-104.8705828
+0812393,Castle Pines Village CDP,Castle Pines Village,cdp,39.4417988,-104.897037
+0812415,Castle Rock town,Castle Rock,place,39.3766015,-104.8503742
+0812450,Cathedral CDP,Cathedral,cdp,38.0836289,-107.0306813
+0812460,Catherine CDP,Catherine,cdp,39.4037555,-107.1449593
+0812470,Cattle Creek CDP,Cattle Creek,cdp,39.4666337,-107.259917
+0812635,Cedaredge town,Cedaredge,place,38.8940974,-107.9254853
+0812815,Centennial city,Centennial,place,39.5905942,-104.863519
+0812855,Center town,Center,place,37.7522993,-106.1103645
+0812900,Central city,Central,place,39.7953801,-105.5089824
+0812945,Chacra CDP,Chacra,cdp,39.5783967,-107.4549073
+0813460,Cheraw town,Cheraw,place,38.1076604,-103.5110222
+0813590,Cherry Creek CDP,Cherry Creek,cdp,39.6094746,-104.8644745
+0813845,Cherry Hills Village city,Cherry Hills Village,place,39.6374175,-104.9474697
+0814175,Cheyenne Wells town,Cheyenne Wells,place,38.8192016,-102.35203
+0814587,Cimarron Hills CDP,Cimarron Hills,cdp,38.8584765,-104.70018
+0814765,City of Creede town,City of Creede,place,37.8485967,-106.9251456
+0815165,Clifton CDP,Clifton,cdp,39.0759897,-108.4607751
+0815302,Coal Creek CDP,Coal Creek,cdp,39.9046933,-105.3721357
+0815330,Coal Creek town,Coal Creek,place,38.3621707,-105.1421992
+0815440,Coaldale CDP,Coaldale,cdp,38.3557364,-105.813087
+0815550,Cokedale town,Cokedale,place,37.1442226,-104.6215896
+0815605,Collbran town,Collbran,place,39.2400088,-107.963517
+0815825,Colona CDP,Colona,cdp,38.32751,-107.7793058
+0815935,Colorado City CDP,Colorado City,cdp,37.9393795,-104.843082
+0816000,Colorado Springs city,Colorado Springs,place,38.8672553,-104.760749
+0816110,Columbine CDP,Columbine,cdp,39.5885857,-105.0691804
+0816385,Columbine Valley town,Columbine Valley,place,39.5936658,-105.0363285
+0816465,Comanche Creek CDP,Comanche Creek,cdp,39.606144,-104.335836
+0816495,Commerce City city,Commerce City,place,39.8827917,-104.7949081
+0816715,Conejos CDP,Conejos,cdp,37.0872571,-106.0159931
+0817100,Cope CDP,Cope,cdp,39.6642169,-102.8451273
+0817150,Copper Mountain CDP,Copper Mountain,cdp,39.4768949,-106.201113
+0817375,Cortez city,Cortez,place,37.349795,-108.5760996
+0817485,Cotopaxi CDP,Cotopaxi,cdp,38.3728059,-105.68552
+0817760,Craig city,Craig,place,40.5170604,-107.5553955
+0817925,Crawford town,Crawford,place,38.7050441,-107.609596
+0818310,Crested Butte town,Crested Butte,place,38.8677899,-106.9772606
+0818420,Crestone town,Crestone,place,37.9945285,-105.6962058
+0818530,Cripple Creek city,Cripple Creek,place,38.7465825,-105.1849812
+0818585,Crisman CDP,Crisman,cdp,40.0433817,-105.3723976
+0818640,Crook town,Crook,place,40.8587821,-102.8013805
+0818750,Crowley town,Crowley,place,38.193506,-103.8597438
+0818860,Cuchara CDP,Cuchara,cdp,37.3627308,-105.1049959
+0819080,Dacono city,Dacono,place,40.0644749,-104.9500023
+0819150,Dakota Ridge CDP,Dakota Ridge,cdp,39.6195884,-105.1326503
+0819355,De Beque town,De Beque,place,39.3099885,-108.2049994
+0819630,Deer Trail town,Deer Trail,place,39.6170001,-104.043851
+0819795,Del Norte town,Del Norte,place,37.6779751,-106.3530181
+0819850,Delta city,Delta,place,38.7573794,-108.0879891
+0820000,Denver city,Denver,place,39.7618502,-104.8811054
+0820275,Derby CDP,Derby,cdp,39.8407912,-104.9162539
+0820440,Dillon town,Dillon,place,39.6277698,-106.0442119
+0820495,Dinosaur town,Dinosaur,place,40.239861,-109.0067951
+0820605,Divide CDP,Divide,cdp,38.9450062,-105.1619493
+0820770,Dolores town,Dolores,place,37.4745838,-108.499503
+0821155,Dotsero CDP,Dotsero,cdp,39.6475944,-107.049856
+0821265,Dove Creek town,Dove Creek,place,37.7668418,-108.9071733
+0821330,Dove Valley CDP,Dove Valley,cdp,39.5749424,-104.8324066
+0821390,Downieville-Lawson-Dumont CDP,Downieville-Lawson-Dumont,cdp,39.7683901,-105.6063981
+0822035,Durango city,Durango,place,37.2645342,-107.8741239
+0822145,Eads town,Eads,place,38.4816478,-102.7798235
+0822200,Eagle town,Eagle,place,39.6432205,-106.8213438
+0822575,East Pleasant View CDP,East Pleasant View,cdp,39.7278781,-105.1565409
+0822860,Eaton town,Eaton,place,40.5256851,-104.7129871
+0822882,Echo Hills CDP,Echo Hills,cdp,39.6747384,-105.4134187
+0823025,Eckley town,Eckley,place,40.1124051,-102.4882908
+0823135,Edgewater city,Edgewater,place,39.7508502,-105.0626198
+0823300,Edwards CDP,Edwards,cdp,39.6118242,-106.6197023
+0823520,Elbert CDP,Elbert,cdp,39.2193795,-104.5396994
+0823575,Eldora CDP,Eldora,cdp,39.9582526,-105.5849796
+0823630,Eldorado Springs CDP,Eldorado Springs,cdp,39.9392659,-105.2490813
+0823740,Elizabeth town,Elizabeth,place,39.35966,-104.6085253
+0823795,El Jebel CDP,El Jebel,cdp,39.4067828,-107.0939612
+0824235,Ellicott CDP,Ellicott,cdp,38.825585,-104.3828725
+0824290,El Moro CDP,El Moro,cdp,37.2466326,-104.4531105
+0824620,Empire town,Empire,place,39.7594405,-105.6816773
+0824785,Englewood city,Englewood,place,39.6469793,-104.9944653
+0824950,Erie town,Erie,place,40.0402866,-105.0383105
+0825115,Estes Park town,Estes Park,place,40.3689078,-105.5312131
+0825280,Evans city,Evans,place,40.3501648,-104.7483547
+0825390,Evergreen CDP,Evergreen,cdp,39.6356071,-105.3380888
+0825550,Fairmount CDP,Fairmount,cdp,39.7925691,-105.1711574
+0825610,Fairplay town,Fairplay,place,39.2243319,-105.9983963
+0826270,Federal Heights city,Federal Heights,place,39.8649728,-105.0153397
+0826600,Firestone town,Firestone,place,40.1547371,-104.9475835
+0826765,Flagler town,Flagler,place,39.2966092,-103.0646424
+0826875,Fleming town,Fleming,place,40.682075,-102.8396309
+0827040,Florence city,Florence,place,38.3796151,-105.1002299
+0827095,Florissant CDP,Florissant,cdp,38.9445571,-105.2898699
+0827175,Floyd Hill CDP,Floyd Hill,cdp,39.7197135,-105.4349043
+0827370,Fort Carson CDP,Fort Carson,cdp,38.6874186,-104.7489323
+0827425,Fort Collins city,Fort Collins,place,40.5484045,-105.0649877
+0827535,Fort Garland CDP,Fort Garland,cdp,37.4279161,-105.4350076
+0827700,Fort Lupton city,Fort Lupton,place,40.083545,-104.8033675
+0827810,Fort Morgan city,Fort Morgan,place,40.2515907,-103.7832013
+0827865,Fountain city,Fountain,place,38.6893793,-104.6805183
+0827950,Four Square Mile CDP,Four Square Mile,cdp,39.6807232,-104.8879243
+0827975,Fowler town,Fowler,place,38.1306192,-104.0260959
+0828105,Foxfield town,Foxfield,place,39.5881395,-104.7857408
+0828250,Franktown CDP,Franktown,cdp,39.3903378,-104.7419132
+0828305,Fraser town,Fraser,place,39.9216934,-105.8095835
+0828360,Frederick town,Frederick,place,40.105907,-104.974497
+0828690,Frisco town,Frisco,place,39.5784824,-106.0909729
+0828745,Fruita city,Fruita,place,39.1555672,-108.7295837
+0828800,Fruitvale CDP,Fruitvale,cdp,39.0934132,-108.4788229
+0828830,Fulford CDP,Fulford,cdp,39.5184916,-106.6587404
+0829185,Garden City town,Garden City,place,40.3945914,-104.689494
+0829240,Gardner CDP,Gardner,cdp,37.7888656,-105.1644577
+0829295,Garfield CDP,Garfield,cdp,38.549268,-106.289276
+0829625,Genesee CDP,Genesee,cdp,39.6879013,-105.2712049
+0829680,Genoa town,Genoa,place,39.2782183,-103.4987169
+0829735,Georgetown town,Georgetown,place,39.7178864,-105.6944881
+0829845,Gerrard CDP,Gerrard,cdp,37.6783487,-106.5752475
+0829955,Gilcrest town,Gilcrest,place,40.2841563,-104.7820241
+0830340,Glendale city,Glendale,place,39.7030524,-104.9361568
+0830350,Glendale CDP,Glendale,cdp,40.0869113,-105.3715458
+0830420,Gleneagle CDP,Gleneagle,cdp,39.0398704,-104.8253511
+0830780,Glenwood Springs city,Glenwood Springs,place,39.5463955,-107.343287
+0830835,Golden city,Golden,place,39.742483,-105.2105614
+0830890,Goldfield CDP,Goldfield,cdp,38.7176448,-105.1253275
+0830945,Gold Hill CDP,Gold Hill,cdp,40.0597388,-105.4189186
+0831550,Granada town,Granada,place,38.062973,-102.3115911
+0831605,Granby town,Granby,place,40.0648028,-105.919386
+0831660,Grand Junction city,Grand Junction,place,39.0890618,-108.567452
+0831715,Grand Lake town,Grand Lake,place,40.246542,-105.8264348
+0831935,Grand View Estates CDP,Grand View Estates,cdp,39.5429582,-104.8226343
+0832155,Greeley city,Greeley,place,40.417205,-104.772887
+0832650,Green Mountain Falls town,Green Mountain Falls,place,38.9349535,-105.0196638
+0833035,Greenwood Village city,Greenwood Village,place,39.6159336,-104.9116883
+0833310,Grover town,Grover,place,40.869111,-104.2259321
+0833420,Guffey CDP,Guffey,cdp,38.7606505,-105.509821
+0833502,Gunbarrel CDP,Gunbarrel,cdp,40.0637487,-105.1714858
+0833640,Gunnison city,Gunnison,place,38.547978,-106.9246043
+0833695,Gypsum town,Gypsum,place,39.6201636,-106.9563569
+0834520,Hartman town,Hartman,place,38.1211277,-102.2216085
+0834630,Hartsel CDP,Hartsel,cdp,39.0226303,-105.8005695
+0834685,Hasty CDP,Hasty,cdp,38.102305,-102.9696811
+0834740,Haswell town,Haswell,place,38.4524924,-103.16498
+0834960,Haxtun town,Haxtun,place,40.6417331,-102.6298584
+0835070,Hayden town,Hayden,place,40.4922165,-107.2643245
+0835400,Heeney CDP,Heeney,cdp,39.8739875,-106.3041554
+0835860,Hidden Lake CDP,Hidden Lake,cdp,40.1051604,-105.477571
+0836410,Highlands Ranch CDP,Highlands Ranch,cdp,39.5413114,-104.9707175
+0836610,Hillrose town,Hillrose,place,40.3244951,-103.5222061
+0836940,Hoehne CDP,Hoehne,cdp,37.2814435,-104.389095
+0837215,Holly town,Holly,place,38.0556393,-102.1245886
+0837220,Holly Hills CDP,Holly Hills,cdp,39.6677274,-104.9216215
+0837270,Holyoke city,Holyoke,place,40.5820655,-102.2967609
+0837380,Hooper town,Hooper,place,37.7459759,-105.8777353
+0837545,Hotchkiss town,Hotchkiss,place,38.7989943,-107.7133849
+0837600,Hot Sulphur Springs town,Hot Sulphur Springs,place,40.0749021,-106.1031704
+0837655,Howard CDP,Howard,cdp,38.4097616,-105.8423894
+0837820,Hudson town,Hudson,place,40.0831849,-104.6200262
+0837875,Hugo town,Hugo,place,39.136179,-103.4731378
+0838370,Idaho Springs city,Idaho Springs,place,39.7487767,-105.5046707
+0838425,Idalia CDP,Idalia,cdp,39.7030002,-102.2939783
+0838480,Idledale CDP,Idledale,cdp,39.6689276,-105.2431911
+0838535,Ignacio town,Ignacio,place,37.1177841,-107.6375347
+0838590,Iliff town,Iliff,place,40.7591774,-103.0661023
+0838810,Indian Hills CDP,Indian Hills,cdp,39.6298811,-105.247461
+0838910,Inverness CDP,Inverness,cdp,39.5757724,-104.8653948
+0839160,Jackson Lake CDP,Jackson Lake,cdp,40.3700545,-104.0591728
+0839195,Jamestown town,Jamestown,place,40.1223685,-105.3935525
+0839250,Jansen CDP,Jansen,cdp,37.1581635,-104.5500895
+0839745,Joes CDP,Joes,cdp,39.6595685,-102.678471
+0839800,Johnson Village CDP,Johnson Village,cdp,38.811894,-106.1071117
+0839855,Johnstown town,Johnstown,place,40.3072482,-104.9112052
+0839965,Julesburg town,Julesburg,place,40.9848643,-102.2627077
+0840185,Keenesburg town,Keenesburg,place,40.1439196,-104.5428602
+0840377,Ken Caryl CDP,Ken Caryl,cdp,39.5767426,-105.1136952
+0840515,Kersey town,Kersey,place,40.3954712,-104.5783438
+0840550,Keystone town,Keystone,place,39.6068498,-105.9328585
+0840570,Kim town,Kim,place,37.2470622,-103.3534114
+0840790,Kiowa town,Kiowa,place,39.3436403,-104.4581425
+0840900,Kirk CDP,Kirk,cdp,39.6144929,-102.5914187
+0841010,Kit Carson town,Kit Carson,place,38.7628276,-102.795476
+0841065,Kittredge CDP,Kittredge,cdp,39.6593751,-105.3048858
+0841560,Kremmling town,Kremmling,place,40.0565421,-106.3782159
+0841835,Lafayette city,Lafayette,place,39.9948143,-105.0996758
+0842000,Laird CDP,Laird,cdp,40.0818012,-102.1018979
+0842055,La Jara town,La Jara,place,37.2735236,-105.9597208
+0842110,La Junta city,La Junta,place,37.9794141,-103.5473359
+0842165,La Junta Gardens CDP,La Junta Gardens,cdp,38.0013489,-103.5548501
+0842330,Lake City town,Lake City,place,38.0231297,-107.3112971
+0842495,Lakeside town,Lakeside,place,39.7790753,-105.057825
+0843000,Lakewood city,Lakewood,place,39.6989385,-105.1175735
+0843110,Lamar city,Lamar,place,38.0759713,-102.6147233
+0843220,Laporte CDP,Laporte,cdp,40.6388598,-105.1434554
+0843550,Larkspur town,Larkspur,place,39.2295733,-104.885679
+0843605,La Salle town,La Salle,place,40.348697,-104.7060852
+0843660,Las Animas city,Las Animas,place,38.0696677,-103.2232289
+0844100,La Veta town,La Veta,place,37.5085623,-105.0084866
+0844265,Lazear CDP,Lazear,cdp,38.7787901,-107.7804019
+0844270,Lazy Acres CDP,Lazy Acres,cdp,40.0855505,-105.3343716
+0844320,Leadville city,Leadville,place,39.2472771,-106.2934602
+0844375,Leadville North CDP,Leadville North,cdp,39.2600177,-106.3112896
+0844595,Lewis CDP,Lewis,cdp,37.5017146,-108.6600585
+0844695,Leyner CDP,Leyner,cdp,40.0520085,-105.107546
+0844980,Limon town,Limon,place,39.2650738,-103.6859106
+0845145,Lincoln Park CDP,Lincoln Park,cdp,38.4251817,-105.2130827
+0845255,Littleton city,Littleton,place,39.5903751,-105.0200838
+0845530,Lochbuie town,Lochbuie,place,40.0269256,-104.6829381
+0845680,Loghill Village CDP,Loghill Village,cdp,38.1994101,-107.7753427
+0845695,Log Lane Village town,Log Lane Village,place,40.2697341,-103.8289605
+0845750,Loma CDP,Loma,cdp,39.2075102,-108.8050249
+0845955,Lone Tree city,Lone Tree,place,39.5309647,-104.8710532
+0845970,Longmont city,Longmont,place,40.1681989,-105.1005223
+0846355,Louisville city,Louisville,place,39.9693035,-105.142686
+0846410,Louviers CDP,Louviers,cdp,39.4798657,-105.0033404
+0846465,Loveland city,Loveland,place,40.4169053,-105.0631107
+0847015,Lynn CDP,Lynn,cdp,37.4219092,-104.643061
+0847070,Lyons town,Lyons,place,40.2230503,-105.2686649
+0847235,McClave CDP,McClave,cdp,38.131547,-102.8504444
+0847345,McCoy CDP,McCoy,cdp,39.9143817,-106.7257229
+0848060,Manassa town,Manassa,place,37.1738412,-105.9372749
+0848115,Mancos town,Mancos,place,37.3466411,-108.2938407
+0848445,Manitou Springs city,Manitou Springs,place,38.8575395,-104.9128609
+0848500,Manzanola town,Manzanola,place,38.1087581,-103.8668039
+0848555,Marble town,Marble,place,39.0716645,-107.190749
+0848940,Marvel CDP,Marvel,cdp,37.1111853,-108.1263275
+0849215,Matheson CDP,Matheson,cdp,39.1683162,-103.9770183
+0849325,Maybell CDP,Maybell,cdp,40.5188271,-108.0884951
+0849490,Maysville CDP,Maysville,cdp,38.5259978,-106.2194258
+0849600,Mead town,Mead,place,40.2269992,-104.9883233
+0849875,Meeker town,Meeker,place,40.0499535,-107.8945842
+0850012,Meridian CDP,Meridian,cdp,39.5456841,-104.8533197
+0850026,Meridian Village CDP,Meridian Village,cdp,39.5280517,-104.8257826
+0850040,Merino town,Merino,place,40.4837051,-103.3536746
+0850380,Midland CDP,Midland,cdp,38.8463438,-105.15212
+0850453,Mill Creek Park CDP,Mill Creek Park,cdp,39.7894598,-105.6387849
+0850480,Milliken town,Milliken,place,40.3104983,-104.8583699
+0850920,Minturn town,Minturn,place,39.5356177,-106.3816083
+0851250,Moffat town,Moffat,place,38.0057343,-105.9101183
+0851635,Monte Vista city,Monte Vista,place,37.5785404,-106.1502131
+0851690,Montezuma town,Montezuma,place,39.5814773,-105.8676401
+0851745,Montrose city,Montrose,place,38.4687826,-107.8589592
+0851800,Monument town,Monument,place,39.0729111,-104.8470435
+0851975,Morgan Heights CDP,Morgan Heights,cdp,40.2874922,-103.8274456
+0852075,Morrison town,Morrison,place,39.6252755,-105.2086314
+0852210,Mountain Meadows CDP,Mountain Meadows,cdp,40.0270385,-105.383136
+0852350,Mountain View town,Mountain View,place,39.7747762,-105.056711
+0852550,Mountain Village town,Mountain Village,place,37.9324164,-107.8577366
+0852570,Mount Crested Butte town,Mount Crested Butte,place,38.9083021,-106.9605872
+0852820,Mulford CDP,Mulford,cdp,39.4063553,-107.1659867
+0853010,Nathrop CDP,Nathrop,cdp,38.7487401,-106.07642
+0853120,Naturita town,Naturita,place,38.2182996,-108.5663902
+0853175,Nederland town,Nederland,place,39.9638145,-105.5058636
+0853395,New Castle town,New Castle,place,39.5817109,-107.5288521
+0853780,Niwot CDP,Niwot,cdp,40.094685,-105.1592131
+0853875,No Name CDP,No Name,cdp,39.5597304,-107.2927865
+0853945,Norrie CDP,Norrie,cdp,39.3281314,-106.6562751
+0854330,Northglenn city,Northglenn,place,39.9116274,-104.9821477
+0854495,North La Junta CDP,North La Junta,cdp,37.9996078,-103.5231869
+0854750,North Washington CDP,North Washington,cdp,39.8077486,-104.9800398
+0854880,Norwood town,Norwood,place,38.1283989,-108.2922503
+0854935,Nucla town,Nucla,place,38.2666747,-108.5486981
+0855045,Nunn town,Nunn,place,40.7137098,-104.7888481
+0855155,Oak Creek town,Oak Creek,place,40.2740243,-106.9576389
+0855540,Olathe town,Olathe,place,38.6084158,-107.9832376
+0855705,Olney Springs town,Olney Springs,place,38.1662739,-103.9444914
+0855870,Ophir town,Ophir,place,37.8568103,-107.8312422
+0855925,Orchard CDP,Orchard,cdp,40.3320011,-104.117799
+0855980,Orchard City town,Orchard City,place,38.8181466,-107.9672484
+0856035,Orchard Mesa CDP,Orchard Mesa,cdp,39.037385,-108.5228358
+0856145,Ordway town,Ordway,place,38.2208343,-103.7565849
+0856365,Otis town,Otis,place,40.1501257,-102.9621381
+0856420,Ouray city,Ouray,place,38.0275433,-107.6733483
+0856475,Ovid town,Ovid,place,40.9607551,-102.3883362
+0856695,Padroni CDP,Padroni,cdp,40.7818138,-103.1732966
+0856860,Pagosa Springs town,Pagosa Springs,place,37.2634415,-107.003462
+0856970,Palisade town,Palisade,place,39.1079309,-108.3573295
+0857025,Palmer Lake town,Palmer Lake,place,39.113772,-104.9060626
+0857245,Paoli town,Paoli,place,40.6127642,-102.4717581
+0857300,Paonia town,Paonia,place,38.8697973,-107.5920843
+0857400,Parachute town,Parachute,place,39.4466327,-108.0549221
+0857445,Paragon Estates CDP,Paragon Estates,cdp,39.9807574,-105.1851869
+0857465,Park Center CDP,Park Center,cdp,38.485177,-105.2261357
+0857630,Parker town,Parker,place,39.5092091,-104.7718968
+0857850,Parshall CDP,Parshall,cdp,40.0555622,-106.1759954
+0858235,Peetz town,Peetz,place,40.9618226,-103.1138091
+0858400,Penrose CDP,Penrose,cdp,38.4212977,-105.0003951
+0858510,Peoria CDP,Peoria,cdp,39.6533345,-104.1369773
+0858592,Perry Park CDP,Perry Park,cdp,39.2604559,-104.9678395
+0858675,Peyton CDP,Peyton,cdp,39.0329789,-104.490402
+0858785,Phippsburg CDP,Phippsburg,cdp,40.2302564,-106.9505963
+0858960,Piedra CDP,Piedra,cdp,37.4417952,-107.1684271
+0859005,Pierce town,Pierce,place,40.6475838,-104.7800508
+0859240,Pine Brook Hill CDP,Pine Brook Hill,cdp,40.0384129,-105.3075263
+0859520,Pine Valley CDP,Pine Valley,cdp,39.6909381,-105.4132282
+0859830,Pitkin town,Pitkin,place,38.6087216,-106.5149184
+0859885,Placerville CDP,Placerville,cdp,38.0053145,-108.0398346
+0860160,Platteville town,Platteville,place,40.2229046,-104.8300047
+0860600,Poncha Springs town,Poncha Springs,place,38.5212308,-106.0720995
+0860655,Ponderosa Park CDP,Ponderosa Park,cdp,39.3986498,-104.6354942
+0860765,Portland CDP,Portland,cdp,38.0892216,-107.6952341
+0861315,Pritchett town,Pritchett,place,37.3700091,-102.8587491
+0862000,Pueblo city,Pueblo,place,38.267479,-104.6134288
+0862220,Pueblo West CDP,Pueblo West,cdp,38.3158297,-104.7849722
+0862660,Ramah town,Ramah,place,39.1214265,-104.1673133
+0862880,Rangely town,Rangely,place,40.087011,-108.78326
+0863045,Raymer (New Raymer) town,Raymer (New Raymer),place,40.6079568,-103.843576
+0863265,Red Cliff town,Red Cliff,place,39.5092996,-106.3699372
+0863320,Red Feather Lakes CDP,Red Feather Lakes,cdp,40.8094743,-105.578991
+0863375,Redlands CDP,Redlands,cdp,39.084956,-108.6549605
+0863650,Redstone CDP,Redstone,cdp,39.180281,-107.238289
+0863705,Redvale CDP,Redvale,cdp,38.1760636,-108.4125079
+0864090,Rico town,Rico,place,37.6890861,-108.0316773
+0864200,Ridgway town,Ridgway,place,38.1571781,-107.7545967
+0864255,Rifle city,Rifle,place,39.5375645,-107.7703439
+0864870,Rock Creek Park CDP,Rock Creek Park,cdp,38.7010678,-104.8347023
+0864970,Rockvale town,Rockvale,place,38.3644246,-105.1645233
+0865190,Rocky Ford city,Rocky Ford,place,38.0498841,-103.7221017
+0865685,Rollinsville CDP,Rollinsville,cdp,39.9231871,-105.5135504
+0865740,Romeo town,Romeo,place,37.1718223,-105.9854148
+0866197,Roxborough Park CDP,Roxborough Park,cdp,39.4447626,-105.0768805
+0866895,Rye town,Rye,place,37.9212833,-104.9319349
+0866995,Saddle Ridge CDP,Saddle Ridge,cdp,40.3130711,-103.8022967
+0867005,Saguache town,Saguache,place,38.0862704,-106.1410529
+0867040,St. Ann Highlands CDP,St. Ann Highlands,cdp,39.987297,-105.4558063
+0867142,St. Mary's CDP,St. Mary's,cdp,39.8165309,-105.6471377
+0867280,Salida city,Salida,place,38.5301175,-105.9984006
+0867445,Salt Creek CDP,Salt Creek,cdp,38.2406934,-104.5866449
+0867500,San Acacio CDP,San Acacio,cdp,37.2086339,-105.5666382
+0867830,Sanford town,Sanford,place,37.2574068,-105.9007664
+0868105,San Luis town,San Luis,place,37.2023749,-105.4225062
+0868655,Sawpit town,Sawpit,place,37.9947175,-108.0021356
+0868847,Security-Widefield CDP,Security-Widefield,cdp,38.7511302,-104.7160225
+0868875,Sedalia CDP,Sedalia,cdp,39.4397047,-104.9699086
+0868930,Sedgwick town,Sedgwick,place,40.9355117,-102.5256366
+0868985,Segundo CDP,Segundo,cdp,37.1225204,-104.7397385
+0869040,Seibert town,Seibert,place,39.297967,-102.8695241
+0869110,Seven Hills CDP,Seven Hills,cdp,40.0337023,-105.3307484
+0869150,Severance town,Severance,place,40.5059438,-104.8634755
+0869480,Shaw Heights CDP,Shaw Heights,cdp,39.8575303,-105.0390854
+0869645,Sheridan city,Sheridan,place,39.6471175,-105.01935
+0869700,Sheridan Lake town,Sheridan Lake,place,38.4667098,-102.2943993
+0869810,Sherrelwood CDP,Sherrelwood,cdp,39.8382511,-105.0023155
+0870112,Sierra Ridge CDP,Sierra Ridge,cdp,39.5285911,-104.8172452
+0870195,Silt town,Silt,place,39.5479782,-107.6527362
+0870250,Silver Cliff town,Silver Cliff,place,38.1292026,-105.3991749
+0870360,Silver Plume town,Silver Plume,place,39.6953724,-105.7270214
+0870525,Silverthorne town,Silverthorne,place,39.6648013,-106.0934528
+0870580,Silverton town,Silverton,place,37.810808,-107.6650128
+0870635,Simla town,Simla,place,39.1408473,-104.0825036
+0871625,Smeltertown CDP,Smeltertown,cdp,38.5523224,-106.0084169
+0871755,Snowmass Village town,Snowmass Village,place,39.2168821,-106.9439684
+0871790,Snyder CDP,Snyder,cdp,40.3308246,-103.5919708
+0871845,Somerset CDP,Somerset,cdp,38.9288098,-107.4649835
+0872320,Southern Ute CDP,Southern Ute,cdp,37.0748875,-107.5933083
+0872395,South Fork town,South Fork,place,37.6691859,-106.6428506
+0873330,Springfield town,Springfield,place,37.4049137,-102.6188979
+0873715,Starkville town,Starkville,place,37.1168261,-104.5232955
+0873825,Steamboat Springs city,Steamboat Springs,place,40.4755779,-106.8229188
+0873925,Stepping Stone CDP,Stepping Stone,cdp,39.5147472,-104.8221571
+0873935,Sterling city,Sterling,place,40.6204866,-103.1925816
+0873943,Sterling Ranch CDP,Sterling Ranch,cdp,39.4932274,-105.0475076
+0874080,Stonegate CDP,Stonegate,cdp,39.5337825,-104.7998413
+0874275,Stonewall Gap CDP,Stonewall Gap,cdp,37.1604728,-105.0342008
+0874375,Strasburg CDP,Strasburg,cdp,39.7207091,-104.3181873
+0874430,Stratmoor CDP,Stratmoor,cdp,38.7719574,-104.7777733
+0874485,Stratton town,Stratton,place,39.3028841,-102.6034704
+0874815,Sugar City town,Sugar City,place,38.2327735,-103.663312
+0874980,Sugarloaf CDP,Sugarloaf,cdp,40.0188747,-105.4076689
+0875585,Sunshine CDP,Sunshine,cdp,40.0636504,-105.369584
+0875640,Superior town,Superior,place,39.9311898,-105.1590853
+0875970,Swink town,Swink,place,38.0140683,-103.6281624
+0876190,Tabernash CDP,Tabernash,cdp,39.9787625,-105.8440505
+0876325,Tall Timber CDP,Tall Timber,cdp,40.0151495,-105.3498216
+0876795,Telluride town,Telluride,place,37.9402333,-107.8181523
+0877235,The Pinery CDP,The Pinery,cdp,39.4483961,-104.7495345
+0877290,Thornton city,Thornton,place,39.920433,-104.9414128
+0877510,Timnath town,Timnath,place,40.5359147,-104.9643609
+0877757,Todd Creek CDP,Todd Creek,cdp,39.9787128,-104.8683185
+0878280,Towaoc CDP,Towaoc,cdp,37.2125992,-108.7264608
+0878335,Towner CDP,Towner,cdp,38.4703998,-102.0804546
+0878345,Trail Side CDP,Trail Side,cdp,40.248952,-103.8433192
+0878610,Trinidad city,Trinidad,place,37.1762435,-104.4902909
+0879100,Twin Lakes CDP,Twin Lakes,cdp,39.8227191,-105.0039688
+0879105,Twin Lakes CDP,Twin Lakes,cdp,39.103707,-106.3189855
+0879270,Two Buttes town,Two Buttes,place,37.5606642,-102.3965556
+0879785,Upper Bear Creek CDP,Upper Bear Creek,cdp,39.6268805,-105.4096908
+0879800,Upper Witter Gulch CDP,Upper Witter Gulch,cdp,39.6610664,-105.426833
+0880040,Vail town,Vail,place,39.6377804,-106.362463
+0880095,Valdez CDP,Valdez,cdp,37.125794,-104.672861
+0880370,Valmont CDP,Valmont,cdp,40.035518,-105.2056445
+0880755,Vernon CDP,Vernon,cdp,39.9395519,-102.3069223
+0880865,Victor city,Victor,place,38.7087383,-105.1418865
+0881030,Vilas town,Vilas,place,37.3736643,-102.4474163
+0881305,Vineland CDP,Vineland,cdp,38.2447376,-104.4598659
+0881690,Vona town,Vona,place,39.3021195,-102.7433515
+0882130,Walden town,Walden,place,40.731584,-106.2813362
+0882350,Walsenburg city,Walsenburg,place,37.6305976,-104.7817194
+0882460,Walsh town,Walsh,place,37.3861073,-102.2799334
+0882735,Ward town,Ward,place,40.0730548,-105.514704
+0882900,Watkins CDP,Watkins,cdp,39.698399,-104.5772232
+0883120,Welby CDP,Welby,cdp,39.840216,-104.9655082
+0883175,Weldona CDP,Weldona,cdp,40.3484079,-103.969365
+0883230,Wellington town,Wellington,place,40.6976523,-105.0062553
+0883450,Westcliffe town,Westcliffe,place,38.1342035,-105.4653063
+0883500,Westcreek CDP,Westcreek,cdp,39.1489338,-105.1623027
+0883835,Westminster city,Westminster,place,39.8801223,-105.0615135
+0884000,Weston CDP,Weston,cdp,37.1459233,-104.8682835
+0884042,West Pleasant View CDP,West Pleasant View,cdp,39.7319321,-105.1784601
+0884440,Wheat Ridge city,Wheat Ridge,place,39.7726754,-105.1048006
+0884770,Wiggins town,Wiggins,place,40.2284207,-104.0727989
+0885045,Wiley town,Wiley,place,38.154585,-102.7192492
+0885155,Williamsburg town,Williamsburg,place,38.3839838,-105.170993
+0885485,Windsor town,Windsor,place,40.4781874,-104.9152601
+0885705,Winter Park town,Winter Park,place,39.8787303,-105.7827704
+0885760,Wolcott CDP,Wolcott,cdp,39.7035715,-106.6793009
+0886090,Woodland Park city,Woodland Park,place,38.9982124,-105.0590191
+0886117,Woodmoor CDP,Woodmoor,cdp,39.1048258,-104.8435905
+0886200,Woody Creek CDP,Woody Creek,cdp,39.2708728,-106.8883312
+0886310,Wray city,Wray,place,40.0799203,-102.2285971
+0886475,Yampa town,Yampa,place,40.1530051,-106.9085272
+0886668,York Gulch CDP,York Gulch,cdp,39.8004879,-105.5721795
+0886750,Yuma city,Yuma,place,40.1225105,-102.7156364
