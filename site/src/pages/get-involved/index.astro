@@ -83,8 +83,9 @@ const STEPS: readonly { icon: IconName; title: string; body: string }[] = [
               <span class="step__icon" set:html={icon(s.icon)} />
               <span class="step__n" aria-hidden="true">
                 {i + 1}
-              </span>
-              <h3>{s.title}</h3>
+              </span>{" "}
+              {/* The spaces keep the step's text as separate words: "3 Meet Paul If it looks like a fit". */}
+              <h3>{s.title}</h3>{" "}
               <p>{s.body}</p>
             </li>
           ))
@@ -171,6 +172,8 @@ const STEPS: readonly { icon: IconName; title: string; body: string }[] = [
     width: 72px;
     height: 72px;
     border-radius: 50%;
+    /* The gold ring keeps the night circle visible on a dark band (dark theme). */
+    border: var(--line-bold) solid var(--c-accent);
     background: var(--c-night);
     color: var(--c-gold-on-night);
   }
