@@ -27,7 +27,7 @@ const id = `theme-${theme.region}`;
     class="theme__art"
     src={art.src}
     srcset={art.srcset}
-    sizes="(max-width: 760px) 100vw, 33vw"
+    sizes="(max-width: 760px) 720px, 33vw"
     width={art.width}
     height={art.height}
     alt={PLACE_ART_ALT[theme.place]}
@@ -46,7 +46,6 @@ const id = `theme-${theme.region}`;
   </div>
   <div class="theme__body">
     <h3 id={id}>{theme.title}</h3>
-    <p class="theme__region">{theme.regionName}</p>
     <div class="theme__tiles">
       {theme.tiles.map((t) => <StatTile {...t} />)}
     </div>
@@ -138,9 +137,6 @@ const id = `theme-${theme.region}`;
   .theme__body h3,
   .theme__body p {
     margin: 0;
-  }
-  .theme__region {
-    color: var(--c-text-dim);
   }
   .theme__tiles {
     display: grid;
