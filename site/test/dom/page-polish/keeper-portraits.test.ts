@@ -8,7 +8,7 @@ import { type KeeperId, portraitAlt } from "../../../src/components/art/keepers"
 import { readDist, SITE_DIR } from "../pages";
 
 // Page polish (#209): the small keeper portrait beside each keeper's name on
-// the home page, the welcome desk (/ and /community/) and the Publicus intro
+// the home page's keeper strip, the welcome desk (/community/) and the Publicus intro
 // on /dispatches/. Each portrait's alt text says the keeper is an AI agent,
 // and each visible disclosure line stays.
 
@@ -34,22 +34,19 @@ function expectSmallPortrait(scope: Element, id: KeeperId) {
   expect(img?.getAttribute("alt"), id).toMatch(/an AI agent/);
 }
 
-describe("home keeper teasers", () => {
-  const main = doc("index.html").querySelector("main")!;
+describe("home keeper strip", () => {
+  const strip = doc("index.html").querySelector("main [data-keeper-strip]")!;
 
-  it("head every keeper card with its small portrait, and keep the badge and the disclosure", () => {
+  it("shows every keeper's small portrait, and names each one an AI agent", () => {
     for (const k of dwarves) {
-      const card = main.querySelector(`[data-keeper="${k.id}"]`)!;
-      expectSmallPortrait(card, k.id);
-      expect(text(card.querySelector("h3"))).toBe(k.name);
-      expect(text(card.querySelector(".hall-card__badges"))).toContain("AI agent");
-      expect(text(card.querySelector(".ai-note"))).toBe(k.disclosure);
+      expectSmallPortrait(strip.querySelector(`[data-face="${k.id}"]`)!, k.id);
+      expect(text(strip)).toContain(k.name);
     }
+    expect(text(strip)).toContain("are AI agents");
   });
 });
 
 describe.each([
-  ["home", "index.html"],
   ["/community/", "community/index.html"],
 ])("welcome desk on %s", (_name, rel) => {
   const desk = doc(rel).querySelector(".welcome-desk")!;

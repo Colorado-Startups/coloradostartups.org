@@ -49,7 +49,7 @@ const cardImages = (file: string) =>
   });
 
 describe("region art sizes (mobile LCP on /regions/)", () => {
-  it.each(["regions/index.html", "index.html"])("%s: each card asks for the 720w file at the lab's 412 px", (file) => {
+  it.each(["regions/index.html"])("%s: each card asks for the 720w file at the lab's 412 px", (file) => {
     for (const img of cardImages(file)) {
       expect(drawnWidth(img.getAttribute("sizes")!, LAB.width)).toBe(360);
       expect(pickedWidth(img)).toBe(720);

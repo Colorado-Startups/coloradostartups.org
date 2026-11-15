@@ -8,7 +8,7 @@ import { portraitAlt } from "../../../src/components/art/keepers";
 import { readDist, SITE_DIR } from "../pages";
 
 // L5b (#209): the Ask Resourcus panel shows Resourcus's small portrait beside
-// its heading, on the home page and on Startup Resources. The alt text says
+// its heading, on /ask/ and on Startup Resources. The alt text says
 // Resourcus is an AI agent, and the panel keeps its disclosure line. Built
 // HTML from dist/ (run `npm run build` first).
 
@@ -23,7 +23,7 @@ const resourcus = (
 const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
 
 describe.each([
-  ["home", "index.html"],
+  ["/ask/", "ask/index.html"],
   ["/ecosystem-canvas/", "ecosystem-canvas/index.html"],
 ])("Ask Resourcus panel on %s", (_name, rel) => {
   const panel = new DOMParser().parseFromString(readDist(rel), "text/html").querySelector("main [data-resourcus]")!;

@@ -26,14 +26,16 @@ let doc: Document;
 let desk: HTMLElement;
 
 beforeAll(() => {
-  doc = new DOMParser().parseFromString(readDist("index.html"), "text/html");
+  doc = new DOMParser().parseFromString(readDist("community/index.html"), "text/html");
   desk = doc.querySelector<HTMLElement>(".welcome-desk")!;
 });
 
 const isWayIn = (href: string) =>
   Object.values(WAYS_IN).includes(href) || href.startsWith(`${WAYS_IN.canvas}#`);
 
-describe("welcome desk on the home page", () => {
+// The full desk sits on /community/; the home page dropped its compact copy
+// in the redesign (2026-11-15).
+describe("welcome desk on /community/", () => {
   it("is on the page, with a heading that labels it", () => {
     expect(desk).not.toBeNull();
     const labelledBy = desk.getAttribute("aria-labelledby")!;
