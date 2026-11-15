@@ -7,6 +7,7 @@ paths:
   - "site/src/components/resourcus/**"
   - "site/src/components/communitas/**"
   - "site/src/components/hall/**"
+  - "site/src/components/home/KeeperStrip.astro"
   - "site/src/components/ui/SiteFooter.astro"
   - "site/src/pages/community/**"
   - "site/src/pages/team/**"
@@ -28,7 +29,7 @@ Every keeper (the dwarves and the gnome) is disclosed as an AI agent wherever it
 | --- | --- |
 | `disclosure` field (the schema requires it), rendered on the Team page (`KeeperCard`), in `ResourcusPanel` and in `WelcomeDesk` | `data/team/dwarves.yaml` |
 | Keeper portraits: alt text from `portraitAlt()`, which says "AI agent" | `site/src/components/art/keepers.ts` |
-| Home page keeper teasers (`KeeperTeasers.astro`, used in `site/src/pages/index.astro`), the Team page (`site/src/pages/team/index.astro`), `/community/`, `/dispatches/` | `site/src/components/hall/KeeperTeasers.astro` and those pages |
+| The home page's keeper strip (`KeeperStrip.astro`, used in `site/src/pages/index.astro`), the `/ask/` line on Resourcus, the Team page (`site/src/pages/team/index.astro`), `/community/`, `/dispatches/` | `site/src/components/home/KeeperStrip.astro` and those pages |
 | The model-readable site summary | `site/public/llms.txt` |
 | Open Graph cards whose art is a keeper portrait; the card text must say "AI agent" | `art/og/cards.txt`, built by `scripts/og/build.mjs` |
 | The `.ai-note` paragraph on every page | `site/src/components/ui/SiteFooter.astro` |

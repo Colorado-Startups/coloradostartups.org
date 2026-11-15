@@ -8,6 +8,11 @@
 //      has drawn.
 // Zones come from data/geo/regions.geojson (US Census places). The region
 // cards beside the map are its list alternative.
+//
+// `live` (default true) marks the figure for the live map. The loader itself
+// is <LiveMaps /> (LiveMaps.astro), which a page adds once: MapLibre is far
+// past a page's 75 KB JavaScript goal, so a page that shows only the drawing,
+// such as the home page, ships none of it.
 import { coloradoMapSvg, MAP_HEIGHT, MAP_WIDTH } from "../../lib/regions/colorado-map";
 
 interface Props {
@@ -15,36 +20,36 @@ interface Props {
   id: string;
   /** Accessible name for the map. */
   label?: string;
-  /** One short line under the map. */
+  /** One short line under the map; empty for none. */
   caption?: string;
+  /** Load the live map over the drawing (the page must also render <LiveMaps />). */
+  live?: boolean;
 }
 
 const {
   id,
   label = "Map of Colorado with the three Colorado Startups regions outlined",
   caption = "Photon Mountain, Fusion Canyon and Space Peak along the Front Range.",
+  live = true,
 } = Astro.props;
 const description =
   "Photon Mountain covers Boulder, Golden, Arvada and Denver. Fusion Canyon covers Fort Collins, Loveland, Windsor and Greeley. Space Peak covers Colorado Springs.";
 const svg = coloradoMapSvg({ label, description });
 ---
 
-<figure class="colorado-map" id={id} data-colorado-map style={`--map-ratio: ${MAP_WIDTH} / ${MAP_HEIGHT}`}>
+<figure class="colorado-map" id={id} data-colorado-map={live ? "" : undefined} style={`--map-ratio: ${MAP_WIDTH} / ${MAP_HEIGHT}`}>
   <div class="colorado-map__box">
     <div class="colorado-map__drawing" set:html={svg} />
-    <div class="colorado-map__live" data-map-canvas data-label={label}></div>
+    {live && <div class="colorado-map__live" data-map-canvas data-label={label} />}
   </div>
   <p class="colorado-map__desc visually-hidden">{description}</p>
   <figcaption>
-    <span>{caption}</span>
-    <small>Zones from US Census places, a proposal, not a legal line. Basemap © OpenMapTiles, data © OpenStreetMap contributors.</small>
+    {caption && <span>{caption}</span>}
+    <small>
+      Zones from US Census places, a proposal, not a legal line.{live && " Basemap © OpenMapTiles, data © OpenStreetMap contributors."}
+    </small>
   </figcaption>
 </figure>
-
-<script>
-  import { mountColoradoMaps } from "./colorado-map.client";
-  mountColoradoMaps();
-</script>
 
 <style>
   .colorado-map {

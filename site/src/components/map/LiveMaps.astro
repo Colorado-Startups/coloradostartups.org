@@ -1,0 +1,10 @@
+---
+// The live map loader. A page that shows a live ColoradoMap renders this once.
+// It lazy-loads MapLibre (colorado-map.client.ts) when a map nears the screen;
+// a page without it ships none of MapLibre, and its maps stay drawings.
+---
+
+<script>
+  import { mountColoradoMaps } from "./colorado-map.client";
+  mountColoradoMaps();
+</script>

@@ -1,0 +1,51 @@
+---
+// One Explore tile: an icon, a live count and what it counts, as one link.
+// The icons are 24 px line drawings in the link color; they mark, not decorate.
+interface Props {
+  href: string;
+  count: number;
+  label: string;
+  icon: "book" | "trophy" | "calendar" | "compass";
+}
+const { href, count, label, icon } = Astro.props;
+
+const PATHS: Record<Props["icon"], string[]> = {
+  book: ["M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z", "M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"],
+  trophy: ["M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z", "M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"],
+  calendar: ["M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z", "M3 10h18M8 3v4M16 3v4"],
+  compass: ["M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18z", "M15.5 8.5l-2 5-5 2 2-5z"],
+};
+---
+
+<a class="explore panel" href={href}>
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    {PATHS[icon].map((d) => <path d={d} />)}
+  </svg>
+  <span class="explore__count">{count}</span>
+  <span class="explore__label">{label}</span>
+</a>
+
+<style>
+  .explore {
+    display: grid;
+    gap: var(--s-1);
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .explore svg {
+    color: var(--ink-community, var(--c-community));
+  }
+  .explore__count {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-4);
+    line-height: 1;
+  }
+  .explore__label {
+    font-weight: 700;
+  }
+  .explore:hover .explore__label,
+  .explore:focus-visible .explore__label {
+    text-decoration: underline;
+  }
+</style>

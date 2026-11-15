@@ -13,13 +13,16 @@ export interface NavItem {
   also?: readonly string[];
 }
 
+// The order follows a first visit (redesign, 2026-11-15): where, what to use,
+// who builds here, when to meet, the people, then asking the data. Team, Get
+// involved and the newsletter sit under Community; the footer lists them too.
 export const NAV: readonly NavItem[] = [
-  { href: "/community/", label: "Community" },
+  { href: "/regions/", label: "Regions" },
   { href: "/ecosystem-canvas/", label: "Startup Resources", also: [GUIDES_INDEX.path] },
   { href: "/leaderboard/", label: "Leaderboard" },
-  { href: "/regions/", label: "Regions" },
-  { href: "/team/", label: "Team" },
-  { href: "/get-involved/", label: "Get involved" },
+  { href: "/event-calendar/", label: "Events" },
+  { href: "/community/", label: "Community", also: ["/team/", "/get-involved/", "/newsletter/"] },
+  { href: "/ask/", label: "Ask" },
 ];
 
 /** True when the page at `pathname` sits in this item's section. */

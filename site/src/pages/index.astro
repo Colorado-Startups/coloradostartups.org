@@ -1,193 +1,309 @@
 ---
-// The Hall (home). Owner: L1. Founders first (decision 46): in a few seconds a
-// Colorado founder should know this community is for them and how to get in.
+// Home. A first-time visitor's Colorado, in the order Paul set on 2026-11-15
+// and signed off as a mockup: join, where, why Colorado, explore, ask, and the
+// keepers last. About 200 visible words; pictures, maps and numbers carry it.
 //
-// Order: the hero and its art slot; the four ways in; the welcome desk, the
-// Resourcus panel and the newsletter; then teasers for Startup Resources, the
-// Leaderboard, the three regions and the keepers. The keepers come last: they
-// are the fun around the founders, not the point.
+// - Join: one gold action, Join the Slack, with the LinkedIn Group beside it.
+//   Join the Slack opens a Google Form, and the note under it says so (#128).
+// - Where: the statewide map as its drawing (ColoradoMap, live={false}: no
+//   MapLibre here, for the 75 KB JavaScript goal) and a chip per region.
+// - Why Colorado: three panels, each with three figures from facts.yaml and
+//   its source line (home-data.ts). No figure without a source.
+// - Explore: live counts from the same data the pages use.
+// - Ask: a search box that opens /ask/ with the words, and the /mcp address.
+// - Keepers: the AI agents, disclosed (KeeperStrip, an ai-disclosure surface).
 //
-// The hero has one gold action, Join the Slack; the other two ways in are
-// quiet links beside it (#201). Two sections carry a Banner, Ways in and
-// Where to start, so the section titles do not all read alike.
-//
-// The Leaderboard teaser never mentions investing (decision 17), and no line
-// here states a member count.
+// The Leaderboard is never tied to investing (decision 17), and no line here
+// states a member count.
 import { WAYS_IN } from "@cs/shared";
 
-import WelcomeDesk from "../components/communitas/WelcomeDesk.astro";
+import { brandArt } from "../components/art/art-assets";
 import { HALL_ART_ALT } from "../components/art/keepers";
-import HeroArt from "../components/hall/HeroArt.astro";
-import KeeperTeasers from "../components/hall/KeeperTeasers.astro";
 import { DESCRIPTOR, homeJsonLd } from "../components/hall/org";
-import RegionTeasers from "../components/hall/RegionTeasers.astro";
-import WaysIn from "../components/hall/WaysIn.astro";
-import Badge from "../components/ui/Badge.astro";
-import Banner from "../components/ui/Banner.astro";
+import ExploreTile from "../components/home/ExploreTile.astro";
+import { homeCounts, themes } from "../components/home/home-data";
+import KeeperStrip from "../components/home/KeeperStrip.astro";
+import ThemePanel from "../components/home/ThemePanel.astro";
+import ColoradoMap from "../components/map/ColoradoMap.astro";
 import Button from "../components/ui/Button.astro";
-import Card from "../components/ui/Card.astro";
-import NewsletterSignup from "../components/newsletter/NewsletterSignup.astro";
-import ResourcusPanel from "../components/resourcus/ResourcusPanel.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { REGION_COLORS } from "../lib/regions/map";
+import { REGIONS } from "../lib/regions/match";
 
 const site = Astro.site!;
-const description = `${DESCRIPTOR} Join the Slack and the LinkedIn Group, find startup resources and meet the founders building here.`;
+const description = `${DESCRIPTOR} Join the Slack and the LinkedIn Group, see Colorado's three startup regions, and find startup resources.`;
+const hero = brandArt("brand/golden")!;
+const counts = await homeCounts();
+const mcpUrl = new URL("/mcp", site).toString();
 ---
 
 <BaseLayout title="Colorado Startups" description={description} ogImage="home" jsonLd={homeJsonLd(site)}>
-  <section class="hero" aria-labelledby="hall-title">
-    <div class="wrap hero-copy">
-      <h1 id="hall-title">Colorado Startups</h1>
-      <p class="lede">
-        Meet the founders building companies in Colorado, and find what your company needs next.
-      </p>
-      <p class="welcome-too">Talent, investors, lenders and service providers who back founders are welcome too.</p>
+  <section class="hero" aria-labelledby="home-title">
+    <div class="hero__art" data-art="brand/golden">
+      <img
+      src={hero.src}
+      srcset={hero.srcset}
+      sizes="100vw"
+      width={hero.width}
+      height={hero.height}
+      alt={HALL_ART_ALT}
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      />
+    </div>
+    <div class="wrap hero__copy">
+      <h1 id="home-title">Colorado Startups</h1>
+      <p class="lede">Meet the founders building companies in Colorado.</p>
       <div class="btn-row">
         <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
-        <Button variant="quiet" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
-        <Button variant="quiet" href={WAYS_IN.newsletter}>Get the newsletter</Button>
+        <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
       </div>
       <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
     </div>
-    <div class="wrap hero-art">
-      <HeroArt alt={HALL_ART_ALT} />
-    </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="ways-in">
-    <div class="wrap">
-      <Banner tone="sky" id="ways-in">Ways in</Banner>
-      <p class="intro">Four places to meet the community. Start with the one that fits how you work.</p>
-      <WaysIn />
-      <p class="forum-note">
-        Coming later: a private forum for founders only.{" "}
-        <a href={WAYS_IN.discourse}>Read about the founders forum</a>
-      </p>
-    </div>
-  </section>
-
-  <section class="section section--lit" aria-labelledby="start">
-    <div class="wrap">
-      <h2 id="start">Start here</h2>
-      <div class="pair">
-        <WelcomeDesk compact />
-        <ResourcusPanel compact />
+  <section class="section section--lit" aria-labelledby="where">
+    <div class="wrap where">
+      <div class="where__copy">
+        <h2 id="where">Three regions along the Front Range</h2>
+        <ul class="region-links" role="list">
+          {
+            REGIONS.map((r) => (
+              <li>
+                <a class="region-link" href={`/regions/${r.id}/`} style={`--region-color: ${REGION_COLORS[r.id]}`}>
+                  <span class="region-link__swatch" aria-hidden="true" />
+                  <span class="region-link__name">{r.name}</span>
+                  <span class="region-link__cities">{r.cities.slice(0, 2).join(" · ")}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-      <div class="signup">
-        <NewsletterSignup variant="inline" returnTo="/" />
+      <ColoradoMap id="home-map" live={false} caption="" />
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="why">
+    <div class="wrap">
+      <h2 id="why">Why Colorado</h2>
+      <div class="themes">
+        {themes().map((theme) => <ThemePanel theme={theme} />)}
       </div>
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="rooms">
+  <section class="section section--lit" aria-labelledby="explore">
     <div class="wrap">
-      <Banner variant="lintel" id="rooms">Where to start</Banner>
-      <ul class="hall-grid rooms" role="list">
-        <Card element="li" title="Startup Resources" data-teaser="resources">
-          <Badge slot="badges">Directory</Badge>
-          <p>
-            Programs, accelerators, investors and service providers for every stage of a company, mapped by the
-            community. Ask a question in plain words and get the resources that fit.
-          </p>
-          <Button slot="actions" href={WAYS_IN.canvas}>Browse Startup Resources</Button>
-        </Card>
-        <Card element="li" title="The Leaderboard" data-teaser="leaderboard">
-          <Badge slot="badges">Leaderboard gallery</Badge>
-          <p>
-            The Leaderboard recognizes companies building in Colorado and their founders. Every listing links to the
-            sources we used.
-          </p>
-          <Button slot="actions" href={WAYS_IN.leaderboard}>See the Leaderboard</Button>
-          <Button slot="actions" variant="secondary" href="/leaderboard/nominate/">Nominate your company</Button>
-        </Card>
+      <h2 id="explore">Explore</h2>
+      <ul class="explore-grid" role="list">
+        <li><ExploreTile href={WAYS_IN.canvas} count={counts.resources} label="Startup Resources" icon="book" /></li>
+        <li><ExploreTile href={WAYS_IN.leaderboard} count={counts.companies} label="Leaderboard companies" icon="trophy" /></li>
+        <li><ExploreTile href={WAYS_IN.events} count={counts.events} label="Upcoming events" icon="calendar" /></li>
+        <li><ExploreTile href="/guides/" count={counts.guides} label="Founder guides" icon="compass" /></li>
       </ul>
     </div>
   </section>
 
-  <section class="section section--lit" aria-labelledby="regions">
-    <div class="wrap">
-      <h2 id="regions">Three regions</h2>
-      <p class="intro">
-        Colorado Startups has three regions along the Front Range. Each one has a Connector seat for a person,
-        never a keeper.
-      </p>
-      <RegionTeasers />
-      <p class="after">
-        Building elsewhere in Colorado? Everything here is yours too.{" "}
-        <a href="/regions/">See all regions</a>
-      </p>
+  <section class="section section--night" aria-labelledby="ask">
+    <div class="wrap ask">
+      <div class="stack">
+        <h2 id="ask">Ask</h2>
+        <form class="ask__form" action="/ask/" method="get" role="search">
+          <label for="home-q">Search resources, companies, guides and events</label>
+          <div class="ask__row">
+            <input id="home-q" name="q" type="search" autocomplete="off" />
+            <Button type="submit">Search</Button>
+          </div>
+        </form>
+        <p class="meta">Or <a href="/ask/">ask Resourcus</a>, an AI agent.</p>
+      </div>
+      <div class="stack connect">
+        <h3>Connect your AI</h3>
+        <p>Claude and OpenCode can search the site. Free, no key.</p>
+        <code>{mcpUrl}</code>
+        <a class="tap-target" href="/ask/#connect">How to connect</a>
+      </div>
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="keepers">
+  <section class="section section--band keepers" aria-label="The keepers">
     <div class="wrap">
-      <h2 id="keepers">The keepers</h2>
-      <p class="intro">
-        Three AI agents help around Colorado Startups. They welcome newcomers, map resources and draft the news. People run
-        the community, and every moderator and organizer seat is for a person.
-      </p>
-      <KeeperTeasers />
-      <div class="btn-row after">
-        <Button variant="secondary" href="/team/">Meet the team</Button>
-        <Button variant="secondary" href="/get-involved/">See open positions</Button>
-      </div>
+      <KeeperStrip />
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* The note under the Slack button says where it goes (#128). */
-  #slack-form-note {
-    margin: var(--s-3) 0 0;
-  }
+  /* The hero: Golden's painting under a night veil, so white text holds 4.5:1
+     on its lightest pixel at every width. */
   .hero {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: min(36rem, 80vh);
     padding-block: var(--s-8) var(--s-7);
+    background: var(--c-night);
+    color: var(--c-on-night);
+    isolation: isolate;
+    --ink-link: var(--c-gold-on-night);
+    --focus-ring: var(--c-focus-on-night);
+  }
+  .hero__art {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .hero__art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background:
-      radial-gradient(90% 70% at 50% 0%, color-mix(in oklab, var(--c-accent) 28%, transparent), transparent 70%),
-      var(--c-ground);
+      linear-gradient(to top, var(--c-night) 0%, color-mix(in oklab, var(--c-night) 70%, transparent) 45%, transparent 85%),
+      linear-gradient(to right, color-mix(in oklab, var(--c-night) 75%, transparent), transparent 70%);
   }
   .hero h1 {
-    margin-bottom: var(--s-4);
+    margin: 0 0 var(--s-3);
+    color: var(--c-on-night);
   }
   .hero .lede {
-    margin-bottom: var(--s-3);
-  }
-  .welcome-too {
-    color: var(--c-text-dim);
     margin-bottom: var(--s-5);
+    color: var(--c-on-night);
   }
-  /* The quiet links already stand 44 px tall, so wrapped rows sit closer. */
-  .hero .btn-row {
-    row-gap: var(--s-1);
+  .hero .meta {
+    margin: var(--s-3) 0 0;
+    color: var(--c-on-night-dim);
   }
-  .hero-art {
-    margin-top: var(--s-7);
+
+  .where {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--s-6);
+    align-items: center;
   }
-  .intro {
+  .region-links {
+    display: grid;
+    gap: var(--s-2);
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .region-link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-1) var(--s-3);
+    min-height: var(--size-tap);
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .region-link__swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--r-chisel);
+    background: var(--region-color);
+  }
+  .region-link__name {
+    font-weight: 700;
+  }
+  .region-link__cities {
+    margin-left: auto;
     color: var(--c-text-dim);
-    margin-bottom: var(--s-5);
+    font-size: var(--t-step--1);
   }
-  .forum-note,
-  .after {
+  .region-link:hover .region-link__name,
+  .region-link:focus-visible .region-link__name {
+    text-decoration: underline;
+  }
+
+  .themes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
     margin-top: var(--s-5);
-    margin-bottom: 0;
   }
-  /* The welcome desk and Ask Resourcus stretch to one height, as on
-     /community/ (#213), so the pair ends on one line (#723). */
-  .pair {
+
+  /* A list gets the reading measure by default (global.css); this one is a grid. */
+  .region-links,
+  .explore-grid {
+    max-width: none;
+  }
+  .explore-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-4);
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ask {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-5);
+    gap: var(--s-7);
+    align-items: start;
   }
-  .signup {
-    margin-top: var(--s-5);
+  .ask h2,
+  .ask h3 {
+    color: var(--c-on-night);
   }
-  .rooms {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .ask__form label {
+    display: block;
+    margin-bottom: var(--s-2);
+    color: var(--c-on-night-dim);
+  }
+  .ask__row {
+    display: flex;
+    gap: var(--s-2);
+  }
+  .ask__row input {
+    flex: 1;
+    min-width: 0;
+    min-height: var(--size-control);
+    padding-inline: var(--s-3);
+    border: var(--line-edge) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    background: var(--c-night-ceiling);
+    color: var(--c-on-night);
+    font: inherit;
+  }
+  .ask .meta {
+    color: var(--c-on-night-dim);
+  }
+  .connect code {
+    display: block;
+    overflow-wrap: anywhere;
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-chisel);
+    background: var(--c-night-ceiling);
+    color: var(--c-gold-on-night);
+  }
+
+  .keepers {
+    padding-block: var(--s-6);
+  }
+
+  @media (max-width: 960px) {
+    .themes {
+      grid-template-columns: 1fr;
+    }
+    .explore-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
   @media (max-width: 760px) {
-    .pair,
-    .rooms {
+    .where,
+    .ask {
       grid-template-columns: 1fr;
     }
   }

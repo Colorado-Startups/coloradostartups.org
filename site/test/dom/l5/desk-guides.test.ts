@@ -22,7 +22,7 @@ const DOORS = [
   ["building", WAYS_IN["guide-accelerators"]],
 ] as const;
 
-describe.each(["index.html", "community/index.html"])("the welcome desk on %s", (file) => {
+describe.each(["community/index.html"])("the welcome desk on %s", (file) => {
   const desk = new DOMParser().parseFromString(readDist(file), "text/html").querySelector(".welcome-desk")!;
   const door = (id: string) =>
     [...desk.querySelectorAll("details")].find((d) => d.querySelector("summary")?.textContent?.trim() === label(id));

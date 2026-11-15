@@ -63,59 +63,64 @@ describe("home page", () => {
     expect(home.querySelector('meta[name="description"]')?.getAttribute("content")?.startsWith(DESCRIPTOR)).toBe(true);
   });
 
-  it("lists the four ways in, each through WAYS_IN", () => {
-    const hrefs = [...main.querySelectorAll(".ways-in .way-action")].map((a) => a.getAttribute("href"));
-    expect(hrefs).toEqual([WAYS_IN.slack, WAYS_IN["linkedin-group"], WAYS_IN["linkedin-page"], WAYS_IN.newsletter]);
+  // The redesign (2026-11-15): a first visit joins first, then sees where,
+  // why Colorado, what to explore and how to ask, with the keepers last.
+  it("offers the Slack and the LinkedIn Group first, each through WAYS_IN", () => {
+    const hrefs = [...main.querySelectorAll(".hero a.btn")].map((a) => a.getAttribute("href"));
+    expect(hrefs).toEqual([WAYS_IN.slack, WAYS_IN["linkedin-group"]]);
   });
 
-  it("places the compact welcome desk and the compact Resourcus panel", () => {
-    expect(main.querySelector('.welcome-desk[data-compact="true"]')).not.toBeNull();
-    expect(main.querySelector('[data-resourcus][data-compact="true"]')).not.toBeNull();
+  it("draws the statewide map, with no live-map script on the page", () => {
+    expect(main.querySelector("#home-map svg[role='img']")).not.toBeNull();
+    expect(main.querySelector("[data-colorado-map]")).toBeNull();
   });
 
-  it("teases Startup Resources and the Leaderboard, and never ties the Leaderboard to investing", () => {
-    const resources = main.querySelector('[data-teaser="resources"]')!;
-    const leaderboard = main.querySelector('[data-teaser="leaderboard"]')!;
-    expect(resources.querySelector(`a[href="${WAYS_IN.canvas}"]`)).not.toBeNull();
-    expect(leaderboard.querySelector(`a[href="${WAYS_IN.leaderboard}"]`)).not.toBeNull();
-    expect(text(leaderboard)).not.toMatch(/invest|fund|capital/i);
-  });
-
-  // #186: the home cards were a copy of RegionCard with a CSS ridge where the
-  // art goes. They are RegionCard now, so they match /regions/, art included.
-  it("shows each region as the same card /regions/ shows, with its art", () => {
-    const regionsPage = new DOMParser().parseFromString(readDist("regions/index.html"), "text/html");
-    for (const id of REGION_IDS) {
-      const card = main.querySelector(`[data-region='${id}']`);
-      expect(card?.querySelector("[data-art] img"), id).not.toBeNull();
-      expect(text(card), id).toBe(text(regionsPage.querySelector(`[data-region='${id}']`)));
-    }
-  });
-
-  it("teases the three regions from data/regions, in order, each linking to its page", () => {
+  it("links the three regions from data/regions, in order, each linking to its page", () => {
     const regions = REGION_IDS.map((id) => yamlFile<{ id: string; name: string; order: number }>(`data/regions/${id}.yaml`))
       .sort((a, b) => a.order - b.order);
-    const cards = [...main.querySelectorAll("[data-region]")];
-    expect(cards.map((c) => c.getAttribute("data-region"))).toEqual(regions.map((r) => r.id));
-    for (const [i, card] of cards.entries()) {
-      expect(text(card.querySelector("h3"))).toBe(regions[i]!.name);
-      expect(card.querySelector(`a[href="/regions/${regions[i]!.id}/"]`)).not.toBeNull();
+    const chips = [...main.querySelectorAll(".region-link")];
+    expect(chips.map((c) => c.getAttribute("href"))).toEqual(regions.map((r) => `/regions/${r.id}/`));
+    expect(chips.map((c) => text(c.querySelector(".region-link__name")))).toEqual(regions.map((r) => r.name));
+  });
+
+  it("shows three Why Colorado panels, each with three figures and their sources", () => {
+    const panels = [...main.querySelectorAll(".theme")];
+    expect(panels).toHaveLength(3);
+    for (const panel of panels) {
+      const stats = [...panel.querySelectorAll(".stat")];
+      expect(stats).toHaveLength(3);
+      for (const stat of stats) {
+        expect(text(stat.querySelector(".stat__value"))).not.toBe("");
+        expect(text(stat.querySelector(".stat__source"))).not.toBe("");
+      }
     }
   });
 
-  it("teases every keeper with its own AI disclosure from dwarves.yaml", () => {
-    const keepers = yamlFile<{ id: string; name: string; disclosure: string }[]>("data/team/dwarves.yaml");
-    const cards = [...main.querySelectorAll("[data-keeper]")];
-    expect(cards).toHaveLength(keepers.length);
+  it("counts the four Explore tiles, each linking to its page", () => {
+    const tiles = [...main.querySelectorAll(".explore")];
+    expect(tiles.map((t) => t.getAttribute("href"))).toEqual([WAYS_IN.canvas, WAYS_IN.leaderboard, WAYS_IN.events, "/guides/"]);
+    for (const tile of tiles) expect(Number(text(tile.querySelector(".explore__count")))).toBeGreaterThan(0);
+  });
+
+  it("never ties the Leaderboard to investing", () => {
+    for (const a of main.querySelectorAll(`a[href="${WAYS_IN.leaderboard}"]`)) expect(text(a)).not.toMatch(/invest|fund|capital/i);
+  });
+
+  it("sends the Ask box to /ask/ and shows the /mcp address", () => {
+    const form = main.querySelector("form[role='search']");
+    expect(form?.getAttribute("action")).toBe("/ask/");
+    expect(form?.querySelector("input[name='q']")).not.toBeNull();
+    expect(text(main.querySelector(".connect code"))).toMatch(/\/mcp$/);
+  });
+
+  it("names every keeper as an AI agent, in words and in each portrait's alt text", () => {
+    const keepers = yamlFile<{ id: string; name: string }[]>("data/team/dwarves.yaml");
+    const strip = main.querySelector("[data-keeper-strip]")!;
+    expect(text(strip)).toContain("are AI agents");
     for (const keeper of keepers) {
-      const card = main.querySelector(`[data-keeper="${keeper.id}"]`);
-      expect(text(card?.querySelector("h3"))).toBe(keeper.name);
-      expect(text(card?.querySelector(".ai-note"))).toBe(keeper.disclosure);
+      expect(text(strip), keeper.id).toContain(keeper.name);
+      expect(strip.querySelector(`[data-face="${keeper.id}"] img`)?.getAttribute("alt"), keeper.id).toContain("AI agent");
     }
-  });
-
-  it("points to the founders forum", () => {
-    expect(main.querySelector('a[href="/founders/"]')).not.toBeNull();
   });
 });
 

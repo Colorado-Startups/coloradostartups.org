@@ -26,7 +26,7 @@ const INVESTING = doorLabel("investing");
 
 test.describe("welcome desk", () => {
   test("opening a door shows its steps, and opening another closes the first", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/community/");
     const desk = page.locator(DESK);
     const idea = desk.locator("details", { has: page.getByText(IDEA, { exact: true }) });
     const investing = desk.locator("details", { has: page.getByText(INVESTING, { exact: true }) });
@@ -41,7 +41,7 @@ test.describe("welcome desk", () => {
   });
 
   test("investors are never pointed at the Leaderboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/community/");
     const investing = page.locator(DESK).locator("details", { has: page.getByText(INVESTING, { exact: true }) });
     await investing.locator("summary").click();
     const hrefs = await investing.getByRole("link").evaluateAll((links) => links.map((a) => a.getAttribute("href")));
@@ -50,7 +50,7 @@ test.describe("welcome desk", () => {
   });
 
   test("works by keyboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/community/");
     const summary = page.locator(`${DESK} summary`).first();
     await summary.focus();
     await page.keyboard.press("Enter");
@@ -58,7 +58,7 @@ test.describe("welcome desk", () => {
   });
 
   test("passes axe, color contrast included", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/community/");
     // Open every door so axe sees the steps too.
     for (const summary of await page.locator(`${DESK} summary`).all()) await summary.click();
     const results = await new AxeBuilder({ page }).include(DESK).analyze();
@@ -70,7 +70,7 @@ test.describe("welcome desk without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
   test("still opens doors and shows steps", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/community/");
     const door = page.locator(`${DESK} details`).first();
     await door.locator("summary").click();
     await expect(door).toHaveAttribute("open", "");

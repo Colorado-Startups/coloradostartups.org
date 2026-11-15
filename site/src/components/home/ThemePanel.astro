@@ -1,0 +1,81 @@
+---
+// One Why Colorado panel: the region's place painting, three sourced figures,
+// and two ways on, to the region and to its Leaderboard honorees. The
+// painting stands in for the theme's clip until the brand ships it.
+import { brandArt } from "../art/art-assets";
+import { PLACE_ART_ALT } from "../art/keepers";
+import { REGION_COLORS } from "../../lib/regions/map";
+import type { Theme } from "./home-data";
+import StatTile from "./StatTile.astro";
+
+interface Props {
+  theme: Theme;
+}
+const { theme } = Astro.props;
+const art = brandArt(`brand/${theme.place}`)!;
+const id = `theme-${theme.region}`;
+---
+
+<article class="theme panel" aria-labelledby={id} style={`--theme-color: ${REGION_COLORS[theme.region]}`}>
+  <img
+    class="theme__art"
+    src={art.src}
+    srcset={art.srcset}
+    sizes="(max-width: 760px) 100vw, 33vw"
+    width={art.width}
+    height={art.height}
+    alt={PLACE_ART_ALT[theme.place]}
+    loading="lazy"
+    decoding="async"
+  />
+  <div class="theme__body">
+    <h3 id={id}>{theme.title}</h3>
+    <p class="theme__region">{theme.regionName}</p>
+    <div class="theme__tiles">
+      {theme.tiles.map((t) => <StatTile {...t} />)}
+    </div>
+    <p class="theme__links">
+      <a class="tap-target" href={`/regions/${theme.region}/`}>Explore {theme.regionName}</a>
+      <a class="tap-target" href="/leaderboard/">{theme.honorees} of the 2026 honorees</a>
+    </p>
+  </div>
+</article>
+
+<style>
+  .theme {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    padding: 0;
+    overflow: hidden;
+    border-top: var(--line-bold) solid var(--theme-color);
+  }
+  .theme__art {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .theme__body {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    padding: var(--s-5);
+  }
+  .theme__body h3,
+  .theme__body p {
+    margin: 0;
+  }
+  .theme__region {
+    color: var(--c-text-dim);
+  }
+  .theme__tiles {
+    display: grid;
+    gap: var(--s-4);
+  }
+  .theme__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+  }
+</style>
