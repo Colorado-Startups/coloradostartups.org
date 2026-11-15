@@ -177,70 +177,48 @@ describe("community page", () => {
   const community = doc("community");
   const main = community.querySelector("main")!;
 
-  it("puts founders first, then the startup community that backs them", () => {
-    const audiences = [...main.querySelectorAll("[data-audience]")].map((el) => el.getAttribute("data-audience"));
-    expect(audiences).toEqual(["founders", "backers"]);
-    const backers = text(main.querySelector('[data-audience="backers"]'));
-    for (const who of ["Talent", "Investors and lenders", "Service providers"]) expect(backers).toContain(who);
+  it("puts founders first, then the people who back them, in one line (decision 46)", () => {
+    expect(text(main.querySelector(".lede"))).toMatch(/^For founders building companies in Colorado, and the people who back them\.$/);
   });
 
-  it("sends service providers' offers to the Wednesday Asks and Offers thread", () => {
-    const backers = main.querySelector('[data-audience="backers"]')!;
-    const providers = [...backers.querySelectorAll("dt")].find((dt) => text(dt) === "Service providers");
-    expect(text(providers?.nextElementSibling)).toMatch(/Wednesday Asks and Offers thread/);
-  });
-
-  it("gives every channel what to expect, its norms and a way in", () => {
-    const channels = [...main.querySelectorAll("[data-channel]")];
-    expect(channels.map((c) => c.getAttribute("data-channel"))).toEqual([
-      "slack",
-      "linkedin-group",
-      "linkedin-page",
-      "newsletter",
-      "events",
-      "founders-forum",
-    ]);
-    for (const c of channels) {
-      expect(c.querySelector("h3")).not.toBeNull();
-      expect(c.querySelectorAll(".norms li").length).toBeGreaterThan(0);
-      expect(c.querySelector("a.action")?.getAttribute("href")).toBeTruthy();
+  it("shows the brand's crest banner, both sizes, with alt text", () => {
+    const banner = main.querySelector<HTMLImageElement>(".hero__banner");
+    expect(banner?.getAttribute("src")).toBe("/art/brand/banner-480x600.png");
+    expect(banner?.getAttribute("srcset")).toContain("/art/brand/banner-960x1200.png 960w");
+    expect(banner?.getAttribute("alt")).toMatch(/crest/);
+    for (const file of ["banner-480x600.png", "banner-960x1200.png"]) {
+      expect(existsSync(path.join(DIST_DIR, "art/brand", file)), file).toBe(true);
     }
   });
 
-  it("discloses Communitas as an AI agent where the Slack card names it", () => {
-    const dwarves = yamlFile<{ id: string; disclosure: string }[]>("data/team/dwarves.yaml");
-    const slack = main.querySelector('[data-channel="slack"]')!;
-    expect(text(slack)).toContain("Communitas");
-    expect(text(slack.querySelector(".ai-note"))).toBe(dwarves.find((d) => d.id === "communitas")!.disclosure);
+  it("offers the four ways in as channel tiles, each through WAYS_IN with one action", () => {
+    const channels = [...main.querySelectorAll("[data-channel]")];
+    expect(channels.map((c) => c.getAttribute("data-channel"))).toEqual(["slack", "linkedin-group", "linkedin-page", "newsletter"]);
+    for (const c of channels) {
+      const kind = c.getAttribute("data-channel") as keyof typeof WAYS_IN;
+      expect(c.querySelector("h3")).not.toBeNull();
+      expect(c.querySelector(".channel__icon svg")).not.toBeNull();
+      expect([...c.querySelectorAll("a.btn")].map((a) => a.getAttribute("href"))).toEqual([WAYS_IN[kind]]);
+    }
+    // The Slack tile holds the page's one gold button.
+    expect([...main.querySelectorAll("a.btn--gold")].map((a) => a.closest("[data-channel]")?.getAttribute("data-channel"))).toEqual([
+      "slack",
+    ]);
   });
 
-  it("links the Code of Conduct", () => {
+  it("shows the Code of Conduct's three promotion rules as icons, says people moderate, and links the Code", () => {
+    const rules = [...main.querySelectorAll("[data-rules] li")];
+    expect(rules.map((li) => text(li.querySelector("strong")))).toEqual(["Promote in One Place", "No Investment Offers", "No Cold Pitches"]);
+    for (const li of rules) expect(li.querySelector("svg[aria-hidden='true']")).not.toBeNull();
+    expect(text(main)).toContain("People moderate. The AI keepers never do.");
     expect(main.querySelector('a[href="/code-of-conduct/"]')).not.toBeNull();
-  });
-
-  it("lists every open community and region seat from positions.yaml, community-wide seats first", () => {
-    const positions = yamlFile<{ title: string; area: string; region?: string; status: string }[]>(
-      "data/team/positions.yaml",
-    );
-    const open = positions.filter((p) => p.status === "open" && ["community", "region"].includes(p.area));
-    const seats = [...main.querySelectorAll("[data-seats] li strong")].map((s) => text(s).replace(/\.$/, ""));
-    expect([...seats].sort()).toEqual(open.map((p) => p.title).sort());
-    const firstRegion = seats.findIndex((title) => open.find((p) => p.title === title)?.area === "region");
-    const lastCommunity = seats.findLastIndex((title) => open.find((p) => p.title === title)?.area === "community");
-    expect(lastCommunity).toBeLessThan(firstRegion);
-    // Region seats follow the regions' own order.
-    const regionSeats = seats.slice(firstRegion).map((title) => open.find((p) => p.title === title)!.region);
-    const regionOrder = REGION_IDS.map((id) => yamlFile<{ id: string; order: number }>(`data/regions/${id}.yaml`))
-      .sort((a, b) => a.order - b.order)
-      .map((r) => r.id)
-      .filter((id) => regionSeats.includes(id));
-    expect(regionSeats).toEqual(regionOrder);
     expect(main.querySelector('a[href="/get-involved/"]')).not.toBeNull();
   });
 
-  it("places the full welcome desk and a newsletter form that returns here", () => {
+  it("places the full welcome desk, and leaves the newsletter form to /newsletter/", () => {
     expect(main.querySelector('.welcome-desk[data-compact="false"]')).not.toBeNull();
-    expect(main.querySelector("form[data-newsletter]")?.getAttribute("data-return-to")).toBe("/community/");
+    expect(main.querySelector("form[data-newsletter]")).toBeNull();
+    expect(main.querySelector('[data-channel="newsletter"] a.btn')?.getAttribute("href")).toBe("/newsletter/");
   });
 });
 

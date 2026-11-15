@@ -1,25 +1,28 @@
 ---
-// /get-involved/: the open positions people fill (decision 44). Owner: L9.
-// Every position in data/team/positions.yaml renders here, grouped community,
-// regions, projects, in the shared comparePositions() order: region seats by
-// region order, the rest by title. A seat with an open `apply` block links to
-// the application form at /get-involved/apply/?role=<id> (L19); every other
-// seat's "Email us about this seat" is an email to info@. No "paid", "hiring" or "job"
-// wording on this page, and "volunteer" only on the four seats that take
-// applications (decisions 44 and 67). A DOM test checks both.
+// /get-involved/: raise a hand (decision 44; Paul, 2026-11-15: visual first,
+// few words). Owner: L9.
 //
-// The first screen holds one gold button, "See open seats", and the group
-// jumps beside it as quiet buttons (#229). Each is 44 px tall, the tap target
-// floor .tap-target gives other standalone links (#420).
-// test/dom/l9/team.test.ts checks the first screen.
+// - The first screen holds one gold button, "See open seats", and the group
+//   jumps beside it as quiet buttons (#229), each 44 px tall (#420).
+// - Three steps as icons. Step 3 promises an interview only if it looks like
+//   a fit (test/dom/l38/interview.test.ts).
+// - Every position in data/team/positions.yaml as a SeatCard, grouped
+//   community, regions, projects, in the shared comparePositions() order.
+//   A seat with an open `apply` block links its seat page and the form at
+//   /get-involved/apply/?role=<id> (L19); every other open seat emails info@.
+//
+// No "paid", "hiring" or "job" wording on this page, and "volunteer" only on
+// the four seats that take applications (decisions 44 and 67).
+// test/dom/l9/team.test.ts checks both, and the first screen.
 import { comparePositions } from "@cs/shared";
 import { getCollection } from "astro:content";
 
-import PositionCard from "../../components/positions/PositionCard.astro";
 import { groupByArea, holderOf, RAISE_HAND_EMAIL } from "../../components/positions/positions";
+import SeatCard from "../../components/positions/SeatCard.astro";
 import Button from "../../components/ui/Button.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { REGIONS } from "../../lib/regions/match";
+import { icon, type IconName } from "../../lib/seats/icons";
 
 const regions = [...REGIONS];
 const positions = (await getCollection("positions")).map((e) => e.data).sort(comparePositions(regions));
@@ -28,6 +31,12 @@ const groups = groupByArea(positions);
 // "See open seats" lands on the first group, where the seat list starts (#229).
 const firstGroup = groups[0];
 const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I would like to help")}`;
+
+const STEPS: readonly { icon: IconName; title: string; body: string }[] = [
+  { icon: "compass", title: "Pick a seat", body: "Each card says what it gives you." },
+  { icon: "door", title: "Raise your hand", body: "Apply online, or email us about the seat." },
+  { icon: "handshake", title: "Meet Paul", body: "If it looks like a fit, Paul sets up an interview." },
+];
 ---
 
 <BaseLayout
@@ -38,11 +47,7 @@ const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I 
   <section class="section section--band" aria-labelledby="involved-title">
     <div class="wrap stack">
       <h1 id="involved-title">Get involved</h1>
-      <p class="lede">People run this community. Pick a seat that fits you, and raise your hand.</p>
-      <p>
-        Every moderator and organizer seat is for a person. The AI keepers help with the work, and they never
-        moderate.
-      </p>
+      <p class="lede">People run this community. Pick a seat and raise your hand.</p>
       <div class="btn-row lead-actions">
         {
           firstGroup && (
@@ -69,18 +74,22 @@ const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I 
   </section>
 
   <section class="section section--lit" aria-labelledby="how-title">
-    <div class="wrap stack">
-      <h2 id="how-title">How to raise your hand</h2>
-      <p>
-        Some seats take an application. Their "Apply for this seat" button opens a short form. First you finish the
-        free Claude Academy courses the seat's card lists, each with its length. <a href="/team/">Paul Foley</a>, our
-        founder, reads every application. If it looks like a fit, Paul sets up an interview.
-      </p>
-      <p>
-        Every other seat's "Email us about this seat" button opens an email to <strong class="email">{RAISE_HAND_EMAIL}</strong>{" "}
-        with the seat in the subject. Tell us a little about yourself, where you are in Colorado and what you are
-        building. A person reads every note.
-      </p>
+    <div class="wrap">
+      <h2 id="how-title">How it works</h2>
+      <ol class="steps">
+        {
+          STEPS.map((s, i) => (
+            <li class="step">
+              <span class="step__icon" set:html={icon(s.icon)} />
+              <span class="step__n" aria-hidden="true">
+                {i + 1}
+              </span>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
     </div>
   </section>
 
@@ -94,10 +103,9 @@ const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I 
       >
         <div class="wrap stack">
           <h2 id={`${g.anchor}-title`}>{g.label}</h2>
-          <p>{g.intro}</p>
           <ul class="hall-grid seat-grid" aria-label={`${g.label} positions`}>
             {g.positions.map((position) => (
-              <PositionCard position={position} holder={holderOf(position, people)} element="li" />
+              <SeatCard position={position} holder={holderOf(position, people)} />
             ))}
           </ul>
         </div>
@@ -107,10 +115,8 @@ const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I 
 
   <section class="section section--lit" aria-labelledby="other-title">
     <div class="wrap stack">
-      <h2 id="other-title">Want to help another way?</h2>
-      <p>
-        Tell us what you would like to do. Write to <strong class="email">{RAISE_HAND_EMAIL}</strong>.
-      </p>
+      <h2 id="other-title">Help another way</h2>
+      <p>Tell us what you would like to do at <strong class="email">{RAISE_HAND_EMAIL}</strong>.</p>
       <p class="btn-row">
         <Button variant="stone" href={generalHref}>Email Colorado Startups</Button>
       </p>
@@ -132,7 +138,70 @@ const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I 
     flex-wrap: wrap;
     gap: var(--s-3);
   }
-  /* L12's .hall-grid, with tracks wide enough for a seat's list. auto-fit
+
+  /* Three steps in a row, joined by a gold rule; a column on a phone. */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
+    max-width: none;
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: none;
+  }
+  .step {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: var(--s-2);
+    text-align: center;
+  }
+  .step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 36px;
+    left: calc(50% + 48px);
+    right: calc(-50% + 48px - var(--s-5));
+    border-top: var(--line-bold) dashed var(--c-accent-deep);
+  }
+  .step__icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--c-night);
+    color: var(--c-gold-on-night);
+  }
+  .step__icon :global(svg) {
+    width: 36px;
+    height: 36px;
+  }
+  .step__n {
+    position: absolute;
+    top: -4px;
+    left: calc(50% + 20px);
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+    font-weight: 800;
+    font-size: var(--t-step--1);
+  }
+  .step h3 {
+    margin: var(--s-2) 0 0;
+    font-size: var(--t-step-1);
+  }
+  .step p {
+    margin: 0;
+    color: var(--c-text-dim);
+  }
+
+  /* L12's .hall-grid, with tracks wide enough for a seat card. auto-fit
      drops empty tracks, so a short row spans the width (#207). */
   .seat-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
@@ -146,5 +215,38 @@ const generalHref = `mailto:${RAISE_HAND_EMAIL}?subject=${encodeURIComponent("I 
   }
   .email {
     overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 760px) {
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .step {
+      grid-template-columns: auto minmax(0, 1fr);
+      justify-items: start;
+      align-items: center;
+      column-gap: var(--s-4);
+      row-gap: 0;
+      text-align: left;
+    }
+    .step__icon {
+      grid-row: span 2;
+      width: 56px;
+      height: 56px;
+    }
+    .step__icon :global(svg) {
+      width: 28px;
+      height: 28px;
+    }
+    .step__n {
+      top: -6px;
+      left: 38px;
+    }
+    .step h3 {
+      margin: 0;
+    }
+    .step:not(:last-child)::after {
+      display: none;
+    }
   }
 </style>

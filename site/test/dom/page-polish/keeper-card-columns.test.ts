@@ -1,6 +1,6 @@
 // Page polish, #255, over the built site (run `npm run build` first;
 // test:content does). On wide screens each keeper card on /team/ sets its
-// text in two columns: title, role and bio on the left, the lists and the
+// text in two columns: title, role and bio on the left, what it can help with and the
 // disclosure on the right. The columns are two wrappers in source order, so
 // the disclosure still closes the card for a screen reader (hard constraint
 // 10). The breakpoint rule itself is checked in
@@ -34,8 +34,8 @@ describe("/team/ keeper cards in two columns (#255)", () => {
         expect(main?.querySelectorAll(":scope > p").length).toBe(3);
       });
 
-      it("puts the lists in the side column and ends it with the disclosure, visible", () => {
-        expect(side?.querySelector(".keeper__lists")).not.toBeNull();
+      it("puts what it can help with in the side column and ends it with the disclosure, visible", () => {
+        expect(side?.querySelector("details.keeper__help li")).not.toBeNull();
         const disclosure = side?.lastElementChild;
         expect(disclosure?.matches("[data-disclosure]")).toBe(true);
         expect(text(disclosure)).toContain("AI agent");

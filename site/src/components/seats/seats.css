@@ -126,25 +126,6 @@
   border-radius: var(--r-card);
   background: var(--c-ground);
 }
-.seat-plaque {
-  max-width: 46rem;
-  padding: var(--s-4) var(--s-5);
-  background: var(--c-stone);
-  border: var(--line-hair) solid var(--c-stone-edge);
-  border-radius: var(--r-bevel-sm);
-  box-shadow: var(--sh-ledge);
-}
-.seat-plaque > * {
-  margin: 0;
-}
-.seat-plaque > * + * {
-  margin-top: var(--s-2);
-}
-.seat-plaque ul:not(.seat-pills) {
-  padding-left: 1.2em;
-  display: grid;
-  gap: var(--s-2);
-}
 .seat-pills {
   display: flex;
   flex-wrap: wrap;

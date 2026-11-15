@@ -1,10 +1,10 @@
 // The seat layouts' types, section order and shared fact lists (layouts.ts and
-// layouts/<seat>.ts). Every page answers the kit README's five questions in
-// SECTION_ORDER, so a page cannot skip or swap one.
+// layouts/<seat>.ts). Every page answers three questions in SECTION_ORDER
+// (Paul, 2026-11-15: what, why, apply), so a page cannot skip or swap one.
 import type { IconName } from "./icons";
 import type { MapRegion, NetworkSeat } from "./viz";
 
-export const SECTION_ORDER = ["get", "network", "colorado", "who", "apply"] as const;
+export const SECTION_ORDER = ["what", "why", "apply"] as const;
 export type SectionKey = (typeof SECTION_ORDER)[number];
 
 interface Tile {
@@ -36,15 +36,8 @@ export type Block =
   | { kind: "tiles"; tiles: readonly Tile[]; caption?: string }
   | { kind: "week"; label: string; days: readonly Day[]; caption: string }
   | { kind: "keeperFlow"; keeper: FlowCard; you: FlowCard & { title: string; icon: IconName } }
-  | { kind: "plaque"; title?: string; lines: readonly string[]; pills?: readonly string[] }
-  /** A plaque that ends with roles.json's org.lead, such as "You work with Paul Foley, Founder & President." */
-  | { kind: "leadPlaque"; before: string }
-  | { kind: "lede"; text: string }
-  | { kind: "note"; text: string }
   | { kind: "split"; left: readonly Block[]; right: readonly Block[] }
   | { kind: "bring"; heading: string }
-  | { kind: "lookFor"; heading: string }
-  | { kind: "rules"; heading: string }
   | { kind: "steps" }
   | { kind: "courses"; intro?: string }
   | { kind: "apply"; heading: string };

@@ -8,7 +8,6 @@ import { builtPages, readDist } from "../pages";
 
 const FORMS = {
   "newsletter/index.html": "/api/subscribe",
-  "community/index.html": "/api/subscribe",
   "ecosystem-canvas/suggest/index.html": "/api/suggest-resource",
   "get-involved/apply/index.html": "/api/apply",
   "leaderboard/nominate/index.html": "/api/nominate",

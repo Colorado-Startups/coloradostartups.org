@@ -1,250 +1,253 @@
 ---
-// /community/: who the community is for, where it meets and its norms.
+// /community/: pick a channel (Paul, 2026-11-15: visual first, few words).
 // Owner: L1. 301 target for /overview and /social-groups (ops/redirects).
 //
-// Founders first, then the startup community that backs them (decision 46).
-// Each channel says what to expect and its norms (channels.ts). The Code of
-// Conduct page belongs to L13. People fill every moderator and organizer seat;
-// the open ones come from data/team/positions.yaml (L9 renders them in full on
-// /get-involved/).
-import { comparePositions, WAYS_IN } from "@cs/shared";
-import { getCollection, getEntry } from "astro:content";
-
+// - The brand's crest banner (brand v4.0.0, dist/logo/banner-*.png, pinned in
+//   brand.lock.json) and one line: founders first, then the people who back
+//   them (decision 46).
+// - Four channel tiles: the ways in, from WAYS (ways.ts), so every href comes
+//   from WAYS_IN. The Slack tile holds the one gold button.
+// - Three house rules as icons: the Code of Conduct's "Promotion and limits"
+//   rules, titles word for word from code-of-conduct.ts. People moderate.
+// - The welcome desk, with Communitas disclosed as an AI agent (WelcomeDesk).
+//
+// No line here states a member count.
+import { CONDUCT_GROUPS } from "../../components/info/code-of-conduct";
+import ChannelTile from "../../components/community/ChannelTile.astro";
+import { communityIcon, type RuleIcon } from "../../components/community/icons";
 import WelcomeDesk from "../../components/communitas/WelcomeDesk.astro";
 import { CHANNELS } from "../../components/hall/channels";
-import NewsletterSignup from "../../components/newsletter/NewsletterSignup.astro";
-import Badge from "../../components/ui/Badge.astro";
-import Banner from "../../components/ui/Banner.astro";
-import Button from "../../components/ui/Button.astro";
-import Card from "../../components/ui/Card.astro";
+import { WAYS } from "../../components/hall/ways";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { REGIONS } from "../../lib/regions/match";
 
-const communitas = await getEntry("dwarves", "communitas");
-if (!communitas) throw new Error("data/team/dwarves.yaml has no communitas entry");
-const disclosures = { communitas: communitas.data.disclosure };
+// The tiles follow WAYS, the four ways in; each draws its icon from its channel.
+const tiles = WAYS.map((way) => CHANNELS.find((c) => c.id === way.kind)!);
 
-// getCollection returns positions sorted by id, not in file order. The shared
-// comparePositions() puts the community-wide seats first, then each region's
-// seat in region order, the same order /get-involved/ uses (L15).
-const regions = [...REGIONS];
-const openSeats = (await getCollection("positions"))
-  .map((p) => p.data)
-  .filter((p) => p.status === "open" && (p.area === "community" || p.area === "region"))
-  .sort(comparePositions(regions));
+// The three promotion rules, each with an icon and a few words of its own body.
+const RULE_ART: Record<string, { icon: RuleIcon; note: string }> = {
+  "Promote in One Place": { icon: "one-place", note: "Each group's weekly thread" },
+  "No Investment Offers": { icon: "no-invest", note: "No funds or open rounds" },
+  "No Cold Pitches": { icon: "no-pitch", note: "No sales pitches by message" },
+};
+const promotion = CONDUCT_GROUPS.find((g) => g.id === "promotion-and-limits");
+if (!promotion) throw new Error("code-of-conduct.ts has no promotion-and-limits group");
+const rules = promotion.rules.map((r) => {
+  const art = RULE_ART[r.title];
+  if (!art) throw new Error(`/community/ has no icon for the Code of Conduct rule "${r.title}"`);
+  return { title: r.title, ...art };
+});
 
-const BACKERS = [
-  {
-    name: "Talent",
-    what: "People who want to join a startup, or already work at one. Meet founders before they post the role.",
-  },
-  {
-    name: "Investors and lenders",
-    what: "Angels, VCs and banks who back Colorado companies. Come to listen and to help.",
-  },
-  {
-    name: "Service providers",
-    what: "Lawyers, accountants, agencies and others who serve startups. Share your offers in the Wednesday Asks and Offers thread.",
-  },
-];
+// The banner is portrait, 4:5. Shown at 240 px wide (120 to 150 px on phones), so
+// the 480 px file covers 2x and 3x screens; the 960 px file is for zoom.
+const BANNER_SIZES = "(max-width: 480px) 120px, (max-width: 760px) 150px, 240px";
 ---
 
 <BaseLayout
   title="Community"
-  description="Who Colorado Startups is for, where the community meets and the norms in each place. Founders building companies in Colorado come first."
+  description="Pick your way into Colorado Startups: the Slack, the LinkedIn Group, the LinkedIn Page or the Startupers newsletter. Founders come first."
   ogImage="community"
 >
-  <section class="section section--lit hero" aria-labelledby="community-title">
-    <div class="wrap">
-      <h1 id="community-title">Community</h1>
-      <p class="lede">
-        Colorado Startups is a community of entrepreneurs building companies in Colorado. Founders come first, and the
-        people who back them are welcome too.
-      </p>
-      <div class="btn-row">
-        <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
-        <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
+  <section class="section section--night hero" aria-labelledby="community-title">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <h1 id="community-title">Community</h1>
+        <p class="lede">For founders building companies in Colorado, and the people who back them.</p>
       </div>
-      <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
+      <img
+        class="hero__banner"
+        src="/art/brand/banner-480x600.png"
+        srcset="/art/brand/banner-480x600.png 480w, /art/brand/banner-960x1200.png 960w"
+        sizes={BANNER_SIZES}
+        width="480"
+        height="600"
+        alt="The Colorado Startups crest, a winged shield over snowy peaks, on a royal-blue banner."
+        loading="eager"
+        decoding="async"
+      />
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="who">
+  <section class="section section--lit" aria-labelledby="channels-title">
     <div class="wrap">
-      <h2 id="who">Who it is for</h2>
-      <div class="who">
-        <Card element="div" title="Founders" tone="gilded" data-audience="founders">
-          <Badge slot="badges" tone="gold">Comes first</Badge>
-          <p>
-            If you are building a company in Colorado, this community is for you. That covers an idea you are testing,
-            a company you are launching and one you are growing.
-          </p>
-          <p>Ask for help, share what you learn and celebrate your wins with people who know the work.</p>
-        </Card>
-        <Card element="div" title="The startup community that backs them" data-audience="backers">
-          <Badge slot="badges">Also welcome</Badge>
-          <dl>
-            {
-              BACKERS.map((b) => (
-                <div>
-                  <dt>{b.name}</dt>
-                  <dd>{b.what}</dd>
-                </div>
-              ))
-            }
-          </dl>
-        </Card>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--lit" aria-labelledby="where">
-    <div class="wrap">
-      <Banner tone="sky" id="where">Where we meet</Banner>
-      <p class="intro">Each place has its own rhythm. Here is what to expect, and the norms that keep it useful.</p>
+      <h2 id="channels-title">Pick a channel</h2>
       <ul class="hall-grid channels" role="list">
-        {
-          CHANNELS.map((c) => (
-            <Card element="li" title={c.name} id={c.id} data-channel={c.id} class="channel">
-              {c.badge && <Badge slot="badges">{c.badge}</Badge>}
-              <p>{c.expect}</p>
-              <h4>Norms</h4>
-              <ul class="norms">
-                {c.norms.map((n) => (
-                  <li>{n}</li>
-                ))}
-              </ul>
-              {c.keeper && <p class="ai-note">{disclosures[c.keeper]}</p>}
-              {c.aside && (
-                <p class="aside">
-                  {c.aside.text} <a href={c.aside.href}>{c.aside.label}</a>
-                </p>
-              )}
-              <a slot="actions" class="community action" href={c.action.href}>
-                {c.action.label}
-              </a>
-            </Card>
-          ))
-        }
+        {tiles.map((channel) => <ChannelTile channel={channel} />)}
       </ul>
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="conduct">
+  <section class="section section--band" aria-labelledby="rules-title">
     <div class="wrap">
-      <h2 id="conduct">How we treat each other</h2>
-      <p>The Code of Conduct sets the norms for the Slack and the LinkedIn Group. In short:</p>
-      <ul class="conduct">
-        <li>Promote your company, product, service or open role in one place: the Wednesday Asks and Offers thread.</li>
-        <li>Never pitch an investment, whether a fund or an open round. A closed raise can be shared as a win.</li>
-        <li>No cold sales pitches by direct message. If one reaches you, tell a moderator.</li>
-        <li>Celebrate wins, and any press that gives Colorado positive exposure.</li>
-      </ul>
-      <Button variant="secondary" href="/code-of-conduct/">Read the Code of Conduct</Button>
-    </div>
-  </section>
-
-  <section class="section section--lit" aria-labelledby="people">
-    <div class="wrap">
-      <h2 id="people">People run the community</h2>
-      <p>
-        Every moderator and organizer seat is for a person from the community. The AI keepers never moderate. These
-        seats are open now:
-      </p>
-      <ul class="seats" data-seats>
+      <h2 id="rules-title">House rules</h2>
+      <ul class="rules" role="list" data-rules>
         {
-          openSeats.map((seat) => (
-            <li>
-              <strong>{seat.title}.</strong> {seat.summary}
+          rules.map((r) => (
+            <li class="rule" data-rule={r.icon}>
+              <span class="rule__icon" set:html={communityIcon(r.icon)} />
+              <strong>{r.title}</strong>
+              <span class="rule__note">{r.note}</span>
             </li>
           ))
         }
       </ul>
-      <Button href="/get-involved/">See every open position</Button>
+      <p class="rules__foot">
+        People moderate. The AI keepers never do. <a href="/code-of-conduct/">Read the Code of Conduct</a>{" or "}
+        <a href="/get-involved/">take a seat</a>.
+      </p>
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="start">
+  <section class="section section--lit" aria-labelledby="desk-title">
     <div class="wrap">
-      <h2 id="start">Find your way in</h2>
-      <div class="pair">
-        <WelcomeDesk />
-        <NewsletterSignup variant="full" returnTo="/community/" />
-      </div>
+      <h2 id="desk-title">Find your door</h2>
+      <WelcomeDesk />
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* The note under the Slack button says where it goes (#128). */
-  #slack-form-note {
-    margin: var(--s-3) 0 0;
-  }
   .hero {
-    background:
-      radial-gradient(90% 80% at 50% 0%, color-mix(in oklab, var(--c-accent) 24%, transparent), transparent 70%),
-      var(--c-ground);
+    padding-block: var(--s-7);
+    --ink-link: var(--c-gold-on-night);
+    --focus-ring: var(--c-focus-on-night);
   }
-  .intro {
-    color: var(--c-text-dim);
-    margin-bottom: var(--s-5);
-  }
-  .who {
+  .hero__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
-    gap: var(--s-5);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--s-6);
   }
-  .who dl {
+  .hero h1 {
+    margin: 0 0 var(--s-3);
+    color: var(--c-on-night);
+  }
+  .hero .lede {
     margin: 0;
-    display: grid;
-    gap: var(--s-3);
+    color: var(--c-on-night);
   }
-  .who dt {
-    font-weight: 700;
+  /* The banner's file has a night ground of its own. "lighten" keeps the
+     brighter of it and the band's night, so its edges vanish in both themes. */
+  .hero__banner {
+    display: block;
+    width: 240px;
+    height: auto;
+    mix-blend-mode: lighten;
   }
-  .who dd {
-    margin: 0;
-    color: var(--c-text-dim);
+
+  /* A list gets the reading measure by default (global.css); these are grids. */
+  .channels,
+  .rules {
+    max-width: none;
   }
+  /* Two by two, four across on a wide screen, one column on a phone: never
+     three and an orphan. */
   .channels {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: var(--s-5);
   }
-  .channels :global([data-channel]) {
-    scroll-margin-top: var(--s-5);
+  @media (min-width: 1200px) {
+    .channels {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
-  .channels h4 {
-    font-size: var(--t-step-0);
-    margin-bottom: var(--s-2);
+  @media (max-width: 560px) {
+    .channels {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
-  .norms {
-    padding-left: var(--s-5);
+
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    list-style: none;
   }
-  .norms li + li {
-    margin-top: var(--s-1);
+  .rule {
+    display: grid;
+    justify-items: center;
+    gap: var(--s-2);
+    text-align: center;
   }
-  .aside {
+  .rule__icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: var(--line-bold) solid var(--c-accent);
+    background: var(--c-ground);
+    color: var(--c-fire);
+  }
+  .rule__icon :global(svg) {
+    width: 36px;
+    height: 36px;
+  }
+  .rule__note {
+    color: var(--c-text-dim);
     font-size: var(--t-step--1);
   }
-  .action {
-    font-weight: 700;
+  .rules__foot {
+    margin: var(--s-6) auto 0;
+    text-align: center;
   }
-  .conduct li + li,
-  .seats li + li {
-    margin-top: var(--s-2);
-  }
-  /* The two panels stretch to one height, so their ledges line up. */
-  .pair {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-5);
-  }
-  /* minmax(0, 1fr), not 1fr: a bare 1fr track grows to its widest content,
-     and the signup's Turnstile box would push both panels past the gutter. */
+
   @media (max-width: 760px) {
-    .who,
-    .pair {
+    .hero {
+      padding-block: var(--s-6);
+    }
+    .hero__banner {
+      width: 150px;
+    }
+    .rules {
       grid-template-columns: minmax(0, 1fr);
+      justify-items: start;
+    }
+    .rule {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      justify-items: start;
+      align-items: center;
+      column-gap: var(--s-4);
+      row-gap: 0;
+      text-align: left;
+    }
+    .rule__icon {
+      grid-row: span 2;
+      width: 56px;
+      height: 56px;
+    }
+    .rule__icon :global(svg) {
+      width: 28px;
+      height: 28px;
+    }
+    .rules__foot {
+      text-align: left;
+    }
+  }
+  /* On a phone the title takes the full width, and the banner hangs beside
+     the line under it. */
+  @media (max-width: 560px) {
+    .hero__grid {
+      grid-template-areas:
+        "title title"
+        "lede banner";
+      column-gap: var(--s-4);
+      row-gap: 0;
+    }
+    .hero__copy {
+      display: contents;
+    }
+    .hero h1 {
+      grid-area: title;
+    }
+    .hero .lede {
+      grid-area: lede;
+    }
+    .hero__banner {
+      grid-area: banner;
+      width: 120px;
     }
   }
 </style>

@@ -4,20 +4,21 @@
 // Fusion Canyon and Space Peak Connectors. Decision 75 lifted decision 67's
 // hold, so people may take these seats; they serve Colorado Startups, Ltd.
 //
-// The words come from the volunteer kit, copied into data/positions/ by
-// scripts/positions/sync-volunteers.mjs and read by lib/seats/load.ts. The
-// layout ports the kit's final pages/<seat id>.html (lib/seats/layouts.ts),
-// in the kit README's order: what you get, how it grows your network, how it
-// helps Colorado, who we are looking for, how to apply. The seat's title,
-// area and courses stay in data/team/positions.yaml, and
-// site/test/unit/l38/ fails if the kit's copy disagrees with it.
+// Each page answers three questions (Paul, 2026-11-15: visual first, few
+// words): what you do, why it matters, how to apply (lib/seats/layouts.ts).
+// lib/seats/load.ts reads every word and figure from data/positions/. The
+// seat files, common.yaml and geo.yaml come from the volunteer kit through
+// scripts/positions/sync-volunteers.mjs, run by hand. facts.yaml is
+// hand-written, edited in a PR, and the sync never touches it. The seat's
+// title, area and courses stay in data/team/positions.yaml, and
+// site/test/unit/l38/ fails if the seat files disagree with it.
 //
 // Copy rules (decision 67, the kit owner): the page says
 // UNPAID_VOLUNTEER_LINE once. No "paid", "pay", "salary", "stipend",
 // "hiring", "hire", "job" or "contributor"; costs are "reimbursed". Every
-// figure is a fact marked R and not gated, with its footnote. Communitas is
-// an AI agent wherever it appears, and people moderate. No JobPosting or other
-// JSON-LD: these are not job ads. site/test/dom/l38/ checks each rule.
+// figure comes from facts.yaml, with its footnote. Communitas is an AI agent
+// wherever it appears, and people moderate. No JobPosting or other JSON-LD:
+// these are not job ads. site/test/dom/l38/ checks each rule.
 import { comparePositions } from "@cs/shared";
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
@@ -70,7 +71,7 @@ const ctx: SeatContext = {
   applyHref: applyHref(position),
 };
 
-const TONES = { get: "band", network: "stone", colorado: "lit", who: "band", apply: "hearth" } as const;
+const TONES = { what: "band", why: "lit", apply: "hearth" } as const;
 ---
 
 <BaseLayout title={seatPageTitle(seat)} description={seatPageDescription(seat)} ogImage="get-involved">
