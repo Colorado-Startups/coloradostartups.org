@@ -5,7 +5,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import YAML from "yaml";
 
-import { fitWidths } from "../../../src/components/art/art-assets";
+import { brandArt, fitWidths } from "../../../src/components/art/art-assets";
 import { EMBERS, emberStyle } from "../../../src/components/art/embers";
 import { KEEPERS, portraitAlt, portraitKeys } from "../../../src/components/art/keepers";
 
@@ -38,20 +38,32 @@ describe("keepers", () => {
     );
   });
 
-  it("maps to the Wave 0b portrait path, agents/<id>", () => {
-    expect(portraitKeys("publicus")).toEqual({ large: "agents/publicus", small: "agents/publicus-small" });
+  it("maps to the brand v3 portraits, brand/<id>", () => {
+    expect(portraitKeys("publicus")).toEqual({ large: "brand/publicus", small: "brand/publicus-small" });
   });
 
   // Portrait.astro has no fallback for a missing crop: a small portrait shows
-  // the -small file, so every keeper needs both files committed.
-  it("has both portrait crops committed for every keeper", () => {
-    const art = path.join(__dirname, "../../../src/assets/art");
-    const committed = (key: string) => ["webp", "png", "jpg"].some((ext) => existsSync(path.join(art, `${key}.${ext}`)));
+  // the -small file, so every keeper needs both pulled, with every webp size.
+  it("has both portrait crops pulled for every keeper, at 4:5 and 1:1", () => {
+    const pub = path.join(__dirname, "../../../public");
     for (const id of Object.keys(KEEPERS) as (keyof typeof KEEPERS)[]) {
       const { large, small } = portraitKeys(id);
-      expect(committed(large), large).toBe(true);
-      expect(committed(small), small).toBe(true);
+      const big = brandArt(large);
+      const crop = brandArt(small);
+      expect(big, large).toBeDefined();
+      expect(crop, small).toBeDefined();
+      expect(big!.width * 5, large).toBe(big!.height * 4);
+      expect(crop!.width, small).toBe(crop!.height);
+      for (const art of [big!, crop!]) {
+        for (const entry of art.srcset.split(", ")) expect(existsSync(path.join(pub, entry.split(" ")[0])), entry).toBe(true);
+      }
     }
+  });
+
+  it("lights a glow only where a keeper holds a lantern", () => {
+    expect(KEEPERS.communitas.glow).not.toBeNull();
+    expect(KEEPERS.resourcus.glow).toBeNull();
+    expect(KEEPERS.publicus.glow).toBeNull();
   });
 });
 

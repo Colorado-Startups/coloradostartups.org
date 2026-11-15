@@ -7,8 +7,9 @@
 //   node scripts/brand/pull.mjs --check      offline: originals match the lock, every size exists
 //   node scripts/brand/pull.mjs --self-test  known-bad and known-clean samples
 //
-// Writes site/public/art/brand/<name>.jpg (the original) and <name>-<w>.webp
-// for each width in WIDTHS that the original can fill. The webp sizes keep the
+// Writes site/public/art/brand/<name>.<ext> (the original), <name>-<w>.webp for
+// each width widthsFor() gives, and sizes.json, which records each picture's
+// size and widths for art-assets.ts brandArt(). The webp sizes keep the
 // image's metadata (sharp keepMetadata): its AI-made label and photo credit
 // live there (brand decision 46, Bria's terms), and Astro's image pipeline
 // would strip them, so these files are served as-is.
@@ -23,10 +24,20 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 export const OUT = "site/public/art/brand";
 export const WIDTHS = [720, 1440];
+export const SIZES = "sizes.json";
 
 export const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 export const stem = (path) => basename(path).replace(/\.[a-z]+$/i, "");
 export const sizeName = (path, w) => `${stem(path)}-${w}.webp`;
+
+// The webp widths for an original `width` px wide: each of WIDTHS it can fill,
+// plus its own width when it falls short of the widest, so a 960 px keeper gets
+// 720 and 960 and a 320 px crop gets 320. Never an upscale.
+export function widthsFor(width) {
+  const fit = WIDTHS.filter((w) => w <= width);
+  if (width < WIDTHS.at(-1) && !fit.includes(width)) fit.push(width);
+  return fit;
+}
 
 export function readLock(root = ROOT) {
   const lock = JSON.parse(readFileSync(join(root, "brand.lock.json"), "utf8"));
@@ -39,12 +50,16 @@ export function readLock(root = ROOT) {
 // Problems with the files on disk, one line each; [] when clean.
 export function checkFiles(lock, root = ROOT) {
   const problems = [];
+  const sizesFile = join(root, OUT, SIZES);
+  const sizes = existsSync(sizesFile) ? JSON.parse(readFileSync(sizesFile, "utf8")) : {};
   for (const [path, want] of Object.entries(lock.files)) {
     const file = join(root, OUT, basename(path));
     if (!existsSync(file)) { problems.push(`${basename(path)}: missing; run npm run brand:pull`); continue; }
     const got = sha256(readFileSync(file));
     if (got !== want) problems.push(`${basename(path)}: sha256 ${got.slice(0, 12)} is not the lock's ${want.slice(0, 12)}`);
-    for (const w of WIDTHS) {
+    const entry = sizes[stem(path)];
+    if (!entry || entry.file !== basename(path)) { problems.push(`${SIZES}: no entry for ${basename(path)}; run npm run brand:pull`); continue; }
+    for (const w of entry.widths) {
       if (!existsSync(join(root, OUT, sizeName(path, w)))) problems.push(`${sizeName(path, w)}: missing; run npm run brand:pull`);
     }
   }
@@ -54,6 +69,7 @@ export function checkFiles(lock, root = ROOT) {
 async function pull(lock) {
   const { default: sharp } = await import("sharp");
   mkdirSync(join(ROOT, OUT), { recursive: true });
+  const sizes = {};
   for (const [path, want] of Object.entries(lock.files)) {
     const url = `https://raw.githubusercontent.com/${lock.repo}/${lock.tag}/${path}`;
     const res = await fetch(url);
@@ -65,12 +81,15 @@ async function pull(lock) {
       process.exit(1);
     }
     writeFileSync(join(ROOT, OUT, basename(path)), buf);
-    const { width } = await sharp(buf).metadata();
-    for (const w of WIDTHS.filter((w) => w <= width)) {
+    const { width, height } = await sharp(buf).metadata();
+    const widths = widthsFor(width);
+    for (const w of widths) {
       await sharp(buf).resize({ width: w }).keepMetadata().webp({ quality: 80 }).toFile(join(ROOT, OUT, sizeName(path, w)));
     }
+    sizes[stem(path)] = { file: basename(path), width, height, widths };
     console.log(`brand: ${basename(path)} ok (${lock.tag})`);
   }
+  writeFileSync(join(ROOT, OUT, SIZES), `${JSON.stringify(sizes, null, 2)}\n`);
 }
 
 function selfTest() {
@@ -79,12 +98,19 @@ function selfTest() {
     mkdirSync(join(dir, OUT), { recursive: true });
     const clean = Buffer.from("clean");
     writeFileSync(join(dir, OUT, "a.jpg"), clean);
-    for (const w of WIDTHS) writeFileSync(join(dir, OUT, sizeName("a.jpg", w)), "x");
+    for (const w of widthsFor(960)) writeFileSync(join(dir, OUT, sizeName("a.jpg", w)), "x");
+    writeFileSync(join(dir, OUT, SIZES), JSON.stringify({ a: { file: "a.jpg", width: 960, height: 1200, widths: widthsFor(960) } }));
     const lock = { repo: "o/r", tag: "t", files: { "dist/a.jpg": sha256(clean) } };
     const ok = checkFiles(lock, dir).length === 0;
+    const widthsOk = JSON.stringify([widthsFor(1440), widthsFor(960), widthsFor(320)]) === "[[720,1440],[720,960],[320]]";
+    rmSync(join(dir, OUT, sizeName("a.jpg", 960)));
+    const missing = checkFiles(lock, dir).some((p) => p.includes("a-960.webp"));
     writeFileSync(join(dir, OUT, "a.jpg"), "tampered");
     const bad = checkFiles(lock, dir).some((p) => p.includes("sha256"));
-    if (!ok || !bad) { console.error(`brand self-test: FAIL (clean ${ok}, bad caught ${bad})`); return 1; }
+    if (!ok || !bad || !missing || !widthsOk) {
+      console.error(`brand self-test: FAIL (clean ${ok}, bad caught ${bad}, missing size caught ${missing}, widths ${widthsOk})`);
+      return 1;
+    }
     console.log("brand self-test: PASS");
     return 0;
   } finally {

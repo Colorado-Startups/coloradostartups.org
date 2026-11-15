@@ -9,20 +9,20 @@ export interface KeeperArt {
   kind: "dwarf" | "gnome";
   /** CSS color for the placeholder ring and small-portrait glow. */
   anchor: string;
-  /** Where the keeper's lantern or lamp sits in the large portrait, as CSS percentages. */
-  glow: { x: string; y: string };
+  /** Where the keeper's lantern sits in the large portrait, as CSS percentages; null when it holds none. */
+  glow: { x: string; y: string } | null;
 }
 
 /** The kind as its badge reads, on the home page and on /team/. */
 export const KIND_LABELS: Record<KeeperArt["kind"], string> = { dwarf: "Dwarf", gnome: "Gnome" };
 
-// Glow positions are read off the batch 1 picks (art/concepts/README.md): the
-// lantern in Communitas's hands, the map room's hanging lamp over Resourcus,
-// and the print shop's lantern above Publicus.
+// Glow positions are read off the brand v3 portraits (brand dist/hall/, decision
+// 53, viewed 2026-11-15): the lantern on Communitas's pole, top left. Resourcus
+// (compass and map) and Publicus (broadsheet) hold no light, so they get none.
 export const KEEPERS: Record<KeeperId, KeeperArt> = {
-  communitas: { kind: "dwarf", anchor: "var(--c-community)", glow: { x: "45%", y: "85%" } },
-  resourcus: { kind: "gnome", anchor: "var(--c-pine)", glow: { x: "64%", y: "25%" } },
-  publicus: { kind: "dwarf", anchor: "var(--c-fire)", glow: { x: "52%", y: "25%" } },
+  communitas: { kind: "dwarf", anchor: "var(--c-community)", glow: { x: "23%", y: "21%" } },
+  resourcus: { kind: "gnome", anchor: "var(--c-pine)", glow: null },
+  publicus: { kind: "dwarf", anchor: "var(--c-fire)", glow: null },
 };
 
 /** Alt text that names the keeper and says it is an AI agent. */
@@ -65,7 +65,7 @@ export function regionArtAlt(id: string): string {
   return alt;
 }
 
-/** Asset keys under src/assets/art for a keeper's two crops (Wave 0b: `portrait: agents/<id>`). */
+/** Art keys for a keeper's two pictures: the brand v3 portrait (960 x 1200) and its 320 x 320 crop (art-assets.ts brandArt). */
 export function portraitKeys(id: KeeperId): { large: string; small: string } {
-  return { large: `agents/${id}`, small: `agents/${id}-small` };
+  return { large: `brand/${id}`, small: `brand/${id}-small` };
 }

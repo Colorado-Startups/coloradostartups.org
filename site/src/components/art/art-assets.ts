@@ -4,6 +4,8 @@
 // any art that has not landed yet.
 import type { ImageMetadata } from "astro";
 
+import SIZES from "../../../public/art/brand/sizes.json";
+
 const files = import.meta.glob<{ default: ImageMetadata }>("../../assets/art/**/*.{webp,png,jpg}", {
   eager: true,
 });
@@ -32,13 +34,21 @@ export function fitWidths(widths: readonly number[], sourceWidth: number): numbe
 
 /**
  * Brand v3 art: scripts/brand/pull.mjs pulls each file named in brand.lock.json
- * into site/public/art/brand/, checks its sha256, and writes 720w and 1440w webp
- * copies that keep the file's metadata. The AI-made label and photo credit live
- * there (brand decision 46), and Astro's image pipeline would strip them, so
- * these files are served as-is. Key: "brand/<name>", e.g. "brand/golden".
+ * into site/public/art/brand/, checks its sha256, writes webp sizes that keep the
+ * file's metadata, and records each picture in sizes.json. The AI-made label and
+ * photo credit live in that metadata (brand decision 46), and Astro's image
+ * pipeline would strip them, so these files are served as-is.
+ * Key: "brand/<name>", e.g. "brand/golden" or "brand/communitas-small".
  */
-export const BRAND_NAMES = ["boulder", "golden", "denver", "springs", "fortcollins"] as const;
-export type BrandName = (typeof BRAND_NAMES)[number];
+interface BrandSize {
+  file: string;
+  width: number;
+  height: number;
+  widths: number[];
+}
+
+const BRAND_SIZES: Readonly<Record<string, BrandSize>> = SIZES;
+export const BRAND_NAMES: readonly string[] = Object.keys(BRAND_SIZES);
 
 export interface BrandArt {
   src: string;
@@ -49,8 +59,13 @@ export interface BrandArt {
 
 export function brandArt(key: string): BrandArt | undefined {
   const name = key.startsWith("brand/") ? key.slice("brand/".length) : "";
-  if (!(BRAND_NAMES as readonly string[]).includes(name)) return undefined;
-  const base = `/art/brand/${name}`;
-  // Every brand place painting is 1440 x 720 (brand art/direction, place images).
-  return { src: `${base}-1440.webp`, srcset: `${base}-720.webp 720w, ${base}-1440.webp 1440w`, width: 1440, height: 720 };
+  const size = Object.hasOwn(BRAND_SIZES, name) ? BRAND_SIZES[name] : undefined;
+  if (!size) return undefined;
+  const url = (w: number) => `/art/brand/${name}-${w}.webp`;
+  return {
+    src: url(size.widths.at(-1)!),
+    srcset: size.widths.map((w) => `${url(w)} ${w}w`).join(", "),
+    width: size.width,
+    height: size.height,
+  };
 }

@@ -16,7 +16,7 @@ art: brand/golden
 
 id: ecosystem-canvas
 title: Startup Resources
-art: agents/resourcus
+art: brand/resourcus
 
 id: regions
 title: Regions
@@ -45,4 +45,4 @@ art: brand/denver
 
 id: dispatches
 title: Dispatches
-art: agents/publicus
+art: brand/publicus
