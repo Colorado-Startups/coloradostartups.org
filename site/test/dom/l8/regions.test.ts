@@ -191,7 +191,8 @@ describe("Fusion Canyon on the page", () => {
 const local = (from: string, spec: string) =>
   spec.startsWith("/") ? path.join(DIST_DIR, spec.replace(/^\//, "")) : path.resolve(path.dirname(from), spec);
 const STATIC_IMPORT = /\b(?:import|export)\s*(?:[^"'()]*?\bfrom\s*)?["']((?:\.{1,2}\/|\/)[^"']+\.m?js)["']/g;
-const DYNAMIC_IMPORT = /\bimport\(\s*["']((?:\.{1,2}\/|\/)[^"']+\.m?js)["']\s*\)/g;
+// The minifier writes a dynamic import's path as a template literal: import(`./maplibre-gl.X.js`).
+const DYNAMIC_IMPORT = /\bimport\(\s*[`"']((?:\.{1,2}\/|\/)[^`"']+\.m?js)[`"']\s*\)/g;
 
 /** A page's up-front JavaScript (entries and their static imports) and what it may load later by import(). */
 function jsOf(page: Document): { upFront: Set<string>; lazy: Set<string> } {
