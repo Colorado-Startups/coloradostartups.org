@@ -1,7 +1,7 @@
 // What a guide page shows in place of its long lists (step F of the redesign,
 // 2026-11-15): one chart row per section, each linked to the Startup
 // Resources view that holds its records, and five records to start with.
-// Pure shaping with no Astro imports; test/unit/guides-browse/ runs it.
+// Pure shaping with no Astro imports; test/unit/l23/browse.test.ts runs it.
 //
 // A row's link filters Startup Resources by the stage, type and city that
 // every one of its records shares, so the linked view always holds all of

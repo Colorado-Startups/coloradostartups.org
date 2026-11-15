@@ -344,4 +344,12 @@ const LEVELS = STAGES.filter((s) => s !== "support");
     margin-top: var(--s-3);
     font-weight: 700;
   }
+  /* Forced colors drop background and border, so the chosen chip takes the system's selected colors. */
+  @media (forced-colors: active) {
+    .pick:has(input:checked),
+    .journey__node:has(input:checked) {
+      background: SelectedItem;
+      color: SelectedItemText;
+    }
+  }
 </style>
