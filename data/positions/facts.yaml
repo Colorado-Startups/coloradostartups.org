@@ -399,7 +399,7 @@ co-venture-2025:
   label: in venture capital invested in Colorado companies (per NVCA and PitchBook data, 2025)
   source: National Venture Capital Association, NVCA 2026 Yearbook, data provided by PitchBook, as of December 31, 2025
   url: https://nvca.org/wp-content/uploads/2026/04/NVCA-2026-Yearbook-4.9.26.pdf
-  read: "2026-10-18"
+  read: "2026-11-15"
   short: per NVCA and PitchBook, 2025
 co-venture-companies-2025:
   value: "379"
@@ -441,7 +441,7 @@ nist-boulder-staff:
   label: NIST staff on the Boulder campus, plus 940 contractors and visiting associates (per NIST)
   source: National Institute of Standards and Technology, NIST in Colorado
   url: https://www.nist.gov/states/colorado
-  read: "2026-10-18"
+  read: "2026-11-15"
   short: per NIST
 nist-boulder-founded:
   value: "1954"
@@ -455,14 +455,14 @@ jila-founded:
   label: year JILA, the joint NIST and CU Boulder institute, was founded (per NIST)
   source: National Institute of Standards and Technology, NIST in Colorado
   url: https://www.nist.gov/states/colorado
-  read: "2026-10-18"
+  read: "2026-11-15"
   short: per NIST
 nlr-staff:
   value: Nearly 3,400
   label: researchers, postdocs, interns and operations staff at the National Laboratory of the Rockies, formerly NREL, which has labs in Golden (per the lab)
   source: National Laboratory of the Rockies, About
   url: https://www.nlr.gov/about
-  read: "2026-10-18"
+  read: "2026-11-15"
   short: per the National Laboratory of the Rockies
 nlr-renamed:
   value: "2025"
@@ -560,7 +560,7 @@ usafa-cadets:
   label: cadets enrolled at the US Air Force Academy in Colorado Springs (per the Academy)
   source: U.S. Air Force Academy, About
   url: https://www.usafa.edu/about/
-  read: "2026-10-18"
+  read: "2026-11-15"
   short: per the US Air Force Academy
 usafa-authorized:
   value: "1954"
@@ -570,11 +570,11 @@ usafa-authorized:
   read: "2026-10-18"
   short: per the US Air Force Academy
 schriever-staff:
-  value: 8,000
+  value: About 8,000
   label: military and civilian staff at Schriever Space Force Base (per the base)
   source: Peterson and Schriever Space Force Base, Space Base Delta 41
   url: https://www.petersonschriever.spaceforce.mil/SpaceBaseDelta41/
-  read: "2026-10-18"
+  read: "2026-11-15"
   short: per Schriever Space Force Base
 fort-carson-established:
   value: "1942"
@@ -590,3 +590,246 @@ uccs-founded:
   url: https://www.uccs.edu/about/history
   read: "2026-10-18"
   short: per UCCS
+# Why Colorado panels on the home page, added by hand on 2026-11-15.
+# The volunteer kit does not hold these facts yet; see the PR that added them.
+# Photonics and quantum: Photon Mountain (Boulder, Golden, Denver).
+elevate-quantum-eda-award:
+  value: $40.5 million
+  label: federal Tech Hub award to Elevate Quantum, the Colorado-led quantum consortium (per the State of Colorado, 2024)
+  source: Colorado Office of Economic Development and International Trade, Governor Polis Announces Major Win for Colorado's Future, Celebrates Tech Hub Funding for Quantum, July 2, 2024
+  url: https://oedit.colorado.gov/press-release/governor-polis-announces-major-win-for-colorados-future-celebrates-tech-hub-funding
+  read: "2026-11-15"
+  short: per the State of Colorado, 2024
+colorado-quantum-state-match:
+  value: $74 million
+  label: in Colorado state investment in quantum, activated when Elevate Quantum won its federal Tech Hub award (per the State of Colorado, 2024)
+  source: Colorado Office of Economic Development and International Trade, Governor Polis Announces Major Win for Colorado's Future, Celebrates Tech Hub Funding for Quantum, July 2, 2024
+  url: https://oedit.colorado.gov/press-release/governor-polis-announces-major-win-for-colorados-future-celebrates-tech-hub-funding
+  read: "2026-11-15"
+  short: per the State of Colorado, 2024
+colorado-quantum-workers:
+  value: 3,000
+  label: workers already in the commercial quantum ecosystem (per the State of Colorado, 2024)
+  source: Colorado Office of Economic Development and International Trade, Governor Polis Announces Major Win for Colorado's Future, Celebrates Tech Hub Funding for Quantum, July 2, 2024
+  url: https://oedit.colorado.gov/press-release/governor-polis-announces-major-win-for-colorados-future-celebrates-tech-hub-funding
+  read: "2026-11-15"
+  short: per the State of Colorado, 2024
+quantum-commons-acres:
+  value: "70"
+  label: acres for the Quantum Commons, a campus for quantum companies in Arvada (per Elevate Quantum)
+  source: Elevate Quantum, Welcome to the Quantum Commons
+  url: https://www.elevatequantum.org/quantum-commons
+  read: "2026-11-15"
+  short: per Elevate Quantum
+darpa-qbi-colorado:
+  value: 2 of 11
+  label: companies DARPA chose for Stage B of its Quantum Benchmarking Initiative are based in Colorado (per DARPA, 2025)
+  source: "Count from DARPA, Quantum Benchmarking Initiative, Stage B selection, as of November 6, 2025: Atom Computing, Boulder, and Quantinuum, Broomfield"
+  url: https://www.darpa.mil/research/programs/quantum-benchmarking-initiative/stage-b-selection
+  read: "2026-11-15"
+  short: per DARPA, 2025
+quantinuum-colorado-systems:
+  value: 3 of 4
+  label: commercial quantum computers Quantinuum operates are at its Colorado campus (per a Quantinuum SEC filing, 2026)
+  source: Quantinuum Inc., Form S-1/A, Amendment No. 2, filed with the US Securities and Exchange Commission on June 1, 2026
+  url: https://www.sec.gov/Archives/edgar/data/2110105/000162828026039286/quantinuum-sx1a2.htm
+  read: "2026-11-15"
+  short: per a Quantinuum SEC filing, 2026
+q-sense-nsf-award:
+  value: $37.5 million
+  label: new NSF award to Q-SEnSE, the quantum sensing institute CU Boulder leads (per CU Boulder, 2026)
+  source: University of Colorado Boulder, CU Boulder Today, $37.5M NSF award aims to define new quantum frontiers, take technology from lab to field, August 25, 2026
+  url: https://www.colorado.edu/today/2026/08/25/375m-nsf-award-aims-define-new-quantum-frontiers-take-technology-lab-field
+  read: "2026-11-15"
+  short: per CU Boulder, 2026
+cu-physics-nobel-laureates:
+  value: "4"
+  label: Nobel laureates in CU Boulder's physics department (per CU Boulder, 2026)
+  source: University of Colorado Boulder, Colorado Arts and Sciences Magazine, Nobel laureates gather to celebrate Department of Physics, September 28, 2026
+  url: https://www.colorado.edu/asmagazine/2026/09/28/nobel-laureates-gather-celebrate-department-physics
+  read: "2026-11-15"
+  short: per CU Boulder, 2026
+nist-boulder-cleanroom:
+  value: 18,000
+  label: square feet of ISO class 5 cleanroom at NIST's Boulder Microfabrication Facility (per NIST)
+  source: National Institute of Standards and Technology, Physical Measurement Laboratory, Boulder Microfabrication Facility
+  url: https://www.nist.gov/pml/bmf
+  read: "2026-11-15"
+  short: per NIST
+cpia-photonics-companies:
+  value: 250+
+  label: photonics companies in Colorado (per the Colorado Photonics Industry Association)
+  source: Colorado Photonics Industry Association, home page
+  url: https://coloradophotonics.org/
+  read: "2026-11-15"
+  short: per the Colorado Photonics Industry Association
+honorees-quantum-photonics:
+  value: "4"
+  label: of the 115 Colorado Startups 2026 Honorees work in quantum and photonics, a count of honorees, not of the market (per Colorado Startups, 2026)
+  source: Colorado Startups, 2026 Honorees, the sector table under What they build
+  url: https://coloradostartups.org/leaderboard/
+  read: "2026-11-15"
+  short: per Colorado Startups, 2026 Honorees
+# Fusion and energy: Fusion Canyon (Fort Collins).
+csu-atlas-facility:
+  value: $160 million
+  label: for ATLAS, the laser research facility Colorado State University is building with Marvel Fusion in Fort Collins (per CSU, 2026)
+  source: Colorado State University, SOURCE, CSU tops out one of world's most advanced laser research facilities, on track for 2026 completion, April 27, 2026
+  url: https://source.colostate.edu/csu-tops-out-one-of-worlds-most-advanced-laser-research-facilities-on-track-for-2026-completion/
+  read: "2026-11-15"
+  short: per CSU, 2026
+csu-ife-hub:
+  value: 1 of 3
+  label: national inertial fusion energy hubs the Energy Department funded in 2023 is led by Colorado State University (per the US Department of Energy, 2023)
+  source: US Department of Energy, DOE Announces $42 Million for Inertial Fusion Energy Hubs, December 7, 2023
+  url: https://www.energy.gov/articles/doe-announces-42-million-inertial-fusion-energy-hubs
+  read: "2026-11-15"
+  short: per the US Department of Energy, 2023
+csu-rise-hub-award:
+  value: $16 million
+  label: four-year Energy Department award to RISE, the inertial fusion hub Colorado State University leads (per CSU, 2023)
+  source: Colorado State University, Walter Scott, Jr. College of Engineering, CSU to lead DOE-funded multi-institution hub to advance laser-driven fusion energy, December 7, 2023
+  url: https://engr.source.colostate.edu/csu-to-lead-doe-funded-multi-institution-hub-to-advance-laser-driven-fusion-energy/
+  read: "2026-11-15"
+  short: per CSU, 2023
+xcimer-fusion-hubs:
+  value: 3 of 3
+  label: Energy Department inertial fusion hubs list Denver's Xcimer Energy as a member (per the US Department of Energy, 2023)
+  source: US Department of Energy, DOE Announces $42 Million for Inertial Fusion Energy Hubs, December 7, 2023
+  url: https://www.energy.gov/articles/doe-announces-42-million-inertial-fusion-energy-hubs
+  read: "2026-11-15"
+  short: per the US Department of Energy, 2023
+csu-aleph-shot-rate:
+  value: Up to 3
+  label: laser shots per second from ALEPH at Colorado State University, which CSU calls the highest rate for lasers of its type (per CSU, 2024)
+  source: Colorado State University, Walter Scott, Jr. College of Engineering, AI and Electrical and Computer Engineering at CSU, 10 cool things you should know, July 23, 2024
+  url: https://engr.source.colostate.edu/ai-and-electrical-and-computer-engineering-at-csu-10-cool-things-you-should-know/
+  read: "2026-11-15"
+  short: per CSU, 2024
+csu-aleph-peak-power:
+  value: "0.85"
+  label: petawatts of peak power from ALEPH, the laser at Colorado State University's Advanced Beam Laboratory (per LaserNetUS)
+  source: LaserNetUS, Advanced Beam Laboratory (ABL), Colorado State University
+  url: https://lasernetus.org/facilities/abl
+  read: "2026-11-15"
+  short: per LaserNetUS
+xcimer-raised:
+  value: About $200 million
+  label: raised from investors by Xcimer Energy, the Denver laser fusion company (per Xcimer Energy, 2026)
+  source: Xcimer Energy, Xcimer Energy Receives Additional $30.5 Million Award from DOE Milestone Program, October 2026
+  url: https://xcimer.energy/news/xcimer-energy-receives-additional-30-5-million-award-from-doe-milestone-program/
+  read: "2026-11-15"
+  short: per Xcimer Energy, 2026
+xcimer-doe-milestone:
+  value: $39.5 million
+  label: in potential Energy Department Milestone Program payments to Xcimer Energy, paid as it meets targets (per Xcimer Energy, 2026)
+  source: Xcimer Energy, Xcimer Energy Receives Additional $30.5 Million Award from DOE Milestone Program, October 2026
+  url: https://xcimer.energy/news/xcimer-energy-receives-additional-30-5-million-award-from-doe-milestone-program/
+  read: "2026-11-15"
+  short: per Xcimer Energy, 2026
+xcimer-denver-facility:
+  value: 74,000
+  label: square feet in Xcimer Energy's Denver laser facility, where its Phoenix prototype began operating in June 2026 (per Xcimer Energy, 2026)
+  source: Xcimer Energy, Xcimer Energy announces the start of operations for Phoenix, June 3, 2026
+  url: https://xcimer.energy/news/xcimer-energy-announces-the-start-of-operations-for-phoenix-a-prototype-system-for-industrial-scale-laser-fusion-architecture/
+  read: "2026-11-15"
+  short: per Xcimer Energy, 2026
+co-wind-share-2024:
+  value: About 29%
+  label: of Colorado's electricity came from wind in 2024, tied with natural gas as the largest source (per Colorado Legislative Council Staff, 2026)
+  source: Colorado Legislative Council Staff, Colorado Electricity Generation, Transmission, Distribution, and Regulation, memorandum, April 29, 2026
+  url: https://content.leg.colorado.gov/sites/default/files/r25-1051-energy-generation-distribution-and-regulation-issue-brief-update-accessible.pdf
+  read: "2026-11-15"
+  short: per Colorado Legislative Council Staff, 2024 data
+rawhide-unit-1:
+  value: "280"
+  label: megawatts at Rawhide Unit 1, a coal unit Platte River Power Authority will remove from its energy mix by the end of 2029 (per Platte River)
+  source: Platte River Power Authority, Rawhide Energy Station
+  url: https://prpa.org/generation/rawhide-energy-station/
+  read: "2026-11-15"
+  short: per Platte River Power Authority
+honorees-energy-climate:
+  value: "6"
+  label: of the 115 Colorado Startups 2026 Honorees work in energy and climate, a count of honorees, not of the market (per Colorado Startups, 2026)
+  source: Colorado Startups, 2026 Honorees, the sector table under What they build
+  url: https://coloradostartups.org/leaderboard/
+  read: "2026-11-15"
+  short: per Colorado Startups, 2026 Honorees
+# Space: Space Peak (Colorado Springs), with Buckley in Aurora.
+guardians-in-colorado:
+  value: Nearly half
+  label: of all uniformed Space Force Guardians are in Colorado (per the Secretary of the Air Force, 2026)
+  source: Secretary of the Air Force Troy Meink, quoted in a press release from the Office of Rep. Jeff Crank, Rep. Crank and SecAF Meink Announce New Investments in Colorado Springs, May 29, 2026
+  url: https://crank.house.gov/media/press-releases/rep-crank-and-secaf-meink-announce-new-investments-colorado-springs
+  read: "2026-11-15"
+  short: per the Secretary of the Air Force, 2026
+co-aerospace-pay:
+  value: $165,186
+  label: average yearly pay in Colorado's private aerospace manufacturing, the highest of the 43 states with published data (computed from BLS data, 2025)
+  source: "Computed from US Bureau of Labor Statistics, Quarterly Census of Employment and Wages, 2025 annual averages, NAICS 3364, private: Colorado $165,186, Massachusetts second at $157,509, seven states and DC withheld"
+  url: https://data.bls.gov/cew/data/api/2025/a/industry/3364.csv
+  read: "2026-11-15"
+  short: computed from BLS data, 2025
+nasa-co-procurement-fy2023:
+  value: $1.75 billion
+  label: in NASA purchasing from Colorado, the 7th most of any state (computed from NASA data, fiscal 2023)
+  source: "Computed from NASA Economic Impact Study, fiscal 2023, Table 2, NASA Procurement: Colorado $1,752,386 thousand, 7.5% of the total"
+  url: https://www.nasa.gov/wp-content/uploads/2024/10/final-fy23-nasa-ecomomic-impact-report.pdf
+  read: "2026-11-15"
+  short: computed from NASA data, fiscal 2023
+nasa-co-jobs-fy2023:
+  value: 21,616
+  label: jobs in Colorado supported by NASA's work, a modeled estimate (per NASA, fiscal 2023)
+  source: NASA, State Economic Impact, Colorado, fact sheet for the fiscal 2023 Economic Impact Report
+  url: https://www.nasa.gov/wp-content/uploads/2025/04/24-eir-statesheet-noncenter-colorado-u25-v1-tagged.pdf
+  read: "2026-11-15"
+  short: NASA estimate, fiscal 2023
+nasa-co-output-fy2023:
+  value: $5.1 billion
+  label: in economic output in Colorado from NASA's work, a modeled estimate (per NASA, fiscal 2023)
+  source: NASA, State Economic Impact, Colorado, fact sheet for the fiscal 2023 Economic Impact Report
+  url: https://www.nasa.gov/wp-content/uploads/2025/04/24-eir-statesheet-noncenter-colorado-u25-v1-tagged.pdf
+  read: "2026-11-15"
+  short: NASA estimate, fiscal 2023
+co-dod-spending-fy2024:
+  value: $13.7 billion
+  label: in Defense Department contracts, grants and payroll in Colorado (per the Defense Department, fiscal 2024)
+  source: US Department of Defense, Office of Local Defense Community Cooperation, Defense Spending by State, Fiscal Year 2024, Abridged Version, November 2025
+  url: https://oldcc.gov/sites/default/files/2025-11/oldcc_dsbs_fy2024_abridged_nov25.pdf
+  read: "2026-11-15"
+  short: per the Defense Department, fiscal 2024
+co-dod-payroll-rank:
+  value: 10th
+  label: Colorado's rank among the states for Defense Department payroll, $4.5 billion (per the Defense Department, fiscal 2024)
+  source: US Department of Defense, Office of Local Defense Community Cooperation, Defense Spending by State, Fiscal Year 2024, Abridged Version, Table 4, November 2025
+  url: https://oldcc.gov/sites/default/files/2025-11/oldcc_dsbs_fy2024_abridged_nov25.pdf
+  read: "2026-11-15"
+  short: per the Defense Department, fiscal 2024
+peterson-personnel-fy2025:
+  value: 8,161
+  label: military and civilian personnel at Peterson Space Force Base in Colorado Springs (per the US Space Force, fiscal 2025)
+  source: Space Base Delta 1, Peterson AFB, FY25 Economic Impact Analysis, as of April 3, 2026
+  url: https://www.petersonschriever.spaceforce.mil/Portals/15/FY25%20EIS.pdf
+  read: "2026-11-15"
+  short: per the US Space Force, fiscal 2025
+buckley-personnel-2024:
+  value: 12,000+
+  label: base personnel at Buckley Space Force Base in Aurora (per the US Space Force, 2024)
+  source: Buckley Space Force Base, Buckley annual State of the Base 2024, January 24, 2024
+  url: https://www.buckley.spaceforce.mil/News/Article-Display/Article/3655452/buckley-annual-state-of-the-base-2024/
+  read: "2026-11-15"
+  short: per the US Space Force, 2024
+co-aerospace-jobs-edc:
+  value: 58,800
+  label: private jobs in Colorado's aerospace cluster, an economic development group's estimate from Lightcast data (per Metro Denver EDC, 2025)
+  source: Metro Denver Economic Development Corporation, Aerospace industry page, citing Lightcast
+  url: https://www.metrodenver.org/work-here/industries/aerospace
+  read: "2026-11-15"
+  short: Metro Denver EDC estimate, 2025
+honorees-space-aerospace:
+  value: "10"
+  label: of the 115 Colorado Startups 2026 Honorees work in space and aerospace, a count of honorees, not of the market (per Colorado Startups, 2026)
+  source: Colorado Startups, 2026 Honorees, the sector table under What they build
+  url: https://coloradostartups.org/leaderboard/
+  read: "2026-11-15"
+  short: per Colorado Startups, 2026 Honorees
