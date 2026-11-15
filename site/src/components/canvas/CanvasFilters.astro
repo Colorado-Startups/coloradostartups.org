@@ -1,11 +1,19 @@
 ---
-// The directory's filter form. Owner: L3. Hidden until canvas-filters.ts
-// runs, because without JavaScript it could not do anything; the directory
-// below it is complete without it. role="search" marks it as the page's
-// search landmark.
+// The directory's filter form. Owner: L3. role="search" marks it as the
+// page's search landmark. Search, then the stage chips drawn as the journey
+// (Idea, Launch and Growth in a row, Support alongside every level, each
+// with its count), then the type chips and the city menu. The chips are
+// radio buttons, so arrow keys move through a group and each choice filters
+// at once.
+//
+// The form is in the HTML from the first paint, so the island reveals
+// nothing that moves the first screen (CLS, e2e/l5a.spec.ts). Without
+// JavaScript it could not filter, so the <noscript> style hides it, as the
+// site header does for its menu button; the rows below are complete without it.
 import type { ResourceCard } from "@cs/shared";
 import { STAGES } from "@cs/shared";
 
+import { countText, stageCounts } from "./filter-logic";
 import { cityLabel, STAGE_LABELS, TYPE_LABELS } from "./labels";
 
 interface Props {
@@ -21,41 +29,91 @@ const cities = [...new Set(cards.map((c) => c.city))].sort((a, b) => {
   if (sa !== -1 || sb !== -1) return (sa === -1 ? 99 : sa) - (sb === -1 ? 99 : sb);
   return a.localeCompare(b);
 });
+// The counts with no filter set; the island keeps them in step after that.
+const counts = stageCounts(
+  cards.map((c) => ({ ...c, text: "" })),
+  { stage: "", type: "", city: "", q: "" },
+  null,
+);
+const LEVELS = STAGES.filter((s) => s !== "support");
 ---
 
-<form class="canvas-filters panel" role="search" aria-label="Filter the directory" data-canvas-filters hidden>
-  <div class="canvas-filters__grid">
-    <div class="field">
-      <label for="canvas-q">Search</label>
-      <input id="canvas-q" name="q" type="search" autocomplete="off" maxlength="100" />
-    </div>
-    <div class="field">
-      <label for="canvas-stage">Stage</label>
-      <select id="canvas-stage" name="stage">
-        <option value="">All stages</option>
-        {STAGES.map((s) => <option value={s}>{STAGE_LABELS[s]}</option>)}
-      </select>
-    </div>
-    <div class="field">
-      <label for="canvas-type">Type</label>
-      <select id="canvas-type" name="type">
-        <option value="">All types</option>
-        {types.map((t) => <option value={t}>{TYPE_LABELS[t]}</option>)}
-      </select>
-    </div>
-    <div class="field">
+<form class="canvas-filters" role="search" aria-label="Filter Startup Resources" data-canvas-filters>
+  <div class="field canvas-search">
+    <label for="canvas-q">Search</label>
+    <input id="canvas-q" name="q" type="search" autocomplete="off" maxlength="100" />
+  </div>
+
+  <div class="canvas-filters__place">
+    <div class="field canvas-city">
       <label for="canvas-city">City</label>
       <select id="canvas-city" name="city">
         <option value="">All cities</option>
         {cities.map((c) => <option value={c}>{cityLabel(c)}</option>)}
       </select>
     </div>
+    <button class="btn btn--stone" type="reset">Clear</button>
   </div>
-  <div class="btn-row">
-    <button class="btn btn--stone" type="reset">Clear filters</button>
-  </div>
+
+  <fieldset class="journey">
+    <legend>Stage</legend>
+    <div class="journey__map">
+      {
+        LEVELS.map((stage, i) => (
+          <>
+            <label class:list={["journey__node", `journey__node--${stage}`]}>
+              <input type="radio" name="stage" value={stage} />
+              <span class="journey__name">{STAGE_LABELS[stage]}</span>
+              <span class="journey__count" data-stage-count={stage}>
+                {counts[stage] ?? 0}
+              </span>
+              <span class="visually-hidden"> resources</span>
+            </label>
+            {i < LEVELS.length - 1 && <span class:list={["journey__arrow", `journey__arrow--${i + 1}`]} aria-hidden="true" />}
+          </>
+        ))
+      }
+      <label class="journey__node journey__node--support">
+        <input type="radio" name="stage" value="support" />
+        <span class="journey__name">{STAGE_LABELS.support}</span>
+        <span class="journey__count" data-stage-count="support">{counts.support ?? 0}</span>
+        <span class="visually-hidden"> resources, alongside every level</span>
+      </label>
+      <label class="journey__node journey__node--all">
+        <input type="radio" name="stage" value="" checked />
+        <span class="journey__name">All</span>
+        <span class="journey__count" data-stage-count="">{counts[""]}</span>
+        <span class="visually-hidden"> resources</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset class="chips">
+    <legend>Type</legend>
+    <div class="chips__row">
+      <label class="pick">
+        <input type="radio" name="type" value="" checked />
+        <span>All</span>
+      </label>
+      {
+        types.map((t) => (
+          <label class="pick">
+            <input type="radio" name="type" value={t} />
+            <span>{TYPE_LABELS[t]}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
 </form>
-<p class="meta" data-canvas-count role="status" aria-live="polite"></p>
+<noscript>
+  <style is:inline>
+    .canvas-filters {
+      display: none !important;
+    }
+  </style>
+</noscript>
+<p class="meta canvas-count" data-canvas-count role="status" aria-live="polite">{countText(cards.length, cards.length)}</p>
 
 <script>
   import { initCanvasFilters } from "./canvas-filters";
@@ -65,9 +123,233 @@ const cities = [...new Set(cards.map((c) => c.city))].sort((a, b) => {
 </script>
 
 <style>
-  .canvas-filters__grid {
+  .canvas-filters {
     display: grid;
-    gap: 0 var(--s-4);
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--s-4);
+  }
+  /* A wide screen sets the search beside the city menu, and the journey
+     beside the type chips, so the first rows show in the first screen. */
+  @media (min-width: 64rem) {
+    .canvas-filters {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      grid-template-areas:
+        "search place"
+        "journey chips";
+      gap: var(--s-4) var(--s-6);
+    }
+    .canvas-search {
+      grid-area: search;
+    }
+    .canvas-filters__place {
+      grid-area: place;
+    }
+    .journey {
+      grid-area: journey;
+    }
+    .chips {
+      grid-area: chips;
+    }
+  }
+  .canvas-filters :is(.field, fieldset) {
+    margin: 0;
+  }
+  fieldset {
+    min-width: 0;
+    max-width: none;
+    padding: 0;
+    border: 0;
+  }
+  legend {
+    padding: 0;
+    margin-bottom: var(--s-2);
+    font-weight: 700;
+  }
+
+  /* Each chip and node is a label over its own radio: the radio fills the
+     label, unseen, so a tap anywhere on it chooses it and the browser's own
+     keyboard and screen reader behavior stays. */
+  .pick,
+  .journey__node {
+    position: relative;
+    cursor: pointer;
+  }
+  .pick input,
+  .journey__node input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .pick:has(input:focus-visible),
+  .journey__node:has(input:focus-visible) {
+    outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+    outline-offset: var(--line-edge);
+  }
+
+  /* The journey: Idea, Launch and Growth in a row with arrows between, and
+     Support as a bar under them all, alongside every level. "All" sits at
+     the start of the row on a wide screen and under the levels on a phone. */
+  .journey__map {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--s-5) minmax(0, 1fr) var(--s-5) minmax(0, 1fr);
+    grid-template-areas:
+      "idea a1 launch a2 growth"
+      "all all support support support";
+    gap: var(--s-2) 0;
+    align-items: stretch;
+  }
+  .journey__node--idea {
+    grid-area: idea;
+  }
+  .journey__node--launch {
+    grid-area: launch;
+  }
+  .journey__node--growth {
+    grid-area: growth;
+  }
+  .journey__node--support {
+    grid-area: support;
+    margin-left: var(--s-2);
+  }
+  .journey__node--all {
+    grid-area: all;
+  }
+  .journey__arrow--1 {
+    grid-area: a1;
+  }
+  .journey__arrow--2 {
+    grid-area: a2;
+  }
+  @media (min-width: 48rem) {
+    .journey__map {
+      grid-template-columns: minmax(6rem, 0.6fr) var(--s-4) minmax(0, 1fr) var(--s-6) minmax(0, 1fr) var(--s-6) minmax(0, 1fr);
+      grid-template-areas:
+        "all . idea a1 launch a2 growth"
+        ". . support support support support support";
+    }
+    .journey__node--support {
+      margin-left: 0;
+    }
+  }
+  .journey__node {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: var(--size-control-lg);
+    padding: var(--s-2) var(--s-3);
+    border: var(--line-edge) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    background: var(--c-ground);
+    color: var(--c-text);
+  }
+  .journey__node--support {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    border-style: dashed;
+  }
+  .journey__name {
+    font-weight: 700;
+  }
+  .journey__count {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-1);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  .journey__node:has(input:checked) {
+    border-color: var(--c-accent-ledge);
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+    box-shadow: var(--sh-ledge-gold);
+  }
+  /* An arrow from one level to the next: a rule with a chevron head. */
+  .journey__arrow {
+    align-self: center;
+    justify-self: stretch;
+    position: relative;
+    height: var(--line-edge);
+    margin-inline: var(--s-1);
+    background: var(--c-border);
+  }
+  .journey__arrow::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-top: var(--line-edge) solid var(--c-border);
+    border-right: var(--line-edge) solid var(--c-border);
+    translate: 0 -50%;
+    rotate: 45deg;
+  }
+
+  /* The type chips wrap on a wide screen and scroll sideways in one row on a
+     phone, so the first screen keeps its room for the list. */
+  .chips__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  @media (max-width: 40rem) {
+    .chips__row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: var(--s-2);
+      scrollbar-width: thin;
+    }
+  }
+  .pick {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: var(--size-tap);
+    padding: 0 var(--s-3);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-bevel);
+    background: var(--c-ground);
+    color: var(--c-text);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .pick:has(input:checked) {
+    border-color: var(--c-text);
+    background: var(--c-text);
+    color: var(--c-ground);
+  }
+
+  .canvas-filters__place {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--s-3) var(--s-4);
+  }
+  .canvas-city {
+    flex: 1 1 12rem;
+    max-width: 22rem;
+  }
+  .canvas-search input {
+    width: 100%;
+  }
+  .canvas-filters__place .btn {
+    min-height: var(--size-control);
+  }
+  .canvas-count {
+    margin-top: var(--s-3);
+    font-weight: 700;
+  }
+  /* Forced colors drop background and border, so the chosen chip takes the system's selected colors. */
+  @media (forced-colors: active) {
+    .pick:has(input:checked),
+    .journey__node:has(input:checked) {
+      background: SelectedItem;
+      color: SelectedItemText;
+    }
   }
 </style>

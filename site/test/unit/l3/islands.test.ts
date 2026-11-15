@@ -4,35 +4,82 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { initCanvasFilters } from "../../../src/components/canvas/canvas-filters";
-import { countText, grounds, groupCountText, idsFromSubResults, matches, readState, writeState } from "../../../src/components/canvas/filter-logic";
+import {
+  countText,
+  groupCountText,
+  idsFromSubResults,
+  limitFor,
+  matches,
+  moreText,
+  PAGE_SIZE,
+  pageOf,
+  readState,
+  shownText,
+  stageCounts,
+  writeState,
+} from "../../../src/components/canvas/filter-logic";
 import { ERROR_MESSAGES, initSuggestForm } from "../../../src/components/canvas/suggest-form";
 
 const card = (id: string, stage: string, type: string, city: string, text: string) =>
-  `<li data-resource data-id="${id}" data-stage="${stage}" data-type="${type}" data-city="${city}"><h4 id="r-${id}">${text}</h4></li>`;
+  `<li data-resource data-id="${id}" data-stage="${stage}" data-type="${type}" data-city="${city}"><h3 id="r-${id}"><a href="https://x.example/${id}">${text}</a></h3></li>`;
+
+// The page as ecosystem-canvas/index.astro renders it (step F): radio chips
+// for stage and type, a city menu, stage sections, then the "Show more" row
+// and the "Back to filters" link after the last stage.
+const radios = (name: string, values: string[]) =>
+  values.map((v) => `<label><input type="radio" name="${name}" value="${v}"${v === "" ? " checked" : ""} /></label>`).join("");
+const form = (stages = ["idea", "launch", "growth", "support"], types = ["event", "investor", "government"]) => `
+  <form data-canvas-filters>
+    <input name="q" />
+    ${radios("stage", [...stages, ""])}
+    ${radios("type", ["", ...types])}
+    <select name="city"><option value=""></option><option value="Denver"></option><option value="Boulder"></option></select>
+  </form>
+  <span data-stage-count="idea"></span><span data-stage-count="launch"></span><span data-stage-count="support"></span><span data-stage-count=""></span>
+  <p data-canvas-count></p>`;
+const tail = `
+  <div data-canvas-more-row hidden><p data-canvas-shown></p><button type="button" data-canvas-more></button></div>
+  <p data-canvas-back hidden><a href="#find-title">Back to filters</a></p>`;
 
 const PAGE = `
 <div data-canvas-root>
-  <form data-canvas-filters hidden>
-    <input name="q" />
-    <select name="stage"><option value=""></option><option value="idea"></option><option value="launch"></option></select>
-    <select name="type"><option value=""></option><option value="event"></option><option value="investor"></option></select>
-    <select name="city"><option value=""></option><option value="Denver"></option><option value="Boulder"></option></select>
-  </form>
-  <p data-canvas-count></p>
-  <section id="idea" data-canvas-group><ul>
+  ${form()}
+  <section id="idea" data-canvas-group><span data-group-count></span><ul>
     ${card("ignite", "idea", "event", "Boulder", "Ignite Boulder, open startup gathering")}
   </ul></section>
-  <section id="launch" data-canvas-group><ul>
+  <section id="launch" data-canvas-group><span data-group-count></span><ul>
     ${card("angels", "launch", "investor", "Denver", "Denver Angels, angel investor group")}
     ${card("seedco", "launch", "investor", "Boulder", "Seed Co, seed venture firm")}
-  </ul><p data-canvas-back hidden><a href="#find-title">Back to filters</a></p></section>
-  <section id="support" data-canvas-group><ul>
+  </ul></section>
+  <section id="support" data-canvas-group><span data-group-count></span><ul>
     ${card("sbdc", "support", "government", "Denver", "Denver SBDC, free business advising")}
   </ul></section>
+  ${tail}
+</div>`;
+
+// A page with more rows than one page holds: 30 Idea events in Denver, then
+// 10 Launch investors in Boulder.
+const LONG = `
+<div data-canvas-root>
+  ${form()}
+  <section id="idea" data-canvas-group><ul>
+    ${Array.from({ length: 30 }, (_, i) => card(`i${i + 1}`, "idea", "event", "Denver", `Idea ${i + 1}`)).join("")}
+  </ul></section>
+  <section id="launch" data-canvas-group><ul>
+    ${Array.from({ length: 10 }, (_, i) => card(`l${i + 1}`, "launch", "investor", "Boulder", `Launch ${i + 1}`)).join("")}
+  </ul></section>
+  ${tail}
 </div>`;
 
 const shown = () => [...document.querySelectorAll<HTMLElement>("[data-resource]")].filter((e) => !e.hidden).map((e) => e.dataset.id);
 const root = () => document.querySelector<HTMLElement>("[data-canvas-root]")!;
+const status = () => document.querySelector("[data-canvas-count]")!.textContent;
+const choose = (name: string, value: string) => {
+  const input = document.querySelector<HTMLInputElement>(`input[name="${name}"][value="${value}"]`)!;
+  input.checked = true;
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+};
+const settle = () => new Promise((r) => setTimeout(r, 0));
 
 describe("filter logic", () => {
   const allowed = { stage: new Set(["idea"]), type: new Set(["event"]), city: new Set(["Denver"]) };
@@ -62,10 +109,31 @@ describe("filter logic", () => {
     expect(matches(at("support"), { ...pick("launch"), city: "Boulder" }, null)).toBe(false);
   });
 
-  it("deals band and lit grounds over the sections still showing (#310)", () => {
-    expect(grounds([true, true, true, true], "band")).toEqual(["band", "lit", "band", "lit"]);
-    expect(grounds([true, false, true, true], "band")).toEqual(["band", null, "lit", "band"]);
-    expect(grounds([false, true, true], "lit")).toEqual([null, "lit", "band"]);
+  it("counts each stage under the other filters, for the journey's chips", () => {
+    const facts = [
+      { id: "a", stage: "idea", type: "event", city: "Denver", text: "" },
+      { id: "b", stage: "launch", type: "investor", city: "Denver", text: "" },
+      { id: "c", stage: "launch", type: "investor", city: "Boulder", text: "" },
+      { id: "d", stage: "support", type: "investor", city: "Denver", text: "" },
+    ];
+    // The chosen stage does not narrow the counts; the type does.
+    expect(stageCounts(facts, { stage: "idea", type: "investor", city: "", q: "" }, null)).toEqual({ "": 3, launch: 2, support: 1 });
+    expect(stageCounts(facts, { stage: "", type: "", city: "Denver", q: "" }, null)).toEqual({ "": 3, idea: 1, launch: 1, support: 1 });
+  });
+
+  it("shows the first matches up to the limit, in page order", () => {
+    expect(pageOf([true, false, true, true, true], 2)).toEqual([true, false, true, false, false]);
+    expect(pageOf([false, false], 24)).toEqual([false, false]);
+  });
+
+  it("raises the limit by whole pages to reach a linked row, and only for a match", () => {
+    const matched = Array.from({ length: 60 }, (_, i) => i % 2 === 0);
+    expect(PAGE_SIZE).toBe(24);
+    // Index 50 is the 26th match: the second page holds it.
+    expect(limitFor(matched, 50, PAGE_SIZE)).toBe(48);
+    expect(limitFor(matched, 4, PAGE_SIZE)).toBe(PAGE_SIZE);
+    expect(limitFor(matched, 51, PAGE_SIZE)).toBe(PAGE_SIZE);
+    expect(limitFor(matched, 50, 72)).toBe(72);
   });
 
   it("keeps only sub-results on this page", () => {
@@ -73,9 +141,12 @@ describe("filter logic", () => {
     expect([...ids]).toEqual(["r-a", "r-c"]);
   });
 
-  it("says how many it shows", () => {
-    expect(countText(3, 3)).toBe("Showing all 3 resources.");
-    expect(countText(1, 3)).toBe("Showing 1 of 3 resources.");
+  it("says how many match, how many show and how many more a click adds", () => {
+    expect(countText(3, 3)).toBe("All 3 resources.");
+    expect(countText(1, 3)).toBe("1 of 3 resources match.");
+    expect(shownText(24, 245)).toBe("Showing 24 of 245.");
+    expect(moreText(221)).toBe("Show 24 more");
+    expect(moreText(7)).toBe("Show 7 more");
     expect(groupCountText(1)).toBe("1 resource");
     expect(groupCountText(12)).toBe("12 resources");
   });
@@ -87,32 +158,49 @@ describe("initCanvasFilters", () => {
     window.history.replaceState(null, "", "/ecosystem-canvas/");
   });
 
-  it("reveals the form and shows everything at first", async () => {
+  it("shows everything at first, with the counts filled in", async () => {
     const { apply } = initCanvasFilters(root(), async () => null);
     await apply();
     expect(document.querySelector<HTMLFormElement>("form")!.hidden).toBe(false);
     expect(shown()).toEqual(["ignite", "angels", "seedco", "sbdc"]);
-    expect(document.querySelector("[data-canvas-count]")!.textContent).toBe("Showing all 4 resources.");
+    expect(status()).toBe("All 4 resources.");
+    const count = (stage: string) => document.querySelector(`[data-stage-count="${stage}"]`)!.textContent;
+    expect([count("idea"), count("launch"), count("support"), count("")]).toEqual(["1", "2", "1", "4"]);
+    expect(document.querySelector<HTMLElement>("[data-canvas-more-row]")!.hidden).toBe(true);
   });
 
-  it("reveals the Back to filters links with the form, and hides them with their stage (#143)", async () => {
+  it("reveals the Back to filters link with the form (#143)", async () => {
     const back = document.querySelector<HTMLElement>("[data-canvas-back]")!;
     expect(back.hidden).toBe(true);
-    window.history.replaceState(null, "", "/ecosystem-canvas/?stage=idea");
     const { apply } = initCanvasFilters(root(), async () => null);
     await apply();
     expect(back.hidden).toBe(false);
-    // Launch has no Idea card, so its section, back link and all, is hidden.
-    expect(back.closest<HTMLElement>("section")!.hidden).toBe(true);
   });
 
-  it("applies filters from the URL, hides empty sections and keeps the URL in step", async () => {
+  it("applies filters from the URL, checks their chips, hides empty stages and keeps the URL in step", async () => {
     window.history.replaceState(null, "", "/ecosystem-canvas/?type=investor&city=Boulder");
     const { apply } = initCanvasFilters(root(), async () => null);
     await apply();
     expect(shown()).toEqual(["seedco"]);
+    expect(document.querySelector<HTMLInputElement>('input[name="type"][value="investor"]')!.checked).toBe(true);
     expect(document.querySelector<HTMLElement>("#idea")!.hidden).toBe(true);
     expect(window.location.search).toBe("?type=investor&city=Boulder");
+    expect(status()).toBe("1 of 4 resources match.");
+  });
+
+  it("filters when a chip is chosen, and counts each stage under the other filters", async () => {
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    choose("type", "investor");
+    await settle();
+    expect(shown()).toEqual(["angels", "seedco"]);
+    expect(window.location.search).toBe("?type=investor");
+    expect(document.querySelector('[data-stage-count="launch"]')!.textContent).toBe("2");
+    expect(document.querySelector('[data-stage-count="idea"]')!.textContent).toBe("0");
+    choose("stage", "support");
+    await settle();
+    expect(shown()).toEqual([]);
+    expect(status()).toBe("0 of 4 resources match.");
   });
 
   it("keeps the stage anchor in the URL", async () => {
@@ -123,6 +211,18 @@ describe("initCanvasFilters", () => {
     expect(window.location.search).toBe("?stage=launch");
   });
 
+  it("chooses the stage a stage anchor names (decision 33), and drops the anchor once another stage is chosen", async () => {
+    window.history.replaceState(null, "", "/ecosystem-canvas/#launch");
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    expect(document.querySelector<HTMLInputElement>('input[name="stage"][value="launch"]')!.checked).toBe(true);
+    expect(shown()).toEqual(["angels", "seedco", "sbdc"]);
+    expect(window.location.search + window.location.hash).toBe("?stage=launch#launch");
+    choose("stage", "idea");
+    await settle();
+    expect(window.location.search + window.location.hash).toBe("?stage=idea");
+  });
+
   it("shows the Support group after the chosen stage (#134)", async () => {
     window.history.replaceState(null, "", "/ecosystem-canvas/?stage=launch");
     const { apply } = initCanvasFilters(root(), async () => null);
@@ -130,7 +230,7 @@ describe("initCanvasFilters", () => {
     expect(shown()).toEqual(["angels", "seedco", "sbdc"]);
     expect(document.querySelector<HTMLElement>("#idea")!.hidden).toBe(true);
     expect(document.querySelector<HTMLElement>("#support")!.hidden).toBe(false);
-    expect(document.querySelector("[data-canvas-count]")!.textContent).toBe("Showing 3 of 4 resources.");
+    expect(status()).toBe("3 of 4 resources match.");
   });
 
   it("uses the search hook's ids for a text query", async () => {
@@ -152,80 +252,61 @@ describe("initCanvasFilters", () => {
     expect(shown()).toEqual(["seedco"]);
   });
 
-  it("alternates the section grounds among the sections a filter leaves showing (#310)", async () => {
-    // The page's order: the find band, four stage sections, then "Missing something?".
-    const stage = (id: string, ground: string, cardStage: string) =>
-      `<section id="${id}" class="section section--${ground}" data-canvas-group><ul>${card(id + "-1", cardStage, "event", "Denver", id)}</ul></section>`;
-    document.body.innerHTML = `
-<div data-canvas-root>
-  <section id="find" class="section section--band">
-    <form data-canvas-filters hidden>
-      <input name="q" />
-      <select name="stage"><option value=""></option><option value="idea"></option><option value="launch"></option><option value="growth"></option><option value="support"></option></select>
-      <select name="type"><option value=""></option></select>
-      <select name="city"><option value=""></option></select>
-    </form>
-    <p data-canvas-count></p>
-  </section>
-  ${stage("idea", "lit", "idea")}
-  ${stage("launch", "band", "launch")}
-  ${stage("growth", "lit", "growth")}
-  ${stage("support", "band", "support")}
-  <section id="missing" class="section section--lit"></section>
-</div>`;
-    const ground = (id: string) => {
-      const list = document.getElementById(id)!.classList;
-      return [list.contains("section--band") && "band", list.contains("section--lit") && "lit"].filter(Boolean).join("+");
-    };
-    const shownGrounds = () =>
-      [...document.querySelectorAll<HTMLElement>("[data-canvas-root] > section")].filter((s) => !s.hidden).map((s) => `${s.id}:${ground(s.id)}`);
-
-    window.history.replaceState(null, "", "/ecosystem-canvas/?stage=launch");
-    const { apply } = initCanvasFilters(root(), async () => null);
-    await apply();
-    expect(shownGrounds()).toEqual(["find:band", "launch:lit", "support:band", "missing:lit"]);
-
-    const select = document.querySelector<HTMLSelectElement>("select[name=stage]")!;
-    select.value = "support";
-    select.dispatchEvent(new Event("change", { bubbles: true }));
-    await apply();
-    expect(shownGrounds()).toEqual(["find:band", "support:lit", "missing:band"]);
-
-    select.value = "";
-    select.dispatchEvent(new Event("change", { bubbles: true }));
-    await apply();
-    expect(shownGrounds()).toEqual(["find:band", "idea:lit", "launch:band", "growth:lit", "support:band", "missing:lit"]);
-  });
-
-  it("keeps each substage's count badge in step with the filters (#220)", async () => {
-    // A substage with its count badge, as ecosystem-canvas/index.astro renders it.
-    document.body.innerHTML = `
-<div data-canvas-root>
-  <form data-canvas-filters hidden>
-    <input name="q" />
-    <select name="stage"><option value=""></option></select>
-    <select name="type"><option value=""></option></select>
-    <select name="city"><option value=""></option><option value="Denver"></option><option value="Boulder"></option></select>
-  </form>
-  <p data-canvas-count></p>
-  <section id="launch" data-canvas-group><div data-canvas-group>
-    <h3>Investors</h3><span data-group-count>2 resources</span>
-    <ul>
-      ${card("angels", "launch", "investor", "Denver", "Denver Angels, angel investor group")}
-      ${card("seedco", "launch", "investor", "Boulder", "Seed Co, seed venture firm")}
-    </ul>
-  </div></section>
-</div>`;
+  it("keeps each stage's count badge in step with the filters (#220)", async () => {
     window.history.replaceState(null, "", "/ecosystem-canvas/?city=Boulder");
     const { apply } = initCanvasFilters(root(), async () => null);
     await apply();
-    const badge = () => document.querySelector("[data-group-count]")!.textContent;
+    const badge = () => document.querySelector("#launch [data-group-count]")!.textContent;
     expect(badge()).toBe("1 resource");
     const city = document.querySelector<HTMLSelectElement>("select[name=city]")!;
     city.value = "";
     city.dispatchEvent(new Event("change", { bubbles: true }));
-    await apply();
+    await settle();
     expect(badge()).toBe("2 resources");
+  });
+});
+
+describe("initCanvasFilters, one page at a time", () => {
+  beforeEach(() => {
+    document.body.innerHTML = LONG;
+    window.history.replaceState(null, "", "/ecosystem-canvas/");
+  });
+  const moreRow = () => document.querySelector<HTMLElement>("[data-canvas-more-row]")!;
+  const more = () => document.querySelector<HTMLButtonElement>("[data-canvas-more]")!;
+
+  it("shows the first 24 matches, hides a stage with none showing, and offers the rest", async () => {
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    expect(shown()).toHaveLength(PAGE_SIZE);
+    expect(document.querySelector<HTMLElement>("#launch")!.hidden).toBe(true);
+    expect(moreRow().hidden).toBe(false);
+    expect(more().textContent).toBe("Show 16 more");
+    expect(document.querySelector("[data-canvas-shown]")!.textContent).toBe("Showing 24 of 40.");
+    expect(status()).toBe("All 40 resources.");
+  });
+
+  it("adds a page on Show more, moves focus to the first new row, and starts again on a new filter", async () => {
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    more().click();
+    await settle();
+    expect(shown()).toHaveLength(40);
+    expect(moreRow().hidden).toBe(true);
+    expect((document.activeElement as HTMLElement | null)?.closest<HTMLElement>("[data-resource]")?.dataset.id).toBe("i25");
+    const city = document.querySelector<HTMLSelectElement>("select[name=city]")!;
+    city.value = "Denver";
+    city.dispatchEvent(new Event("change", { bubbles: true }));
+    await settle();
+    expect(shown()).toHaveLength(PAGE_SIZE);
+  });
+
+  it("shows a row a link points to, even past the first page", async () => {
+    window.history.replaceState(null, "", "/ecosystem-canvas/#r-l3");
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    expect(shown()).toContain("l3");
+    // l3 is the 33rd match, so the second page shows, and 40 rows are all there are.
+    expect(shown()).toHaveLength(40);
   });
 });
 

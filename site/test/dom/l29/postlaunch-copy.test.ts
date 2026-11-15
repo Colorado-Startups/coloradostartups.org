@@ -89,17 +89,18 @@ describe("the founders forum after launch", () => {
   });
 });
 
-describe.each(GUIDE_SLUGS)("/guides/%s/ table of contents", (slug) => {
+// Step F (2026-11-15): the chart's rows took over from the table of contents.
+describe.each(GUIDE_SLUGS)("/guides/%s/ chart counts", (slug) => {
   const main = doc(`guides/${slug}/index.html`).querySelector("main")!;
-  const entries = [...main.querySelectorAll("nav[aria-label='On this page'] li")];
+  const rows = [...main.querySelectorAll("[data-guide-row]")];
 
-  it("gives each section's count with its unit, singular for one", () => {
-    expect(entries.length).toBeGreaterThan(0);
-    for (const li of entries) {
-      const id = li.querySelector("a")?.getAttribute("href")?.slice(1) ?? "";
-      const n = main.querySelectorAll(`section#${id} [data-guide-item]`).length;
-      expect(n, id).toBeGreaterThan(0);
-      expect(text(li.querySelector(".meta")), id).toBe(n === 1 ? "(1 listing)" : `(${n} listings)`);
+  it("gives each row's count with its unit, singular for one", () => {
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      const count = text(row.querySelector("[data-guide-count]"));
+      const n = Number(count.match(/^\d+/)?.[0]);
+      expect(n, count).toBeGreaterThan(0);
+      expect(count).toBe(n === 1 ? "1 listing" : `${n} listings`);
     }
   });
 });

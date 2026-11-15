@@ -9,6 +9,7 @@ import axe from "axe-core";
 import { describe, expect, it } from "vitest";
 
 import { amountLine, BUCKETS, CREDITS_GUIDE, parseCredits, shownPrograms, sourceLabel } from "../../../src/lib/guides/credits";
+import { CHART_FLOOR, creditValue, providerCredits } from "../../../src/lib/guides/credits-chart";
 import { readDist, SITE_DIR, sitemapPaths } from "../pages";
 
 const credits = parseCredits(readFileSync(path.resolve(SITE_DIR, "..", "data", "credits", "startup-programs.json"), "utf8"));
@@ -105,8 +106,35 @@ describe(CREDITS_GUIDE.path, () => {
   it("is in the sitemap and linked from the guides index and Startup Resources", () => {
     expect(sitemapPaths()).toContain(CREDITS_GUIDE.path);
     expect(doc("guides/index.html").querySelector(`main [data-guide-item] a[href='${CREDITS_GUIDE.path}']`)).not.toBeNull();
-    const intro = doc("ecosystem-canvas/index.html").querySelector("section[aria-labelledby='canvas-title']");
-    expect(intro?.querySelector(`a[href='${CREDITS_GUIDE.path}']`)).not.toBeNull();
+    const closing = doc("ecosystem-canvas/index.html").querySelector("section[aria-labelledby='missing-title']");
+    expect(closing?.querySelector(`a[href='${CREDITS_GUIDE.path}']`)).not.toBeNull();
+  });
+
+  // Step F (2026-11-15): a bar chart of the largest credit each provider
+  // states comes before the tables, and each program's details collapse.
+  it("draws the chart before the tables, as one labeled image with its data and source", () => {
+    const figure = main.querySelector("figure[aria-labelledby='credit-bars-title']")!;
+    expect(figure).not.toBeNull();
+    const firstTable = main.querySelector("section[data-credits-group]")!;
+    expect(figure.compareDocumentPosition(firstTable) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    for (const svg of figure.querySelectorAll(".plot svg")) {
+      expect(svg.getAttribute("role")).toBe("img");
+      expect(svg.getAttribute("aria-label")).toBe(text(figure.querySelector("h3")));
+    }
+    const charted = providerCredits(shown).filter((d) => d.amount >= CHART_FLOOR);
+    const cells = [...figure.querySelectorAll("details tbody tr")].map((tr) => [text(tr.querySelector("th")), text(tr.querySelector("td"))]);
+    expect(cells).toEqual(charted.map((d) => [d.provider, creditValue(d)]));
+    for (const [, value] of cells) expect(value).toMatch(/, per /);
+    expect(text(figure.querySelector("figcaption"))).toMatch(/per each provider's own page/);
+  });
+
+  it("collapses each program's needs and terms under a closed Details disclosure", () => {
+    for (const row of rows) {
+      const details = row.querySelectorAll("details[data-program-details]");
+      expect(details, row.dataset.program).toHaveLength(1);
+      expect(details[0]!.hasAttribute("open"), row.dataset.program).toBe(false);
+      expect(text(details[0]!.querySelector("summary")), row.dataset.program).toMatch(/^What you need and terms/);
+    }
   });
 
   // The 30 s limit: axe on a long page can pass 5 s when the Mac is busy.

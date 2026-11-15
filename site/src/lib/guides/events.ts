@@ -72,11 +72,11 @@ export function startupEvents({ records, date, calendar }: GuideInput): Guide {
       { text: "Colorado Startups event calendar", href: EVENT_CALENDAR },
       ", which holds Colorado Startups events and events from across the community. ",
       series.length === 1
-        ? "Below is the 1 event or group that Startup Resources lists as an event, as of "
-        : `Below, by city, are the ${series.length} events, groups and maker spaces that Startup Resources lists as events, as of `,
+        ? "The chart below counts the 1 event or group that Startup Resources lists as an event, as of "
+        : `The chart below counts, by city, the ${series.length} events, groups and maker spaces that Startup Resources lists as events, as of `,
       dated(date),
       ".",
-      upcoming ? " The calendar's next events come first, with times in Mountain Time." : "",
+      upcoming ? " The calendar's next events follow, with times in Mountain Time." : "",
     ],
     [
       {

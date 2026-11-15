@@ -39,7 +39,7 @@ export interface Guide extends GuideMeta {
   path: string;
   /** Two or three sentences that answer the question, count and source included. */
   answer: Part[];
-  /** The next events on the calendar, shown ahead of the lists. Only the events guide has them. */
+  /** The next events on the calendar, shown after the chart. Only the events guide has them. */
   upcoming?: UpcomingList;
   sections: GuideSection[];
 }

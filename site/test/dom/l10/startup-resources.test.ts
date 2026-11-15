@@ -27,10 +27,12 @@ describe("/ecosystem-canvas/ is titled Startup Resources", () => {
     expect(canvas.querySelector('meta[name="description"]')?.getAttribute("content")).toMatch(/^Startup Resources/);
   });
 
-  it("credits the Ecosystem Canvas and Founder Institute in its intro", () => {
-    const intro = canvas.querySelector("section[aria-labelledby='canvas-title']")?.textContent ?? "";
-    expect(intro).toMatch(/built on the Ecosystem Canvas/);
-    expect(intro).toMatch(/created by\s+Founder Institute and Colorado Startups/);
+  // Step F (2026-11-15): the first screen is the search and the chips, so
+  // the credit moved to the closing section.
+  it("credits the Ecosystem Canvas and Founder Institute in its closing section", () => {
+    const closing = canvas.querySelector("section[aria-labelledby='missing-title']")?.textContent ?? "";
+    expect(closing).toMatch(/built on the Ecosystem Canvas/);
+    expect(closing).toMatch(/created by\s+Founder Institute and Colorado Startups/);
   });
 
   it("keeps the stage anchors the welcome desk links to (decision 33c)", () => {
@@ -41,7 +43,9 @@ describe("/ecosystem-canvas/ is titled Startup Resources", () => {
 });
 
 describe("the first result follows the filters (#143)", () => {
-  const find = canvas.querySelector<HTMLElement>("section[aria-labelledby='find-title']")!;
+  // The title, the filters, the count and the Resourcus disclosure share the
+  // first section (step F, 2026-11-15).
+  const find = canvas.querySelector<HTMLElement>("section[aria-labelledby='canvas-title']")!;
   const form = find.querySelector("form[data-canvas-filters]")!;
   const status = find.querySelector("[data-canvas-count]")!;
   const ask = find.querySelector<HTMLDetailsElement>("details[data-canvas-ask]");
@@ -64,24 +68,24 @@ describe("the first result follows the filters (#143)", () => {
   });
 
   it("goes straight from the filters to the first stage", () => {
-    expect(find.nextElementSibling?.id).toBe("idea");
+    expect(find.nextElementSibling?.querySelector("section")?.id).toBe("idea");
     const first = canvas.querySelector("main [data-resource]")!;
     expect(first.closest("section")?.id).toBe("idea");
   });
 
-  it("ends each stage with a Back to filters link that the island reveals", () => {
-    for (const stage of STAGE_IDS) {
-      const section = canvas.querySelector(`section#${stage}`)!;
-      const back = section.querySelector<HTMLElement>("[data-canvas-back]");
-      expect(back, stage).not.toBeNull();
-      expect(back?.parentElement?.lastElementChild, stage).toBe(back);
-      expect(back?.hasAttribute("hidden"), stage).toBe(true);
-      expect(back?.hasAttribute("data-pagefind-ignore"), stage).toBe(true);
-      const link = back?.querySelector("a");
-      expect(link?.textContent?.trim(), stage).toBe("Back to filters");
-      expect(link?.getAttribute("href"), stage).toBe("#find-title");
-      expect(link?.classList.contains("btn--quiet"), stage).toBe(true);
-    }
+  it("ends the list with one Back to filters link that the island reveals", () => {
+    const backs = [...canvas.querySelectorAll<HTMLElement>("[data-canvas-back]")];
+    expect(backs).toHaveLength(1);
+    const [back] = backs;
+    const last = canvas.querySelector(`section#${STAGE_IDS.at(-1)}`)!;
+    expect(follows(last, back!)).toBe(true);
+    expect(back!.parentElement?.lastElementChild).toBe(back);
+    expect(back!.hasAttribute("hidden")).toBe(true);
+    expect(back!.hasAttribute("data-pagefind-ignore")).toBe(true);
+    const link = back!.querySelector("a");
+    expect(link?.textContent?.trim()).toBe("Back to filters");
+    expect(link?.getAttribute("href")).toBe("#find-title");
+    expect(link?.classList.contains("btn--quiet")).toBe(true);
     expect(canvas.getElementById("find-title")?.closest("section")).toBe(find);
   });
 

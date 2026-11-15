@@ -14,7 +14,8 @@ const PAGES = [
   // #723 and #724: the calendar's two ways in, and the directory's own task.
   { route: "/event-calendar/", action: { role: "link", name: "See our events on Luma" } },
   { route: "/event-calendar/", action: { role: "link", name: "Add to Google Calendar" } },
-  { route: "/ecosystem-canvas/", action: { role: "link", name: "Find a resource" } },
+  // Step F (2026-11-15): the directory opens on its search box.
+  { route: "/ecosystem-canvas/", action: { role: "searchbox", name: "Search" } },
 ] as const;
 
 const SCREENS = [

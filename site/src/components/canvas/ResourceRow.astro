@@ -1,0 +1,75 @@
+---
+// One resource in the directory, as a row: its name (linked to its own site),
+// its type and city, then one line of description. Owner: L3. Built from our
+// own data at build time; the heading's id is the anchor Pagefind, the guides
+// and Resourcus link to.
+import type { ResourceCard } from "@cs/shared";
+
+import { cityLabel, TYPE_LABELS } from "./labels";
+
+interface Props {
+  card: ResourceCard;
+}
+
+const { card } = Astro.props;
+---
+
+<li
+  class="canvas-row"
+  data-resource
+  data-id={card.id}
+  data-stage={card.stage}
+  data-type={card.type}
+  data-city={card.city}
+>
+  <h3 id={`r-${card.id}`} class="canvas-row__name"><a href={card.url}>{card.name}</a></h3>
+  <p class="meta canvas-row__facts">{TYPE_LABELS[card.type]}, {cityLabel(card.city)}</p>
+  <p class="canvas-row__desc">{card.description}</p>
+</li>
+
+<style>
+  .canvas-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 var(--s-3);
+    align-content: start;
+    padding: var(--s-3) 0;
+    border-top: var(--line-hair) solid var(--c-rule);
+    list-style: none;
+  }
+  /* The island hides rows past the shown page; display: grid above would
+     otherwise outrank the browser's own [hidden] rule. */
+  .canvas-row[hidden] {
+    display: none;
+  }
+  .canvas-row__name {
+    margin: 0;
+    font-size: var(--t-step-0);
+    line-height: 1.3;
+  }
+  .canvas-row__facts {
+    margin: 0;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .canvas-row__desc {
+    grid-column: 1 / -1;
+    margin: var(--s-1) 0 0;
+    font-size: var(--t-step--1);
+  }
+  /* A phone puts the type and city under the name. */
+  @media (max-width: 30rem) {
+    .canvas-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .canvas-row__facts {
+      text-align: left;
+      white-space: normal;
+    }
+  }
+  /* A row that has been scrolled to, from a guide or a search result, stays
+     clear of the top edge. */
+  .canvas-row__name {
+    scroll-margin-top: var(--s-5);
+  }
+</style>

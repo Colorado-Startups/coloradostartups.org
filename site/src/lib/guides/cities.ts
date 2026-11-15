@@ -18,8 +18,6 @@ import { CITY_GUIDES, CITY_SLUGS, type CitySlug, count, dated, everything, first
 interface NeedRule {
   id: string;
   heading: string;
-  /** How the answer names this section's records. */
-  noun: string;
   intro: Part[];
   pick: (r: GuideRecord) => boolean;
   /** How the section splits its list, as for a topic guide's SectionRule. */
@@ -34,7 +32,6 @@ export const CITY_NEEDS: readonly NeedRule[] = [
   {
     id: "accelerators",
     heading: "Accelerators and incubators",
-    noun: "accelerators and incubators",
     intro: [
       "An accelerator is a mentor-led program for a company that is already building. ",
       "An incubator helps founders test an idea, build a team and set up the company.",
@@ -48,7 +45,6 @@ export const CITY_NEEDS: readonly NeedRule[] = [
   {
     id: "meet",
     heading: "Where founders meet",
-    noun: "meetups and events",
     intro: [
       "Groups and events where founders learn, find cofounders and pitch. ",
       { text: "Startup events in Colorado", href: guidePath("colorado-startup-events") },
@@ -63,14 +59,12 @@ export const CITY_NEEDS: readonly NeedRule[] = [
   {
     id: "coworking",
     heading: "Coworking spaces",
-    noun: "coworking spaces",
     intro: ["Shared workspaces where founders rent a desk or an office."],
     pick: (r) => r.type === "coworking",
   },
   {
     id: "investors",
     heading: "Investors",
-    noun: "investors",
     intro: ["A listing is not a recommendation, so ask other founders about an investor before you pitch."],
     pick: (r) => r.type === "investor" || isAngelGroup(r),
     groups: [
@@ -82,7 +76,6 @@ export const CITY_NEEDS: readonly NeedRule[] = [
   {
     id: "support",
     heading: "Funding and support programs",
-    noun: "support programs",
     intro: [
       "Offices and programs that help local businesses start and grow. For statewide programs, see ",
       { text: "How to start a company in Colorado", href: guidePath("start-a-company-in-colorado") },
@@ -96,7 +89,6 @@ export const CITY_NEEDS: readonly NeedRule[] = [
   {
     id: "universities",
     heading: "Universities",
-    noun: "universities",
     intro: ["Universities and colleges that Startup Resources lists as support for founders."],
     pick: (r) => r.type === "university",
   },
@@ -158,18 +150,17 @@ export function cityGuide(slug: CitySlug, { records, regions, date }: GuideInput
   const needs = needSections(own);
   const shown = guideItems({ sections: needs }).length;
   const nearby = nearbySection(slug, region, { records, regions, date });
-  const nouns = CITY_NEEDS.filter((_, i) => needs[i]!.groups.length > 0).map((n) => n.noun);
-  const then = nearby.groups.length > 0 ? ", then towns nearby" : "";
-  // Why the page lists fewer records than the city has: no need picks a service
-  // provider, a large company or a coding school. Name the biggest reason.
+  // Why the chart counts fewer records than the city has: no need picks a
+  // service provider, a large company or a coding school. Name the biggest
+  // reason. The chart's rows name the needs, so the answer does not (step F).
   const listed = new Set(guideItems({ sections: needs }).map((r) => r.id));
   const rest = own.filter((r) => !listed.has(r.id));
   const providers = rest.filter((r) => r.type === "service-provider").length;
   const leftOut =
     providers * 2 > rest.length
-      ? "; most of the rest are service providers"
+      ? " Most of the rest are service providers."
       : providers > 0
-        ? "; service providers are left out"
+        ? " Service providers are left out."
         : "";
   // The region's other core cities, or its nearby towns when the city is its only core city.
   const others = region.cities.filter((c) => cityKey(c) !== cityKey(city));
@@ -180,11 +171,11 @@ export function cityGuide(slug: CitySlug, { records, regions, date }: GuideInput
     [
       `Startup Resources lists ${count(own.length, "resource", "resources")} for founders in ${city}, as of `,
       dated(date),
-      shown > 0 ? `, and the lists below show ${shown} of them by need. ` : ". ",
+      shown > 0 ? `, and the chart below counts ${shown} of them by need. ` : ". ",
       `${city} is in `,
       { text: region.name, href: `/regions/${region.id}/` },
       around.length > 0 ? `, the Colorado Startups region that also takes in ${andList(around)}.` : ", a Colorado Startups region.",
-      nouns.length > 0 ? ` The lists cover ${andList(nouns)}${then}${leftOut}.` : "",
+      shown > 0 ? leftOut : "",
     ],
     [...needs, nearby],
   );

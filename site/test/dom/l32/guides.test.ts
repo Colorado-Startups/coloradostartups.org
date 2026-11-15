@@ -158,23 +158,27 @@ describe.each(CITY_SLUGS)("/guides/%s/ city rules", (slug) => {
     expect(text(answer.querySelector(`a[href='/regions/${region.id}/']`))).toBe(region.name);
   });
 
-  it("states the count the lists show, and the nearby count, each matching the page", () => {
+  // Step F (2026-11-15): the chart's rows replace the lists; the answer
+  // states the count of the city's own rows.
+  const count = (row: Element) => Number(text(row.querySelector("[data-guide-count]")).match(/^\d+/)?.[0]);
+
+  it("states the count the chart shows by need, matching its rows, with nearby as the last row", () => {
     const answer = text(main.querySelector("[data-guide-answer]"));
-    const all = main.querySelectorAll("[data-guide-item]").length;
-    const nearby = main.querySelectorAll("section#nearby [data-guide-item]").length;
-    expect(answer).toContain(`, and the lists below show ${all - nearby} of them by need.`);
-    if (nearby > 0) expect(text(main.querySelector("section#nearby h2 + p"))).toMatch(new RegExp(`^Startup Resources lists ${nearby} more in `));
+    const rows = [...main.querySelectorAll<HTMLElement>("[data-guide-row]")];
+    const own = rows.filter((r) => r.dataset.guideRow !== "nearby").reduce((n, r) => n + count(r), 0);
+    expect(answer).toContain(`, and the chart below counts ${own} of them by need.`);
+    const nearby = main.querySelector("[data-guide-row='nearby']");
+    if (nearby) {
+      expect(rows.at(-1)).toBe(nearby);
+      expect(text(nearby.querySelector(".guide-chart__label"))).toBe(`Nearby in ${region.name}`);
+    }
   });
 
-  it("lists the city's own records before nearby, and none from statewide or online", () => {
+  it("shows records from the city first, and none from statewide or online", () => {
     const items = [...main.querySelectorAll("[data-guide-item]")];
-    const nearby = new Set(main.querySelectorAll("section#nearby [data-guide-item]"));
-    for (const li of items) {
-      const where = cityOf(li);
-      expect(["Statewide", "Online"], where).not.toContain(where);
-      if (nearby.has(li)) expect(where).not.toBe(city);
-      else expect(where).toBe(city);
-    }
+    expect(items.length).toBeGreaterThan(0);
+    expect(cityOf(items[0]!)).toBe(city);
+    for (const li of items) expect(["Statewide", "Online"], cityOf(li)).not.toContain(cityOf(li));
   });
 });
 
@@ -187,11 +191,13 @@ describe("/guides/colorado-startup-events/", () => {
     expect(answer.querySelector(`a[href='${EVENT_CALENDAR}']`)).not.toBeNull();
   });
 
-  it("lists the event records by city, under a heading that does not call them all recurring", () => {
-    const byCity = main.querySelector("section#by-city")!;
-    expect(text(byCity.querySelector("h2"))).toBe("Events and groups by city");
-    expect(byCity.querySelectorAll("h3").length).toBeGreaterThan(0);
-    expect(byCity.querySelectorAll("[data-guide-item]").length).toBe(main.querySelectorAll("[data-guide-item]").length);
+  it("charts the event records by city, each row linking its city's events, and never calls them all recurring", () => {
+    const rows = [...main.querySelectorAll<HTMLElement>("[data-guide-row]")];
+    expect(rows.length).toBeGreaterThan(1);
+    for (const row of rows) {
+      const href = row.querySelector("a")?.getAttribute("href") ?? "";
+      expect(new URL(href, "https://x.example").searchParams.get("type"), row.dataset.guideRow).toBe("event");
+    }
     expect(text(main)).not.toMatch(/recurring/i);
   });
 

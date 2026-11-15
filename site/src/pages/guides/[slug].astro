@@ -1,24 +1,34 @@
 ---
 // /guides/<slug>/: one answer page, built from Startup Resources at build
 // time. Owner: L23; L32 added the city and events guides. lib/guides/guides.ts
-// decides what each guide says and lists; this page only renders it and passes
-// its ItemList to BaseLayout.
+// decides what each guide says and lists, and lib/guides/browse.ts turns its
+// lists into the chart's rows and the five records it shows; this page only
+// renders them and passes the ItemList of those five to BaseLayout.
 import type { GetStaticPaths } from "astro";
 
 import GuidePage from "../../components/guides/GuidePage.astro";
 import { guideInput } from "../../components/guides/guide-data";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { buildGuide, GUIDE_SLUGS, guideJsonLd, otherGuides } from "../../lib/guides/guides";
+import { browseHref, guideRows, startWith } from "../../lib/guides/browse";
+import { buildGuide, GUIDE_SLUGS, guideItems, guideJsonLd, otherGuides } from "../../lib/guides/guides";
+import { REGIONS } from "../../lib/regions/match";
 
 export const getStaticPaths = (() => GUIDE_SLUGS.map((slug) => ({ params: { slug } }))) satisfies GetStaticPaths;
 
 const { slug } = Astro.params;
-const guide = buildGuide(slug, await guideInput());
+const input = await guideInput();
+const guide = buildGuide(slug, input);
+const rows = guideRows(
+  guide,
+  REGIONS.map((r) => r.id),
+);
+const start = startWith(rows);
+const browse = browseHref(guideItems(guide)) ?? "/ecosystem-canvas/";
 const site = Astro.site!;
 ---
 
-<BaseLayout title={guide.title} description={guide.description} jsonLd={guideJsonLd(guide, site)}>
+<BaseLayout title={guide.title} description={guide.description} jsonLd={guideJsonLd(guide, site, start)}>
   {/* The /ask/ search filters by this type (Pagefind). */}
   <span data-pagefind-filter="type:Guides"></span>
-  <GuidePage guide={guide} others={otherGuides(slug)} />
+  <GuidePage guide={guide} rows={rows} start={start} browse={browse} date={input.date} others={otherGuides(slug)} />
 </BaseLayout>

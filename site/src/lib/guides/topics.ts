@@ -172,7 +172,7 @@ export function whereFoundersMeet({ records, regions, date }: GuideInput): Guide
       `. Startup Resources lists ${guideItems({ sections }).length} of these places as of `,
       dated(date),
       `${leader}. `,
-      `The lists below run by region (${andList(regions.map((r) => r.name))}), then statewide and online.`,
+      `The chart below counts them by region (${andList(regions.map((r) => r.name))}), then statewide and online.`,
     ],
     sections,
   );
