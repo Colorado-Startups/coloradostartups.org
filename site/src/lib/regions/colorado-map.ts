@@ -34,6 +34,12 @@ export function clockwise<F extends { geometry: { coordinates: LonLat[][] } }>(f
 export const MAP_WIDTH = 640;
 export const MAP_HEIGHT = 470;
 
+/** The statewide drawing's central meridian, as a [west, east] pair of one point. */
+const STATE_CENTRE: [LonLat, LonLat] = [
+  [-105.55, 0],
+  [-105.55, 0],
+];
+
 export interface MapView {
   /** Zoom to one zone and dim the other two. Omit for the whole state. */
   zone?: RegionId;
@@ -53,7 +59,7 @@ export function coloradoMapSvg(text: ChartText, { zone }: MapView = {}): string 
         const [lon, lat] = zoneLabelPoint(z);
         return { lon, lat, name: z.properties.name };
       });
-  const [[west], [east]] = focus ? zoneBounds(focus.id) : [[-105.55], [-105.55]];
+  const [[west], [east]] = focus ? zoneBounds(focus.id) : STATE_CENTRE;
   const lit = (id: RegionId) => !focus || focus.id === id;
   // A zone's view names its cities; a city within 0.15° of the zone's east
   // edge (Greeley, Colorado Springs) takes its name on the west side, or the
