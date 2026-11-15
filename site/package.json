@@ -37,6 +37,7 @@
     "@cs/shared": "*",
     "@observablehq/plot": "0.6.17",
     "astro": "7.4.4",
+    "maplibre-gl": "6.16.0",
     "yaml": "2.9.1",
     "zod": "^4.6.7"
   },

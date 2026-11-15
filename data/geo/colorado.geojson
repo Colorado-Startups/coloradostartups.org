@@ -1,0 +1,53 @@
+{
+ "type": "FeatureCollection",
+ "source": "US Census Bureau TIGERweb, State_County layer 0, simplified 0.01 degrees",
+ "license": "CC0-1.0 (Census data is not copyrighted)",
+ "features": [
+  {
+   "type": "Feature",
+   "id": "colorado",
+   "properties": {
+    "name": "Colorado"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -105.155,
+       36.995
+      ],
+      [
+       -102.042,
+       36.993
+      ],
+      [
+       -102.052,
+       41.002
+      ],
+      [
+       -109.05,
+       41.001
+      ],
+      [
+       -109.06,
+       38.278
+      ],
+      [
+       -109.043,
+       38.157
+      ],
+      [
+       -109.045,
+       36.999
+      ],
+      [
+       -105.155,
+       36.995
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

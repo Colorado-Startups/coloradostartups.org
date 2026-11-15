@@ -20,6 +20,8 @@ local/
 # contact data never enters this repo (Paul's rule: lists live in Drive only)
 *.csv
 !ops/redirects/map.csv
+# US Census place names and points, public domain (data/geo/README.md); no people in it
+!data/geo/places.csv
 __pycache__/
 *.pyc
 # Quality and Speed: the CI run is rebuilt each time; local.json and history/ are committed

@@ -41,7 +41,9 @@
     "typescript": "6.0.3"
   },
   "overrides": {
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "@maplibre/geojson-vt": "6.3.0",
+    "@maplibre/maplibre-gl-style-spec": "26.4.4"
   },
   "allowScripts": {
     "msw": false,

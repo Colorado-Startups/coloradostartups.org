@@ -74,6 +74,8 @@ for (const scheme of SCHEMES) {
           window.scrollTo(0, 0);
         });
         await page.waitForLoadState("networkidle");
+        // A live map (ColoradoMap) draws its tiles after the network goes quiet; wait for it, at most 20 s.
+        await page.waitForFunction(() => !document.querySelector('[data-map="loading"]'), null, { timeout: 20_000 }).catch(() => undefined);
         await page.evaluate(() => document.fonts.ready);
         const file = fileName(route, width, scheme);
         await page.screenshot({ path: path.join(OUT, file), fullPage: true, animations: "disabled" });

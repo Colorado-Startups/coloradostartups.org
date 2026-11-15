@@ -1,0 +1,432 @@
+{
+ "type": "FeatureCollection",
+ "source": "US Census Bureau TIGERweb place points (data/geo/places.csv); towns from data/regions/*.yaml",
+ "license": "CC0-1.0 (derived from Census data, which is not copyrighted)",
+ "features": [
+  {
+   "type": "Feature",
+   "id": "photon-mountain",
+   "properties": {
+    "id": "photon-mountain",
+    "name": "Photon Mountain",
+    "cities": [
+     "Boulder",
+     "Golden",
+     "Arvada",
+     "Denver"
+    ],
+    "towns": [
+     "Louisville",
+     "Lafayette",
+     "Superior",
+     "Erie",
+     "Longmont",
+     "Niwot",
+     "Lyons",
+     "Nederland",
+     "Broomfield",
+     "Westminster",
+     "Thornton",
+     "Lakewood",
+     "Wheat Ridge",
+     "Evergreen",
+     "Englewood",
+     "Littleton",
+     "Centennial",
+     "Greenwood Village",
+     "Aurora",
+     "Parker",
+     "Lone Tree",
+     "Highlands Ranch",
+     "Castle Rock"
+    ],
+    "cityPoints": [
+     {
+      "name": "Boulder",
+      "lon": -105.251251,
+      "lat": 40.0244306
+     },
+     {
+      "name": "Golden",
+      "lon": -105.2105614,
+      "lat": 39.742483
+     },
+     {
+      "name": "Arvada",
+      "lon": -105.1502698,
+      "lat": 39.8337667
+     },
+     {
+      "name": "Denver",
+      "lon": -104.8811054,
+      "lat": 39.7618502
+     }
+    ],
+    "method": "convex hull of the Census points of its 27 towns, padded 5 km",
+    "note": "A proposal, not a legal line."
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -105.56433,
+       39.96381
+      ],
+      [
+       -105.55988,
+       39.94651
+      ],
+      [
+       -105.3921,
+       39.6183
+      ],
+      [
+       -105.37943,
+       39.60363
+      ],
+      [
+       -104.89172,
+       39.34463
+      ],
+      [
+       -104.87275,
+       39.33482
+      ],
+      [
+       -104.85037,
+       39.33138
+      ],
+      [
+       -104.828,
+       39.33482
+      ],
+      [
+       -104.80903,
+       39.34463
+      ],
+      [
+       -104.79636,
+       39.3593
+      ],
+      [
+       -104.71788,
+       39.4919
+      ],
+      [
+       -104.63539,
+       39.67099
+      ],
+      [
+       -104.63093,
+       39.6883
+      ],
+      [
+       -104.63539,
+       39.7056
+      ],
+      [
+       -105.04651,
+       40.1855
+      ],
+      [
+       -105.05918,
+       40.20017
+      ],
+      [
+       -105.07815,
+       40.20998
+      ],
+      [
+       -105.24629,
+       40.26483
+      ],
+      [
+       -105.26866,
+       40.26827
+      ],
+      [
+       -105.29104,
+       40.26483
+      ],
+      [
+       -105.31001,
+       40.25502
+      ],
+      [
+       -105.5472,
+       39.99579
+      ],
+      [
+       -105.55988,
+       39.98112
+      ],
+      [
+       -105.56433,
+       39.96381
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "space-peak",
+   "properties": {
+    "id": "space-peak",
+    "name": "Space Peak",
+    "cities": [
+     "Colorado Springs"
+    ],
+    "towns": [
+     "Manitou Springs",
+     "Monument",
+     "Fountain",
+     "Woodland Park",
+     "Cascade"
+    ],
+    "cityPoints": [
+     {
+      "name": "Colorado Springs",
+      "lon": -104.760749,
+      "lat": 38.8672553
+     }
+    ],
+    "method": "convex hull of the Census points of its 6 towns, padded 5 km",
+    "note": "A proposal, not a legal line."
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -105.11674,
+       38.99821
+      ],
+      [
+       -105.11234,
+       38.98091
+      ],
+      [
+       -105.09983,
+       38.96624
+      ],
+      [
+       -104.95367,
+       38.82557
+      ],
+      [
+       -104.72133,
+       38.6574
+      ],
+      [
+       -104.70261,
+       38.6476
+      ],
+      [
+       -104.68052,
+       38.64416
+      ],
+      [
+       -104.65843,
+       38.6476
+      ],
+      [
+       -104.63971,
+       38.6574
+      ],
+      [
+       -104.62719,
+       38.67207
+      ],
+      [
+       -104.6228,
+       38.68938
+      ],
+      [
+       -104.62719,
+       38.70668
+      ],
+      [
+       -104.79372,
+       39.09022
+      ],
+      [
+       -104.80623,
+       39.10489
+      ],
+      [
+       -104.82496,
+       39.11469
+      ],
+      [
+       -104.84704,
+       39.11813
+      ],
+      [
+       -104.86913,
+       39.11469
+      ],
+      [
+       -105.08111,
+       39.03999
+      ],
+      [
+       -105.09983,
+       39.03019
+      ],
+      [
+       -105.11234,
+       39.01552
+      ],
+      [
+       -105.11674,
+       38.99821
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "fusion-canyon",
+   "properties": {
+    "id": "fusion-canyon",
+    "name": "Fusion Canyon",
+    "cities": [
+     "Fort Collins",
+     "Loveland",
+     "Windsor",
+     "Greeley"
+    ],
+    "towns": [
+     "Timnath",
+     "Wellington",
+     "Berthoud",
+     "Johnstown",
+     "Evans",
+     "Estes Park"
+    ],
+    "cityPoints": [
+     {
+      "name": "Fort Collins",
+      "lon": -105.0649877,
+      "lat": 40.5484045
+     },
+     {
+      "name": "Loveland",
+      "lon": -105.0631107,
+      "lat": 40.4169053
+     },
+     {
+      "name": "Windsor",
+      "lon": -104.9152601,
+      "lat": 40.4781874
+     },
+     {
+      "name": "Greeley",
+      "lon": -104.772887,
+      "lat": 40.417205
+     }
+    ],
+    "method": "convex hull of the Census points of its 10 towns, padded 5 km",
+    "note": "A proposal, not a legal line."
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -105.59023,
+       40.36891
+      ],
+      [
+       -105.58574,
+       40.3516
+      ],
+      [
+       -105.57294,
+       40.33693
+      ],
+      [
+       -105.5538,
+       40.32713
+      ],
+      [
+       -105.53121,
+       40.32369
+      ],
+      [
+       -104.96699,
+       40.24462
+      ],
+      [
+       -104.9444,
+       40.24806
+      ],
+      [
+       -104.72577,
+       40.30839
+      ],
+      [
+       -104.70662,
+       40.31819
+      ],
+      [
+       -104.69383,
+       40.33286
+      ],
+      [
+       -104.68934,
+       40.35016
+      ],
+      [
+       -104.69383,
+       40.36747
+      ],
+      [
+       -104.71836,
+       40.43451
+      ],
+      [
+       -104.95173,
+       40.71496
+      ],
+      [
+       -104.96452,
+       40.72963
+      ],
+      [
+       -104.98367,
+       40.73943
+      ],
+      [
+       -105.00626,
+       40.74287
+      ],
+      [
+       -105.02884,
+       40.73943
+      ],
+      [
+       -105.04799,
+       40.72963
+      ],
+      [
+       -105.57294,
+       40.40088
+      ],
+      [
+       -105.58574,
+       40.38621
+      ],
+      [
+       -105.59023,
+       40.36891
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
