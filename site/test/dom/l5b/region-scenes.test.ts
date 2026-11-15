@@ -17,6 +17,9 @@ const positions = parse(readFileSync(path.join(SITE_DIR, "../data/team/positions
   region?: string;
 }[];
 const doc = (rel: string) => new DOMParser().parseFromString(readDist(rel), "text/html");
+// Each region's art key, from its data file (a brand v3 place painting, e.g. brand/springs).
+const regionArt = (id: string) =>
+  (parse(readFileSync(path.join(SITE_DIR, `../data/regions/${id}.yaml`), "utf8")) as { art: string }).art;
 
 describe("/get-involved/ seat cards", () => {
   const main = doc("get-involved/index.html").querySelector("main")!;
@@ -27,10 +30,10 @@ describe("/get-involved/ seat cards", () => {
     for (const card of cards) {
       const region = positions.find((p) => p.id === card.dataset.position)?.region;
       const art = card.querySelector(".hall-card__media [data-art]");
-      if (region) expect(art?.getAttribute("data-art"), card.dataset.position).toBe(`regions/${region}`);
+      if (region) expect(art?.getAttribute("data-art"), card.dataset.position).toBe(regionArt(region));
       else expect(art, card.dataset.position).toBeNull();
     }
-    expect(cards.some((c) => c.querySelector("[data-art^='regions/']"))).toBe(true);
+    expect(cards.some((c) => c.querySelector("[data-art^='brand/']"))).toBe(true);
   });
 });
 

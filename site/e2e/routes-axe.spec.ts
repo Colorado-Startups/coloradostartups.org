@@ -16,6 +16,7 @@ const PAGES = [
   "/guides/startup-credits/",
   "/leaderboard/nominate/thanks/",
   "/sponsors/",
+  "/credits/",
   "/styleguide/",
 ];
 

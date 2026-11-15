@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { REGION_ART_ALT } from "../../../src/components/art/keepers";
+import { PLACE_ART_ALT } from "../../../src/components/art/keepers";
 import { guideArt, GUIDES_SCENE } from "../../../src/components/guides/guide-art";
 import { GUIDE_SLUGS } from "../../../src/lib/guides/core";
 import { readDist } from "../pages";
@@ -8,7 +8,7 @@ import { readDist } from "../pages";
 // L5b: every guide shows one picture under its answer, lazily, since it is
 // below the first screen. The index, the topic guides and the credits guide
 // show L6's guides scene (#713), which has no keeper. Each city guide shows
-// its region's scene, whose alt names its keepers as AI agents (#761).
+// its own city's brand v3 place painting, with the brand caption as alt.
 // Built HTML from dist/.
 
 const PAGES = [
@@ -36,21 +36,20 @@ describe.each(PAGES)("%s", (file, art) => {
 
 describe("the city guides", () => {
   const cities = {
-    "startups-in-denver": "photon-mountain",
-    "startups-in-boulder": "photon-mountain",
-    "startups-in-colorado-springs": "space-peak",
-    "startups-in-fort-collins": "fusion-canyon",
+    "startups-in-denver": "denver",
+    "startups-in-boulder": "boulder",
+    "startups-in-colorado-springs": "springs",
+    "startups-in-fort-collins": "fortcollins",
   } as const;
 
-  it.each(Object.entries(cities))("%s shows %s, with an alt that discloses its keepers", (slug, region) => {
+  it.each(Object.entries(cities))("%s shows the %s place painting, with the brand caption as alt", (slug, place) => {
     const art = guideArt(slug as keyof typeof cities);
-    expect(art.src).toBe(`regions/${region}`);
-    expect(art.alt).toBe(REGION_ART_ALT[region]);
-    expect(art.alt).toMatch(/the site's AI agents/);
+    expect(art.src).toBe(`brand/${place}`);
+    expect(art.alt).toBe(PLACE_ART_ALT[place]);
   });
 
-  it("are the only guides that show a region scene", () => {
-    const regional = GUIDE_SLUGS.filter((slug) => guideArt(slug).src.startsWith("regions/"));
-    expect(regional.sort()).toEqual(Object.keys(cities).sort());
+  it("are the only guides that show a place painting", () => {
+    const placed = GUIDE_SLUGS.filter((slug) => guideArt(slug).src.startsWith("brand/"));
+    expect(placed.sort()).toEqual(Object.keys(cities).sort());
   });
 });

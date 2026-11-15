@@ -143,13 +143,15 @@ describe("keeper disclosure on cards (L17, hard constraint 10)", () => {
     expect(disclosureProblem(guides, ["Guides", "How to start up here.", DISCLOSURE_CAPTION], "hero/hall")).toBeNull();
   });
 
-  // #761: every region scene has dwarf and gnome helpers, so every region's card discloses.
-  it("counts every region's scene as keeper art, and captions each region card", () => {
+  // Brand v3: each region card draws on its brand place painting, whose crowds
+  // are community folk, not keepers, so it needs no keeper caption.
+  it("draws each region card on its brand place painting, with no keeper caption", () => {
     const regionCards = parseCards(CARDS, REGIONS).filter((c: { region?: string }) => c.region);
     expect(regionCards.map((c: { region: string }) => c.region).sort()).toEqual(Object.keys(REGIONS).sort());
     for (const card of regionCards) {
-      expect(isKeeperArt(card.art), card.id).toBe(true);
-      expect(disclosureCaption(card), card.id).toBe(DISCLOSURE_CAPTION);
+      expect(card.art, card.id).toMatch(/^brand\//);
+      expect(isKeeperArt(card.art), card.id).toBe(false);
+      expect(disclosureCaption(card), card.id).toBeNull();
     }
   });
 

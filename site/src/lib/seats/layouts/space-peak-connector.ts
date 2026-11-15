@@ -4,7 +4,7 @@ import { APPLY_HEADING, WEAK_TIES, type SeatLayout } from "../layout-types";
 
 export const SPACE_PEAK_CONNECTOR: SeatLayout = {
   hero: {
-    art: "regions/space-peak",
+    art: "brand/springs",
     alt: REGION_ART_ALT["space-peak"],
     kicker: "Volunteer role · Space Peak",
     pills: ["Colorado Springs", "Manitou Springs", "Monument", "Fountain", "Woodland Park", "Cascade"],

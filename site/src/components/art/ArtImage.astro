@@ -1,13 +1,14 @@
 ---
 // Any illustration of the Hall: heroes, region scenes, section textures.
 // Pass the asset key (a path under src/assets/art without an extension); the
-// component finds the .webp, .png or .jpg, lets Astro optimize it, and covers a
+// component finds the .webp, .png or .jpg, lets Astro optimize it (brand/<name>
+// keys serve the pulled brand files as-is, art-assets.ts brandArt), and covers a
 // fixed-ratio box so layout never shifts. Until the art exists it shows a warm
 // placeholder of the same ratio. Idle motion (lantern glow, rising embers) is
 // off for visitors who ask for reduced motion. Owned by L7; see
 // art/DIRECTION.md.
 import { Image } from "astro:assets";
-import { findArt, fitWidths } from "./art-assets";
+import { brandArt, findArt, fitWidths } from "./art-assets";
 import { EMBERS, emberStyle } from "./embers";
 import "./idle-motion.css";
 
@@ -43,7 +44,8 @@ const {
   class: className,
 } = Astro.props;
 
-const art = findArt(src);
+const brand = brandArt(src);
+const art = brand ? undefined : findArt(src);
 const showGlow = motion !== "none";
 const showEmbers = motion === "forge";
 const style = [`--art-aspect:${aspect}`, tint && `--art-tint:${tint}`].filter(Boolean).join(";");
@@ -51,7 +53,19 @@ const style = [`--art-aspect:${aspect}`, tint && `--art-tint:${tint}`].filter(Bo
 
 <figure class:list={["art-frame", "art-image", className]} style={style} data-art={src}>
   {
-    art ? (
+    brand ? (
+      <img
+        src={brand.src}
+        srcset={brand.srcset}
+        sizes={sizes}
+        width={brand.width}
+        height={brand.height}
+        alt={alt}
+        loading={loading}
+        decoding="async"
+        fetchpriority={loading === "eager" ? "high" : "auto"}
+      />
+    ) : art ? (
       <Image
         src={art}
         alt={alt}

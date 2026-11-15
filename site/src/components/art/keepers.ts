@@ -31,28 +31,30 @@ export function portraitAlt(id: KeeperId, name: string, title: string): string {
 }
 
 /**
- * Alt text for the Great Hall picture (src/assets/art/hero/hall). Dwarf and
- * gnome keepers carry lanterns among the founders there (art/prompts/hero-a.txt),
- * so every place that shows it says they are AI agents (#714). One constant,
- * so the alts never drift apart.
+ * Alt text for brand v3's place paintings, from the brand's own plain captions
+ * (Colorado-Startups/brand data/world.yaml place_art, read 2026-11-14), so no
+ * franchise word reaches the page. The crowds in them are community folk, not
+ * the keepers, so these alts carry no AI-agent line; keeper portraits do
+ * (portraitAlt above). One constant per picture, so the alts never drift apart.
  */
-export const HALL_ART_ALT =
-  "An illustrated golden hall in the Front Range where founders work at long tables, with dwarf and gnome keepers, the site's AI agents, among them.";
+export const PLACE_ART_ALT = {
+  boulder: "The Flatirons as an elven city of waterfalls, moon portals and a great tree, with dragons.",
+  golden: "Table Mountain as a dwarven kingdom's forge gate, with steam carts and a boulder wyrm.",
+  denver: "The Denver skyline behind a walled castle town, with knights on white horses and white gryphons.",
+  springs: "Pikes Peak's rock spires as tower aeries, with gyrocopters and a gryphon.",
+  fortcollins:
+    "Poudre Canyon as a gnome workshop village of water wheels and round-door homes, with small dragons and mechanical striders.",
+} as const;
 
-/**
- * Alt text for each region's scene (src/assets/art/regions/<id>). Dwarf and
- * gnome keepers work among the founders in all three (art/prompts/region-*.txt),
- * so every place that shows one says they are AI agents (#761). RegionArt and
- * the Connector seat heroes read these, so the alts never drift apart.
- */
+/** The Hall picture: Golden's forge gate (brand/golden). */
+export const HALL_ART_ALT = PLACE_ART_ALT.golden;
+
+/** Each region's picture (data/regions/<id>.yaml art). RegionArt and the Connector seat heroes read these. */
 export const REGION_ART_ALT = {
-  "photon-mountain":
-    "A crystal-and-brass workshop carved into the foothills above Boulder, where founders build machines that compute with light, with dwarf and gnome keepers, the site's AI agents, helping them.",
-  "space-peak":
-    "An observatory workshop above Colorado Springs, under Pikes Peak, where founders work beside a great brass telescope, with gnome and dwarf keepers, the site's AI agents, among them.",
-  "fusion-canyon":
-    "A forge-workshop at Fort Collins, where founders work around a small sun in a brass ring, with dwarf and gnome keepers, the site's AI agents, tuning its coils.",
-} as const satisfies Readonly<Record<string, string>>;
+  "photon-mountain": PLACE_ART_ALT.boulder,
+  "space-peak": PLACE_ART_ALT.springs,
+  "fusion-canyon": PLACE_ART_ALT.fortcollins,
+} as const;
 
 export type RegionArtId = keyof typeof REGION_ART_ALT;
 

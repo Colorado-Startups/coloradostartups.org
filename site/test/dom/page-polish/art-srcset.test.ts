@@ -38,14 +38,14 @@ describe("art srcsets", () => {
   });
 
   it("reach the source width on the home hero, for 2x screens", () => {
-    const img = doc("index.html").querySelector('[data-art="hero/hall"] img')!;
+    const img = doc("index.html").querySelector('[data-art="brand/golden"] img')!;
     expect(img).not.toBeNull();
     expect(Math.max(...srcsetWidths(img))).toBe(Number(img.getAttribute("width")));
   });
 
   it("reach the source width on each region page's hero", () => {
     for (const id of REGION_IDS) {
-      const img = doc(`regions/${id}/index.html`).querySelector(`[data-art="regions/${id}"] img`)!;
+      const img = doc(`regions/${id}/index.html`).querySelector(`main .region-art--hero img`)!;
       expect(img, id).not.toBeNull();
       expect(Math.max(...srcsetWidths(img)), id).toBe(Number(img.getAttribute("width")));
     }

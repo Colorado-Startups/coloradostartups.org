@@ -4,7 +4,7 @@ import { APPLICATIONS, APPLY_HEADING, WEAK_TIES, type SeatLayout } from "../layo
 
 export const FUSION_CANYON_CONNECTOR: SeatLayout = {
   hero: {
-    art: "regions/fusion-canyon",
+    art: "brand/fortcollins",
     alt: REGION_ART_ALT["fusion-canyon"],
     kicker: "Volunteer role · Fort Collins and Northern Colorado",
     pills: ["Fort Collins", "Loveland", "Windsor", "Greeley", "Your own schedule"],

@@ -4,7 +4,7 @@ import { APPLICATIONS, APPLY_HEADING, WEAK_TIES, type SeatLayout } from "../layo
 
 export const PHOTON_MOUNTAIN_CONNECTOR: SeatLayout = {
   hero: {
-    art: "regions/photon-mountain",
+    art: "brand/boulder",
     alt: REGION_ART_ALT["photon-mountain"],
     kicker: "Photon Mountain outpost",
     pills: ["Boulder", "Denver", "Golden"],
