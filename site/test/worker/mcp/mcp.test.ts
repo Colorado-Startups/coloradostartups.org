@@ -38,6 +38,24 @@ describe("/mcp", () => {
     for (const t of result.tools) expect(t.annotations.readOnlyHint).toBe(true);
   });
 
+  it("refuses a browser Origin from another site with 403", async () => {
+    const res = await SELF.fetch(`${BASE}/mcp`, {
+      method: "POST",
+      headers: { ...HEADERS, Origin: "https://evil.example" },
+      body: rpc("tools/list"),
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it("accepts the site's own Origin", async () => {
+    const res = await SELF.fetch(`${BASE}/mcp`, {
+      method: "POST",
+      headers: { ...HEADERS, Origin: BASE },
+      body: rpc("tools/list"),
+    });
+    expect(res.status).toBe(200);
+  });
+
   it("sends a browser to the connect steps", async () => {
     const res = await SELF.fetch(`${BASE}/mcp`, { headers: { Accept: "text/html" }, redirect: "manual" });
     expect(res.status).toBe(303);

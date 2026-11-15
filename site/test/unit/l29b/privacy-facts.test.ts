@@ -128,9 +128,10 @@ describe("Request logs", () => {
     }
   });
 
-  it("names the requests that reach the Worker, which run_worker_first sets to /api/ only", () => {
-    expect(wrangler).toMatch(/"run_worker_first":\s*\["\/api\/\*"\]/);
+  it("names the requests that reach the Worker, which run_worker_first sets to /api/ and /mcp", () => {
+    expect(wrangler).toMatch(/"run_worker_first":\s*\["\/api\/\*", "\/mcp"\]/);
     expect(logs).toContain("every address under `/api/`");
+    expect(logs).toContain("It also runs for `/mcp`");
     expect(logs).toContain("Requests for our pages and files skip it");
   });
 });

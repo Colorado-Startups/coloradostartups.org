@@ -59,7 +59,7 @@ describe("parseJsonc", () => {
       assets: { run_worker_first: string[] };
       ratelimits: { name: string; simple: { limit: number } }[];
     };
-    expect(config.assets.run_worker_first).toEqual(["/api/*"]);
+    expect(config.assets.run_worker_first).toEqual(["/api/*", "/mcp"]);
     // The top-level FORM_RATE_LIMIT in wrangler.jsonc allows 10 posts per 60 s.
     expect(config.ratelimits.find((r) => r.name === "FORM_RATE_LIMIT")?.simple.limit).toBe(10);
   });
