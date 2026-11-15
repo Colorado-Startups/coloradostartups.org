@@ -45,12 +45,13 @@ export function initHonoreesTables(doc: Document): void {
           theme: tr.dataset.theme ?? "",
         },
       }));
-      const sector = form.querySelector<HTMLSelectElement>('select[name="sector"]');
+      const sectorField = form.querySelector('select[name="sector"]');
+      const sector = sectorField instanceof HTMLSelectElement ? sectorField : null;
       const allThemes = form.querySelector<HTMLInputElement>('input[name="theme"][value=""]');
       const apply = (event?: Event) => {
-        const changed = event?.target as HTMLInputElement | HTMLSelectElement | null;
-        if (changed?.name === "theme" && sector) sector.value = "";
-        if (changed?.name === "sector" && changed.value && allThemes) allThemes.checked = true;
+        const changed = event?.target;
+        if (changed instanceof HTMLInputElement && changed.name === "theme" && sector) sector.value = "";
+        if (changed === sector && sector?.value && allThemes) allThemes.checked = true;
         const data = new FormData(form);
         const filters = {
           q: String(data.get("q") ?? ""),
