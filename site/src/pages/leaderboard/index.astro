@@ -9,8 +9,8 @@
 // The title is carved in a lintel, and the Great Hall picture sits beside the
 // lede from 64rem (#239, #723). On a phone the picture stays a small seal
 // under the actions, smaller than the lede, so the lede stays the largest
-// thing in the first screen and the mobile LCP stays text. Keepers appear in
-// the picture, so its alt is HALL_ART_ALT.
+// thing in the first screen and the mobile LCP stays text. Its alt is
+// HALL_ART_ALT, the brand's caption.
 import { getCollection } from "astro:content";
 
 import ArtImage from "../../components/art/ArtImage.astro";
@@ -93,7 +93,7 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
         </div>
       </div>
       <ArtImage
-        src="hero/hall"
+        src="brand/golden"
         alt={HALL_ART_ALT}
         aspect="21 / 9"
         widths={[400, 640, 960]}

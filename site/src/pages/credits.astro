@@ -1,0 +1,68 @@
+---
+// /credits/: where each picture on the site comes from. The brand v3 place
+// paintings are AI-made with FIBO 2.0 from real photos (lib/brand-credits.ts).
+// CC BY asks for credit "in any reasonable manner"; this page is that credit,
+// beside the photo credit kept in each file's metadata.
+import InfoHeader from "../components/info/InfoHeader.astro";
+import { PLACE_ART_ALT } from "../components/art/keepers";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { BRAND_CREDITS_URL, PLACE_CREDITS } from "../lib/brand-credits";
+
+const rows = Object.entries(PLACE_CREDITS).map(([place, c]) => ({
+  ...c,
+  caption: PLACE_ART_ALT[place as keyof typeof PLACE_ART_ALT],
+}));
+---
+
+<BaseLayout title="Image credits" description="Where each picture on Colorado Startups comes from, and how it was made.">
+  <section class="section section--lit" aria-labelledby="page-title">
+    <div class="wrap">
+      <InfoHeader kicker="Where the pictures come from" title="Image credits">
+        <p class="lede">Each place painting is AI-made with FIBO 2.0 from a real photo of that place.</p>
+        <p>The brand keeps the full record: <a href={BRAND_CREDITS_URL}>image credits in the brand repo</a>.</p>
+      </InfoHeader>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="places-title">
+    <div class="wrap">
+      <h2 id="places-title">Place paintings</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th scope="col">Place</th><th scope="col">Region</th><th scope="col">Painting</th><th scope="col">Source photo</th></tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((r) => (
+                <tr>
+                  <th scope="row">{r.town}</th>
+                  <td>{r.region}</td>
+                  <td>{r.caption} AI-made with FIBO 2.0.</td>
+                  <td>{r.credit}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .table-scroll {
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: var(--s-2) var(--s-3);
+    border-bottom: var(--line-hair) solid var(--c-rule);
+  }
+</style>

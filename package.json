@@ -16,7 +16,7 @@
     "test": "npm run -w @cs/site test && npm run -w @cs/communitas test && npm run test:ai-visibility",
     "check": "npm run -w @cs/site check",
     "check:push": "node scripts/tmp-leak-check.mjs --self-test && node scripts/tmp-leak-check.mjs npm run check:push:steps",
-    "check:push:steps": "npm run -w @cs/site check && npm run -w @cs/site test && npm run -w @cs/communitas test && npm run test:ai-visibility",
+    "check:push:steps": "npm run brand:check && npm run -w @cs/site check && npm run -w @cs/site test && npm run -w @cs/communitas test && npm run test:ai-visibility",
     "eval:resourcus": "node evals/resourcus/run.mjs",
     "eval:ai-visibility": "node evals/ai-visibility/run.ts",
     "test:ai-visibility": "node --test evals/ai-visibility/test/",
@@ -28,7 +28,9 @@
     "lint:content": "python3 04_tools/cs_site_lint.py",
     "lint:built": "python3 04_tools/cs_site_lint.py --built site/dist",
     "lint:selftest": "python3 04_tools/cs_site_lint.py --self-test && python3 04_tools/contract_test.py && bash 04_tools/hook_selftest.sh && node scripts/tmp-leak-check.mjs --self-test",
-    "secrets": "secretlint \"**/*\""
+    "secrets": "secretlint \"**/*\"",
+    "brand:pull": "node scripts/brand/pull.mjs",
+    "brand:check": "node scripts/brand/pull.mjs --self-test && node scripts/brand/pull.mjs --check"
   },
   "devDependencies": {
     "@secretlint/secretlint-rule-preset-recommend": "13.1.0",

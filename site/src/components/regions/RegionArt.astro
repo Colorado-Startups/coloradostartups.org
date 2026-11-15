@@ -1,7 +1,6 @@
 ---
-// A region's illustration slot. L7 drops each scene at
-// src/assets/art/<region.art>.(webp|png|jpg), for example
-// src/assets/art/regions/space-peak.webp. L7's ArtImage finds it, lets Astro
+// A region's illustration slot: data/regions/<id>.yaml names its art, a brand
+// v3 place painting such as brand/springs (scripts/brand/pull.mjs). L7's ArtImage finds it, lets Astro
 // optimize it, and shows a placeholder tinted with the region's color until the
 // file lands, so layout does not shift. The region page's hero gets a lantern
 // glow; list cards stay still. Owner: L8; wired by L7 (lane/L7-wiring).
@@ -22,9 +21,9 @@ interface Props {
 }
 
 const { region, size = "card", loading, sizes } = Astro.props;
-// Keepers work in every region scene, so the alt always says they are AI
-// agents (#761); no caller can blank it, and a region with no alt fails the
-// build instead of rendering an empty one.
+// The alt is the brand's plain caption (keepers.ts REGION_ART_ALT); no caller
+// can blank it, and a region with no alt fails the build instead of rendering
+// an empty one.
 const alt = regionArtAlt(region.id);
 const hero = size === "hero";
 

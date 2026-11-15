@@ -6,7 +6,7 @@
 // list and its Event JSON-LD are L24's (components/events/), built from
 // data/events/upcoming.json so crawlers can read what the iframe hides.
 import ArtImage from "../components/art/ArtImage.astro";
-import { HALL_ART_ALT } from "../components/art/keepers";
+import { PLACE_ART_ALT } from "../components/art/keepers";
 import { eventsJsonLd, SNAPSHOT, upcomingEvents } from "../components/events/events";
 import UpcomingEvents from "../components/events/UpcomingEvents.astro";
 import CalendarEmbed from "../components/info/CalendarEmbed.astro";
@@ -38,8 +38,8 @@ const events = upcomingEvents(SNAPSHOT, new Date());
           </div>
         </InfoHeader>
         <ArtImage
-          src="hero/hall"
-          alt={HALL_ART_ALT}
+          src="brand/denver"
+          alt={PLACE_ART_ALT.denver}
           aspect="21 / 9"
           widths={[640, 960, 1280]}
           sizes="(min-width: 60rem) 26rem, 100vw"

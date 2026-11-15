@@ -15,5 +15,5 @@ summary: >-
   takes in the towns around them, from Longmont to Castle Rock.
 cities: [Boulder, Golden, Arvada, Denver]
 nearby: [Louisville, Lafayette, Superior, Erie, Longmont, Niwot, Lyons, Nederland, Broomfield, Westminster, Thornton, Lakewood, Wheat Ridge, Evergreen, Englewood, Littleton, Centennial, Greenwood Village, Aurora, Parker, Lone Tree, Highlands Ranch, Castle Rock]
-art: regions/photon-mountain
+art: brand/boulder
 order: 1

@@ -9,7 +9,8 @@
 //   art/og/cards.txt                 card copy (in art/ so the content gate scans it)
 //   data/regions/<id>.yaml           name, tagline and art for the region cards (L8's data)
 //   01_doctrine/brand_tokens.yaml    colors (the one token source)
-//   site/src/assets/art/<key>.*      the card's art; falls back to hero/hall, and exits 3 without it.
+//   site/src/assets/art/<key>.*      the card's art (brand/<name>: site/public/art/brand/<name>.jpg);
+//                                    falls back to hero/hall, and exits 3 without it.
 //                                    A picture with keepers (lib.mjs isKeeperArt) gets an AI-agent
 //                                    line above the URL unless the card's words already say so
 //                                    Wide art covers the card; a portrait stands whole at the right
@@ -129,6 +130,11 @@ function loadFonts(fontkit) {
 }
 
 function findArtFile(key) {
+  // Brand v3 art (brand/<name>) is pulled by scripts/brand/pull.mjs; draw on the original.
+  if (key.startsWith("brand/")) {
+    const file = path.join(ROOT, "site/public/art/brand", `${key.slice("brand/".length)}.jpg`);
+    return fs.existsSync(file) ? file : undefined;
+  }
   for (const ext of ["webp", "png", "jpg"]) {
     const file = path.join(ART_DIR, `${key}.${ext}`);
     if (fs.existsSync(file)) return file;

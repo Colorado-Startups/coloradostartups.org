@@ -4,7 +4,7 @@ import { APPLY_HEADING, type SeatLayout } from "../layout-types";
 
 export const SLACK_COMMUNITY_LEAD: SeatLayout = {
   hero: {
-    art: "hero/hall",
+    art: "brand/golden",
     alt: HALL_ART_ALT,
     kicker: "Online, statewide",
     pills: [],

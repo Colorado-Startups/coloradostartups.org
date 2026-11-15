@@ -60,9 +60,9 @@ describe("dispatch pages", () => {
       }
     });
 
-    it("puts one Hall picture between the body and the tags, its keepers disclosed (#261, #714)", () => {
+    it("puts one Hall picture between the body and the tags, the brand caption as alt (#261)", () => {
       const seals = [...column.querySelectorAll<HTMLElement>(":scope > figure[data-art]")];
-      expect(seals.map((f) => f.dataset.art)).toEqual(["hero/hall"]);
+      expect(seals.map((f) => f.dataset.art)).toEqual(["brand/golden"]);
       const seal = seals[0]!;
       const img = seal.querySelector("img");
       expect(img, "the art file exists, so no placeholder").not.toBeNull();

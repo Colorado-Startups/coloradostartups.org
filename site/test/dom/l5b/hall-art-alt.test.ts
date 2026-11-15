@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 import { HALL_ART_ALT } from "../../../src/components/art/keepers";
 import { contentPages } from "../pages";
 
-// #714: the Great Hall picture (hero/hall) shows dwarf and gnome keepers, so
-// every built page that shows it gives the same alt, which says they are AI
-// agents (.claude/rules/ai-disclosure.md). Built HTML from dist/.
+// The Hall picture is brand v3's Golden painting (brand/golden). Every built
+// page that shows it gives the same alt, the brand's caption (HALL_ART_ALT).
+// Built HTML from dist/.
 
 const shown = contentPages().flatMap((p) =>
-  [...new DOMParser().parseFromString(p.html, "text/html").querySelectorAll('[data-art="hero/hall"] img')].map(
+  [...new DOMParser().parseFromString(p.html, "text/html").querySelectorAll('[data-art="brand/golden"] img')].map(
     (img) => [p.route, img.getAttribute("alt")] as const,
   ),
 );
@@ -21,8 +21,7 @@ describe("the Great Hall picture", () => {
     expect(routes.size).toBeGreaterThanOrEqual(5);
   });
 
-  it.each(shown)("%s: its alt discloses the keepers as AI agents", (_route, alt) => {
+  it.each(shown)("%s: its alt is the brand caption", (_route, alt) => {
     expect(alt).toBe(HALL_ART_ALT);
-    expect(alt).toMatch(/AI agents/);
   });
 });
