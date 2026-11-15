@@ -4,7 +4,7 @@ name: visual-check
 # merge. It runs on demand: this Mac renders nothing (Paul, 2026-11-02), so a
 # session or a reviewer takes screenshots here instead:
 #
-#   gh workflow run visual-check.yml -f ref=<sha or branch> -f paths=/,/team/ -f widths=375,1280
+#   gh workflow run visual-check.yml -f ref=<sha or branch> -f paths=/,/team/ -f widths=375,1280 -f schemes=light,dark
 #   gh run list --workflow visual-check.yml --limit 1
 #   gh run download <id> -n visual
 #
@@ -36,6 +36,11 @@ on:
         description: Comma-separated viewport widths in px, 200 to 2560
         required: false
         default: "375,768,1280"
+        type: string
+      schemes:
+        description: Comma-separated system color schemes, light and/or dark
+        required: false
+        default: "light"
         type: string
   pull_request:
     paths:
@@ -100,6 +105,7 @@ jobs:
           CS_PEOPLE_FIXTURES: "1"
           VISUAL_PATHS: ${{ inputs.paths || '/' }}
           VISUAL_WIDTHS: ${{ inputs.widths || '375' }}
+          VISUAL_SCHEMES: ${{ inputs.schemes || 'light' }}
         run: npm run -w @cs/site test:visual
 
       # Uploads whatever the spec wrote, even when a page failed its check.

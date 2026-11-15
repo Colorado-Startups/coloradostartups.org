@@ -13,6 +13,7 @@ import { readDist, SITE_DIR } from "../pages";
 const doc = new DOMParser().parseFromString(readDist("styleguide/index.html"), "text/html");
 const tokens = parse(readFileSync(path.join(SITE_DIR, "..", "01_doctrine/brand_tokens.yaml"), "utf8")) as {
   contrast: { fg: string; bg: string; min: number }[];
+  contrast_night: { fg: string; bg: string; min: number }[];
 };
 
 describe("/styleguide/ contrast table (#254)", () => {
@@ -33,6 +34,17 @@ describe("/styleguide/ contrast table (#254)", () => {
       } else {
         expect(sample.textContent?.trim(), label).toBe("Aa");
       }
+    });
+  });
+});
+
+describe("/styleguide/ night contrast table", () => {
+  it("has one row per night pairing in brand_tokens.yaml, in order", () => {
+    const rows = [...doc.querySelectorAll(".sg-contrast-night tbody tr")];
+    expect(rows).toHaveLength(tokens.contrast_night.length);
+    rows.forEach((row, i) => {
+      const p = tokens.contrast_night[i]!;
+      expect(row.textContent?.replace(/\s+/g, " "), `${p.fg} on ${p.bg}`).toContain(`${p.fg} on ${p.bg}`);
     });
   });
 });
