@@ -1,7 +1,8 @@
 ---
-// One sourced figure: the number, what it counts, and where it comes from.
-// The source line is the fact's own `short` (data/positions/facts.yaml), so a
-// figure never shows without its source.
+// One sourced figure: the number, then what it counts and where it comes
+// from. The source line is the fact's own `short` (data/positions/facts.yaml),
+// so a figure never shows without its source. One row per figure: the number
+// on the left, its words on the right.
 import type { StatTileData } from "./home-data";
 
 type Props = StatTileData;
@@ -10,15 +11,18 @@ const { value, label, source } = Astro.props;
 
 <div class="stat">
   <p class="stat__value">{value}</p>
-  <p class="stat__label">{label}</p>
-  <p class="stat__source">{source}</p>
+  <div class="stat__text">
+    <p class="stat__label">{label}</p>
+    <p class="stat__source">{source}</p>
+  </div>
 </div>
 
 <style>
   .stat {
     display: grid;
-    align-content: start;
-    gap: var(--s-1);
+    grid-template-columns: minmax(6.5rem, 40%) minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: baseline;
   }
   .stat p {
     margin: 0;
@@ -30,13 +34,12 @@ const { value, label, source } = Astro.props;
     line-height: 1.1;
     color: var(--c-text);
   }
-  .stat__label {
+  .stat__label,
+  .stat__source {
     font-size: var(--t-step--1);
     line-height: 1.35;
   }
   .stat__source {
-    font-size: var(--t-step--1);
-    line-height: 1.35;
     color: var(--c-text-dim);
   }
 </style>

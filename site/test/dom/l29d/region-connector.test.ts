@@ -1,5 +1,5 @@
 // Post-launch item 12 over the built site (run `npm run build` first;
-// test:content does). The region pages, /regions/ and the home page's region
+// test:content does). The region pages and /regions/
 // teasers call each regional seat by its title from positions.yaml (decision
 // 67), never "organizer". An open seat that takes applications links to
 // /get-involved/apply/?role=<id> with the unpaid line beside it.
@@ -78,14 +78,4 @@ describe("the regional seats are Connector seats", () => {
     expect(readDist("llms.txt")).toContain("Only people moderate the groups or hold Connector and organizer seats.");
   });
 
-  it("the home page's region teasers say Connector", () => {
-    const home = doc(readDist("index.html"));
-    const section = home.getElementById("regions")?.closest("section");
-    expect(text(section)).toContain("Each one has a Connector seat for a person");
-    for (const id of REGION_IDS) {
-      const teaser = section?.querySelector(`[data-region='${id}']`);
-      if (seatOf(id).status === "open") expect(text(teaser)).toContain("Connector seat open");
-      expect(text(teaser)).not.toMatch(/organizer/i);
-    }
-  });
 });

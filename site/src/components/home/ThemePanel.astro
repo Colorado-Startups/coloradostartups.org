@@ -71,17 +71,11 @@ const id = `theme-${theme.region}`;
   }
   .theme__tiles {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--s-3);
+    gap: var(--s-4);
   }
   .theme__links {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-2) var(--s-4);
-  }
-  @media (max-width: 420px) {
-    .theme__tiles {
-      grid-template-columns: 1fr;
-    }
   }
 </style>

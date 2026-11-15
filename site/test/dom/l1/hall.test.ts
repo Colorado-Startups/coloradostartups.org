@@ -75,12 +75,12 @@ describe("home page", () => {
     expect(main.querySelector("[data-colorado-map]")).toBeNull();
   });
 
-  it("chips the three regions from data/regions, in order, each linking to its page", () => {
+  it("links the three regions from data/regions, in order, each linking to its page", () => {
     const regions = REGION_IDS.map((id) => yamlFile<{ id: string; name: string; order: number }>(`data/regions/${id}.yaml`))
       .sort((a, b) => a.order - b.order);
-    const chips = [...main.querySelectorAll(".chip")];
+    const chips = [...main.querySelectorAll(".region-link")];
     expect(chips.map((c) => c.getAttribute("href"))).toEqual(regions.map((r) => `/regions/${r.id}/`));
-    expect(chips.map((c) => text(c.querySelector(".chip__name")))).toEqual(regions.map((r) => r.name));
+    expect(chips.map((c) => text(c.querySelector(".region-link__name")))).toEqual(regions.map((r) => r.name));
   });
 
   it("shows three Why Colorado panels, each with three figures and their sources", () => {

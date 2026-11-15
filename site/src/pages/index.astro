@@ -66,14 +66,14 @@ const mcpUrl = new URL("/mcp", site).toString();
     <div class="wrap where">
       <div class="where__copy">
         <h2 id="where">Three regions along the Front Range</h2>
-        <ul class="chips" role="list">
+        <ul class="region-links" role="list">
           {
             REGIONS.map((r) => (
               <li>
-                <a class="chip" href={`/regions/${r.id}/`} style={`--chip-color: ${REGION_COLORS[r.id]}`}>
-                  <span class="chip__swatch" aria-hidden="true" />
-                  <span class="chip__name">{r.name}</span>
-                  <span class="chip__cities">{r.cities.slice(0, 2).join(" · ")}</span>
+                <a class="region-link" href={`/regions/${r.id}/`} style={`--region-color: ${REGION_COLORS[r.id]}`}>
+                  <span class="region-link__swatch" aria-hidden="true" />
+                  <span class="region-link__name">{r.name}</span>
+                  <span class="region-link__cities">{r.cities.slice(0, 2).join(" · ")}</span>
                 </a>
               </li>
             ))
@@ -185,14 +185,14 @@ const mcpUrl = new URL("/mcp", site).toString();
     gap: var(--s-6);
     align-items: center;
   }
-  .chips {
+  .region-links {
     display: grid;
     gap: var(--s-2);
     margin: var(--s-4) 0 0;
     padding: 0;
     list-style: none;
   }
-  .chip {
+  .region-link {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -204,22 +204,22 @@ const mcpUrl = new URL("/mcp", site).toString();
     color: var(--c-text);
     text-decoration: none;
   }
-  .chip__swatch {
+  .region-link__swatch {
     width: 14px;
     height: 14px;
     border-radius: var(--r-chisel);
-    background: var(--chip-color);
+    background: var(--region-color);
   }
-  .chip__name {
+  .region-link__name {
     font-weight: 700;
   }
-  .chip__cities {
+  .region-link__cities {
     margin-left: auto;
     color: var(--c-text-dim);
     font-size: var(--t-step--1);
   }
-  .chip:hover .chip__name,
-  .chip:focus-visible .chip__name {
+  .region-link:hover .region-link__name,
+  .region-link:focus-visible .region-link__name {
     text-decoration: underline;
   }
 
@@ -230,6 +230,11 @@ const mcpUrl = new URL("/mcp", site).toString();
     margin-top: var(--s-5);
   }
 
+  /* A list gets the reading measure by default (global.css); this one is a grid. */
+  .region-links,
+  .explore-grid {
+    max-width: none;
+  }
   .explore-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

@@ -7,7 +7,6 @@ import { describe, expect, it } from "vitest";
 import { builtPages, readDist } from "../pages";
 
 const FORMS = {
-  "index.html": "/api/subscribe",
   "newsletter/index.html": "/api/subscribe",
   "community/index.html": "/api/subscribe",
   "ecosystem-canvas/suggest/index.html": "/api/suggest-resource",

@@ -16,6 +16,7 @@ const canvas = doc(readDist("ecosystem-canvas/index.html"));
 const home = doc(readDist("index.html"));
 const team = doc(readDist("team/index.html"));
 const askPage = doc(readDist("ask/index.html"));
+const community = doc(readDist("community/index.html"));
 const STAGE_IDS = ["idea", "launch", "growth", "support"];
 const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 
@@ -132,7 +133,7 @@ describe("one name, Startup Resources, for the directory (#141)", () => {
 
 describe("the welcome desk hands questions to Resourcus in Startup Resources", () => {
   it("names the page by its new title", () => {
-    const desk = home.querySelector(".welcome-desk");
+    const desk = community.querySelector(".welcome-desk");
     const handoff = [...(desk?.querySelectorAll("a") ?? [])].find((a) => /Ask Resourcus/.test(a.textContent ?? ""));
     expect(handoff?.textContent?.trim()).toBe("Ask Resourcus in Startup Resources");
     expect(handoff?.getAttribute("href")).toBe(WAYS_IN.canvas);
