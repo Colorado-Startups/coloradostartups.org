@@ -9,8 +9,10 @@
 // list it.
 //
 // Color has one job: whether the bar's program needs a funding round or a
-// partner code. Two steps of the site's navy: the dark step for a credit you
-// can claim without raising, the light step for one that needs a round. The
+// partner code. Two steps of the site's ink: the text color, the strongest
+// on the ground in either theme, for a credit you can claim without raising,
+// and the border color for one that needs a round. The theme swaps which is
+// darker, so no words call them dark or light. The
 // dataviz validator (2026-11-15) reads the pair at ΔE 27.2 under the worst
 // color-vision simulation in light mode and 35.4 in dark, both steps 3:1 or
 // more on the surface; its lightness-band and chroma checks are for a palette
