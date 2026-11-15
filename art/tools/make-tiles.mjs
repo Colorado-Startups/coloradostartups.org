@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Makes the page-background texture tiles for L12 from Anima renders.
+// Makes the page-background texture tiles for L12 from a texture render (brand v3:
+// the brand's FIBO stone, dist/hall/stone.png, for all three tiles).
 //
 //   node art/tools/make-tiles.mjs --from <dir>   read <dir>/tile-<name>.png, write the WebP tiles
 //   --pick stone=tile-stone-2                     read <dir>/tile-stone-2.png for the stone tile instead
@@ -223,17 +224,21 @@ export async function checkTile(file, spec, colors) {
   return { problems, bytes, seam, mostShare: hasMost ? most / gray.length : null };
 }
 
-export const BLURS = [0, 0.7, 1.2, 1.8]; // px sigma, tried in order until a tile fits its size goal
+// px sigma, tried in order until a tile fits its size goal. The brand's FIBO stone
+// (brand dist/hall/stone.png) carries finer grain than the old renders and needs
+// up to 3.8; three sigma (about 11 px at 512) stays inside the 16 px crop margin.
+export const BLURS = [0, 0.7, 1.2, 1.8, 2.5, 3.2, 3.8];
 
 // Lossless WebP only: lossy WebP's chroma subsampling moves colors by a few
 // levels, which escapes a band as narrow as night's. The size budget buys
 // smoothness instead: each step blurs a little more, which a quiet background
 // wants anyway, and checkTile judges every attempt.
-export async function encodeTile(gray1024, n, out, spec, colors) {
+export async function encodeTile(gray1024, n, out, spec, colors, xmp) {
   let result;
   for (const blur of BLURS) {
     const { rgb, gamma } = await makeTile(gray1024, n, spec, colors, { blur });
-    await sharp(rgb, { raw: { width: SIZE, height: SIZE, channels: 3 } }).webp({ lossless: true, effort: 6 }).toFile(out);
+    const webp = sharp(rgb, { raw: { width: SIZE, height: SIZE, channels: 3 } }).webp({ lossless: true, effort: 6 });
+    await (xmp ? webp.withXmp(xmp) : webp).toFile(out);
     result = { ...(await checkTile(out, spec, colors)), blur, gamma };
     if (!result.problems.some((p) => p.includes("KB"))) break;
   }
@@ -268,12 +273,15 @@ export function sourceFile(from, value) {
   return value.endsWith(".png") ? path.resolve(value) : path.join(from, `${value}.png`);
 }
 
-// One render PNG to one delivered tile; make-finals.mjs calls this too.
+// One render PNG to one delivered tile; make-finals.mjs calls this too. The
+// render's XMP rides into the tile, so an AI-made label survives (brand
+// decision 46).
 export async function tileFromPng(src, out, spec, colors) {
   const { data, info } = await sharp(src).resize(1024, 1024, { fit: "cover" }).greyscale().raw().toBuffer({ resolveWithObject: true });
   const gray = Float32Array.from(data.subarray(0, info.width * info.height));
+  const { xmp } = await sharp(src).metadata();
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  return encodeTile(gray, 1024, out, spec, colors);
+  return encodeTile(gray, 1024, out, spec, colors, xmp ? xmp.toString("utf8") : undefined);
 }
 
 export function describeTile(result, out, spec) {

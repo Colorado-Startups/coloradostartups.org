@@ -498,7 +498,7 @@
 /* ---------- Banner heading ----------
    hang: a section title on cloth hung from a bronze rod, cut swallowtail.
    lintel: a section title carved into the stone over a doorway, with a gold
-   keystone. Cinzel, so h1 and h2 only (decision 15). */
+   keystone. Aileron, so h1 and h2 only (decision 15). */
 .hall-banner {
   --_cloth-hi: var(--c-molten);
   --_cloth: var(--c-accent);

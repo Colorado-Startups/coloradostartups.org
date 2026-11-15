@@ -18,3 +18,17 @@ condition = "AND"
 paths = ['''^quality/collectors/claude\.test\.mjs$''']
 regexTarget = "secret"
 regexes = ['''^[a-z_]+\.[a-z0-9_]+$''']
+
+# brand.lock.json maps each brand file to its sha256. generic-api-key reads
+# the hash after "dist/tokens.json" as a key, for the word "tokens". Only that
+# rule, only that file, and only a lowercase 64-hex value: and any value there
+# that is not the real hash of its pulled file fails npm run brand:check, so a
+# key cannot hide in it. Ruled 2026-11-15 by the orchestrator (PR #33).
+[[allowlists]]
+description = "brand.lock.json: sha256 hashes, not keys"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''^brand\.lock\.json$''']
+regexTarget = "secret"
+regexes = ['''^[0-9a-f]{64}$''']
+

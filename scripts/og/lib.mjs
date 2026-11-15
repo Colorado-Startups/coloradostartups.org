@@ -3,7 +3,6 @@
 // (site/src/components/kit/build-badges.mjs). No file or network access here,
 // so site/test/unit/l7/og.test.ts can test them directly.
 
-import path from "node:path";
 
 export const CARD = { width: 1200, height: 630 };
 
@@ -161,34 +160,6 @@ export function xmlEscape(s) {
 }
 
 // ---- Fonts and text as SVG paths (OG cards and badges) ----
-
-// Static weights can carry the weight in the legacy family name ("Alegreya Sans Medium").
-const ofFamily = (font, family) => font.familyName === family || font.familyName.startsWith(`${family} `);
-
-/**
- * The face for one family and weight from candidates ({ font, file }) in folder
- * order. Each folder is searched in full, an exact weight and then a variable
- * font, before the next: a static weight left in the cache must not beat the
- * variable font the build ships (#380). Returns the candidate with embolden, a
- * stroke width in em that fakes extra weight: Cinzel arrives as one variable
- * WOFF2 that fontkitten 1.0.3 cannot instance, so a variable font is used at
- * its default weight with a same-color stroke, about 0.04 em from 400 to 700.
- */
-export function pickFont(candidates, family, weight) {
-  for (const dir of new Set(candidates.map((c) => path.dirname(c.file)))) {
-    const here = candidates.filter((c) => path.dirname(c.file) === dir && ofFamily(c.font, family));
-    const exact = here.find(
-      (c) => c.font["OS/2"]?.usWeightClass === weight && !/italic/i.test(`${c.font.familyName} ${c.font.subfamilyName}`),
-    );
-    if (exact) return { ...exact, embolden: 0 };
-    const variable = here.find((c) => c.font.variationAxes?.wght);
-    if (variable) {
-      const base = variable.font.variationAxes.wght.default;
-      return { ...variable, embolden: Math.max(0, ((weight - base) / 300) * 0.04) };
-    }
-  }
-  return undefined;
-}
 
 /** A line's width at one face and size, letter spacing between glyphs included. */
 export function measure({ font, embolden }, size, spacing = 0) {

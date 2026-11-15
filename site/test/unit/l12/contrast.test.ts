@@ -120,8 +120,8 @@ describe("brand_tokens.yaml texture limits", () => {
     expect(contrast(doc.color.link, composite(doc.color.stone, 0.5, doc.color["stone-edge"]))).toBeLessThan(4.5);
   });
 
-  it("fails a known-bad ceiling: gold text over a night tile lifted to bronze (3.64:1)", () => {
-    expect(contrast(doc.color["gold-on-night"], doc.color.bronze)).toBeLessThan(4.5);
+  it("fails a known-bad ceiling: gold text over a night tile lifted to brass (2.74:1)", () => {
+    expect(contrast(doc.color["gold-on-night"], doc.color.brass)).toBeLessThan(4.5);
   });
 
   it.each(Object.entries(textures))("%s names exactly one limit, a floor or a ceiling", (_name, t) => {

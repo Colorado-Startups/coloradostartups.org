@@ -1,12 +1,11 @@
 // L26, #268: the badge check fails a stale badge, and never calls a font
-// change stale. Google Fonts does not always serve the same Cinzel, so the
-// check compares SVGs only when the fonts match badge-fonts.json; otherwise it
-// reports "could not check", which the DOM test turns into a skip. #380: in
-// CI that skip warns, and the build's own folder wins the font pick.
+// change stale. It compares SVGs only when the fonts match badge-fonts.json;
+// otherwise it reports "could not check", which the DOM test turns into a
+// skip, and in CI that skip warns (#380). Since brand v3 the fonts are
+// Aileron from @fontsource/aileron, pinned by package-lock.json.
 // Hermetic: stand-in fonts draw each letter as a box, so no build is needed.
 import { describe, expect, it } from "vitest";
 
-import { pickFont } from "../../../../scripts/og/lib.mjs";
 import { KIT_BADGES } from "../../../src/components/kit/badges";
 import {
   checkBadges,
@@ -40,14 +39,14 @@ function box(ch: string) {
 const face = (family: string, sha256: string) => ({
   font: { familyName: family, unitsPerEm: 1000, glyphsForString: (text: string) => [...text].map(box) },
   embolden: 0,
-  file: `dist/_astro/fonts/${family.replace(/ /g, "-")}.woff2`,
+  file: `@fontsource/aileron/files/${family.replace(/ /g, "-")}.woff2`,
   sha256,
 });
 
 const FONTS = {
-  title: face("Cinzel", "a".repeat(64)),
-  kicker: face("Alegreya Sans", "b".repeat(64)),
-  status: face("Alegreya Sans Medium", "c".repeat(64)),
+  title: face("Aileron", "a".repeat(64)),
+  kicker: face("Aileron", "b".repeat(64)),
+  status: face("Aileron", "c".repeat(64)),
 };
 const RECORD = fontRecord(FONTS);
 const TOKENS = loadTokens();
@@ -79,12 +78,12 @@ describe("the badge check, when the fonts match the record", () => {
 
 describe("the badge check, when a font is not the recorded one", () => {
   it("says it could not check and names the font, never stale", () => {
-    const record = { ...RECORD, title: { family: "Cinzel", sha256: "d".repeat(64) } };
+    const record = { ...RECORD, title: { family: "Aileron", sha256: "d".repeat(64) } };
     // A changed token too: still not stale, because nothing was compared.
     const result = checkBadges({ fonts: FONTS, tokens: { ...TOKENS, "on-night": "#000000" }, record, read });
     expect(result.stale).toEqual([]);
     expect(result.couldNotCheck).toBe(
-      "the title font is Cinzel in dist/_astro/fonts/Cinzel.woff2 (sha256 aaaaaaaaaaaa), not the Cinzel font the badges were drawn with (sha256 dddddddddddd)",
+      "the title font is Aileron in @fontsource/aileron/files/Aileron.woff2 (sha256 aaaaaaaaaaaa), not the Aileron font the badges were drawn with (sha256 dddddddddddd)",
     );
   });
 
@@ -100,14 +99,14 @@ describe("badge-fonts.json", () => {
     const record = loadFontRecord();
     expect(Object.keys(record)).toEqual(Object.keys(FONTS));
     for (const role of Object.values(record) as { family: string; sha256: string }[]) {
-      expect(role.family).toMatch(/^(Cinzel|Alegreya Sans)\b/);
+      expect(role.family).toMatch(/^Aileron\b/);
       expect(role.sha256).toMatch(/^[0-9a-f]{64}$/);
     }
   });
 });
 
 describe("the could-not-check warning", () => {
-  const reason = "the title font is Cinzel SemiBold in dist/_astro/fonts/x.woff2 (sha256 c3b7d5cbea13)";
+  const reason = "the title font is Aileron in @fontsource/aileron/files/x.woff2 (sha256 c3b7d5cbea13)";
 
   it("is a GitHub ::warning:: naming the font when run in GitHub Actions", () => {
     expect(couldNotCheckWarning(reason, { GITHUB_ACTIONS: "true" })).toBe(
@@ -124,33 +123,5 @@ describe("the could-not-check warning", () => {
   it("prints nothing outside GitHub Actions", () => {
     expect(couldNotCheckWarning(reason, {})).toBeUndefined();
     expect(couldNotCheckWarning(reason, { CI: "true" })).toBeUndefined();
-  });
-});
-
-describe("the font pick", () => {
-  const DIST = "dist/_astro/fonts";
-  const CACHE = "node_modules/.astro/fonts";
-  const cinzel = (dir: string, name: string, font: object) => ({
-    font: { familyName: "Cinzel", subfamilyName: "Regular", ...font },
-    file: `${dir}/${name}.woff2`,
-    sha256: name,
-  });
-  const variable = (dir: string) => cinzel(dir, "variable", { "OS/2": { usWeightClass: 400 }, variationAxes: { wght: { min: 400, default: 400, max: 900 } } });
-  const static700 = (dir: string) => cinzel(dir, "static-700", { subfamilyName: "Bold", "OS/2": { usWeightClass: 700 } });
-
-  it("takes the build's variable font over an exact weight left in the cache", () => {
-    const picked = pickFont([variable(DIST), static700(CACHE)], "Cinzel", 700);
-    expect(picked?.file).toBe(`${DIST}/variable.woff2`);
-    expect(picked?.embolden).toBeCloseTo(0.04);
-  });
-
-  it("takes an exact weight over a variable font in the same folder", () => {
-    const picked = pickFont([variable(DIST), static700(DIST)], "Cinzel", 700);
-    expect(picked).toMatchObject({ file: `${DIST}/static-700.woff2`, embolden: 0 });
-  });
-
-  it("falls back to the cache when the build's folder has no match", () => {
-    expect(pickFont([static700(CACHE)], "Cinzel", 700)?.file).toBe(`${CACHE}/static-700.woff2`);
-    expect(pickFont([variable(DIST)], "Alegreya Sans", 700)).toBeUndefined();
   });
 });

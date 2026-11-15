@@ -1,19 +1,18 @@
-# The Hall: design tokens for coloradostartups.org (v2, after Gate A feedback).
+# The Hall: design tokens for coloradostartups.org (v3, brand decision 51).
 # One definition. site/scripts/sync-brand.mjs generates site/src/styles/tokens.css
 # from this file on every dev and build; test/unit/brand-tokens-sync.test.ts
 # fails if the generated file drifts. Edit here, never in tokens.css.
 #
-# Direction (decision 21, Paul, 2026-10-08): gold, fire and light. An illuminated
-# hall inside the Front Range, bright and warm. Colorado and startups first.
-#   Ground and surfaces are warm daylight. Text is bronze, never black.
-#   Gold is a fill (buttons, glows, rules), never text on a light ground (1.95:1).
-#   Copper carries links. Colorado sky blue carries community links.
-#   Fire (ember) is accent and glow only. Night is the dark band for the footer
-#   and city-lights sections, where gold and light text sit.
-# Hall materials (L12, Paul's brief of 2026-10-18): a dwarven forge-kingdom
-# carved into the Front Range. Carved stone, hammered bronze, forge gold,
-# gnome brass and molten channels, in bold chunky shapes. Each material below
-# is a role, so components name what a surface is made of, not its hex.
+# Direction (brand v3, decision 51; Paul, "State palette leads"): the State of
+# Colorado palette in the Hall's role names. The color block is a copy of
+# Colorado-Startups/brand dist/tokens.json (light set) at the tag in
+# brand.lock.json; test/unit/brand-tokens-sync.test.ts fails if a value drifts.
+#   Ground is white and text is State Blue. State Yellow is a fill behind Blue
+#   text, never text on white. State Red carries links, underlined at rest.
+#   Teal carries community links. Night is State Blue taken near black, for
+#   the footer and city-lights bands, where Yellow and white text sit.
+# Hall materials keep their role names (stone, bronze, brass, molten), so
+# components still name what a surface is made of, not its hex.
 #
 # Contrast: every text and UI pairing is listed in the contrast block at the end,
 # with its WCAG 2.2 ratio. test/unit/l12/contrast.test.ts recomputes each ratio
@@ -25,45 +24,42 @@
 # text size and still draws the same at the default 16 px root.
 
 color:
-  ground: "#FFFBF3"        # page ground, warm daylight
-  surface: "#FDF1D8"       # panels and cards, lantern light
-  surface-2: "#F8E3B8"     # raised surface, hover, section band (sunstone)
-  rule: "#E6D3AE"          # decorative rules only, not UI boundaries
-  border: "#8A7152"        # form fields and UI boundaries (3:1 or better)
-  text: "#2B1D12"          # body text, bronze
-  text-dim: "#5A4632"      # secondary text
-  accent: "#F0A92B"        # gold fill: buttons, glows, highlights
-  accent-deep: "#D9921A"   # pressed gold
-  on-accent: "#2B1D12"     # text on gold
-  link: "#A3400F"          # copper links
-  community: "#1A5CA8"     # Colorado sky: community links
-  fire: "#E2561C"          # ember accent and glow, decoration and large text only
-  focus: "#1A5CA8"         # keyboard focus ring
-  danger: "#B42318"        # form errors
-  night: "#14223F"         # dark band: footer, city lights
-  on-night: "#FFFBF3"      # text on night
-  on-night-dim: "#E9DCC0"  # secondary text on night
-  gold-on-night: "#F0A92B" # links and accents on night
-  brand-teal: "#02718D"    # CS brand teal, logo context only
-  brand-purple: "#5D4276"  # CS brand purple, logo context only
-  # Hall materials (L12, 2026-10-18).
-  stone: "#EFE3CC"         # carved stone face: lintels, stone panels
-  stone-edge: "#C9AD7F"    # carved edge and the ledge under stone; decoration only
-  bronze: "#7A4B24"        # hammered bronze: secondary buttons, plaques, rods
-  bronze-deep: "#5A3416"   # bronze ledge and pressed bronze
-  on-bronze: "#FFFBF3"     # text on bronze
-  accent-ledge: "#B0701A"  # the forged ledge under gold; decoration only
-  molten: "#FFD66E"        # molten-gold highlight in gradients
-  brass: "#B8862F"         # gnome brass: gears and rivets; decoration only
-  focus-on-night: "#F0A92B" # keyboard focus ring on night bands
-  danger-on-night: "#FF8A7A" # form errors on night bands
-  night-ceiling: "#1E2E50"  # lightest pixel a night-stone tile may paint; decoration only
-  # Tag washes: a light ground paired with one ink, for badges.
-  sky-wash: "#E4EEF9"      # with community ink
-  copper-wash: "#FBE5D6"   # with link ink
-  pine: "#3E5A4A"          # evergreen, from art/DIRECTION.md; ink only
-  pine-wash: "#E3EEE6"     # with pine ink
-
+  ground: "#FFFFFF"           # page ground
+  surface: "#F2F4F8"          # panels and cards
+  surface-2: "#E6E8F1"        # raised surface, hover and section band
+  rule: "#D6DAE8"             # decorative rules only, never a UI boundary
+  border: "#6675A9"           # form fields and UI boundaries
+  text: "#001970"             # body text
+  text-dim: "#384C8F"         # secondary text
+  accent: "#FFD100"           # fill for buttons and highlights
+  accent-deep: "#E0B800"      # pressed accent
+  on-accent: "#001970"        # text on Yellow
+  link: "#C3002F"             # links
+  community: "#35647E"        # community links and tags
+  fire: "#C3002F"             # warm accent for decoration and large text
+  focus: "#001970"            # keyboard focus ring
+  danger: "#C3002F"           # form errors
+  night: "#000A33"            # dark band for footers and city lights
+  on-night: "#FFFFFF"         # text on the night band
+  on-night-dim: "#B8C2E8"     # secondary text on the night band
+  gold-on-night: "#FFD100"    # links and accents on the night band
+  brand-teal: "#35647E"       # logo context only
+  brand-purple: "#6D3A5D"     # logo context only
+  stone: "#E3E9ED"            # carved stone face for lintels and stone panels
+  stone-edge: "#AEC1CB"       # carved edge and the ledge under stone, decoration only
+  bronze: "#6D3A5D"           # secondary buttons and plaques
+  bronze-deep: "#4E2A43"      # bronze ledge and pressed bronze
+  on-bronze: "#FFFFFF"        # text on bronze
+  accent-ledge: "#B29200"     # the forged ledge under Yellow, decoration only
+  molten: "#FFE673"           # highlight in gradients
+  brass: "#7A853B"            # gears and rivets, decoration only
+  focus-on-night: "#FFD100"   # keyboard focus ring on the night band
+  danger-on-night: "#E48CA1"  # errors on the night band
+  night-ceiling: "#001970"    # lightest pixel a night-stone tile may paint, decoration only
+  sky-wash: "#EBF0F2"         # badge ground for community ink
+  copper-wash: "#FAEBEE"      # badge ground for link ink
+  pine: "#245D38"             # ink for nature and green status
+  pine-wash: "#E9EFEB"        # badge ground for pine ink
 # Old names from the dark v1 palette, kept so lane code written against them
 # still renders. New code uses the names above; these go away after Wave 2.
 alias:
@@ -117,7 +113,7 @@ size:
   wrap: "1180px"           # widest content column
 
 shadow:
-  glow: "0 10px 30px rgb(240 169 43 / 0.22)"       # warm lantern glow under raised items
+  glow: "0 10px 30px rgb(0 25 112 / 0.16)"         # soft State Blue glow under raised items
   edge: "inset 0 1px 0 rgb(255 255 255 / 0.6)"     # lit top edge on panels
   # Solid ledges, not soft grey shadows: the chunky painted depth of the Hall.
   ledge: "0 var(--size-ledge) 0 var(--c-stone-edge)"         # under carved stone
@@ -137,50 +133,50 @@ type:
   measure: "68ch"
 
 # Every text and UI pairing the components use, with its WCAG 2.2 contrast
-# ratio (computed 2026-10-18 from the hex values above). min is 4.5 for body
+# ratio (recomputed 2026-11-15 from the brand v3 hex values above). min is 4.5 for body
 # text, 3 for large text and for UI parts such as borders and focus rings.
 # test/unit/l12/contrast.test.ts recomputes each ratio and fails on any drift.
 contrast:
-  - { fg: text, bg: ground, ratio: 15.81, min: 4.5 }
-  - { fg: text, bg: surface, ratio: 14.57, min: 4.5 }
-  - { fg: text, bg: surface-2, ratio: 12.95, min: 4.5 }
-  - { fg: text, bg: stone, ratio: 12.84, min: 4.5 }
-  - { fg: text-dim, bg: ground, ratio: 8.63, min: 4.5 }
-  - { fg: text-dim, bg: surface, ratio: 7.96, min: 4.5 }
-  - { fg: text-dim, bg: surface-2, ratio: 7.07, min: 4.5 }
-  - { fg: text-dim, bg: stone, ratio: 7.01, min: 4.5 }
-  - { fg: link, bg: ground, ratio: 6.17, min: 4.5 }
-  - { fg: link, bg: surface, ratio: 5.69, min: 4.5 }
-  - { fg: link, bg: surface-2, ratio: 5.06, min: 4.5 }
-  - { fg: link, bg: stone, ratio: 5.01, min: 4.5 }
-  - { fg: community, bg: ground, ratio: 6.48, min: 4.5 }
-  - { fg: community, bg: surface, ratio: 5.97, min: 4.5 }
-  - { fg: community, bg: surface-2, ratio: 5.31, min: 4.5 }
-  - { fg: community, bg: stone, ratio: 5.26, min: 4.5 }
-  - { fg: danger, bg: surface, ratio: 5.87, min: 4.5 }
-  - { fg: danger, bg: ground, ratio: 6.37, min: 4.5 }
-  - { fg: danger, bg: stone, ratio: 5.17, min: 4.5 }
-  - { fg: on-accent, bg: accent, ratio: 8.09, min: 4.5 }
-  - { fg: on-accent, bg: molten, ratio: 11.73, min: 4.5 }
-  - { fg: on-accent, bg: accent-deep, ratio: 6.27, min: 4.5 }
-  - { fg: on-bronze, bg: bronze, ratio: 7.12, min: 4.5 }
-  - { fg: on-bronze, bg: bronze-deep, ratio: 10.50, min: 4.5 }
-  - { fg: ground, bg: link, ratio: 6.17, min: 4.5 }
-  - { fg: ground, bg: community, ratio: 6.48, min: 4.5 }
-  - { fg: on-night, bg: night, ratio: 15.29, min: 4.5 }
-  - { fg: on-night-dim, bg: night, ratio: 11.62, min: 4.5 }
-  - { fg: gold-on-night, bg: night, ratio: 7.83, min: 4.5 }
-  - { fg: danger-on-night, bg: night, ratio: 6.89, min: 4.5 }
-  - { fg: community, bg: sky-wash, ratio: 5.70, min: 4.5 }
-  - { fg: link, bg: copper-wash, ratio: 5.24, min: 4.5 }
-  - { fg: pine, bg: pine-wash, ratio: 6.38, min: 4.5 }
-  - { fg: border, bg: ground, ratio: 4.46, min: 3 }
-  - { fg: border, bg: surface, ratio: 4.11, min: 3 }
-  - { fg: border, bg: stone, ratio: 3.62, min: 3 }
-  - { fg: focus, bg: ground, ratio: 6.48, min: 3 }
-  - { fg: focus, bg: surface, ratio: 5.97, min: 3 }
-  - { fg: focus, bg: stone, ratio: 5.26, min: 3 }
-  - { fg: focus-on-night, bg: night, ratio: 7.83, min: 3 }
+  - { fg: text, bg: ground, ratio: 15.29, min: 4.5 }
+  - { fg: text, bg: surface, ratio: 13.89, min: 4.5 }
+  - { fg: text, bg: surface-2, ratio: 12.51, min: 4.5 }
+  - { fg: text, bg: stone, ratio: 12.49, min: 4.5 }
+  - { fg: text-dim, bg: ground, ratio: 8.08, min: 4.5 }
+  - { fg: text-dim, bg: surface, ratio: 7.34, min: 4.5 }
+  - { fg: text-dim, bg: surface-2, ratio: 6.61, min: 4.5 }
+  - { fg: text-dim, bg: stone, ratio: 6.60, min: 4.5 }
+  - { fg: link, bg: ground, ratio: 6.25, min: 4.5 }
+  - { fg: link, bg: surface, ratio: 5.67, min: 4.5 }
+  - { fg: link, bg: surface-2, ratio: 5.11, min: 4.5 }
+  - { fg: link, bg: stone, ratio: 5.10, min: 4.5 }
+  - { fg: community, bg: ground, ratio: 6.41, min: 4.5 }
+  - { fg: community, bg: surface, ratio: 5.82, min: 4.5 }
+  - { fg: community, bg: surface-2, ratio: 5.24, min: 4.5 }
+  - { fg: community, bg: stone, ratio: 5.23, min: 4.5 }
+  - { fg: danger, bg: surface, ratio: 5.67, min: 4.5 }
+  - { fg: danger, bg: ground, ratio: 6.25, min: 4.5 }
+  - { fg: danger, bg: stone, ratio: 5.10, min: 4.5 }
+  - { fg: on-accent, bg: accent, ratio: 10.47, min: 4.5 }
+  - { fg: on-accent, bg: molten, ratio: 12.25, min: 4.5 }
+  - { fg: on-accent, bg: accent-deep, ratio: 8.03, min: 4.5 }
+  - { fg: on-bronze, bg: bronze, ratio: 8.70, min: 4.5 }
+  - { fg: on-bronze, bg: bronze-deep, ratio: 12.10, min: 4.5 }
+  - { fg: ground, bg: link, ratio: 6.25, min: 4.5 }
+  - { fg: ground, bg: community, ratio: 6.41, min: 4.5 }
+  - { fg: on-night, bg: night, ratio: 19.24, min: 4.5 }
+  - { fg: on-night-dim, bg: night, ratio: 10.92, min: 4.5 }
+  - { fg: gold-on-night, bg: night, ratio: 13.17, min: 4.5 }
+  - { fg: danger-on-night, bg: night, ratio: 7.85, min: 4.5 }
+  - { fg: community, bg: sky-wash, ratio: 5.58, min: 4.5 }
+  - { fg: link, bg: copper-wash, ratio: 5.41, min: 4.5 }
+  - { fg: pine, bg: pine-wash, ratio: 6.68, min: 4.5 }
+  - { fg: border, bg: ground, ratio: 4.48, min: 3 }
+  - { fg: border, bg: surface, ratio: 4.07, min: 3 }
+  - { fg: border, bg: stone, ratio: 3.66, min: 3 }
+  - { fg: focus, bg: ground, ratio: 15.29, min: 3 }
+  - { fg: focus, bg: surface, ratio: 13.89, min: 3 }
+  - { fg: focus, bg: stone, ratio: 12.49, min: 3 }
+  - { fg: focus-on-night, bg: night, ratio: 13.17, min: 3 }
 
 # Texture limits (L12 and L7 contract, 2026-10-18). A light tile in
 # site/src/assets/art/textures/ never goes darker than its floor color; a dark

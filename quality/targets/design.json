@@ -22,7 +22,7 @@
         {
           "file": "site/src/layouts/BaseLayout.astro",
           "line": "name=\"theme-color\"",
-          "why": "theme-color #FFFBF3, approved by decision 59"
+          "why": "theme-color #001970, State Blue (brand decision 50)"
         }
       ],
       "tokens": {

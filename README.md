@@ -78,7 +78,7 @@ Not ours to give away; each keeps its own license.
 | Thing | Where | License |
 | --- | --- | --- |
 | npm packages | `package.json`, `package-lock.json`; `npm install` downloads them | Each package's own |
-| Web fonts Alegreya Sans and Cinzel | The build downloads them (`site/astro.config.mjs`); the repo holds none | SIL Open Font License 1.1 |
+| Aileron, the display font | The build downloads it from Fontsource (`site/astro.config.mjs`); the OG cards and badges read `@fontsource/aileron`; the repo holds none | CC0 1.0 |
 | `04_tools/voice_lint.py` | Vendored from `SoulCraft-Org/git-crafter` | Apache 2.0 ([`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt)) |
 | The Code of Conduct's Covenant text | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | CC BY-SA 4.0, from the Contributor Covenant |
 | gitleaks, the secret scanner | CI downloads the release binary | MIT |

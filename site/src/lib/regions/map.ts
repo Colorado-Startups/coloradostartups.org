@@ -10,13 +10,11 @@ import { COLORADO_PLACES, type Place } from "../leaderboard/places";
 import { renderPlot, type ChartText } from "../plot";
 import { loadGeo } from "../seats/load";
 
-// One color per region, from the brand tokens. The trio passed the dataviz
-// palette validator on --c-ground (#FFFBF3) with all pairs compared, since any
-// two regions can sit side by side on a map: lightness band, chroma floor,
-// color-vision separation and the normal-vision floor all pass. Deep gold sits
-// at 2.52:1 against the ground, under the 3:1 mark target, so every city is
-// labelled on the map and listed in the table under it (validator run
-// 2026-10-18). Rerun it if L12 changes these tokens.
+// One color per region, from the brand tokens (brand v3: deep State Yellow,
+// Teal and State Red). Against the white ground, Teal is 6.41:1 and Red 6.25:1;
+// deep Yellow is 1.91:1, under the 3:1 mark target, so every city is labelled
+// on the map and listed in the table under it (WCAG ratios from the tokens,
+// 2026-11-15). Recheck these if the tokens change.
 export const REGION_COLORS: Readonly<Record<RegionId, string>> = {
   "photon-mountain": "var(--c-accent-deep)",
   "space-peak": "var(--c-community)",
