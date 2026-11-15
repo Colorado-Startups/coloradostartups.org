@@ -11,7 +11,7 @@ flowchart LR
 
 | Check | How | Fails when |
 | --- | --- | --- |
-| Paths | `python3 04_tools/merge_policy.py --pr <n> --sha <head>` | An agent merges a PR the checker calls not AI-mergeable, or at another SHA, or anyone approves as an agent |
+| Paths | `python3 04_tools/merge_policy.py --pr <n> --sha <head>` | An agent merges an outside PR the checker calls not AI-mergeable, or at another SHA, or anyone approves as an agent |
 | Tests | Read `gh pr checks <n>` | A required check is red, or new code has no test |
 | Content gate | `python3 04_tools/cs_site_lint.py <changed data files>` | A FAIL, or an em dash |
 | AI disclosure | [`.claude/rules/ai-disclosure.md`](.claude/rules/ai-disclosure.md) | A keeper appears without "AI agent" in words or alt text |
