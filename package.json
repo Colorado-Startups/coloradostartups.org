@@ -33,6 +33,7 @@
     "brand:check": "node scripts/brand/pull.mjs --self-test && node scripts/brand/pull.mjs --check"
   },
   "devDependencies": {
+    "@fontsource/aileron": "5.3.0",
     "@secretlint/secretlint-rule-preset-recommend": "13.1.0",
     "@vitest/coverage-v8": "5.0.5",
     "knip": "6.44.0",

@@ -17,7 +17,9 @@ const hall = readFileSync(path.join(SITE, "src/assets/art/hero/hall.webp"));
 const PHOTO = path.join(SITE, "src/components/team/photos/paul-foley.webp");
 const HAS_PHOTO = existsSync(PHOTO);
 const photo = HAS_PHOTO ? readFileSync(PHOTO) : Buffer.alloc(0);
-const png = readFileSync(path.join(SITE, "public/og/team.png"));
+// A plain PNG with no packet. The OG cards are built at prebuild, after the
+// unit tests run, so the test makes its own.
+const png = await sharp({ create: { width: 8, height: 8, channels: 3, background: "#001970" } }).png().toBuffer();
 const packet = readWebpXmp(hall) ?? "";
 
 // Astro passes its image config; the sharp service reads only these two.

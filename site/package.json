@@ -9,7 +9,7 @@
   "scripts": {
     "predev": "CS_PEOPLE_FIXTURES=1 node ../scripts/people/overlay.mjs && node scripts/sync-brand.mjs",
     "dev": "astro dev",
-    "prebuild": "node ../scripts/people/overlay.mjs && node scripts/sync-brand.mjs && (node ../scripts/events/fetch-ics.mjs --prebuild || true)",
+    "prebuild": "node ../scripts/people/overlay.mjs && node scripts/sync-brand.mjs && node ../scripts/og/build.mjs && (node ../scripts/events/fetch-ics.mjs --prebuild || true)",
     "build": "astro build && pagefind --site dist",
     "astro": "astro",
     "precheck": "CS_PEOPLE_FIXTURES=1 node ../scripts/people/overlay.mjs",

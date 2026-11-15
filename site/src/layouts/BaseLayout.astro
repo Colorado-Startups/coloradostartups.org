@@ -21,7 +21,7 @@ interface Props {
 const { title, description, ogImage = "default", noindex = false, jsonLd } = Astro.props;
 const site = Astro.site!;
 const canonical = new URL(Astro.url.pathname, site).toString();
-const ogUrl = new URL(`/og/${ogImage}.png`, site).toString();
+const ogUrl = new URL(`/og/${ogImage}.jpg`, site).toString();
 const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado Startups`;
 ---
 

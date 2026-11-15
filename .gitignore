@@ -43,3 +43,6 @@ quality/data/
 quality/history/
 quality/dist/
 .code-os-packs/
+
+# Open Graph cards: built in prebuild by scripts/og/build.mjs (CI and Workers Builds)
+site/public/og/

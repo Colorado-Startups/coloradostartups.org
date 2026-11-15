@@ -8,9 +8,9 @@ import path from "node:path";
 export const CARD = { width: 1200, height: 630 };
 
 // Parses art/og/cards.txt: blocks of `key: value` lines separated by blank lines.
-// Every card needs an id. A card with `region: <id>` takes its title and
-// subtitle from data/regions/<id>.yaml (L8's data, through `regions`); every
-// other card needs its own title and subtitle. art is optional.
+// Every card needs an id and a title; brand v3 cards show only their name
+// (brand decision 46: no taglines). A card with `region: <id>` takes its name
+// and art from data/regions/<id>.yaml (L8's data, through `regions`). art is optional.
 export function parseCards(text, regions = {}) {
   const cards = [];
   const blocks = text
@@ -29,11 +29,10 @@ export function parseCards(text, regions = {}) {
       const r = regions[card.region];
       if (!r) throw new Error(`cards.txt: card "${card.id}" names region "${card.region}", which has no data/regions file`);
       card.title ??= r.name;
-      // The brand has no taglines (brand decision 46): the summary's first sentence.
-      card.subtitle ??= String(r.summary ?? "").trim().split(/(?<=\.)\s/)[0];
       card.art ??= r.art;
     }
-    for (const key of ["id", "title", "subtitle"]) {
+    if (card.subtitle) throw new Error(`cards.txt: card "${card.id}" has a subtitle; brand cards show only their name (brand decision 46)`);
+    for (const key of ["id", "title"]) {
       if (!card[key]) throw new Error(`cards.txt: a card is missing "${key}" (${JSON.stringify(card)})`);
     }
     if (!/^[a-z0-9-]+$/.test(card.id)) throw new Error(`cards.txt: id "${card.id}" must be lowercase words and hyphens`);
@@ -89,50 +88,19 @@ export function portraitPlacement(sw, sh, tw, th) {
   return { resize: { width, height: th }, left: tw - width, top: 0 };
 }
 
-// Where the text scrim is solid and where it has faded out, as fractions of
-// the card width. A wide-art card fades across the middle of the picture. A
-// portrait card keeps the scrim off the portrait: solid to just short of its
-// left edge, clear at the edge, so the keeper is never washed out.
-export function scrimStops(portraitLeft, width = CARD.width) {
-  if (portraitLeft == null) return { solid: 0.55, clear: 0.82 };
-  return { solid: (portraitLeft - 24) / width, clear: portraitLeft / width };
-}
+// Brand v3 card composition (Colorado-Startups/brand art/render/fibo_cards.py
+// compose()): the place painting covers the card, a State-red rule sits near
+// the top left, and the card's name sits under it in white Aileron. A keeper
+// card adds its AI-agent caption under the name. Sizes in px for 1200 x 630.
+export const CARD_TEXT = { title: 64, titlePitch: 74, small: 26 };
 
-// Type sizes and line pitches on the card, in px.
-export const CARD_TEXT = { title: 68, titlePitch: 78, body: 30, bodyPitch: 40, small: 24 };
-
-// The text column's baselines, in px. The title, accent rule and body flow
-// down from below the logo; the caption (null without one) and the URL hold
-// fixed slots above the bottom edge, so layoutProblem checks the body clears them.
-export function textLayout(titleCount, bodyCount, hasCaption) {
-  const top = 236 + Math.round(CARD_TEXT.title * 0.72);
+// Baselines and the rule's top, in px: the rule at y 72, the name below it, and
+// the caption (null without one) one line under the name's last line.
+export function textLayout(titleCount, hasCaption) {
+  const rule = 72;
+  const top = rule + 6 + 24 + Math.round(CARD_TEXT.title * 0.78);
   const title = Array.from({ length: titleCount }, (_, i) => top + i * CARD_TEXT.titlePitch);
-  const rule = top + (titleCount - 1) * CARD_TEXT.titlePitch + 30;
-  const body = Array.from({ length: bodyCount }, (_, i) => rule + 6 + 50 + i * CARD_TEXT.bodyPitch);
-  return { title, rule, body, caption: hasCaption ? CARD.height - 100 : null, url: CARD.height - 56 };
-}
-
-// A line's box runs from its font's ascent above the baseline to its descent
-// below, in em (Alegreya Sans: 0.9 and 0.3). The body's own lines sit 4 px
-// apart, so under 8 px between the body, caption and URL reads as touching.
-const MIN_GAP = 8;
-
-// A problem when the body's last line, the caption and the URL come within
-// MIN_GAP px of each other in a textLayout; null when they clear.
-export function layoutProblem(id, layout, em = { ascent: 0.9, descent: 0.3 }) {
-  const lines = [
-    { name: "subtitle", baseline: layout.body.at(-1), size: CARD_TEXT.body },
-    layout.caption != null && { name: "caption", baseline: layout.caption, size: CARD_TEXT.small },
-    { name: "URL", baseline: layout.url, size: CARD_TEXT.small },
-  ].filter(Boolean);
-  for (let i = 1; i < lines.length; i += 1) {
-    const [above, below] = [lines[i - 1], lines[i]];
-    const gap = below.baseline - em.ascent * below.size - (above.baseline + em.descent * above.size);
-    if (gap < MIN_GAP) {
-      return `card "${id}": its ${above.name} runs into its ${below.name} (${gap.toFixed(1)} px apart, ${MIN_GAP} needed); shorten the title or subtitle`;
-    }
-  }
-  return null;
+  return { rule, title, caption: hasCaption ? title.at(-1) + 52 : null };
 }
 
 // Every keeper is disclosed as an AI agent wherever its picture appears (BRIEF,
@@ -157,13 +125,13 @@ export function isKeeperArt(art) {
 export const DISCLOSURE_CAPTION = "The keepers in the picture are AI agents.";
 
 // The caption a card needs for the art it is drawn on (after any fallback), or
-// null when the art shows no keeper or the title and subtitle already disclose.
+// null when the art shows no keeper or the name already discloses.
 export function disclosureCaption(card, art = card.art) {
   if (!isKeeperArt(art)) return null;
-  return `${card.title} ${card.subtitle}`.includes(DISCLOSURE) ? null : DISCLOSURE_CAPTION;
+  return String(card.title).includes(DISCLOSURE) ? null : DISCLOSURE_CAPTION;
 }
 
-// `lines` is what the card renders (title, subtitle and any caption, after
+// `lines` is what the card renders (its name and any caption, after
 // wrapping); `art` is the picture it is drawn on, after any fallback. Returns
 // a problem when a keeper card's lines lack the disclosure, or when wrapping
 // cut the text short (wrapText ends a cut line with an ellipsis), since a
@@ -172,7 +140,7 @@ export function disclosureProblem(card, lines, art = card.art) {
   if (!isKeeperArt(art)) return null;
   const text = lines.join(" ");
   if (!text.includes(DISCLOSURE)) return `card "${card.id}" shows keepers (${art}) but its rendered text does not say "${DISCLOSURE}"`;
-  if (text.includes("…")) return `card "${card.id}" shows keepers (${art}) and its text is cut short; shorten the subtitle`;
+  if (text.includes("…")) return `card "${card.id}" shows keepers (${art}) and its text is cut short; shorten the name`;
   return null;
 }
 
