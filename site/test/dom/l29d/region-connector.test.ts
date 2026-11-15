@@ -12,7 +12,6 @@ import { REGION_IDS } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
-import { UNPAID_VOLUNTEER_LINE } from "../../../src/components/positions/positions";
 import { REGIONS } from "../../../src/lib/regions/match";
 import { readDist, SITE_DIR } from "../pages";
 
