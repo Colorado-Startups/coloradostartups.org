@@ -1,7 +1,7 @@
 {
-  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.0.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
+  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.2.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
   "repo": "Colorado-Startups/brand",
-  "tag": "v4.0.0",
+  "tag": "v4.2.0",
   "files": {
     "dist/places/boulder.jpg": "2816f12e39305c407c7e400702f734c79440429f52ef3724a5971d066bf9072c",
     "dist/places/golden.jpg": "10737f40c1cdff6ec90255fe2c25e68f8ef8a72e2724e9b15dc908bf9092b3c9",
@@ -25,6 +25,8 @@
     "dist/logo/favicon.ico": "238da7a1fb8cfa6bb0b860b0a4dc519ba453c6581bf2f882898f14d6516d4dda",
     "dist/logo/apple-touch-icon.png": "23c0d573706e87b3f474902fabbccc4a00bf61f44e5c3213d6442f86aff184bc",
     "dist/logo/icon-192.png": "d38bb081b7cb827dd37c281646c0d78e78b0abc643737fd6a617747bc0b90674",
-    "dist/logo/icon-512.png": "cbdbe869187b8eb86e3a0da7ecc71d8a43bd35e46f10fe663764537ad0b33485"
+    "dist/logo/icon-512.png": "cbdbe869187b8eb86e3a0da7ecc71d8a43bd35e46f10fe663764537ad0b33485",
+    "dist/clips/photonics.webm": "494c8b69c52433dd6977debd54d47b2632f302b527c7226b87cff55f0d651425",
+    "dist/clips/photonics.mp4": "9923f4ace75554f8a64d48c7799978c89e0af795ae563f834c222370353bdeb7"
   }
 }

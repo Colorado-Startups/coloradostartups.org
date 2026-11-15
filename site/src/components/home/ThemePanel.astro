@@ -1,7 +1,12 @@
 ---
 // One Why Colorado panel: the region's place painting, three sourced figures,
-// and two ways on, to the region and to its Leaderboard honorees. The
-// painting stands in for the theme's clip until the brand ships it.
+// and two ways on, to the region and to its Leaderboard honorees.
+//
+// A theme with a brand clip (brand v4.2.0: photonics) plays it over the
+// painting: muted, looped, loaded only when the panel nears the screen, with a
+// Pause button, and never under prefers-reduced-motion. The painting stays
+// underneath as the image, its alt text and the no-JavaScript view; the clip
+// is aria-hidden, since it is the same picture moving.
 import { brandArt } from "../art/art-assets";
 import { PLACE_ART_ALT } from "../art/keepers";
 import { REGION_COLORS } from "../../lib/regions/map";
@@ -17,6 +22,7 @@ const id = `theme-${theme.region}`;
 ---
 
 <article class="theme panel" aria-labelledby={id} style={`--theme-color: ${REGION_COLORS[theme.region]}`}>
+  <div class="theme__media">
   <img
     class="theme__art"
     src={art.src}
@@ -28,6 +34,16 @@ const id = `theme-${theme.region}`;
     loading="lazy"
     decoding="async"
   />
+  {
+    theme.clip && (
+      <video class="theme__clip" data-theme-clip muted loop playsinline preload="none" width={art.width} height={art.height} aria-hidden="true">
+        <source src={`/art/brand/${theme.clip}.webm`} type="video/webm" />
+        <source src={`/art/brand/${theme.clip}.mp4`} type="video/mp4" />
+      </video>
+    )
+  }
+  {theme.clip && <button type="button" class="theme__toggle" data-clip-toggle>Pause</button>}
+  </div>
   <div class="theme__body">
     <h3 id={id}>{theme.title}</h3>
     <p class="theme__region">{theme.regionName}</p>
@@ -41,6 +57,29 @@ const id = `theme-${theme.region}`;
   </div>
 </article>
 
+<script>
+  // Play each clip while its panel is on screen; the button pauses it for good.
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    for (const video of document.querySelectorAll<HTMLVideoElement>("[data-theme-clip]")) {
+      const media = video.parentElement!;
+      const toggle = media.querySelector<HTMLButtonElement>("[data-clip-toggle]");
+      let held = false;
+      const play = () => video.play().then(() => (media.dataset.playing = "true")).catch(() => undefined);
+      new IntersectionObserver(([entry]) => {
+        if (held) return;
+        if (entry?.isIntersecting) void play();
+        else video.pause();
+      }, { threshold: 0.25 }).observe(media);
+      toggle?.addEventListener("click", () => {
+        held = !video.paused;
+        if (held) video.pause();
+        else void play();
+        toggle.textContent = held ? "Play" : "Pause";
+      });
+    }
+  }
+</script>
+
 <style>
   .theme {
     display: grid;
@@ -48,6 +87,40 @@ const id = `theme-${theme.region}`;
     padding: 0;
     overflow: hidden;
     border-top: var(--line-bold) solid var(--theme-color);
+  }
+  .theme__media {
+    position: relative;
+  }
+  .theme__clip {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .theme__toggle {
+    position: absolute;
+    right: var(--s-2);
+    bottom: var(--s-2);
+    min-height: var(--size-tap);
+    padding-inline: var(--s-3);
+    border: 0;
+    border-radius: var(--r-chisel);
+    background: color-mix(in oklab, var(--c-night) 75%, transparent);
+    color: var(--c-on-night);
+    font: inherit;
+    font-weight: 700;
+    /* Not just see-through: hidden, so Tab never lands on it before the clip shows. */
+    visibility: hidden;
+  }
+  .theme__media[data-playing] .theme__clip {
+    opacity: 1;
+  }
+  .theme__media[data-playing] .theme__toggle {
+    visibility: visible;
   }
   .theme__art {
     display: block;
