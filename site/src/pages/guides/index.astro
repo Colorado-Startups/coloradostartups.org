@@ -7,6 +7,9 @@
 //
 // Step F of the redesign (2026-11-15): one tile per guide, its title and the
 // number of listings it draws on, so a visitor picks a question at a glance.
+// The tiles lead (Paul, 2026-11-16: "they're supposed to be getting info"):
+// the first section holds the title and the answer only, and the guides
+// scene closes the page, lazily.
 import snapshotRaw from "../../../../data/credits/startup-programs.json?raw";
 import ArtImage from "../../components/art/ArtImage.astro";
 import { GUIDE_ART_IMAGE, GUIDES_SCENE as art } from "../../components/guides/guide-art";
@@ -41,19 +44,9 @@ const answer: Part[] = [
   {/* The /ask/ search filters by this type (Pagefind). */}
   <span data-pagefind-filter="type:Guides"></span>
   <section class="section section--band" aria-labelledby="guides-title">
-    <div class="wrap guides-head">
-      <div class="stack">
-        <h1 id="guides-title">{GUIDES_INDEX.title}</h1>
-        <p class="lede" data-guide-answer><GuideText parts={answer} /></p>
-      </div>
-      <ArtImage
-        src={art.src}
-        alt={art.alt}
-        {...GUIDE_ART_IMAGE}
-        loading="lazy"
-        motion="none"
-        class="guide-art"
-      />
+    <div class="wrap stack">
+      <h1 id="guides-title">{GUIDES_INDEX.title}</h1>
+      <p class="lede" data-guide-answer><GuideText parts={answer} /></p>
     </div>
   </section>
 
@@ -96,28 +89,21 @@ const answer: Part[] = [
     <div class="wrap stack">
       <h2 id="else-title">Looking for something else?</h2>
       <p class="btn-row"><a class="btn btn--stone" href="/ecosystem-canvas/">Browse Startup Resources</a></p>
+      <ArtImage src={art.src} alt={art.alt} {...GUIDE_ART_IMAGE} loading="lazy" motion="none" class="guide-art" />
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* The guide's picture under its answer (L6's scenes, 2026-11-04). */
+  /* The guides scene closes the page (L6's scenes, 2026-11-04). */
   :global(.guide-art) {
     width: min(100%, 40rem);
     border-radius: var(--r-card);
     box-shadow: var(--sh-glow);
   }
-  /* The answer beside the picture on a wide screen, so the tiles start in
-     the first screen. */
-  .guides-head {
-    display: grid;
-    gap: var(--s-5);
-    align-items: center;
-  }
-  @media (min-width: 64rem) {
-    .guides-head {
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    }
+  /* Outranks ArtImage's own margin: 0, so the gap above the scene holds. */
+  section :global(.guide-art) {
+    margin-top: var(--s-6);
   }
   .guide-group + .guide-group {
     margin-top: var(--s-7);

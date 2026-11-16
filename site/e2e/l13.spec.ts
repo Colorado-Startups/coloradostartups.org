@@ -44,7 +44,10 @@ test("an unknown path answers 404 with the Hall's not-found page", async ({ page
   const response = await page.goto("/a-page-that-does-not-exist/");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("This passage leads nowhere");
-  await expect(page.getByRole("link", { name: "Browse Startup Resources" })).toHaveAttribute("href", "/ecosystem-canvas/");
+  // A way back leads (2026-11-16): the site search, then the main sections.
+  const main = page.locator("main");
+  await expect(main.getByRole("search").getByRole("searchbox", { name: "Search the site" })).toBeVisible();
+  await expect(main.getByRole("link", { name: "Startup Resources", exact: true })).toHaveAttribute("href", "/ecosystem-canvas/");
 });
 
 test("the event calendar frame loads lazily and keeps its title", async ({ page }) => {

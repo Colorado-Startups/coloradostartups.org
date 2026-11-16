@@ -1,8 +1,9 @@
-// S0: the header carries two empty slots, AskButton (K1, "Ask anywhere") and
+// S0: the header carries two slots, AskButton (K1, "Ask anywhere") and
 // YourRegion (W8, the visitor's region crest). They sit in the nav after the
 // links and before "Join the Slack". K1 filled AskButton (the Search button
-// and the Ask dialog); YourRegion renders nothing until W8, so the rest of
-// the header, the phone menu and the focus order stay as they were. The unit project runs in plain Node and cannot compile
+// and the Ask dialog). W8 filled YourRegion (the Pick your region link, the
+// chooser and the picked region's crest). Neither changed the rest of the
+// header's markup. The unit project runs in plain Node and cannot compile
 // .astro, so these checks read the source.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -21,6 +22,8 @@ const template = (source: string) => source.split("---").slice(2).join("---");
 // K1 (2026-11-16) filled AskButton and left SiteHeader's own markup alone: the
 // hash still holds, and the check below on AskButton replaces its "renders
 // nothing" check. The header's styles (after the <script>) gained K1's gaps.
+// W8 (2026-11-16) filled YourRegion the same way: only the slot comment's
+// words changed, and the check below on YourRegion replaces its own.
 // M1c (2026-11-16) marks Join the Slack for the click listener; the hash is
 // taken with that one mark removed, so the rest stays pinned.
 const MARKUP_BEFORE_S0 = "129944a847f68aa6ad4daee22e2dbf58b793b0a3052821997bd4225e81b81d4e";
@@ -33,8 +36,16 @@ const SLOTS = [
 const header = read("SiteHeader.astro");
 
 describe("header slots", () => {
-  it("YourRegion (W8) renders nothing yet", () => {
-    expect(template(read("header/YourRegion.astro")).trim()).toBe("");
+  it("YourRegion (W8) renders a link to /regions/, a hidden chooser button, a hidden picked state and the chooser", () => {
+    const region = template(read("header/YourRegion.astro"));
+    expect(region).toMatch(/<a class="btn btn--stone your-region__pick" href="\/regions\/" data-region-link>/);
+    expect(region).toMatch(/<button class="btn btn--stone your-region__pick" type="button" aria-haspopup="dialog" data-region-open hidden>/);
+    expect(region).toContain('<span class="your-region__label">Pick your region</span>');
+    expect(region).toMatch(/<div class="your-region__mine" data-region-mine hidden>/);
+    expect(region).toMatch(/<template data-region-template>\s*<dialog class="region-chooser"/);
+    // Bundled, never inline, and nothing sent: no is:inline script, no fetch, no data-track.
+    expect(region).not.toMatch(/<script[^>]*is:inline/);
+    expect(region).not.toMatch(/data-track|fetch\(|sendBeacon/);
   });
 
   it("AskButton (K1) renders a link to /ask/, a hidden Search button and the Ask dialog", () => {

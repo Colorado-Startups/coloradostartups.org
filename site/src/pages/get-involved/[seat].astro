@@ -19,10 +19,15 @@
 // figure comes from facts.yaml, with its footnote. Communitas is an AI agent
 // wherever it appears, and people moderate. No JobPosting or other JSON-LD:
 // these are not job ads. site/test/dom/l38/ checks each rule.
+//
+// The words lead (Paul, 2026-11-16: "they're supposed to be getting info"):
+// the hero is the plaque, and the seat's painting (layout.hero.art, with its
+// alt) sits under "Why it matters", after the map, lazily.
 import { comparePositions } from "@cs/shared";
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
 
+import ArtImage from "../../components/art/ArtImage.astro";
 import { applyHref, takesApplications } from "../../components/positions/positions";
 import OtherSeats from "../../components/seats/OtherSeats.astro";
 import SeatBlock from "../../components/seats/SeatBlock.astro";
@@ -94,6 +99,19 @@ const TONES = { what: "band", why: "lit", apply: "hearth" } as const;
             {section.blocks.map((block) => (
               <SeatBlock block={block} ctx={ctx} />
             ))}
+            {key === "why" && (
+              <ArtImage
+                src={layout.hero.art}
+                alt={layout.hero.alt}
+                aspect="21 / 9"
+                widths={[640, 960, 1280]}
+                sizes="(min-width: 44rem) 40rem, calc(100vw - 48px)"
+                loading="lazy"
+                motion="none"
+                label="Illustration in progress"
+                class="seat-art"
+              />
+            )}
           </div>
         </section>
       );

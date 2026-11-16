@@ -1,8 +1,8 @@
 ---
-// HallSeal: a small picture of the Great Hall that closes a text-only page,
-// the way an ornament ends a chapter (#261). The thanks pages and the two
-// forms close with it; the dispatch article closes the same way with its own
-// scoped rule. Its alt is HALL_ART_ALT, the brand's caption for Golden's
+// HallSeal: a small picture of the Great Hall that closes a page, the way an
+// ornament ends a chapter (#261). The thanks pages, the two forms and the
+// Leaderboard's nominate hearth close with it; the dispatch article closes
+// the same way with its own scoped rule. Its alt is HALL_ART_ALT, the brand's caption for Golden's
 // forge gate. It sits at the end of the page, so it loads
 // lazily. Owner: L5b.
 import ArtImage from "../art/ArtImage.astro";
@@ -20,8 +20,10 @@ import { HALL_ART_ALT } from "../art/keepers";
 />
 
 <style>
-  /* ArtImage renders the figure in its own scope, so this reaches it by class. */
-  :global(.hall-seal) {
+  /* ArtImage renders the figure in its own scope, so this reaches it by
+     class. The element and both classes outrank ArtImage's own margin: 0,
+     so the gap above the seal holds. */
+  :global(figure.hall-seal.art-image) {
     width: min(100%, 24rem);
     margin-top: var(--s-6);
     border-radius: var(--r-card);

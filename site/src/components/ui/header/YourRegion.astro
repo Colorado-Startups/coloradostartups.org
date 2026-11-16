@@ -1,5 +1,322 @@
 ---
-// Header slot for the visitor's region crest (plan step W8). It renders
-// nothing until W8 fills it, so the header's HTML, layout and focus order stay
-// as they were (S0).
+// Header slot for the visitor's region (plan step W8). A visitor picks one
+// region once, and this device remembers it (lib/your-region.ts). Nothing
+// about the pick leaves the browser.
+//
+// The page ships a plain "Pick your region" link to /regions/, so without
+// JavaScript the slot still goes somewhere useful. region-slot.ts swaps in a
+// button that opens the chooser or, once a region is picked, its crest and
+// name, linking to its page, with a Change button beside them.
+//
+// The chooser lists every region as an equal: the same size, A to Z by name,
+// which on the map also reads north to south. Each shows its crest, its name
+// and its core cities. It ships in a <template>, as the Ask dialog does, so
+// its crests load only when a visitor opens it.
+//
+// From 1200 px the header is one row with little room to spare (#424). There
+// the slot holds 60 px in every state, so restoring a pick never moves the
+// row: the pin or the crest with a small caret. The words stay for screen
+// readers. In the phone menu they show in full.
+import { REGION_IDS } from "@cs/shared";
+
+import { brandArt } from "../../art/art-assets";
+import { regionCrestKey } from "../../art/keepers";
+import { REGION_COLORS } from "../../../lib/regions/map";
+import { REGIONS } from "../../../lib/regions/match";
+import { andList } from "../../../lib/text";
+
+const regions = [...REGIONS]
+  .sort((a, b) => a.name.localeCompare(b.name, "en"))
+  .map((region) => {
+    const crest = brandArt(regionCrestKey(region.id));
+    if (!crest) throw new Error(`no crest for region "${region.id}"; add it to brand.lock.json`);
+    return { ...region, crest };
+  });
 ---
+
+<div class="your-region" data-your-region data-region-ids={REGION_IDS.join(" ")}>
+  <a class="btn btn--stone your-region__pick" href="/regions/" data-region-link>
+    <svg class="your-region__pin" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+      <path d="M10 18s5.5-5.2 5.5-9.5a5.5 5.5 0 0 0-11 0C4.5 12.8 10 18 10 18Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+      <circle cx="10" cy="8.5" r="2" fill="currentColor"></circle>
+    </svg>
+    <span class="your-region__label">Pick your region</span>
+  </a>
+  <button class="btn btn--stone your-region__pick" type="button" aria-haspopup="dialog" data-region-open hidden>
+    <svg class="your-region__pin" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+      <path d="M10 18s5.5-5.2 5.5-9.5a5.5 5.5 0 0 0-11 0C4.5 12.8 10 18 10 18Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+      <circle cx="10" cy="8.5" r="2" fill="currentColor"></circle>
+    </svg>
+    <span class="your-region__label">Pick your region</span>
+    <svg class="your-region__caret" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+      <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </button>
+  <div class="your-region__mine" data-region-mine hidden>
+    <a class="your-region__page" href="/regions/" data-region-page>
+      <span class="your-region__crest" data-region-crest></span>
+      <span class="your-region__name"><span class="visually-hidden">Your region: </span><span data-region-name></span></span>
+    </a>
+    <button class="btn btn--quiet your-region__change" type="button" aria-haspopup="dialog" data-region-change>
+      <svg class="your-region__caret" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+        <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <span class="your-region__label">Change<span class="visually-hidden"> your region</span></span>
+    </button>
+  </div>
+  <template data-region-template>
+    <dialog class="region-chooser" aria-labelledby="region-chooser-title" closedby="any">
+      <div class="region-chooser__box">
+        <div class="region-chooser__head">
+          <h2 id="region-chooser-title">Pick your region</h2>
+          <form method="dialog">
+            <button type="submit" class="btn btn--stone">Close</button>
+          </form>
+        </div>
+        <p class="region-chooser__note">Your browser keeps your pick on this device. It is never sent to us.</p>
+        <ul class="region-chooser__list" role="list">
+          {
+            regions.map((r) => (
+              <li>
+                <button
+                  type="button"
+                  class="region-choice"
+                  data-region-pick={r.id}
+                  data-region-href={`/regions/${r.id}/`}
+                  aria-pressed="false"
+                  style={`--region-color: ${REGION_COLORS[r.id]}`}
+                >
+                  <img class="region-choice__crest" src={r.crest.src} srcset={r.crest.srcset} sizes="40px" width="40" height="40" alt="" loading="lazy" decoding="async" />
+                  <span class="region-choice__name">
+                    <span data-region-name>{r.name}</span>
+                    <span class="region-choice__mine">Your region</span>
+                  </span>
+                  <span class="region-choice__cities">{andList(r.cities)}</span>
+                </button>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="region-chooser__forget" data-region-forget-row hidden>
+          <button type="button" class="btn btn--quiet" data-region-forget>Forget my region</button>
+        </p>
+      </div>
+    </dialog>
+  </template>
+</div>
+
+<script>
+  // Bundled by Astro, never inline. The chooser is built on first open.
+  import { initRegionSlot } from "./region-slot";
+
+  const slot = document.querySelector<HTMLElement>("[data-your-region]");
+  if (slot) initRegionSlot(slot);
+</script>
+
+<style>
+  .your-region {
+    display: flex;
+    align-items: center;
+  }
+  /* .btn sets display, which beats the browser's own [hidden] rule. */
+  .your-region__pick[hidden],
+  .your-region__mine[hidden] {
+    display: none;
+  }
+  .your-region__pick {
+    padding-inline: var(--s-4);
+  }
+  .your-region__pin,
+  .your-region__caret {
+    flex: none;
+  }
+  .your-region__caret {
+    display: none;
+  }
+  .your-region__mine {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+  .your-region__page {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--size-tap);
+    color: var(--c-text);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .your-region__page:hover [data-region-name] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  /* The brand shows a crest at 32 px and up. The box holds its size before
+     the crest arrives. */
+  .your-region__crest {
+    display: inline-block;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+  }
+  .your-region__crest :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* The one-row header: 60 px in every state. The slot sits 4 px from the
+     Search button, one pair of small controls, so the row keeps the room
+     it had for a classic scrollbar and a fallback font (#424). */
+  @media (min-width: 1200px) {
+    .your-region {
+      inline-size: 3.75rem;
+      margin-inline-start: calc(var(--s-1) - var(--s-3));
+    }
+    .your-region__pick {
+      inline-size: 100%;
+      gap: var(--s-1);
+      padding-inline: var(--s-1);
+    }
+    .your-region__label,
+    .your-region__name {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .your-region__caret {
+      display: block;
+    }
+    .your-region__mine {
+      inline-size: 100%;
+      gap: 0;
+      min-height: var(--size-control);
+      border-radius: var(--r-chisel);
+      background: var(--c-ground);
+      box-shadow: 0 0 0 var(--line-hair) var(--c-border);
+    }
+    .your-region__page {
+      flex: 1;
+      justify-content: center;
+    }
+    .your-region__change {
+      inline-size: 1.5rem;
+      padding-inline: 0;
+    }
+  }
+  /* In the phone menu the slot lines up with Search and Join the Slack. */
+  @media (max-width: 1199px) {
+    .your-region {
+      align-self: flex-start;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Global, not scoped: the chooser is copied out of a <template> onto
+     <body>. The same stone tablet as the Ask dialog. */
+  .region-chooser {
+    width: min(100% - 2 * var(--s-4), 32rem);
+    max-height: min(100% - 2 * var(--s-5), 40rem);
+    margin: max(var(--s-5), 8vh) auto auto;
+    padding: 0;
+    color: var(--c-text);
+    background: var(--c-ground);
+    border: var(--line-edge) solid var(--c-stone-edge);
+    border-radius: var(--r-chisel);
+    box-shadow:
+      inset 0 3px 0 var(--c-accent),
+      var(--sh-ledge);
+  }
+  .region-chooser::backdrop {
+    background: color-mix(in oklab, var(--c-text) 55%, transparent);
+  }
+  .region-chooser__box {
+    padding: var(--s-5);
+  }
+  .region-chooser__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+  .region-chooser h2 {
+    margin: 0;
+  }
+  .region-chooser__note {
+    margin: var(--s-3) 0 0;
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+  }
+  .region-chooser__list {
+    display: grid;
+    gap: var(--s-3);
+    max-width: none;
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Every region the same size: one full-width row each. */
+  .region-choice {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0 var(--s-3);
+    inline-size: 100%;
+    min-height: var(--size-control-lg);
+    padding: var(--s-2) var(--s-4);
+    border: 0;
+    border-left: var(--line-bold) solid var(--region-color);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    box-shadow: 0 0 0 var(--line-hair) var(--c-border);
+    color: var(--c-text);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .region-choice[aria-pressed="true"] {
+    box-shadow: 0 0 0 var(--line-edge) var(--region-color);
+  }
+  .region-choice__crest {
+    grid-row: 1 / span 2;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  .region-choice__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s-2);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--t-step-1);
+  }
+  .region-choice:hover [data-region-name],
+  .region-choice:focus-visible [data-region-name] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .region-choice__mine {
+    display: none;
+    font-family: var(--font-body);
+    font-size: var(--t-step--1);
+    font-weight: 700;
+  }
+  .region-choice[aria-pressed="true"] .region-choice__mine {
+    display: inline;
+  }
+  .region-choice__cities {
+    grid-column: 2;
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+  }
+  .region-chooser__forget {
+    margin: var(--s-4) 0 0;
+  }
+  .region-chooser__forget[hidden] {
+    display: none;
+  }
+</style>

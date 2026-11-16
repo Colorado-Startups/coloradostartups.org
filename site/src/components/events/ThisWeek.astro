@@ -26,13 +26,17 @@
 // Both join links count as join_click (step M1c): "home-week" on home,
 // "regions-<id>-week" on a region page.
 //
+// Your region (step W8). On home, a region picked on this device puts its
+// events first, and a hidden line comes up to say so, with a Show all button
+// (initRegionFirst in this-week.ts). With no pick the build's order stands.
+//
 import { WAYS_IN, type Region } from "@cs/shared";
 import { getCollection } from "astro:content";
 
 import { clampWords } from "../../lib/communitas/doors";
 import { SLACK_JOIN } from "../../lib/communitas/join";
 import { placeRegion } from "../../lib/data/open-data";
-import { ELSEWHERE } from "../../lib/regions/match";
+import { ELSEWHERE, REGIONS } from "../../lib/regions/match";
 import { joinAttrs } from "../../lib/track-attrs";
 import { countdown } from "./countdown";
 import { dateParts, endsAt, SNAPSHOT, startsAt, upcomingEvents } from "./events";
@@ -56,10 +60,12 @@ const TITLE_WORDS = 5;
 const now = Date.now();
 const placed = upcomingEvents(SNAPSHOT, new Date(now)).map((event) => ({ event, place: placeRegion(event.location) }));
 const events = (region ? placed.filter((p) => p.place === region.id) : placed).slice(0, KEEP);
-/** Where the titles go: the event calendar, or on a region page its list filtered to the region. */
 /** The band, as join_click's `where`. */
 const where = region ? `regions-${region.id}-week` : "home-week";
+/** Where the titles go: the event calendar, or on a region page its list filtered to the region. */
 const eventsHref = region ? `${WAYS_IN.events}${filterQuery({ region: region.id, when: "", type: "" })}#all-events` : WAYS_IN.events;
+/** Each region's name by id, for home's "Showing <region> first" line. */
+const regionNames = JSON.stringify(Object.fromEntries(REGIONS.map((r) => [r.id, r.name])));
 
 const DAYS = [
   { day: "mon", label: "Mon" },
@@ -107,6 +113,16 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
           {region ? "No events listed here yet." : <a href={WAYS_IN.events}>See the event calendar</a>}
         </p>
         {
+          !region && (
+            <p class="this-week__first" data-region-first data-region-names={regionNames} hidden>
+              <span data-region-first-text>Showing your region first.</span>{" "}
+              <button type="button" class="btn btn--quiet" data-region-first-toggle>
+                Show all
+              </button>
+            </p>
+          )
+        }
+        {
           region && (
             <p class="this-week__more" data-events-more hidden={events.length >= COUNT}>
               <a href={eventsHref} data-link="region-events">
@@ -137,10 +153,13 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
 </section>
 
 <script>
-  import { refreshBand } from "./this-week";
+  import { initRegionFirst, refreshBand } from "./this-week";
 
   const now = Date.now();
-  for (const root of document.querySelectorAll<HTMLElement>("[data-this-week]")) refreshBand(root, now);
+  for (const root of document.querySelectorAll<HTMLElement>("[data-this-week]")) {
+    refreshBand(root, now);
+    initRegionFirst(root);
+  }
 </script>
 
 <style>
@@ -176,7 +195,8 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
   /* display: flex would beat the hidden attribute's own rule. */
   .this-week__list li[hidden],
   .this-week__empty[hidden],
-  .this-week__more[hidden] {
+  .this-week__more[hidden],
+  .this-week__first[hidden] {
     display: none;
   }
   .this-week__when {
@@ -194,7 +214,15 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
     font-weight: 700;
   }
   .this-week__ways,
-  .this-week__more {
+  .this-week__more,
+  .this-week__first {
     margin: var(--s-2) 0 0;
+  }
+  .this-week__first {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--s-2);
+    max-width: none;
   }
 </style>

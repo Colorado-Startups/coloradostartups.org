@@ -15,6 +15,10 @@
 // the groups section. It hides itself with JavaScript off, and the tables
 // stay the full list either way.
 //
+// The answer leads (Paul, 2026-11-16: "they're supposed to be getting
+// info"): the first section holds the answer, the notice and the chart, so
+// the chart is the first picture. The guides scene closes the page, lazily.
+//
 // Every figure shares its sentence with its source, because the built-HTML
 // gate reads each cell as its own line. The amount line names the source page
 // and the date it was checked; attributed() names the provider in any other
@@ -109,31 +113,21 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
           <li aria-current="page">{CREDITS_GUIDE.title}</li>
         </ol>
       </nav>
-      <div class="credits-head">
-        <div class="stack">
-          <h1 id="credits-title">{CREDITS_GUIDE.title}</h1>
-          <p class="lede" data-guide-answer>
-            Startup credits are free usage that cloud and AI companies give new companies, so you can build before you
-            pay. This guide compares {total} programs, each checked on the provider's own page as of <time
-              datetime={date.iso}>{date.label}</time
-            >. Start with the group that matches where your company is today.
+      <div class="stack credits-head">
+        <h1 id="credits-title">{CREDITS_GUIDE.title}</h1>
+        <p class="lede" data-guide-answer>
+          Startup credits are free usage that cloud and AI companies give new companies, so you can build before you
+          pay. This guide compares {total} programs, each checked on the provider's own page as of <time
+            datetime={date.iso}>{date.label}</time
+          >. Start with the group that matches where your company is today.
+        </p>
+        <aside class="hall-callout hall-callout--parchment" aria-labelledby="check-title" data-credits-notice>
+          <p class="hall-callout__title" id="check-title">Check before you apply</p>
+          <p>
+            Amounts and terms change, so read the provider's page first. Colorado Startups is not affiliated with these
+            programs. Nothing here is legal, tax or financial advice.
           </p>
-          <aside class="hall-callout hall-callout--parchment" aria-labelledby="check-title" data-credits-notice>
-            <p class="hall-callout__title" id="check-title">Check before you apply</p>
-            <p>
-              Amounts and terms change, so read the provider's page first. Colorado Startups is not affiliated with these
-              programs. Nothing here is legal, tax or financial advice.
-            </p>
-          </aside>
-        </div>
-        <ArtImage
-          src={art.src}
-          alt={art.alt}
-          {...GUIDE_ART_IMAGE}
-          loading="lazy"
-          motion="none"
-          class="guide-art"
-        />
+        </aside>
       </div>
 
       <h2 id="compare-title">Compare the credits</h2>
@@ -395,22 +389,21 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
         the provider states. Spot a change? <a href="/contact/">Tell us</a>, and a person will check it.
       </p>
       <p><a href="/guides/">More guides for founders</a></p>
+      <ArtImage src={art.src} alt={art.alt} {...GUIDE_ART_IMAGE} loading="lazy" motion="none" class="guide-art" />
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* The answer and notice beside the guide's picture on a wide screen (L6's
-     scenes, 2026-11-04), the picture under them on a phone. */
+  /* The answer and its notice at reading width, so the chart under them
+     starts in the first screen on a wide one. */
   .credits-head {
-    display: grid;
-    gap: var(--s-5);
-    align-items: center;
+    max-width: var(--t-measure);
   }
-  @media (min-width: 64rem) {
-    .credits-head {
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    }
+  /* The guides scene closes the page (L6's scenes, 2026-11-04). The id
+     outranks ArtImage's own margin: 0, so the gap above the scene holds. */
+  #about :global(.guide-art) {
+    margin-top: var(--s-6);
   }
   :global(.guide-art) {
     width: min(100%, 40rem);
