@@ -84,6 +84,10 @@ import AskDialog from "../../ask/AskDialog.astro";
       display: inline-block;
     }
   }
+  /* The visitor turned the "/" key off in the dialog: no hint for a dead key. */
+  .ask-slot[data-ask-key="off"] .ask-trigger__key {
+    display: none;
+  }
   /* In the phone menu the button lines up with Join the Slack. */
   @media (max-width: 1199px) {
     .ask-trigger {

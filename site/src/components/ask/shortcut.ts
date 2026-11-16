@@ -9,6 +9,31 @@
 
 export const ASK_KEY = "/";
 
+// WCAG 2.1.4 (character key shortcuts): a visitor can turn "/" off with the
+// dialog's checkbox. The choice stays on the device. With storage blocked the
+// key stays on, and the checkbox still works until the page changes.
+export const ASK_KEY_STORE = "cs-ask-key";
+
+type Store = Pick<Storage, "getItem" | "setItem">;
+
+/** True unless this device turned the "/" key off. Never throws. */
+export function readAskKeyOn(store: () => Store | null | undefined): boolean {
+  try {
+    return store()?.getItem(ASK_KEY_STORE) !== "off";
+  } catch {
+    return true;
+  }
+}
+
+/** Saves the choice on this device, when storage allows it. Never throws. */
+export function saveAskKeyOn(store: () => Store | null | undefined, on: boolean): void {
+  try {
+    store()?.setItem(ASK_KEY_STORE, on ? "on" : "off");
+  } catch {
+    // Blocked storage: the choice lasts for this page view only.
+  }
+}
+
 const EDITABLE = '[contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"]';
 
 /** True when the element takes typed text: an input, textarea, select or editable element. */

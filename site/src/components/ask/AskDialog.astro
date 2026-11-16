@@ -24,6 +24,11 @@ import AskAi from "../ai/AskAi.astro";
         <button type="submit" class="btn btn--gold">Search</button>
       </div>
     </form>
+    {/* WCAG 2.1.4: a one-key shortcut must be possible to turn off. Saved on this device. */}
+    <p class="ask-dialog__key">
+      <input id="ask-dialog-key" type="checkbox" checked data-ask-key-toggle />
+      <label for="ask-dialog-key">Open search with the / key</label>
+    </p>
     <p class="ask-dialog__resourcus">
       <a href="/ask/">Ask Resourcus, an AI agent</a>, about Colorado's startup resources.
     </p>
@@ -91,6 +96,20 @@ import AskAi from "../ai/AskAi.astro";
     background: var(--c-surface);
     border: var(--line-edge) solid var(--c-border);
     border-radius: var(--r-chisel);
+  }
+  .ask-dialog__key {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--size-tap);
+    margin: var(--s-3) 0 0;
+    font-size: var(--t-step--1);
+  }
+  .ask-dialog__key input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    accent-color: var(--c-accent-deep);
   }
   .ask-dialog__resourcus {
     margin: var(--s-5) 0 0;

@@ -5,18 +5,31 @@
 // so pages that promise no form (the founders page) still have none. On
 // <body> it also escapes the phone menu, which hides the nav it sits in.
 import { initAskAi, setAskAiPage } from "../ai/ask-ai";
-import { opensAsk } from "./shortcut";
+import { opensAsk, readAskKeyOn, saveAskKeyOn } from "./shortcut";
 
 const SITE_SUFFIX = / \| Colorado Startups$/;
 
-export function initAskDialog(root: HTMLElement): void {
+/** Reading localStorage can itself throw where site data is blocked. */
+const deviceStore = () => window.localStorage;
+
+export function initAskDialog(root: HTMLElement, store: () => Pick<Storage, "getItem" | "setItem"> = deviceStore): () => void {
   const link = root.querySelector<HTMLAnchorElement>("[data-ask-link]");
   const button = root.querySelector<HTMLButtonElement>("[data-ask-open]");
   const template = root.querySelector<HTMLTemplateElement>("template[data-ask-template]");
-  if (!link || !button || !template) return;
+  if (!link || !button || !template) return () => {};
 
   let dialog: HTMLDialogElement | null = null;
   let returnTo: HTMLElement | null = null;
+  // Read before the key listener exists, so a visitor who turned "/" off
+  // never sees it open the dialog. data-ask-key="off" hides the "/" hint.
+  let keyOn = readAskKeyOn(store);
+  const setKeyOn = (on: boolean) => {
+    keyOn = on;
+    root.dataset.askKey = on ? "on" : "off";
+    button.toggleAttribute("aria-keyshortcuts", on);
+    if (on) button.setAttribute("aria-keyshortcuts", "/");
+  };
+  setKeyOn(keyOn);
 
   const build = (): HTMLDialogElement | null => {
     const made = template.content.firstElementChild?.cloneNode(true);
@@ -28,6 +41,14 @@ export function initAskDialog(root: HTMLElement): void {
       // The prompt names the page the visitor is on, as the guide pages' row does.
       setAskAiPage(ai, document.title.replace(SITE_SUFFIX, "") || "Colorado Startups", location.pathname);
       initAskAi(ai);
+    }
+    const keyBox = made.querySelector<HTMLInputElement>("input[data-ask-key-toggle]");
+    if (keyBox) {
+      keyBox.checked = keyOn;
+      keyBox.addEventListener("change", () => {
+        setKeyOn(keyBox.checked);
+        saveAskKeyOn(store, keyBox.checked);
+      });
     }
     // Escape is the dialog's. Kept from document, it would also close the
     // phone menu (site-nav.ts) and move focus to the menu button.
@@ -71,9 +92,12 @@ export function initAskDialog(root: HTMLElement): void {
   link.hidden = true;
   button.hidden = false;
   button.addEventListener("click", open);
-  document.addEventListener("keydown", (event) => {
-    if (dialog?.open || !opensAsk(event)) return;
+  const onKey = (event: KeyboardEvent) => {
+    if (!keyOn || dialog?.open || !opensAsk(event)) return;
     event.preventDefault();
     open();
-  });
+  };
+  document.addEventListener("keydown", onKey);
+  // Pages never call this; tests do, so no listener outlives its test.
+  return () => document.removeEventListener("keydown", onKey);
 }
