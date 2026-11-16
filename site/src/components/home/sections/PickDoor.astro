@@ -14,7 +14,9 @@
 // (site/test/dom/home/home-budget.test.ts) counts closed doors too. The build
 // renders the next few events with all but the first hidden; prune.ts, the
 // script /event-calendar/ uses, moves the row along as events end. Without
-// JavaScript the build-time event stands.
+// JavaScript the build-time event stands. The title links the event calendar,
+// which lists it with the host's own link: home links only a few known
+// outside hosts (site/test/dom/l1/hall.test.ts), and event hosts vary.
 import { WAYS_IN } from "@cs/shared";
 
 import { clampWords } from "../../../lib/communitas/doors";
@@ -46,9 +48,7 @@ const events = upcomingEvents(SNAPSHOT, new Date()).slice(0, KEEP);
                   <time class="door-event__date" datetime={event.start}>
                     {date.month} {date.day}
                   </time>
-                  <a href={event.url ?? WAYS_IN.events} {...(event.url ? { rel: "nofollow noopener" } : {})}>
-                    {clampWords(event.title)}
-                  </a>
+                  <a href={WAYS_IN.events}>{clampWords(event.title)}</a>
                 </li>
               );
             })}

@@ -16,10 +16,6 @@ import { readDist, SITE_DIR } from "../pages";
 const DATA = path.join(SITE_DIR, "../data");
 const routes = parse(readFileSync(path.join(DATA, "communitas/routes.yaml"), "utf8")) as { id: string; door: string }[];
 const dwarves = parse(readFileSync(path.join(DATA, "team/dwarves.yaml"), "utf8")) as { id: string; disclosure: string }[];
-const snapshot = JSON.parse(readFileSync(path.join(DATA, "events/upcoming.json"), "utf8")) as {
-  events: { url: string | null }[];
-};
-const eventUrls = new Set(snapshot.events.map((e) => e.url).filter(Boolean));
 
 const resources = readdirSync(path.join(DATA, "resources"), { recursive: true, encoding: "utf8" })
   .filter((f) => f.endsWith(".yaml"))
@@ -78,18 +74,19 @@ describe("Pick your door on home", () => {
       expect(empty.hasAttribute("hidden")).toBe(true);
       expect(shown[0]!.querySelector("time")?.getAttribute("datetime")).toBeTruthy();
       expect(text(shown[0]!.querySelector("a")).length).toBeGreaterThan(0);
+      expect(shown[0]!.querySelector("a")?.getAttribute("href")).toBe(WAYS_IN.events);
     } else {
       expect(empty.hasAttribute("hidden")).toBe(false);
       expect(empty.querySelector("a")?.getAttribute("href")).toBe(WAYS_IN.events);
     }
   });
 
-  it("links only to WAYS_IN, to a stage's picks that exist on Startup Resources, or to a calendar event", () => {
+  it("links only to WAYS_IN, or to a stage's picks that exist on Startup Resources", () => {
     const ways = new Set(Object.values(WAYS_IN));
     for (const a of band.querySelectorAll("a")) {
       const href = a.getAttribute("href")!;
       if (href.startsWith(`${WAYS_IN.canvas}#`)) expect(canvasIds.has(href.split("#")[1]!), href).toBe(true);
-      else expect(ways.has(href) || eventUrls.has(href), href).toBe(true);
+      else expect(ways.has(href), href).toBe(true);
     }
   });
 
