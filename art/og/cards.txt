@@ -46,3 +46,7 @@ art: brand/denver
 id: dispatches
 title: Dispatches
 art: brand/publicus
+
+id: connect
+title: Connect your AI
+art: brand/golden

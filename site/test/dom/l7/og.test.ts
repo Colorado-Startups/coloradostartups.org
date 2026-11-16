@@ -30,6 +30,7 @@ const EXPECTED: Record<string, string> = {
   "/regions/": "regions",
   "/leaderboard/": "leaderboard",
   "/ecosystem-canvas/": "ecosystem-canvas",
+  "/connect/": "connect",
   ...Object.fromEntries(regionIds.map((id) => [`/regions/${id}/`, id])),
 };
 

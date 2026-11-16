@@ -82,7 +82,7 @@ describe("/mcp", () => {
   it("sends a browser to the connect steps", async () => {
     const res = await SELF.fetch(`${BASE}/mcp`, { headers: { Accept: "text/html" }, redirect: "manual" });
     expect(res.status).toBe(303);
-    expect(res.headers.get("Location")).toBe("/ask/#connect");
+    expect(res.headers.get("Location")).toBe("/connect/");
   });
 });
 
