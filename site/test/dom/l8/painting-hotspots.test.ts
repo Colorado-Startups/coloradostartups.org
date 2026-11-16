@@ -2,17 +2,22 @@
 // each region page's painting carries 4 hotspots. Each is a real button,
 // named by its label, that opens a popover card holding at least one link;
 // and the plain list under the painting holds the same links.
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { REGION_IDS } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
 import { REGIONS } from "../../../src/lib/regions/match";
-import { readDist } from "../pages";
+import { declFor, pageCss, rulesFor } from "../page-polish/css";
+import { DIST_DIR, readDist } from "../pages";
 
 const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
 const hrefs = (root: Element) => [...root.querySelectorAll("a[href]")].map((a) => a.getAttribute("href")!).sort();
 
 describe.each(REGION_IDS)("%s painting hotspots", (id) => {
-  const page = new DOMParser().parseFromString(readDist(`regions/${id}/index.html`), "text/html");
+  const html = readDist(`regions/${id}/index.html`);
+  const page = new DOMParser().parseFromString(html, "text/html");
   const media = page.querySelector(".region-art__media")!;
   const buttons = [...media.querySelectorAll<HTMLButtonElement>(".hotspots button[popovertarget]")];
   const data = REGIONS.find((r) => r.id === id)!.hotspots ?? [];
@@ -50,5 +55,20 @@ describe.each(REGION_IDS)("%s painting hotspots", (id) => {
     const cards = buttons.map((b) => page.getElementById(b.getAttribute("popovertarget")!)!);
     expect(hrefs(list)).toEqual(cards.flatMap((c) => hrefs(c)).sort());
     expect([...list.querySelectorAll(".painting-links__title")].map((p) => text(p))).toEqual(data.map((h) => h.label));
+  });
+
+  it("pauses the clip and shows the still while a card is open, and pulses only without reduced motion", () => {
+    // The page script marks the media box data-card-open while any card is
+    // open (a popover toggle), and pauses the clip; the visitor's own Pause wins.
+    const js = [...page.querySelectorAll<HTMLScriptElement>("script[type='module'][src^='/']")]
+      .map((s) => readFileSync(path.join(DIST_DIR, s.getAttribute("src")!), "utf8"))
+      .join("\n");
+    expect(js).toContain("cardOpen");
+    expect(js).toContain(":popover-open");
+    const css = pageCss(html);
+    expect(declFor(css, ".region-art__media[data-card-open] .region-art__clip", "opacity")).toBe("0");
+    const pulse = rulesFor(css, ".hotspot__mark::after");
+    expect(pulse.length).toBeGreaterThan(0);
+    for (const r of pulse) expect(r.at).toContain("prefers-reduced-motion");
   });
 });

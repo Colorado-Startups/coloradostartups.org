@@ -19,13 +19,15 @@ art: brand/springs
 # the painting from its top left. Each sits on a painted feature: the lit
 # balcony of the middle tower, the lit door of the right tower, the left
 # spire's lit window, and the middle tower's lookout. W3b checked each by eye
-# on the 1440 px painting. The lookout point moved down from the bare peak to
-# the battlements, since y 15 sat in the strip a 21:9 desktop crop hides. The
+# on the 1440 px painting and on the clip's first, middle and last frames. The
+# lookout point moved down from the bare peak to the top of the tower wall,
+# since y 15 sat in the strip a 21:9 desktop crop hides, and the clip draws
+# the tower a little larger than the still. The
 # left spire point moved onto its lit window. No place hotspot: Pikes Peak is
 # Tava, sacred to the Ute, and never decoration; its note is the owner's call.
 hotspots:
   - { x: 39, y: 49, kind: companies, label: Who builds here }
   - { x: 61, y: 74, kind: event, label: Next event }
   - { x: 12, y: 48, kind: resources, label: Where to get help }
-  - { x: 36, y: 26, kind: seat, label: The organizer seat }
+  - { x: 36, y: 29, kind: seat, label: The organizer seat }
 order: 2

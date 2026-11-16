@@ -20,8 +20,13 @@
 // size container, and each button works out the painting's drawn size from
 // the box (--lw, --lh: the larger of the box and the box stretched to the
 // painting's ratio), offsets it by half the cropped part, and is clamped to
-// stay whole inside the box. The same links sit in a list under the painting
-// for anyone who prefers it, open from the start where Popover is missing.
+// stay whole inside the box. The clip is 2:1 too (1280 x 640) and covers the
+// same box the same way, so one set of points serves both layers; each point
+// was checked on the still and on the clip's first, middle and last frames
+// (visual-check clip_times). While a card is open the clip pauses and the
+// still shows (data-card-open), so the card names the exact painted feature.
+// The same links sit in a list under the painting for anyone who prefers it,
+// open from the start where Popover is missing.
 import type { Region } from "@cs/shared";
 
 import { REGION_COLORS } from "../../lib/regions/map";
@@ -184,30 +189,50 @@ const art = {
     for (const list of document.querySelectorAll<HTMLDetailsElement>("[data-painting-links]")) list.open = true;
   }
 
-  // Play each clip while its painting is on screen; the button pauses it for good.
+  // Play each clip while its painting is on screen. Three things stop it: the
+  // visitor's own Pause, which only their Play undoes; the painting leaving
+  // the screen; and an open hotspot card. While a card is open the media box
+  // carries data-card-open, the clip pauses, and the CSS shows the still
+  // under it, so the card points at the exact feature it names. When the last
+  // card closes the clip plays again, unless the visitor paused it.
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     for (const video of document.querySelectorAll<HTMLVideoElement>("[data-region-clip]")) {
       const media = video.parentElement!;
       const toggle = media.querySelector<HTMLButtonElement>("[data-clip-toggle]");
+      const cards = [...(media.parentElement?.querySelectorAll<HTMLElement>("[data-hotspot-card]") ?? [])];
       let held = false;
-      const play = () =>
+      let onScreen = false;
+      const open = new Set<HTMLElement>();
+      const sync = () => {
+        if (open.size > 0) media.dataset.cardOpen = "";
+        else delete media.dataset.cardOpen;
+        if (held || !onScreen || open.size > 0) {
+          video.pause();
+          return;
+        }
         video
           .play()
           .then(() => (media.dataset.playing = "true"))
           .catch(() => undefined);
+      };
       new IntersectionObserver(
         ([entry]) => {
-          if (held) return;
-          if (entry?.isIntersecting) void play();
-          else video.pause();
+          onScreen = entry?.isIntersecting ?? false;
+          sync();
         },
         { threshold: 0.25 },
       ).observe(media);
+      for (const card of cards) {
+        card.addEventListener("toggle", () => {
+          if (card.matches(":popover-open")) open.add(card);
+          else open.delete(card);
+          sync();
+        });
+      }
       toggle?.addEventListener("click", () => {
-        held = !video.paused;
-        if (held) video.pause();
-        else void play();
+        held = !held;
         toggle.textContent = held ? "Play" : "Pause";
+        sync();
       });
     }
   }
@@ -255,6 +280,10 @@ const art = {
   .region-art__media[data-playing] .region-art__clip {
     opacity: 1;
   }
+  /* An open hotspot card shows the still, whose features the points name exactly. */
+  .region-art__media[data-card-open] .region-art__clip {
+    opacity: 0;
+  }
   .region-art__media[data-playing] .region-art__toggle {
     visibility: visible;
   }
@@ -299,8 +328,8 @@ const art = {
   }
   .hotspot__mark {
     position: relative;
-    width: 1.375rem;
-    height: 1.375rem;
+    width: calc(var(--size-tap) / 2);
+    height: calc(var(--size-tap) / 2);
     border: var(--line-bold) solid var(--c-gold-on-night);
     border-radius: 50%;
     background: radial-gradient(circle, var(--c-gold-on-night) 0 28%, color-mix(in oklab, var(--c-night) 70%, transparent) 32%);
@@ -374,6 +403,7 @@ const art = {
      by default; where anchor positioning works and the screen is wide enough,
      it hangs off its hotspot and flips at the edges instead. */
   .hotspot-card {
+    /* No width token fits a small card (--size-wrap is the page, --t-measure prose), so 20rem stays. */
     width: min(20rem, calc(100vw - 2 * var(--s-4)));
     padding: var(--s-4) var(--s-4) var(--s-3);
     border: var(--line-edge) solid var(--c-border);
@@ -382,6 +412,7 @@ const art = {
     color: var(--c-text);
     box-shadow: var(--sh-glow);
   }
+  /* A media query cannot read CSS variables: 40rem is where a 20rem card fits beside its hotspot. */
   @media (min-width: 40rem) {
     @supports (position-area: block-end) {
       .hotspot-card {
@@ -447,6 +478,7 @@ const art = {
   }
   .painting-links__groups {
     display: grid;
+    /* No token names a column width, so 14rem stays: four columns at the 1180 px wrap. */
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
     gap: var(--s-4) var(--s-5);
     padding-block: var(--s-3);
