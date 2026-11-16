@@ -1,5 +1,93 @@
 ---
-// Header slot for the "Ask anywhere" button (plan step K1). It renders
-// nothing until K1 fills it, so the header's HTML, layout and focus order stay
-// as they were (S0).
+// Header slot for "Ask anywhere" (plan step K1): a Search button that opens
+// the Ask dialog, with the "/" key shown beside it on wide screens. The page
+// ships a plain link to /ask/; ask-dialog.ts swaps in the <button>, so without
+// JavaScript the link still goes to the Ask page. On phones the button sits
+// in the open menu with the rest of the nav. Between 1200 and 1439 px the
+// header is one row with little room to spare (#424), so there it shows only
+// the lens; its name stays "Search" for screen readers.
+import AskDialog from "../../ask/AskDialog.astro";
 ---
+
+<div class="ask-slot" data-ask-slot>
+  <a class="btn btn--stone ask-trigger" href="/ask/" data-ask-link>
+    <svg class="ask-trigger__lens" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+      <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+      <path d="M12.6 12.6 17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+    <span class="ask-trigger__label">Search</span>
+  </a>
+  <button class="btn btn--stone ask-trigger" type="button" aria-haspopup="dialog" aria-keyshortcuts="/" data-ask-open hidden>
+    <svg class="ask-trigger__lens" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+      <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+      <path d="M12.6 12.6 17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+    <span class="ask-trigger__label">Search</span>
+    <kbd class="ask-trigger__key" aria-hidden="true">/</kbd>
+  </button>
+  <AskDialog />
+</div>
+
+<script>
+  // Bundled by Astro, never inline. Its whole weight is the dialog and the
+  // Ask-your-AI prompt builder.
+  import { initAskDialog } from "../../ask/ask-dialog";
+
+  const slot = document.querySelector<HTMLElement>("[data-ask-slot]");
+  if (slot) initAskDialog(slot);
+</script>
+
+<style>
+  .ask-slot {
+    display: contents;
+  }
+  .ask-trigger {
+    padding-inline: var(--s-4);
+  }
+  /* .btn sets display, which beats the browser's own [hidden] rule. */
+  .ask-trigger[hidden] {
+    display: none;
+  }
+  .ask-trigger__lens {
+    flex: none;
+  }
+  .ask-trigger__key {
+    display: none;
+    min-width: 1.5em;
+    padding: 0 var(--s-1);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    color: var(--c-text-dim);
+    font: inherit;
+    font-size: var(--t-step--1);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  /* The one-row header at its narrowest: the lens alone, 48 px square. */
+  @media (min-width: 1200px) and (max-width: 1439px) {
+    .ask-trigger {
+      width: var(--size-control);
+      padding: 0;
+    }
+    .ask-trigger__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+  /* Wide screens have a keyboard, so the key that opens Ask shows here. */
+  @media (min-width: 1440px) {
+    .ask-trigger__key {
+      display: inline-block;
+    }
+  }
+  /* In the phone menu the button lines up with Join the Slack. */
+  @media (max-width: 1199px) {
+    .ask-trigger {
+      align-self: flex-start;
+    }
+  }
+</style>
