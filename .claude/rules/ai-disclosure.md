@@ -13,7 +13,7 @@ paths:
   - "site/src/pages/team/**"
   - "site/src/pages/index.astro"
   - "site/src/pages/dispatches/**"
-  - "site/public/llms.txt"
+  - "site/src/pages/llms.txt.ts"
   - "art/og/**"
   - "scripts/og/**"
   - "workers/communitas/**"
@@ -30,7 +30,7 @@ Every keeper (the dwarves and the gnome) is disclosed as an AI agent wherever it
 | `disclosure` field (the schema requires it), rendered on the Team page (`KeeperCard`), in `ResourcusPanel` and in `WelcomeDesk` | `data/team/dwarves.yaml` |
 | Keeper portraits: alt text from `portraitAlt()`, which says "AI agent" | `site/src/components/art/keepers.ts` |
 | The home page's keeper strip (`KeeperStrip.astro`, used in `site/src/pages/index.astro`), the `/ask/` line on Resourcus, the Team page (`site/src/pages/team/index.astro`), `/community/`, `/dispatches/` | `site/src/components/home/KeeperStrip.astro` and those pages |
-| The model-readable site summary | `site/public/llms.txt` |
+| The model-readable site summary | `site/src/pages/llms.txt.ts` |
 | Open Graph cards whose art is a keeper portrait; the card text must say "AI agent" | `art/og/cards.txt`, built by `scripts/og/build.mjs` |
 | The `.ai-note` paragraph on every page | `site/src/components/ui/SiteFooter.astro` |
 | The Communitas Slack app profile and its welcome DM | `workers/communitas/`, `data/communitas/` |
