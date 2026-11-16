@@ -90,6 +90,35 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
     for (const s of stats) expect(text(s.querySelector(".stat__source")).length, text(s)).toBeGreaterThan(0);
   });
 
+  // #67: the brand bans a hub word on a place (decision 58).
+  it("is titled with the region name alone, with no hub word", () => {
+    const title = text(page.querySelector("title"));
+    expect(title).toBe(`${region.name} | Colorado Startups`);
+    expect(page.querySelector("meta[property='og:title']")?.getAttribute("content")).toBe(title);
+    expect(title).not.toMatch(/\b(?:Outpost|HQ|Hall)\b/i);
+  });
+
+  // Step R0 split the page into sections/; the slots render nothing yet, so
+  // the outline is the one the page had before the split.
+  it("keeps its headings in the order they had before the split into sections", () => {
+    const position = positions.find((p) => p.region === id)!;
+    const outline = [...page.querySelectorAll("main h1, main h2")].map((h) => `${h.tagName} ${text(h)}`);
+    expect(outline).toEqual([
+      `H1 ${region.name}`,
+      `H2 ${region.name} in numbers`,
+      "H2 Where it is",
+      expect.stringMatching(/^H2 (?:Your|The) /),
+      "H2 Startup Resources",
+      "H2 Leaderboard honorees",
+      "H2 Meet founders here",
+      "H2 The other regions",
+    ]);
+    expect(outline[3], "the seat heading names the seat").toContain(position.title);
+    const where = [...(page.getElementById("where")?.parentElement?.querySelectorAll("h3") ?? [])].map(text);
+    expect(where).toEqual(["Core cities", ...(region.nearby.length > 0 ? ["Nearby towns"] : []), "Size"]);
+    expect(page.querySelector("h1")?.closest("section")?.querySelector(".region-art--hero")).not.toBeNull();
+  });
+
   it("zooms the map to the region, names its core cities, and lists its towns", () => {
     const fig = page.querySelector<HTMLElement>("figure#region-map");
     expect(fig?.dataset.zone).toBe(id);

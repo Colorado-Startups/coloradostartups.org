@@ -1,0 +1,57 @@
+---
+// The region page's first section: breadcrumb, name, lede and the main
+// action, in the first screen at 375 and 1280 px (#218). The page puts Art in
+// the slot, so the painting and figures stay inside this section. Owner: L8.
+import type { Region } from "@cs/shared";
+import { regionLede, WAYS_IN } from "@cs/shared";
+
+import { REGION_COLORS } from "../../../lib/regions/map";
+
+interface Props {
+  region: Region;
+}
+
+const { region } = Astro.props;
+---
+
+<section class="section section--lit" aria-labelledby="region-title" style={`--region-color: ${REGION_COLORS[region.id]}`}>
+  <div class="wrap">
+    <nav aria-label="Breadcrumb" class="crumbs">
+      <ol>
+        <li><a href="/regions/">Regions</a></li>
+        <li aria-current="page">{region.name}</li>
+      </ol>
+    </nav>
+    <h1 id="region-title">{region.name}</h1>
+    <p class="lede">{regionLede(region)}</p>
+    {/* "Meet founders here" below repeats this. Each Slack button says where
+        it goes (#128). */}
+    <div class="first-actions">
+      <div class="btn-row">
+        <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note-top">Join the Slack</a>
+        <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
+      </div>
+      <p class="meta" id="slack-note-top">Join the Slack opens a Google Form.</p>
+    </div>
+    <slot />
+  </div>
+</section>
+
+<style>
+  /* The breadcrumb's look, and its 44 px phone targets, are global.css's
+     .crumbs (#682); only the space above the title is this page's. */
+  .crumbs ol {
+    margin: 0 0 var(--s-3);
+  }
+  h1 {
+    border-bottom: 4px solid var(--region-color);
+    display: inline-block;
+    padding-bottom: var(--s-1);
+  }
+  .first-actions {
+    margin: var(--s-4) 0 var(--s-6);
+  }
+  .first-actions .meta {
+    margin: var(--s-3) 0 0;
+  }
+</style>
