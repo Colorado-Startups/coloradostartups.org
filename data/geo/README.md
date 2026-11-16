@@ -88,7 +88,7 @@ Each is the relief and the drawing in one standalone SVG, built with the site by
 
 ## When a loop changes
 
-This repo holds the loops. Five other places show them, and two follow on their own.
+This repo holds the loops. Six other places show them, and two of the six follow on their own.
 
 | # | Where | Follows on its own | Do |
 | --- | --- | --- | --- |
