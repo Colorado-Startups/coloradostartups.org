@@ -10,8 +10,9 @@
 // | 4 | The 12 shown are listed A to Z: no positions, no "top" |
 //
 // Rotation: the week is the ISO week (Monday 00:00 UTC) of `date`, the build
-// time unless a test passes one, so every build in a week shows the same 12
-// and every honoree gets a turn within a few weeks.
+// time unless a test passes one, so every build in a week shows the same 12.
+// The site has no scheduled build: the set turns at the first deploy after a
+// Monday, and every honoree gets a turn within a few such weeks.
 import type { Company, Region } from "@cs/shared";
 
 import { countBy } from "../leaderboard/board";
@@ -52,7 +53,7 @@ export const SECTOR_WORD: Readonly<Record<Sector, string>> = {
   "Consumer and retail": "Consumer",
   "Food and beverage": "Food",
   "Travel, hospitality and events": "Travel",
-  "Real estate and construction": "Construction",
+  "Real estate and construction": "Property",
   "Media and entertainment": "Media",
   "Logistics and mobility": "Logistics",
   "Nonprofit and community": "Nonprofit",
