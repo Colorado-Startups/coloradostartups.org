@@ -113,8 +113,8 @@ type Px = [number, number];
 /** A bold character's width in em: a little wide on purpose, so a real font never runs past its box. */
 const CHAR_EM = 0.62;
 /** The type scale's two smallest steps, in px (styles/tokens.css): names of places, then everything else. */
-const NAME_PX = 18;
-const SMALL_PX = 15;
+export const NAME_PX = 18;
+export const SMALL_PX = 15;
 
 const toPx = (frame: Frame, p: LonLat): Px => {
   const [x, y] = inFrame(frame, p);

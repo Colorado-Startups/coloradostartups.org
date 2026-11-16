@@ -4,6 +4,10 @@ The [Colorado Startups](https://coloradostartups.org) website, for founders buil
 
 Brand: [Colorado Startups brand guide](https://colorado-startups.github.io/brand/)
 
+[![Map of Colorado with the three Colorado Startups regions: Fusion Canyon, Photon Mountain and Space Peak](https://coloradostartups.org/maps/colorado.svg)](https://coloradostartups.org/regions/)
+
+Each region's line follows named roads and is about the size of Silicon Valley: [`data/geo/`](data/geo/README.md).
+
 | Scores | [Quality, Speed and Consumption](https://colorado-startups.github.io/coloradostartups.org/) · [Process maps](https://colorado-startups.github.io/coloradostartups.org/process.html) · [OpenSSF Scorecard](https://scorecard.dev/viewer/?uri=github.com/Colorado-Startups/coloradostartups.org) |
 | --- | --- |
 

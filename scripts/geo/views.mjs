@@ -137,7 +137,7 @@ async function fetchHighways(view, box, layers, types, tolKm) {
       properties: { view, name: roadLabel(name), kind: road.kind },
       geometry: { type: "MultiLineString", coordinates: road.lines },
     }));
-  // Every view here has Interstate 25 in it: a view with no highway is a failed fetch, not a quiet place.
+  // Every view holds at least one numbered highway; none means a failed query.
   if (!roads.length) throw new Error(`no highways found for ${view} inside [${box}]`);
   return roads;
 }
