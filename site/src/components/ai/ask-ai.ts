@@ -29,11 +29,10 @@ export function initAskAi(root: HTMLElement): void {
   });
 }
 
-/** Rewrites the row's prompt and both links for another page's subject and path. */
+/** Rewrites the row's prompt and its Claude link for another page's subject and path. */
 export function setAskAiPage(root: HTMLElement, subject: string, path: string): void {
-  const { prompt, claude, chatgpt } = askAiLinks({ subject, path });
+  const { prompt, claude } = askAiLinks({ subject, path });
   const field = root.querySelector<HTMLTextAreaElement>("[data-ask-prompt]");
   if (field) field.value = prompt;
   root.querySelector<HTMLAnchorElement>("[data-ask-claude]")?.setAttribute("href", claude);
-  root.querySelector<HTMLAnchorElement>("[data-ask-chatgpt]")?.setAttribute("href", chatgpt);
 }

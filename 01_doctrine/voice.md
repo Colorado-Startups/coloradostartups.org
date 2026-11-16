@@ -21,6 +21,9 @@
 
 - Write "Colorado", not "CO".
 - UI copy: sentence case; buttons say exactly what happens ("Join the Slack", "Ask Resourcus", "Nominate a company"); errors say what went wrong and how to fix it, without apology.
+- Where the site offers to connect, open or ask an AI, it names only Claude and OpenCode, and speaks of open-weight models in general (Paul, 2026-11-16).
+- It never offers ChatGPT, Gemini, Grok, Meta AI or another frontier lab's assistant. The lists and the exempt paths live in [`ai_recommend.yaml`](ai_recommend.yaml).
+- `site/test/unit/ai/allow-list.test.ts` reads that file and fails on a never-offer name in the site's UI source, the plugin or the MCP server.
 
 ## Who we write for
 

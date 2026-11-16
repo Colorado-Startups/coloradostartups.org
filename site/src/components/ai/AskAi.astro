@@ -1,7 +1,9 @@
 ---
-// The "Ask your AI" row (step A3a, 2026-11-15): Copy prompt, Open in Claude,
-// Open in ChatGPT, all made from the page's subject (prompt.ts). Copy prompt
-// comes first because it works with any AI; the two links are best effort.
+// The "Ask your AI" row (step A3a, 2026-11-15): Copy prompt and Open in
+// Claude, both made from the page's subject (prompt.ts). Copy prompt comes
+// first because it works in Claude, OpenCode and any open-weight model; the
+// link is best effort. Only the AIs in 01_doctrine/ai_recommend.yaml are
+// offered (Paul, 2026-11-16).
 // The prompt sits in a box too, so a visitor without JavaScript, or whose
 // browser refuses the copy, can select it by hand. The copy button stays
 // hidden until the bundled script runs. Owner: A3a.
@@ -19,7 +21,7 @@ interface Props {
 }
 
 const { subject, path, question, id = "ask-ai" } = Astro.props;
-const { prompt, claude, chatgpt } = askAiLinks({ subject, path, question });
+const { prompt, claude } = askAiLinks({ subject, path, question });
 const field = `${id}-prompt`;
 ---
 
@@ -33,13 +35,10 @@ const field = `${id}-prompt`;
     <a class="btn btn--stone" href={claude} data-ask-claude target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
       Open in Claude
     </a>
-    <a class="btn btn--stone" href={chatgpt} data-ask-chatgpt target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
-      Open in ChatGPT
-    </a>
   </div>
   <p class="meta" role="status" data-ask-status></p>
   <p class="meta" id={`${id}-note`}>
-    Each opens in a new tab with the prompt filled in. If the chat opens empty, copy the prompt and paste it.
+    Open in Claude fills the prompt in a new tab. In OpenCode or an open-weight model, paste the copied prompt.
   </p>
   <details data-ask-details>
     <summary>See the prompt</summary>

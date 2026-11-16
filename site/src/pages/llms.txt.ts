@@ -118,7 +118,7 @@ export function buildLlmsTxt(
     "",
     `- [Open data](${link(DATA_PAGE_PATH)}): Every /data/ file, the ${LICENSE.name} license, the fields and a credit line to copy.`,
     ...DATA_FILES.map((f) => dataFileLine(f, link)),
-    `- [Ask](${link("/ask/")}): Search the whole site by type, ask Resourcus, an AI agent, or connect an AI client to the MCP server.`,
+    `- [Ask](${link("/ask/")}): Search the whole site by type, ask Resourcus, an AI agent, or connect Claude or OpenCode to the MCP server.`,
     `- [MCP server](${link("/mcp")}): A free, read-only, keyless MCP server (Streamable HTTP). Its tools search, events and region read the /data/ files and return at most ${MAX_RESULTS} results each.`,
     `- [Dispatches JSON Feed](${link("/feed.json")}): News from Colorado Startups as a JSON Feed.`,
     `- [Dispatches RSS](${link("/rss.xml")}): The same news as an RSS feed.`,
