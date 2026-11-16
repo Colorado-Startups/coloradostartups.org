@@ -26,12 +26,34 @@ const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace
 // Words a reader sees in <main>. Not counted: scripts, styles, hidden and
 // visually hidden text, and the maps' SVG labels (city and road names on a
 // drawing, not copy).
+//
+// The build strips the whitespace between elements, so the text of two
+// elements can touch ("doorIdea"). The count walks the text nodes and joins
+// them with a space, so words from different elements never merge.
 const UNSEEN = "script, style, template, noscript, svg, [hidden], [aria-hidden='true'], .visually-hidden";
+const WORD = /[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu;
 function visibleWords(root: Element, skip = ""): string[] {
-  const copy = root.cloneNode(true) as Element;
-  for (const el of copy.querySelectorAll(skip ? `${UNSEEN}, ${skip}` : UNSEEN)) el.remove();
-  return text(copy).match(/[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu) ?? [];
+  const unseen = skip ? `${UNSEEN}, ${skip}` : UNSEEN;
+  const parts: string[] = [];
+  const walk = (node: Node) => {
+    for (const child of node.childNodes) {
+      if (child.nodeType === child.TEXT_NODE) parts.push(child.textContent ?? "");
+      else if (child.nodeType === child.ELEMENT_NODE && !(child as Element).matches(unseen)) walk(child);
+    }
+  };
+  walk(root);
+  return parts.join(" ").match(WORD) ?? [];
 }
+
+describe("the word counter", () => {
+  it("counts the words of adjacent elements separately, even with no whitespace between them", () => {
+    const fixture = new DOMParser().parseFromString(
+      '<main><h2>Pick your door</h2><ul><li><span>Idea</span><b>Slack,</b><a href="/">Monday</a></li></ul><p hidden>Gone</p></main>',
+      "text/html",
+    );
+    expect(visibleWords(fixture.querySelector("main")!)).toEqual(["Pick", "your", "door", "Idea", "Slack,", "Monday"]);
+  });
+});
 
 describe("home budget", () => {
   const main = home.querySelector("main")!;
