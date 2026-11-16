@@ -22,6 +22,9 @@ for (const width of [1280, 375]) {
     const map = page.locator(MAP);
     await expect(map.locator(".colorado-map__drawing svg[role='img']")).toHaveCount(1);
     for (const name of ["Photon Mountain", "Fusion Canyon", "Space Peak"]) await expect(map.locator(".colorado-map__drawing")).toContainText(name);
+    // The button lives under the drawing, never in its box: in a corner it covered the names beneath it on a phone.
+    await expect(map.locator("[data-map-open]")).toHaveCount(1);
+    await expect(map.locator(".colorado-map__box [data-map-open]")).toHaveCount(0);
     const webgl2 = await page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")));
     test.skip(!webgl2, "no WebGL2 in this browser: the drawing is the map");
     // The drawing is the map until a visitor asks for the live one.

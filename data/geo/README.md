@@ -52,7 +52,7 @@ Photon Mountain's eight roads are the ones its own corridor map locked ([photon-
 | Layer | Made by | Shows |
 | --- | --- | --- |
 | Relief image | `views.mjs`, lazy-loaded | Mountains and plains, tinted by the page's own colors |
-| Drawing, no JavaScript | [`colorado-map.ts`](../../site/src/lib/regions/colorado-map.ts) | Highways, each zone's line with its roads named, cities, a mile bar |
+| Drawing, no JavaScript | [`colorado-map.ts`](../../site/src/lib/regions/colorado-map.ts) | Highways, interstate shields and two peaks statewide; each zone's line with its roads named, cities, a mile bar |
 | Live map, on demand | [`colorado-map.client.ts`](../../site/src/components/map/colorado-map.client.ts) | MapLibre over OpenFreeMap with Mapterhorn relief, behind "Explore the live map" |
 
 Every view is Web Mercator, so the three layers line up.
@@ -85,6 +85,20 @@ Each is the relief and the drawing in one standalone SVG, built with the site by
 | A city sits off its loop | 3 miles outside the line |
 | A loop is the wrong size | 0.75 to 2 times Silicon Valley's area |
 | A town has no centre and no Census place | never |
+
+## When a loop changes
+
+This repo holds the loops. Five other places show them, and two follow on their own.
+
+| # | Where | Follows on its own | Do |
+| --- | --- | --- | --- |
+| 1 | This repo | no | Edit [`boundaries.yaml`](boundaries.yaml) or `data/regions/*.yaml`. Run `build.mjs --roads`, then `views.mjs` |
+| 2 | The site's maps and [`/maps/*.svg`](https://coloradostartups.org/maps/colorado.svg) | yes, on deploy | Nothing |
+| 3 | The map image in each README: this repo, the [org profile](https://github.com/Colorado-Startups/.github), the three region repos | yes, it is `/maps/*.svg` | Nothing |
+| 4 | [`brand`](https://github.com/Colorado-Startups/brand) `data/world.yaml` | no | Each region's `plain_label` lists its cities |
+| 5 | [`fusion-canyon`](https://github.com/Colorado-Startups/fusion-canyon) `03_deliverables/map/fusion_canyon_corridor.geojson` | no | Copy the loop in, with this repo's commit in `source_url` and `coord_detail` |
+| 6 | [`space-peak`](https://github.com/Colorado-Startups/space-peak) `04_tools/space_peak_map.py` | no | Set `WEBSITE_COMMIT`, and the same commit in `.github/workflows/ci.yml`. Rebuild |
+| 7 | [`photon-mountain`](https://github.com/Colorado-Startups/photon-mountain) `03_deliverables/maps/` | no | Its ring is its own OpenStreetMap trace. Update the facts panel's figures and `MAP_NOTES.md` |
 
 ## Commands
 
