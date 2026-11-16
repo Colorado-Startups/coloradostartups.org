@@ -1,31 +1,29 @@
-// Top picks for Startup Resources: up to 3 resources per stage, 12 in all,
-// so the page can open on a short list instead of all 501 (plan step L1a;
-// L1b renders it). Pure: no DOM, no network, no clock, no randomness.
+// Picks for Startup Resources: up to 3 resources per stage, so the page can
+// open on a short list instead of the whole directory (plan step L1a; L1b
+// renders it). Pure: no DOM, no network, no clock, no randomness.
 //
-// The ranking reads only a card's stage, type, city, name and id. No field
-// for money, sponsorship or self-description enters it, so nothing paid,
-// sponsored or self-promotional can move a resource up (voice.md: founders
-// first, never a vendor directory).
+// The ranking reads only a card's stage, substage, type, city, name and id.
+// No field for money, sponsorship or self-description enters it, so nothing
+// paid, sponsored or self-promotional can move a resource up (voice.md:
+// founders first, never a vendor directory).
 //
-// Commercial types (COMMERCIAL below) are firms that sell to founders. A
-// featured pick reads as an endorsement, so they never appear in a first-need
-// list, and a stage shows one at most, only to fill a slot that its
-// non-commercial cards cannot.
+// Commercial cards (isCommercial below: a COMMERCIAL type, or any record in
+// the service-providers substage) are firms that sell to founders. A
+// featured pick reads as an endorsement, so they are never picked. A stage
+// whose cards are all commercial gets no picks (PR #89 review, 2026-11-16).
 //
 // How one stage is picked, slot by slot:
 //   1. Rank its cards: in the visitor's region (when one is given), then
 //      statewide reach, then the stage's first-need type order below, then
 //      name, then id.
-//   2. Choose the pool. While any non-commercial card is left, the pool is
-//      the non-commercial cards only. When none is left, the pool is the
-//      commercial cards, until the stage holds one; after that it is empty
-//      and the stage stops short.
+//   2. The pool is the stage's non-commercial cards; when it runs out, the
+//      stage stops short.
 //   3. Take the best-ranked card in the pool that adds a new type and a new
 //      city. Relax the rule step by step when no card fits: new type and a
 //      new city that no earlier stage used either, new type and a new city in
 //      this stage, new type, new city, then anything. "statewide" and
 //      "online" are not places, so they never use up a city.
-import { STAGES, type Region, type ResourceCard, type Stage } from "@cs/shared";
+import { STAGES, SUBSTAGES, type Region, type ResourceCard, type Stage } from "@cs/shared";
 
 import { cityKey, NOT_CITIES } from "../../lib/regions/match";
 
@@ -35,13 +33,22 @@ export const PICKS_PER_STAGE = 3;
 type ResourceType = ResourceCard["type"];
 
 /**
- * Types that sell a service, capital or space to founders. A stage shows one
- * at most between them, and only once no non-commercial card is left.
+ * Types that sell a service, capital or space to founders. They are never
+ * picked.
  */
 export const COMMERCIAL: ReadonlySet<ResourceType> = new Set(["service-provider", "investor", "coworking"]);
 
-/** At most this many commercial picks in one stage. */
-export const COMMERCIAL_PER_STAGE = 1;
+/**
+ * The substage of firms that sell to founders. Its records count as
+ * commercial whatever their type: a scoring company typed "accelerator" or an
+ * investor platform typed "event" still sells to founders (PR #89 review).
+ */
+export const COMMERCIAL_SUBSTAGE = "service-providers";
+
+/** True for a card that sells a service, capital or space to founders. */
+export function isCommercial(card: Pick<ResourceCard, "type" | "substage">): boolean {
+  return COMMERCIAL.has(card.type) || card.substage === COMMERCIAL_SUBSTAGE;
+}
 
 /**
  * The non-commercial resource types a founder needs first at each stage,
@@ -105,6 +112,16 @@ function placeOf(card: ResourceCard): string | null {
 const isStatewide = (card: ResourceCard) => cityKey(card.city) === "statewide";
 
 /**
+ * A stage's substages with their card counts, in schema order, empty ones
+ * left out: what a stage with no picks offers to browse instead.
+ */
+export function substageCounts(cards: readonly ResourceCard[], stage: Stage): { substage: string; count: number }[] {
+  return SUBSTAGES[stage]
+    .map((substage) => ({ substage, count: cards.filter((c) => c.stage === stage && c.substage === substage).length }))
+    .filter((s) => s.count > 0);
+}
+
+/**
  * Up to 3 picks for each of the four stages, in journey order. The same
  * input always gives the same output, whatever order the cards arrive in.
  */
@@ -156,13 +173,10 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
       () => true,
     ];
 
-    const nonCommercial = ranked.filter((c) => !COMMERCIAL.has(c.type));
-    const commercialCards = ranked.filter((c) => COMMERCIAL.has(c.type));
-    let commercial = 0;
-    while (picks.length < PICKS_PER_STAGE) {
-      const pool =
-        nonCommercial.length > 0 ? nonCommercial : commercial < COMMERCIAL_PER_STAGE ? commercialCards : [];
-      if (pool.length === 0) break;
+    // Only non-commercial cards are ever picked. A stage with none shows no
+    // picks; the page offers a browse row for it instead (StartHere.astro).
+    const pool = ranked.filter((c) => !isCommercial(c));
+    while (picks.length < PICKS_PER_STAGE && pool.length > 0) {
       let index = -1;
       for (const rule of rules) {
         index = pool.findIndex(rule);
@@ -177,7 +191,6 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
             ? "first-need"
             : "spread";
       picks.push({ card, reason });
-      if (COMMERCIAL.has(card.type)) commercial += 1;
       types.add(card.type);
       const place = placeOf(card);
       if (place !== null) cities.add(place);

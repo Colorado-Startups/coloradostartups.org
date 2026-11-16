@@ -1,6 +1,8 @@
 ---
-// The directory's filter form. Owner: L3. role="search" marks it as the
-// page's search landmark. Search, then the stage chips drawn as the journey
+// The directory's filter form. Owner: L3. role="search" marks it as a
+// search landmark. Its search box sits above the picks (CanvasSearch.astro,
+// step L1b) and belongs to this form through form="canvas-filters", so Clear
+// resets it too. Here: the stage chips drawn as the journey
 // (Idea, Launch and Growth in a row, Support alongside every level, each
 // with its count), then the type chips and the city menu. The chips are
 // radio buttons, so arrow keys move through a group and each choice filters
@@ -38,12 +40,7 @@ const counts = stageCounts(
 const LEVELS = STAGES.filter((s) => s !== "support");
 ---
 
-<form class="canvas-filters" role="search" aria-label="Filter Startup Resources" data-canvas-filters>
-  <div class="field canvas-search">
-    <label for="canvas-q">Search</label>
-    <input id="canvas-q" name="q" type="search" autocomplete="off" maxlength="100" />
-  </div>
-
+<form id="canvas-filters" class="canvas-filters" role="search" aria-label="Filter Startup Resources" data-canvas-filters>
   <div class="canvas-filters__place">
     <div class="field canvas-city">
       <label for="canvas-city">City</label>
@@ -127,18 +124,16 @@ const LEVELS = STAGES.filter((s) => s !== "support");
     display: grid;
     gap: var(--s-4);
   }
-  /* A wide screen sets the search beside the city menu, and the journey
-     beside the type chips, so the first rows show in the first screen. */
+  /* A wide screen sets the journey beside the type chips, under the city
+     menu. The search box sits above the picks (CanvasSearch.astro) and
+     joins this form through its form="canvas-filters" attribute. */
   @media (min-width: 64rem) {
     .canvas-filters {
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       grid-template-areas:
-        "search place"
+        "place place"
         "journey chips";
       gap: var(--s-4) var(--s-6);
-    }
-    .canvas-search {
-      grid-area: search;
     }
     .canvas-filters__place {
       grid-area: place;
@@ -333,9 +328,6 @@ const LEVELS = STAGES.filter((s) => s !== "support");
   .canvas-city {
     flex: 1 1 12rem;
     max-width: 22rem;
-  }
-  .canvas-search input {
-    width: 100%;
   }
   .canvas-filters__place .btn {
     min-height: var(--size-control);
