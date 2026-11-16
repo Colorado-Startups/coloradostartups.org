@@ -83,15 +83,42 @@ test.describe("home at 375 px", () => {
   });
 });
 
-test("Golden's painting fetches nothing with the first screen, and loads once it nears the screen", async ({ page }) => {
+// loading="lazy" leaves the fetch to the browser, and Chromium starts a lazy
+// image some distance before it reaches the screen: 1250 px on a fast
+// connection and more on a slow or unknown one (web.dev, "Browser-level image
+// lazy loading for the web"). On a phone the painting is far past that, so
+// nothing of it loads with the first screen. On a laptop the page is shorter
+// (the painting starts 3361 px down on the dev server's fixture data) and
+// CI's Chromium fetched it on load (run 43907055785), so there the check is
+// that it never competes with the map: the relief is asked for first, at high
+// priority, and the painting never at high.
+test("on a phone, Golden's painting fetches nothing with the first screen, and loads once it nears the screen", async ({ page }) => {
   const art: string[] = [];
   page.on("request", (r) => {
     if (/\/art\/brand\/golden/.test(r.url())) art.push(r.url());
   });
-  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/", { waitUntil: "load" });
   expect(art, "nothing of the painting loads with the first screen").toEqual([]);
   await page.locator(`${PAINTING} img`).scrollIntoViewIfNeeded();
   await expect.poll(() => art.length, { timeout: 15_000 }).toBeGreaterThan(0);
   await expect(page.locator(`${PAINTING} img`)).toHaveJSProperty("complete", true);
+});
+
+test("on a laptop, the map's relief is asked for first and at high priority, the painting never at high", async ({ page }) => {
+  const asked: { url: string; priority: string }[] = [];
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Network.enable");
+  cdp.on("Network.requestWillBeSent", (e) => {
+    if (/relief-state|\/art\/brand\/golden/.test(e.request.url)) asked.push({ url: e.request.url, priority: e.request.initialPriority });
+  });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/", { waitUntil: "load" });
+  await page.waitForTimeout(500);
+  const relief = asked.findIndex((r) => /relief-state/.test(r.url));
+  expect(relief, "the relief is asked for").toBe(0);
+  expect(asked[relief]!.priority, "the relief's priority").toMatch(/^(?:High|VeryHigh)$/);
+  for (const r of asked.filter((a) => /\/art\/brand\/golden/.test(a.url))) {
+    expect(r.priority, `${r.url} priority`).not.toMatch(/^(?:High|VeryHigh)$/);
+  }
 });

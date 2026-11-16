@@ -87,11 +87,19 @@ describe("the Builders band on home", () => {
   // Since 2026-11-16 the first screen is the hero and the map's band under
   // it (Paul: "The homepage should lead with the Colorado map too"); Builders
   // comes right after both.
+  // The band before, skipping the <script> a band may render after itself
+  // (Where.astro's Escape handler).
+  const sectionBefore = (el: Element | null | undefined) => {
+    let prev = el?.previousElementSibling;
+    while (prev && !prev.matches("section")) prev = prev.previousElementSibling;
+    return prev;
+  };
+
   it("sits right after the first screen, the hero and the map, headed Builders", () => {
     expect(band).not.toBeNull();
-    const where = band.previousElementSibling;
+    const where = sectionBefore(band);
     expect(where?.matches('section[aria-labelledby="where"]'), "the map's band before it").toBe(true);
-    expect(where?.previousElementSibling?.matches("section.hero"), "the hero before that").toBe(true);
+    expect(sectionBefore(where)?.matches("section.hero"), "the hero before that").toBe(true);
     expect(text(band.querySelector("h2#builders"))).toBe("Builders");
   });
 
