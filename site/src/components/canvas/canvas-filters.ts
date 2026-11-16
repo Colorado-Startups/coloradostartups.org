@@ -22,6 +22,7 @@ import {
   limitFor,
   matches,
   moreText,
+  opensOnList,
   PAGE_SIZE,
   pageOf,
   readState,
@@ -83,6 +84,7 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     facts: {
       id: el.dataset.id ?? "",
       stage: el.dataset.stage ?? "",
+      substage: el.dataset.substage ?? "",
       type: el.dataset.type ?? "",
       city: el.dataset.city ?? "",
       text: el.textContent ?? "",
@@ -97,6 +99,22 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
   const moreRow = root.querySelector<HTMLElement>("[data-canvas-more-row]");
   const moreButton = root.querySelector<HTMLButtonElement>("[data-canvas-more]");
   const shownLine = root.querySelector<HTMLElement>("[data-canvas-shown]");
+  // Step L1b: the page opens on the picks, and the full list (with this
+  // form) waits behind "Show all N resources". It ships hidden, and a
+  // <noscript> style shows it when this script cannot run.
+  const full = root.querySelector<HTMLElement>("[data-canvas-full]");
+  const showAll = root.querySelector<HTMLButtonElement>("[data-canvas-show-all]");
+  const picks = root.querySelector<HTMLElement>("[data-canvas-picks]");
+
+  /** Shows the full list and retires its control. True when it was closed. */
+  const openList = (): boolean => {
+    if (!full || !full.hidden) return false;
+    full.hidden = false;
+    showAll?.setAttribute("aria-expanded", "true");
+    const row = showAll?.closest<HTMLElement>("[data-canvas-show-row]");
+    if (row) row.hidden = true;
+    return true;
+  };
 
   const control = (name: string) => form.elements.namedItem(name) as Control | null;
   // The values a control offers: a select's options, or each radio's value.
@@ -110,7 +128,13 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
         )
         .filter(Boolean),
     );
-  const allowed = { stage: optionsOf("stage"), type: optionsOf("type"), city: optionsOf("city") };
+  const allowed = {
+    stage: optionsOf("stage"),
+    // No control offers substages; the rows' own values are the allowed ones.
+    substage: new Set(cards.map((c) => c.facts.substage).filter(Boolean)),
+    type: optionsOf("type"),
+    city: optionsOf("city"),
+  };
   const pagePath = window.location.pathname;
 
   let state: FilterState = readState(window.location.search, allowed);
@@ -130,6 +154,8 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     const id = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "";
     const target = id ? document.getElementById(id) : null;
     if (!target) return null;
+    // A link into the list (#launch, #r-<id>) opens it first.
+    if (full?.contains(target)) openList();
     if (target.matches("section[data-canvas-group]") && allowed.stage.has(id)) state = { ...state, stage: id };
     wanted = target.closest<HTMLElement>("[data-resource]");
     return target;
@@ -140,6 +166,11 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     const mine = ++run;
     const hits = state.q.trim() ? await search(state.q, pagePath) : null;
     if (mine !== run) return;
+    // A query opens the list and sets the picks aside, so the results sit
+    // right under the search box; an empty box brings the picks back.
+    const searching = state.q.trim() !== "";
+    if (searching) openList();
+    if (picks) picks.hidden = searching;
     const matched = cards.map(({ facts }) => matches(facts, state, hits));
     if (wanted) {
       limit = limitFor(matched, indexOf.get(wanted) ?? -1, limit);
@@ -207,15 +238,20 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     stage.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" });
   }
 
+  // Listened for on the root: the search box sits above the picks, outside
+  // the form's markup, and joins it through form="canvas-filters" (step
+  // L1b). Only this form's own controls count, not Resourcus's.
+  const ours = (e: Event) => (e.target as HTMLInputElement | null)?.form === form;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  form.addEventListener("change", (e) => {
+  root.addEventListener("change", (e) => {
+    if (!ours(e)) return;
     const menu = (e.target as HTMLElement).tagName === "SELECT";
     void refilter().then(() => {
       if (menu) revealFirstResult();
     });
   });
-  form.addEventListener("input", (e) => {
-    if ((e.target as HTMLElement).getAttribute("name") !== "q") return;
+  root.addEventListener("input", (e) => {
+    if (!ours(e) || (e.target as HTMLElement).getAttribute("name") !== "q") return;
     clearTimeout(timer);
     timer = setTimeout(() => void refilter(), 200);
   });
@@ -251,9 +287,20 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     void apply().then(() => scrollTo(target));
   });
 
+  // "Show all" opens the list and moves focus to its heading, so a keyboard
+  // or screen reader user carries on at the list's filters.
+  showAll?.addEventListener("click", () => {
+    if (!openList()) return;
+    const heading = root.querySelector<HTMLElement>("#find-title");
+    (heading ?? form.querySelector<HTMLElement>("input, select"))?.focus();
+  });
+
   form.hidden = false;
   for (const back of root.querySelectorAll<HTMLElement>("[data-canvas-back]")) back.hidden = false;
-  const target = readHash();
+  // A filtered or searched URL opens on the list, as before step L1b, so a
+  // shared link or a region page's "See all" lands on its results.
+  const byUrl = opensOnList(window.location.search) && openList();
+  const target = readHash() ?? (byUrl ? full : null);
   setControls();
   void apply().then(() => scrollTo(target));
   return { apply };

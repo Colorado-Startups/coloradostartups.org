@@ -5,7 +5,7 @@
 import { STAGES, type ResourceCard, type Stage } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
-import { COMMERCIAL, FIRST_NEED, topPicks } from "../../../src/components/canvas/top-picks";
+import { COMMERCIAL, FIRST_NEED, isCommercial, substageCounts, topPicks } from "../../../src/components/canvas/top-picks";
 
 type Type = ResourceCard["type"];
 
@@ -68,14 +68,12 @@ describe("topPicks", () => {
     expect(topPicks(shuffled)).toEqual(first);
   });
 
-  it("returns 3 picks for each of the 4 stages, 12 in all, in journey order", () => {
+  it("returns up to 3 picks for each of the 4 stages, in journey order", () => {
     const result = topPicks(FIXTURE);
     expect(result.map((s) => s.stage)).toEqual([...STAGES]);
-    for (const s of result) {
-      expect(s.picks).toHaveLength(3);
-      for (const p of s.picks) expect(p.card.stage).toBe(s.stage);
-    }
-    expect(result.flatMap((s) => s.picks)).toHaveLength(12);
+    for (const s of result) for (const p of s.picks) expect(p.card.stage).toBe(s.stage);
+    // Growth holds two non-commercial cards, so it stops at two.
+    expect(result.map((s) => s.picks.length)).toEqual([3, 3, 2, 3]);
   });
 
   it("puts statewide reach first, then the stage's first-need types", () => {
@@ -94,12 +92,8 @@ describe("topPicks", () => {
       "Front Range Accelerator",
     ]);
     expect(launch.picks.map((p) => p.reason)).toEqual(["first-need", "first-need", "first-need"]);
-    // Growth has two non-commercial cards, so one commercial card fills the last slot.
-    expect(growth.picks.map((p) => p.card.name)).toEqual([
-      "Colorado Business News",
-      "Springs Scale Program",
-      "Growth Capital Partners",
-    ]);
+    // Growth has two non-commercial cards, and no commercial card fills the last slot.
+    expect(growth.picks.map((p) => p.card.name)).toEqual(["Colorado Business News", "Springs Scale Program"]);
     expect(support.picks[0].card.name).toBe("State Office of Economic Development");
   });
 
@@ -182,8 +176,8 @@ describe("topPicks", () => {
       card("growth", "Second Growth", "media", "Denver"),
     ];
     const result = topPicks(cards);
-    expect(result.map((s) => s.picks.length)).toEqual([1, 0, 2, 0]);
-    expect(names(result)).toEqual([["Only Idea"], [], ["Second Growth", "First Growth"], []]);
+    expect(result.map((s) => s.picks.length)).toEqual([1, 0, 1, 0]);
+    expect(names(result)).toEqual([["Only Idea"], [], ["Second Growth"], []]);
   });
 
   it("returns four empty stages for an empty list", () => {
@@ -216,12 +210,8 @@ describe("topPicks", () => {
     for (const stage of STAGES) for (const t of FIRST_NEED[stage]) expect(COMMERCIAL.has(t)).toBe(false);
   });
 
-  it("gives commercial types at most one pick a stage, after the non-commercial picks", () => {
-    for (const s of topPicks(FIXTURE)) {
-      const flags = s.picks.map((p) => COMMERCIAL.has(p.card.type));
-      expect(flags.filter(Boolean).length).toBeLessThanOrEqual(1);
-      expect(flags.indexOf(true) === -1 || flags.indexOf(true) === flags.length - 1).toBe(true);
-    }
+  it("never picks a commercial card, even to fill a slot", () => {
+    for (const s of topPicks(FIXTURE)) expect(s.picks.filter((p) => isCommercial(p.card))).toEqual([]);
     const cards = [
       card("launch", "Aardvark Law", "service-provider", "statewide"),
       card("launch", "Acme Capital", "investor", "statewide"),
@@ -229,17 +219,31 @@ describe("topPicks", () => {
       card("launch", "Zed Accelerator", "accelerator", "Denver"),
     ];
     const launch = topPicks(cards)[1];
-    // The statewide firms rank after a local program, and only one appears.
-    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator", "Aardvark Law"]);
-    // A stage with only commercial cards shows one, not three.
-    const onlyCommercial = topPicks(cards.filter((c) => COMMERCIAL.has(c.type)))[1];
-    expect(onlyCommercial.picks).toHaveLength(1);
-    // A region does not lift the cap.
+    // The statewide firms never appear, though a slot stays empty.
+    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator"]);
+    // A region does not let a firm in either.
     const regional = topPicks([...cards, card("launch", "Fort Collins Law", "service-provider", "Fort Collins")], { region: FUSION_CANYON })[1];
-    expect(regional.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator", "Fort Collins Law"]);
+    expect(regional.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator"]);
   });
 
-  it("picks a non-commercial card before a commercial one that spread and reach would favor", () => {
+  // PR #89 review: a stage whose cards are all commercial gets no picks; the
+  // page shows a browse row for it instead.
+  it("gives a stage whose cards are all commercial zero picks", () => {
+    const cards = [
+      card("growth", "Acme Capital", "investor", "statewide"),
+      card("growth", "Able Desks", "coworking", "Denver"),
+      { ...card("growth", "Score Co", "accelerator", "statewide"), substage: "service-providers" },
+      { ...card("growth", "Pitch Platform", "event", "online"), substage: "service-providers" },
+    ];
+    expect(topPicks(cards)[2].picks).toEqual([]);
+    expect(topPicks(cards, { region: FUSION_CANYON })[2].picks).toEqual([]);
+    expect(substageCounts(cards, "growth")).toEqual([
+      { substage: "investors", count: 2 },
+      { substage: "service-providers", count: 2 },
+    ]);
+  });
+
+  it("picks no commercial card even when spread and reach would favor it", () => {
     // Idea uses Denver, so the spread rule alone would take the statewide
     // investor first. The pick order is asserted as returned, with no reorder.
     const cards = [
@@ -248,7 +252,7 @@ describe("topPicks", () => {
       card("launch", "Zed Accelerator", "accelerator", "Denver"),
     ];
     const launch = topPicks(cards)[1];
-    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator", "Acme Capital"]);
+    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator"]);
   });
 
   it("picks no commercial card when a stage has 3 or more non-commercial cards", () => {

@@ -1,0 +1,36 @@
+---
+// The directory's search box, above the picks (step L1b, PR #89 review): a
+// visitor who came to search types at once, without opening the list first.
+// The box belongs to the filter form further down (CanvasFilters.astro)
+// through form="canvas-filters", so the island reads it with the chips and
+// Clear resets it. Typing opens the full list, filters it, and sets the picks
+// aside while a query is in the box (canvas-filters.ts). Without JavaScript it
+// could not filter, so the <noscript> style hides it, as it hides the form.
+// Owner: L3.
+---
+
+<div class="canvas-search" role="search" aria-label="Search Startup Resources" data-canvas-search>
+  <div class="field">
+    <label for="canvas-q">Search</label>
+    <input id="canvas-q" name="q" form="canvas-filters" type="search" autocomplete="off" maxlength="100" />
+  </div>
+</div>
+<noscript>
+  <style is:inline>
+    .canvas-search {
+      display: none !important;
+    }
+  </style>
+</noscript>
+
+<style>
+  .canvas-search {
+    max-width: 36rem;
+  }
+  .canvas-search .field {
+    margin: 0;
+  }
+  .canvas-search input {
+    width: 100%;
+  }
+</style>

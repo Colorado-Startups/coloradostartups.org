@@ -1,21 +1,39 @@
 ---
 // A region's illustration slot: data/regions/<id>.yaml names its art, a brand
-// v3 place painting such as brand/springs (scripts/brand/pull.mjs). L7's ArtImage finds it, lets Astro
+// place painting such as brand/springs (scripts/brand/pull.mjs). L7's ArtImage finds it, lets Astro
 // optimize it, and shows a placeholder tinted with the region's color until the
 // file lands, so layout does not shift. The region page's hero gets a lantern
 // glow; list cards stay still. Owner: L8; wired by L7 (lane/L7-wiring).
 //
-// A region with a brand clip (keepers.ts REGION_CLIP; brand v4.2.0: Photon
-// Mountain) plays it over its hero painting: muted, looped, loaded only when
-// the painting nears the screen, with a Pause button, and never under
+// Every region has a brand clip (keepers.ts REGION_CLIP; brand v4.3.0), which
+// plays over its hero painting: muted, looped, loaded only when the painting
+// nears the screen, with a Pause button, and never under
 // prefers-reduced-motion. The painting stays underneath as the image, its alt
 // text and the no-JavaScript view; the clip is aria-hidden, since it is the
 // same picture moving.
+//
+// Step W3b: the hero's hotspots (hotspots.ts, from Art.astro) sit above the
+// clip as real buttons, each opening a popover card of real content. The
+// labels are HTML, never letters in the art. A point is a percentage of the
+// painting, but the hero box crops it (object-fit: cover, 21:9 on a desktop
+// and 16:9 on a phone, against a 2:1 painting). So the hotspot layer is a
+// size container, and each button works out the painting's drawn size from
+// the box (--lw, --lh: the larger of the box and the box stretched to the
+// painting's ratio), offsets it by half the cropped part, and is clamped to
+// stay whole inside the box. The clip is 2:1 too (1280 x 640) and covers the
+// same box the same way, so one set of points serves both layers; each point
+// was checked on the still and on the clip's first, middle and last frames
+// (visual-check clip_times). While a card is open the clip pauses and the
+// still shows (data-card-open), so the card names the exact painted feature.
+// The same links sit in a list under the painting for anyone who prefers it,
+// open from the start where Popover is missing.
 import type { Region } from "@cs/shared";
 
 import { REGION_COLORS } from "../../lib/regions/map";
+import { brandArt } from "../art/art-assets";
 import ArtImage from "../art/ArtImage.astro";
 import { REGION_CLIP, regionArtAlt, type RegionArtId } from "../art/keepers";
+import type { HotspotCard } from "./hotspots";
 
 interface Props {
   region: Region;
@@ -25,15 +43,23 @@ interface Props {
   loading?: "eager" | "lazy";
   /** The drawn width, for a card in a grid other than the 17rem .hall-grid. */
   sizes?: string;
+  /** The hero's hotspot cards (Art.astro). A card never shows hotspots. */
+  hotspots?: readonly HotspotCard[];
 }
 
-const { region, size = "card", loading, sizes } = Astro.props;
+const { region, size = "card", loading, sizes, hotspots = [] } = Astro.props;
 // The alt is the brand's plain caption (keepers.ts REGION_ART_ALT); no caller
 // can blank it, and a region with no alt fails the build instead of rendering
 // an empty one.
 const alt = regionArtAlt(region.id);
 const hero = size === "hero";
 const clip = hero ? REGION_CLIP[region.id as RegionArtId] : undefined;
+const spots = hero ? hotspots : [];
+// The painting's own ratio, from the pulled file; 2 (the brand's 1440 x 720) before it lands.
+const file = brandArt(region.art);
+const ratio = file ? file.width / file.height : 2;
+// A label reads away from the nearer side edge, so it never runs off the painting.
+const side = (x: number) => (x > 55 ? "start" : "end");
 
 // `sizes` is the width the art really draws, so a phone picks the smallest
 // file that still covers it. Both sit in .wrap (100vw less two 24 px
@@ -65,16 +91,91 @@ const art = {
 ---
 
 {
-  clip ? (
-    <div class="region-art__media">
-      <ArtImage {...art} />
-      <video class="region-art__clip" data-region-clip muted loop playsinline preload="none" aria-hidden="true">
-        <source src={`/art/brand/${clip}.webm`} type="video/webm" />
-        <source src={`/art/brand/${clip}.mp4`} type="video/mp4" />
-      </video>
-      <button type="button" class="region-art__toggle" data-clip-toggle>
-        Pause
-      </button>
+  clip || spots.length > 0 ? (
+    <div class="region-art__stage">
+      <div class="region-art__media">
+        <ArtImage {...art} />
+        {clip && (
+          <video class="region-art__clip" data-region-clip muted loop playsinline preload="none" aria-hidden="true">
+            <source src={`/art/brand/${clip}.webm`} type="video/webm" />
+            <source src={`/art/brand/${clip}.mp4`} type="video/mp4" />
+          </video>
+        )}
+        {spots.length > 0 && (
+          <div class="hotspots" style={`--ar:${ratio}`} data-hotspots>
+            {spots.map((h) => (
+              <button
+                type="button"
+                class="hotspot"
+                popovertarget={h.id}
+                style={`--x:${h.x};--y:${h.y}`}
+                data-hotspot={h.kind}
+                data-side={side(h.x)}
+              >
+                <span class="hotspot__mark" aria-hidden="true" />
+                <span class="hotspot__label">{h.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {clip && (
+          <button type="button" class="region-art__toggle" data-clip-toggle>
+            Pause
+          </button>
+        )}
+      </div>
+      {spots.map((h) => (
+        <div id={h.id} popover class="hotspot-card" data-hotspot-card={h.kind}>
+          <p class="hotspot-card__title">
+            {h.label}
+          </p>
+          {h.links.length > 0 && (
+            <ul class="hotspot-card__links" role="list">
+              {h.links.map((l) => (
+                <li>
+                  {l.href ? <a href={l.href}>{l.text}</a> : <span>{l.text}</span>}
+                  {l.meta && <span class="meta">{l.meta}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+          {h.empty && <p class="hotspot-card__empty">{h.empty}</p>}
+          <p class="hotspot-card__more">
+            <a href={h.more.href} data-hotspot-more>
+              {h.more.text}
+            </a>
+          </p>
+          <button type="button" class="hotspot-card__close" popovertarget={h.id} popovertargetaction="hide">
+            Close
+          </button>
+        </div>
+      ))}
+      {spots.length > 0 && (
+        <details class="painting-links" data-painting-links>
+          <summary>List what the painting opens</summary>
+          <div class="painting-links__groups">
+            {spots.map((h) => (
+              <div class="painting-links__group" data-painting-group={h.kind}>
+                <p class="painting-links__title">{h.label}</p>
+                {h.links.length > 0 && (
+                  <ul role="list">
+                    {h.links.map((l) => (
+                      <li>
+                        {l.href ? <a href={l.href}>{l.text}</a> : <span>{l.text}</span>}
+                        {l.meta && <span class="meta">{l.meta}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {h.empty && <p>{h.empty}</p>}
+                <p>
+                  <a href={h.more.href}>{h.more.text}</a>
+                </p>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
     </div>
   ) : (
     <ArtImage {...art} />
@@ -82,30 +183,56 @@ const art = {
 }
 
 <script>
-  // Play each clip while its painting is on screen; the button pauses it for good.
+  // Without the Popover API the hotspots are hidden (CSS below), so open the
+  // list of the same links under each painting instead.
+  if (!Object.hasOwn(HTMLElement.prototype, "popover")) {
+    for (const list of document.querySelectorAll<HTMLDetailsElement>("[data-painting-links]")) list.open = true;
+  }
+
+  // Play each clip while its painting is on screen. Three things stop it: the
+  // visitor's own Pause, which only their Play undoes; the painting leaving
+  // the screen; and an open hotspot card. While a card is open the media box
+  // carries data-card-open, the clip pauses, and the CSS shows the still
+  // under it, so the card points at the exact feature it names. When the last
+  // card closes the clip plays again, unless the visitor paused it.
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     for (const video of document.querySelectorAll<HTMLVideoElement>("[data-region-clip]")) {
       const media = video.parentElement!;
       const toggle = media.querySelector<HTMLButtonElement>("[data-clip-toggle]");
+      const cards = [...(media.parentElement?.querySelectorAll<HTMLElement>("[data-hotspot-card]") ?? [])];
       let held = false;
-      const play = () =>
+      let onScreen = false;
+      const open = new Set<HTMLElement>();
+      const sync = () => {
+        if (open.size > 0) media.dataset.cardOpen = "";
+        else delete media.dataset.cardOpen;
+        if (held || !onScreen || open.size > 0) {
+          video.pause();
+          return;
+        }
         video
           .play()
           .then(() => (media.dataset.playing = "true"))
           .catch(() => undefined);
+      };
       new IntersectionObserver(
         ([entry]) => {
-          if (held) return;
-          if (entry?.isIntersecting) void play();
-          else video.pause();
+          onScreen = entry?.isIntersecting ?? false;
+          sync();
         },
         { threshold: 0.25 },
       ).observe(media);
+      for (const card of cards) {
+        card.addEventListener("toggle", () => {
+          if (card.matches(":popover-open")) open.add(card);
+          else open.delete(card);
+          sync();
+        });
+      }
       toggle?.addEventListener("click", () => {
-        held = !video.paused;
-        if (held) video.pause();
-        else void play();
+        held = !held;
         toggle.textContent = held ? "Play" : "Pause";
+        sync();
       });
     }
   }
@@ -135,6 +262,8 @@ const art = {
   }
   .region-art__toggle {
     position: absolute;
+    /* Above the hotspots, so no hotspot ever covers it. */
+    z-index: 2;
     right: var(--s-2);
     bottom: var(--s-2);
     min-height: var(--size-tap);
@@ -151,6 +280,10 @@ const art = {
   .region-art__media[data-playing] .region-art__clip {
     opacity: 1;
   }
+  /* An open hotspot card shows the still, whose features the points name exactly. */
+  .region-art__media[data-card-open] .region-art__clip {
+    opacity: 0;
+  }
   .region-art__media[data-playing] .region-art__toggle {
     visibility: visible;
   }
@@ -160,6 +293,206 @@ const art = {
   @media (max-width: 47.5rem) {
     :global(figure.art-image.region-art--hero) {
       aspect-ratio: 16 / 9;
+    }
+  }
+
+  /* The hotspot layer: the box the painting is cropped into. */
+  .hotspots {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    container-type: size;
+    pointer-events: none;
+  }
+  .hotspot {
+    /* The painting's drawn size under object-fit: cover, and half a button plus a hair. */
+    --lw: max(100cqw, 100cqh * var(--ar));
+    --lh: max(100cqh, 100cqw / var(--ar));
+    --half: calc(var(--size-tap) / 2 + var(--s-1));
+    position: absolute;
+    left: clamp(var(--half), calc(var(--x) * var(--lw) / 100 - (var(--lw) - 100cqw) / 2), calc(100cqw - var(--half)));
+    top: clamp(var(--half), calc(var(--y) * var(--lh) / 100 - (var(--lh) - 100cqh) / 2), calc(100cqh - var(--half)));
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: var(--size-tap);
+    height: var(--size-tap);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--c-on-night);
+    font: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .hotspot__mark {
+    position: relative;
+    width: calc(var(--size-tap) / 2);
+    height: calc(var(--size-tap) / 2);
+    border: var(--line-bold) solid var(--c-gold-on-night);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--c-gold-on-night) 0 28%, color-mix(in oklab, var(--c-night) 70%, transparent) 32%);
+    box-shadow: 0 0 0 var(--line-edge) color-mix(in oklab, var(--c-night) 60%, transparent);
+  }
+  .hotspot:hover .hotspot__mark,
+  .hotspot:focus-visible .hotspot__mark {
+    scale: 1.2;
+  }
+  .hotspot:focus-visible {
+    outline: var(--line-bold) solid var(--c-focus-on-night);
+    outline-offset: 0;
+  }
+  .hotspot__label {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r-chisel);
+    background: color-mix(in oklab, var(--c-night) 80%, transparent);
+    color: var(--c-on-night);
+    font-size: var(--t-step--1);
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .hotspot[data-side="end"] .hotspot__label {
+    left: calc(100% - var(--s-1));
+  }
+  .hotspot[data-side="start"] .hotspot__label {
+    right: calc(100% - var(--s-1));
+  }
+  /* On a phone the painting is about 330 px wide: four labels would bury it.
+     The words stay as each button's name, and the list below spells them out. */
+  @media (max-width: 47.5rem) {
+    .hotspot__label {
+      clip-path: inset(50%);
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      padding: 0;
+    }
+  }
+  /* A ring that swells three times as the painting first shows, then rests. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hotspot__mark {
+      transition: scale 0.15s;
+    }
+    .hotspot__mark::after {
+      content: "";
+      position: absolute;
+      inset: calc(-1 * var(--line-bold));
+      border: var(--line-edge) solid var(--c-gold-on-night);
+      border-radius: 50%;
+      opacity: 0;
+      animation: hotspot-pulse 1.6s ease-out 0.6s 3;
+    }
+  }
+  @keyframes hotspot-pulse {
+    from {
+      opacity: 0.9;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 2;
+    }
+  }
+
+  /* The card each hotspot opens. Popover puts it in the top layer, centered
+     by default; where anchor positioning works and the screen is wide enough,
+     it hangs off its hotspot and flips at the edges instead. */
+  .hotspot-card {
+    /* No width token fits a small card (--size-wrap is the page, --t-measure prose), so 20rem stays. */
+    width: min(20rem, calc(100vw - 2 * var(--s-4)));
+    padding: var(--s-4) var(--s-4) var(--s-3);
+    border: var(--line-edge) solid var(--c-border);
+    border-radius: var(--r-card);
+    background: var(--c-ground);
+    color: var(--c-text);
+    box-shadow: var(--sh-glow);
+  }
+  /* A media query cannot read CSS variables: 40rem is where a 20rem card fits beside its hotspot. */
+  @media (min-width: 40rem) {
+    @supports (position-area: block-end) {
+      .hotspot-card {
+        inset: auto;
+        margin: var(--s-2);
+        position-area: block-end span-inline-end;
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+      }
+    }
+  }
+  .hotspot-card__title,
+  .painting-links__title {
+    margin: 0 0 var(--s-2);
+    font-weight: 700;
+  }
+  .hotspot-card__links,
+  .painting-links ul {
+    display: grid;
+    gap: var(--s-2);
+    margin: 0 0 var(--s-3);
+    padding: 0;
+    list-style: none;
+  }
+  .hotspot-card__links li,
+  .painting-links li {
+    display: grid;
+  }
+  .hotspot-card__empty {
+    margin: 0 0 var(--s-3);
+  }
+  .hotspot-card__more {
+    margin: 0;
+  }
+  .hotspot-card__more a,
+  .hotspot-card__links a {
+    display: inline-block;
+    padding-block: var(--s-1);
+  }
+  .hotspot-card__close {
+    margin-top: var(--s-2);
+    min-height: var(--size-tap);
+    padding-inline: var(--s-3);
+    border: var(--line-edge) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    background: var(--c-surface);
+    color: var(--c-text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* The same links as a plain list, for anyone who prefers one. */
+  .painting-links {
+    margin-top: var(--s-3);
+  }
+  .painting-links summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    color: var(--c-link);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .painting-links__groups {
+    display: grid;
+    /* No token names a column width, so 14rem stays: four columns at the 1180 px wrap. */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--s-4) var(--s-5);
+    padding-block: var(--s-3);
+  }
+  .painting-links__group p {
+    margin: 0 0 var(--s-2);
+  }
+
+  /* No Popover API: the buttons could open nothing and the cards would sit in
+     the page, so both go, and the list (opened by the script) carries the links. */
+  @supports not selector(:popover-open) {
+    .hotspots,
+    .hotspot-card {
+      display: none;
     }
   }
 </style>
