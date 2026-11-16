@@ -37,6 +37,9 @@ jobs:
     name: mcp-registry
     # ubuntu-slim: a short job that downloads one binary and makes two HTTPS calls.
     runs-on: ubuntu-slim
+    # Publishing writes under the org's name, so only main may run it: the
+    # mcp-registry environment's branch policy allows main alone (review of #82).
+    environment: mcp-registry
     timeout-minutes: 10
     permissions:
       id-token: write
