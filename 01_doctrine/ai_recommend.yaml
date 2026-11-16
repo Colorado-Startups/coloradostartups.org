@@ -1,0 +1,64 @@
+# Which AIs the site may offer as a way to connect, open or ask.
+# One definition. site/test/unit/ai/allow-list.test.ts reads this file and
+# fails when a file in `scope` names a `never_offer` term, outside `exempt`.
+# Matching is whole words, case-insensitive. voice.md points here.
+
+source:
+  who: Paul Foley, founder
+  date: 2026-11-16
+  words: >-
+    "We can recommend Claude, we can recommend open weight models, and we can
+    recommend open code as the desktop app. The frontier labs such as ChatGPT,
+    Google, and SpaceX Grok, as well as Meta, we do not ever recommend."
+
+# What the site may name when it offers a way to connect, open or ask.
+recommend:
+  - name: Claude
+    covers: [claude.ai, Claude Desktop, Claude Code]
+  - name: OpenCode
+    covers: [the OpenCode desktop app and CLI]
+  - name: open-weight models
+    covers: [open-weight models in general, with no lab named]
+
+# Names the site never offers as a way to connect, open or ask.
+never_offer:
+  - ChatGPT
+  - chatgpt.com
+  - OpenAI
+  - openai.com
+  - GPT
+  - Gemini
+  - gemini.google.com
+  - Bard
+  - Google AI Studio
+  - AI Studio
+  - aistudio.google.com
+  - Grok
+  - grok.com
+  - xAI
+  - x.ai
+  - Meta AI
+  - meta.ai
+
+# Where the gate looks. A glob ending in /** is a folder; anything else is one file.
+scope:
+  - site/src/**
+  - site/worker/mcp/**
+  - plugins/**
+  - server.json
+
+# Paths in scope that may name a never_offer term, each with its reason.
+exempt:
+  - path: site/src/pages/guides/startup-credits.astro
+    reason: >-
+      The startup credits guide lists credit programs from many providers,
+      Google included. Whether they stay is an open question for Paul.
+  - path: site/src/components/credits/**
+    reason: The credits guide's calculator, held with the guide for the same question.
+
+# Outside scope on purpose, so not exempt entries.
+not_scanned:
+  - path: site/worker/resourcus/**
+    reason: >-
+      Resourcus's model list is internal routing on an open-weight model, not
+      a recommendation to visitors.

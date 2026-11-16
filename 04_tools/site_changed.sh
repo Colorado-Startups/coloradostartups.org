@@ -8,6 +8,8 @@
 # evals/ or ops/ (check:push tests all three) runs site-tests and skips e2e.
 # A change to this file, to .npmrc (npm ci reads it, #272) or to the brand
 # tokens the prebuild reads runs both.
+# The plugin, server.json and the AI allow list run site-tests, whose unit
+# allow-list gate reads them (Paul, 2026-11-16).
 # The content lint, its rules and voice_lint run site-tests, whose lint:built
 # step reads the real build, so a rule change meets the site on its own pull
 # request (#808 review).
@@ -47,7 +49,7 @@ COMMON='site/|packages/|data/|art/|scripts/|01_doctrine/brand_tokens\.yaml$|pack
 # The anchored pattern for SUITE, or nothing for an unknown suite.
 pattern() {
   case "$1" in
-    site-tests) printf '^(%s|workers/|evals/|ops/|04_tools/(cs_site_lint(_[a-z]+)?\\.py|cs_site_rules\\.json|voice_lint\\.py)$|\\.github/workflows/site-tests\\.yml$)' "$COMMON" ;;
+    site-tests) printf '^(%s|workers/|evals/|ops/|plugins/|server\\.json$|01_doctrine/ai_recommend\\.yaml$|04_tools/(cs_site_lint(_[a-z]+)?\\.py|cs_site_rules\\.json|voice_lint\\.py)$|\\.github/workflows/site-tests\\.yml$)' "$COMMON" ;;
     e2e) printf '^(%s|\\.github/workflows/e2e\\.yml$)' "$COMMON" ;;
     process-page) printf '^(quality/process/|quality/targets/|04_tools/site_changed\\.sh$|\\.github/workflows/quality-pages\\.yml$)' ;;
     *) return 1 ;;
@@ -167,6 +169,11 @@ e2e quality/collectors/evals.mjs skip
 site-tests 01_doctrine/brand_tokens.yaml run
 site-tests evals/ai-visibility/test/cli.test.ts run
 site-tests 01_doctrine/voice.md skip
+site-tests 01_doctrine/ai_recommend.yaml run
+site-tests plugins/colorado-startups/skills/colorado-startups/SKILL.md run
+site-tests server.json run
+e2e 01_doctrine/ai_recommend.yaml skip
+e2e plugins/colorado-startups/README.md skip
 e2e 01_doctrine/brand_tokens.yaml run
 e2e evals/ai-visibility/test/cli.test.ts skip
 site-tests ops/redirects/map.mjs run
