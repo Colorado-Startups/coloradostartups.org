@@ -1,13 +1,13 @@
 // The /mcp server: keyless, read-only and stateless. Each request gets a
 // fresh McpServer from createMcpHandler, which serves the 2026-07-28 protocol
-// and, for older clients, the stateless 2025 Streamable HTTP fallback. Three
+// and, for older clients, the stateless 2025 Streamable HTTP fallback. Five
 // tools, each read-only and capped at 25 results (tools.ts).
-import { REGION_IDS } from "@cs/shared";
+import { REGION_IDS, SlugSchema, STAGES } from "@cs/shared";
 import { createMcpHandler, McpServer, type McpHttpHandler } from "@modelcontextprotocol/server";
 import * as z from "zod";
 
 import type { OpenData } from "./data";
-import { events, MAX_RESULTS, region, search, SEARCH_TYPES } from "./tools";
+import { company, events, MAX_RESULTS, path, PATH_STEPS, region, search, SEARCH_TYPES } from "./tools";
 
 export const SERVER_NAME = "coloradostartups";
 
@@ -16,6 +16,8 @@ export const INSTRUCTIONS = [
   "This server is read-only and needs no key.",
   "It searches the site's open data: Startup Resources (programs, investors, coworking and services for founders), the Leaderboard's honoree companies, the guides for founders, and the event calendar.",
   "The community has three regions: Photon Mountain (Boulder, Golden, Arvada and Denver), Space Peak (Colorado Springs and Fountain) and Fusion Canyon (Fort Collins, Loveland and Windsor).",
+  `For a founder asking where to start, path gives up to ${PATH_STEPS} Startup Resources for their stage, each with one line on why it fits.`,
+  "For one Leaderboard honoree, company gives its public record by id; search finds the id.",
   `Each tool returns at most ${MAX_RESULTS} results, each with a link to its page on the site.`,
   "The data is free under CC BY 4.0: credit Colorado Startups and link https://coloradostartups.org/data/.",
   "Listings change, so tell people to check each organization's own site.",
@@ -79,6 +81,38 @@ export function buildServer(data: OpenData, origin: string, now: () => Date = ()
     async ({ id }) => {
       const r = region(data, id, origin, now());
       return r ? result(r) : { ...result({ error: `No data for region ${id}` }), isError: true };
+    },
+  );
+
+  server.registerTool(
+    "path",
+    {
+      title: "A founder's next steps",
+      description: `A short path for a founder at one stage: up to ${PATH_STEPS} Startup Resources, in the order of the stage's steps, each with one line on why it fits. Add what they need and their region to narrow it.`,
+      inputSchema: z.object({
+        stage: z.enum(STAGES).describe("idea, launch, growth or support"),
+        need: z.string().min(1).max(200).optional().describe("What the founder needs now, such as 'first customers' or 'hardware'"),
+        region: RegionArg.optional(),
+      }),
+      annotations: READ_ONLY,
+    },
+    async (input) => result(path(data, input, origin)),
+  );
+
+  server.registerTool(
+    "company",
+    {
+      title: "A Leaderboard company",
+      description:
+        "One Leaderboard honoree's public record: what it does, sector, city, region, boards, website and sources. Find the id with search.",
+      inputSchema: z.object({ id: SlugSchema.describe("The company id, such as 'acme-robotics'") }),
+      annotations: READ_ONLY,
+    },
+    async ({ id }) => {
+      const c = company(data, id, origin);
+      return c
+        ? result(c)
+        : { ...result({ error: `No Leaderboard company with id ${id}. Use search with type company to find one.` }), isError: true };
     },
   );
 
