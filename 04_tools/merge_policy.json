@@ -61,7 +61,7 @@
     "quality/**",
     "evals/**",
     "site/public/_headers",
-    "site/public/llms.txt",
+    "site/src/pages/llms.txt.ts",
     "site/src/layouts/BaseLayout.astro",
     "site/src/components/ui/SiteHeader.astro",
     "site/src/components/ui/SiteFooter.astro",
