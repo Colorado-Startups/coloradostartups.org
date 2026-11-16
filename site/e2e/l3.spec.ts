@@ -122,7 +122,8 @@ test.describe("/ecosystem-canvas/", () => {
 
   test("searches with Pagefind and treats several words as all of them", async ({ page }) => {
     await openList(page);
-    await page.getByLabel("Search").fill("coworking boulder");
+    // By role: "Search Startup Resources" also labels the search landmark.
+    await page.getByRole("searchbox", { name: "Search", exact: true }).fill("coworking boulder");
     await expect(count(page)).toHaveText(/^\d+ of \d+ resources match\.$/);
     const shown = visibleCards(page);
     expect(await shown.count()).toBeGreaterThan(0);
