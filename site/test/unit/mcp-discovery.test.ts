@@ -57,3 +57,19 @@ describe("server.json for the MCP Registry", () => {
     expect(listing.repository).toEqual({ url: "https://github.com/Colorado-Startups/coloradostartups.org", source: "github" });
   });
 });
+
+// Publishing writes under the org's name. The job runs in the mcp-registry
+// environment, whose branch policy allows main alone, so a branch cannot
+// publish (review of #82). The token it asks for stays as narrow as it was.
+describe("the registry publish workflow", () => {
+  const workflow = readFileSync(new URL("../../../.github/workflows/mcp-registry.yml", import.meta.url), "utf8");
+
+  it("runs its publish job in the main-only mcp-registry environment", () => {
+    expect(workflow).toMatch(/^ {4}environment: mcp-registry$/m);
+  });
+
+  it("grants nothing at the top level, and the job only an OIDC token and read access", () => {
+    expect(workflow).toMatch(/^permissions: \{\}$/m);
+    expect(workflow).toMatch(/^ {4}permissions:\n {6}id-token: write\n {6}contents: read\n/m);
+  });
+});
