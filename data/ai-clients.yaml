@@ -10,6 +10,9 @@
 #   command:  {url} is replaced with the /mcp URL.
 #   config:   JSON the page fills with the /mcp URL (opencode only).
 #   steps:    the app's own menu names, in order.
+#   plugin:   commands that install this repo's Claude Code plugin instead
+#             (plugins/colorado-startups/README.md).
+#   skill:    the claude.ai skill download (plugins/colorado-startups/README.md).
 # docs: where the form was read; read: the date it was read.
 
 - id: claude
@@ -19,6 +22,7 @@
     - Customize › Connectors › + Add › Add custom connector
     - Name it, paste the URL, then Continue
     - "Authentication: No sign in, then Add"
+  skill: /downloads/colorado-startups-skill.zip
   docs: https://support.claude.com
   read: 2026-11-15
 
@@ -57,6 +61,9 @@
   name: Claude Code
   effort: one-command
   command: claude mcp add --transport http coloradostartups {url}
+  plugin:
+    - claude plugin marketplace add Colorado-Startups/coloradostartups.org
+    - claude plugin install colorado-startups@colorado-startups
   docs: https://code.claude.com/docs
   read: 2026-11-15
 

@@ -2,6 +2,8 @@
 // /connect/ shows one card per AI client in data/ai-clients.yaml, 7 in all
 // (3 one click, 2 one command, 2 guided), the /mcp URL, and 5 things to ask.
 // Each deep link decodes to the vendor's documented form, pointing at /mcp.
+// Claude Code also offers the repo's plugin, Claude the skill download, and
+// each ask opens in Claude or ChatGPT with the shared Ask-your-AI prompt.
 import { describe, expect, it } from "vitest";
 
 import { readDist } from "./pages";
@@ -65,14 +67,28 @@ describe("/connect/", () => {
     expect(config.mcp.servers.coloradostartups).toEqual({ type: "remote", url: MCP_URL, oauth: false });
   });
 
+  it("offers the Claude Code plugin and the claude.ai skill", () => {
+    expect(page.getElementById("plugin-claude-code")?.textContent).toBe(
+      "claude plugin marketplace add Colorado-Startups/coloradostartups.org\n" +
+        "claude plugin install colorado-startups@colorado-startups",
+    );
+    expect(card("claude").querySelector('a[href="/downloads/colorado-startups-skill.zip"]')).not.toBeNull();
+  });
+
   it("gives Claude and ChatGPT guided steps with no sign in", () => {
     expect(card("claude").textContent).toContain("No sign in");
     expect(card("chatgpt").textContent).toContain("Add custom MCP server");
     for (const id of ["claude", "chatgpt"]) expect(card(id).querySelectorAll("ol li").length).toBeGreaterThan(0);
   });
 
-  it("lists 5 things to ask", () => {
-    expect(page.querySelectorAll("[data-asks] li")).toHaveLength(5);
+  it("lists 5 things to ask, each opening in Claude and ChatGPT with the /mcp prompt", () => {
+    const asks = [...page.querySelectorAll("[data-asks] li")];
+    expect(asks).toHaveLength(5);
+    for (const ask of asks) {
+      const links = [...ask.querySelectorAll("a")].map((a) => a.getAttribute("href")!);
+      expect(links.map((h) => h.split("?")[0])).toEqual(["https://claude.ai/new", "https://chatgpt.com/"]);
+      for (const h of links) expect(new URL(h).searchParams.get("q")).toContain(MCP_URL);
+    }
   });
 
   it("is linked from /ask/#connect and the home page", () => {

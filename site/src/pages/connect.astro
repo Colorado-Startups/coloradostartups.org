@@ -8,11 +8,15 @@
 //   Cursor   cursor://anysphere.cursor-deeplink/mcp/install?name=…&config=<base64 of {"url":…}>
 //   VS Code  vscode:mcp/install?<url-encoded JSON {name, type: "http", url}>
 //   Goose    goose://extension?url=…&type=streamable_http&id=…&name=…
+// Claude Code also gets this repo's plugin and Claude the skill download
+// (plugins/colorado-startups/README.md). Each of the 5 asks opens in Claude or
+// ChatGPT through the Ask-your-AI prompt helper (components/ai/prompt.ts).
 // A bad record throws, so the build stops before a card ships wrong.
 import { parse } from "yaml";
 import { z } from "zod";
 
 import clientsRaw from "../../../data/ai-clients.yaml?raw";
+import { askAiLinks } from "../components/ai/prompt";
 import Button from "../components/ui/Button.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
@@ -29,6 +33,8 @@ const Client = z
     command: z.string().includes("{url}").optional(),
     config: z.literal("opencode").optional(),
     steps: z.array(z.string().min(1)).min(1).optional(),
+    plugin: z.array(z.string().min(1)).min(1).optional(),
+    skill: z.string().regex(/^\/downloads\/[a-z0-9-]+\.zip$/).optional(),
     docs: z.string().url(),
     read: z.union([z.string(), z.date()]),
   })
@@ -68,7 +74,7 @@ const asks = [
   "Find Colorado resources for hardware founders.",
   "Which guide covers free startup credits?",
   "Show me a Leaderboard company in my sector, with its sources.",
-];
+].map((question) => ({ question, ...askAiLinks({ subject: "Connect your AI", path: "/connect/", question }) }));
 ---
 
 <BaseLayout
@@ -83,6 +89,8 @@ const asks = [
         {count("one-click")} apps take one click, {count("one-command")} take one command and {count("guided")} take a
         few steps.
       </p>
+      <p>7 tools and 2 prompts. The this_week and region tools render a card in hosts that support MCP Apps.</p>
+      <p class="meta">Listed in the MCP Registry as <code>io.github.Colorado-Startups/coloradostartups</code>.</p>
       <div class="connect-url">
         <pre class="connect-code"><code id="mcp-url" data-mcp-url>{mcpUrl}</code></pre>
         <Button variant="secondary" data-copy="mcp-url">Copy URL</Button>
@@ -108,6 +116,15 @@ const asks = [
                   </Button>
                 </>
               )}
+              {c.plugin && (
+                <details>
+                  <summary>Or install the plugin</summary>
+                  <pre class="connect-code"><code id={`plugin-${c.id}`}>{c.plugin.join("\n")}</code></pre>
+                  <Button variant="secondary" data-copy={`plugin-${c.id}`}>
+                    Copy commands
+                  </Button>
+                </details>
+              )}
               {c.config === "opencode" && (
                 <details>
                   <summary>Or add it to opencode.jsonc</summary>
@@ -124,6 +141,11 @@ const asks = [
                   ))}
                 </ol>
               )}
+              {c.skill && (
+                <p>
+                  Then <a href={c.skill}>download the skill</a> and add it as a skill.
+                </p>
+              )}
             </li>
           ))
         }
@@ -135,7 +157,19 @@ const asks = [
     <div class="wrap stack">
       <h2 id="asks-title">5 things to ask</h2>
       <ol class="connect-asks" data-asks>
-        {asks.map((a) => <li>{a}</li>)}
+        {
+          asks.map((a) => (
+            <li>
+              {a.question}{" "}
+              <a href={a.claude} target="_blank" rel="noopener">
+                Ask Claude
+              </a>{" "}
+              <a href={a.chatgpt} target="_blank" rel="noopener">
+                Ask ChatGPT
+              </a>
+            </li>
+          ))
+        }
       </ol>
       <p class="meta"><a href="/data/">The open data</a> behind it is free under CC BY 4.0.</p>
     </div>
