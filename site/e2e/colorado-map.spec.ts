@@ -60,7 +60,7 @@ test("/regions/fusion-canyon/ map: zoomed to the zone, drawing then live map", a
   await page.goto("/regions/fusion-canyon/");
   const map = page.locator("#region-map");
   await expect(map).toHaveAttribute("data-zone", "fusion-canyon");
-  for (const city of ["Fort Collins", "Loveland", "Windsor", "Greeley"]) await expect(map.locator(".colorado-map__drawing")).toContainText(city);
+  for (const city of ["Fort Collins", "Loveland", "Windsor"]) await expect(map.locator(".colorado-map__drawing")).toContainText(city);
   const webgl2 = await page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")));
   test.skip(!webgl2, "no WebGL2 in this browser: the drawing is the map");
   await map.scrollIntoViewIfNeeded();

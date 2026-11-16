@@ -67,6 +67,7 @@ export const PLACE_COUNTIES: Readonly<Record<string, readonly string[]>> = {
   Parker: ["Douglas"],
   Pueblo: ["Pueblo"],
   Salida: ["Chaffee"],
+  "Security-Widefield": ["El Paso"],
   Silverthorne: ["Summit"],
   "Steamboat Springs": ["Routt"],
   Superior: ["Boulder", "Jefferson"],

@@ -1,6 +1,6 @@
 // Observable Plot rendered to an SVG string at build time, in Node, through
 // one JSDOM document: the Leaderboard charts (leaderboard/charts.ts) and the
-// /regions/ map (regions/map.ts). No `tip` marks: they need a live browser
+// statewide map (regions/colorado-map.ts). No `tip` marks: they need a live browser
 // layout and fail under JSDOM (PLAN.md, Leaderboard). No client JavaScript
 // ships for either.
 

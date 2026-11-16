@@ -9,7 +9,6 @@ import { REGION_IDS, type Region } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
-import { COLORADO_PLACES } from "../../../src/lib/leaderboard/places";
 import { cityKey, ELSEWHERE, parseRegions, REGIONS, regionForCity } from "../../../src/lib/regions/match";
 import { INSIDE_A_CANYON } from "./canyon-rule";
 
@@ -22,17 +21,15 @@ describe("REGIONS", () => {
     expect(REGIONS.map((r) => r.order)).toEqual([1, 2, 3]);
   });
 
-  it("keeps the core cities Paul named (decision 45)", () => {
+  // Decision 45, re-cut by Paul on 2026-11-15: the cities on the corners of
+  // each region's road loop (data/geo/boundaries.yaml), about Silicon Valley's size.
+  it("keeps the cities Paul named", () => {
     const cities = Object.fromEntries(REGIONS.map((r) => [r.id, r.cities]));
     expect(cities).toEqual({
       "photon-mountain": ["Boulder", "Golden", "Arvada", "Denver"],
-      "space-peak": ["Colorado Springs"],
-      "fusion-canyon": ["Fort Collins", "Loveland", "Windsor", "Greeley"],
+      "space-peak": ["Colorado Springs", "Fountain"],
+      "fusion-canyon": ["Fort Collins", "Loveland", "Windsor"],
     });
-  });
-
-  it("can place every core city on the map", () => {
-    for (const r of REGIONS) for (const city of r.cities) expect(COLORADO_PLACES[city], city).toBeDefined();
   });
 });
 
@@ -43,10 +40,10 @@ describe("regionForCity", () => {
     ["Arvada", "photon-mountain"],
     ["Denver", "photon-mountain"],
     ["Colorado Springs", "space-peak"],
+    ["Fountain", "space-peak"],
     ["Fort Collins", "fusion-canyon"],
     ["Loveland", "fusion-canyon"],
     ["Windsor", "fusion-canyon"],
-    ["Greeley", "fusion-canyon"],
   ])("maps the core city %s to %s", (city, region) => {
     expect(regionForCity(city)).toBe(region);
   });
@@ -59,6 +56,9 @@ describe("regionForCity", () => {
     ["Monument", "space-peak"],
     ["Manitou Springs", "space-peak"],
     ["Cascade", "space-peak"],
+    ["Security-Widefield", "space-peak"],
+    ["Pueblo", "space-peak"],
+    ["Greeley", "fusion-canyon"],
     ["Timnath", "fusion-canyon"],
     ["Estes Park", "fusion-canyon"],
   ])("maps the nearby city %s to %s", (city, region) => {
@@ -75,7 +75,7 @@ describe("regionForCity", () => {
   // The default fallback (fallbackRegion in src/lib/regions/match.ts; Paul's
   // rule is a Project 2 card). When Paul writes his own rule, these cases
   // change with it.
-  it.each(["Durango", "Grand Junction", "Pueblo", "Frederick", "Bailey", "Nowhere Junction"])(
+  it.each(["Durango", "Grand Junction", "Frederick", "Bailey", "Nowhere Junction"])(
     "sends the unlisted city %s to elsewhere",
     (city) => {
       expect(regionForCity(city)).toBe(ELSEWHERE);

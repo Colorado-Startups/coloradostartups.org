@@ -1,11 +1,13 @@
 // The statewide map's data: the Colorado outline and the three zones, from
-// data/geo/ (built by scripts/geo/build.mjs from US Census places). Data only,
-// so the browser bundle (components/map/colorado-map.client.ts) can import it
-// without Plot or JSDOM.
+// data/geo/ (built by scripts/geo/build.mjs from US Census road lines and
+// places). Each zone is the loop its named roads close. Data only, so the
+// browser bundle (components/map/colorado-map.client.ts) can import it without
+// Plot or JSDOM.
 import type { RegionId } from "@cs/shared";
 
-// The same raw-import pattern as lib/seats/load.ts.
-const files = import.meta.glob<string>("../../../../data/geo/*.geojson", { query: "?raw", import: "default", eager: true });
+// The same raw-import pattern as lib/seats/load.ts. Only these two files: the
+// traced roads and the yardstick in data/geo/ stay out of the browser bundle.
+const files = import.meta.glob<string>("../../../../data/geo/{colorado,regions}.geojson", { query: "?raw", import: "default", eager: true });
 function raw(name: string): string {
   const text = files[`../../../../data/geo/${name}.geojson`];
   if (!text) throw new Error(`data/geo/${name}.geojson is missing; run node scripts/geo/build.mjs`);
@@ -28,7 +30,24 @@ interface Polygon {
 export interface ZoneFeature {
   type: "Feature";
   id: RegionId;
-  properties: { id: RegionId; name: string; cities: string[]; towns: string[]; cityPoints: CityPoint[]; method: string; note: string };
+  properties: {
+    id: RegionId;
+    name: string;
+    /** The cities on the loop's corners, and their centres. */
+    cities: string[];
+    cityPoints: CityPoint[];
+    /** The nearby towns, most of them outside the line, and their points. */
+    towns: string[];
+    townPoints: CityPoint[];
+    /** The named roads the loop follows, in order. */
+    roads: string[];
+    area_sq_mi: number;
+    span_mi: number;
+    /** The loop's area as a multiple of Silicon Valley's US-101 and I-280 loop. */
+    vs_silicon_valley: number;
+    method: string;
+    note: string;
+  };
   geometry: Polygon;
 }
 
@@ -72,9 +91,13 @@ export function zoneById(id: RegionId): ZoneFeature {
   return zone;
 }
 
-/** [[west, south], [east, north]] of one zone, for a map zoomed to it. */
+/**
+ * [[west, south], [east, north]] of one zone, for a map zoomed to it: its loop
+ * and its cities, since a corner city can sit just outside the line.
+ */
 export function zoneBounds(id: RegionId): [LonLat, LonLat] {
-  return ringBounds(zoneById(id).geometry.coordinates[0]!);
+  const zone = zoneById(id);
+  return ringBounds([...zone.geometry.coordinates[0]!, ...zone.properties.cityPoints.map((c): LonLat => [c.lon, c.lat])]);
 }
 
 /**

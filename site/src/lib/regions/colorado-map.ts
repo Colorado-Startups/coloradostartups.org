@@ -1,5 +1,6 @@
 // The statewide map drawn at build time: the Colorado outline, the three zones
-// in their region colors, the core cities and the zone names. It is what a
+// (each the loop its named roads close) in their region colors, the cities on
+// their corners and the zone names. It is what a
 // visitor sees with no JavaScript, and before the live map (ColoradoMap's
 // MapLibre layer) loads over it. Plot's `geo` mark with a conformal conic
 // projection, the usual choice for a state this shape.
@@ -74,7 +75,10 @@ export function coloradoMapSvg(text: ChartText, { zone }: MapView = {}): string 
       type: "conic-conformal",
       parallels: [37.5, 40.5],
       rotate: [-(west + east) / 2, 0],
-      domain: focus ?? outline,
+      // A zone's view fits its loop and its cities: a corner city can sit just outside the line.
+      domain: focus
+        ? { type: "GeometryCollection", geometries: [focus.geometry, { type: "MultiPoint", coordinates: cities.map((c) => [c.lon, c.lat]) }] }
+        : outline,
       inset: focus ? 32 : 12,
     },
     marks: [

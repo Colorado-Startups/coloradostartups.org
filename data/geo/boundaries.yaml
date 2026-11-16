@@ -1,0 +1,82 @@
+# The named roads that bound each region, in loop order (Paul, 2026-11-15):
+# cities sit on the corners, major roads between them are the edges, and each
+# loop is about the size of Silicon Valley's.
+#
+# scripts/geo/build.mjs traces each road from US Census TIGERweb road lines.
+#   road   the name the map shows
+#   names  the Census NAME values that road carries
+#   to     about where it meets the next road, as [lon, lat]; the build snaps
+#          to the real junction within 3 km
+# Change a line, then run: node scripts/geo/build.mjs --roads
+#
+# silicon-valley is the yardstick, never a zone: US-101 and I-280 from Menlo
+# Park to San Jose.
+
+photon-mountain:
+  # The eight roads Photon Mountain's own corridor map locked (its MAP_NOTES.md, revision 6a).
+  - road: CO-93 and Broadway
+    names: [State Hwy 93, Broadway, Broadway St, S Broadway St]
+    to: [-105.2797, 40.0177] # Pearl St, Boulder
+  - road: Pearl St and Pearl Pkwy
+    names: [Pearl St, Pearl Pkwy]
+    to: [-105.2405, 40.0245] # Foothills Pkwy
+  - road: Foothills Pkwy
+    names: [Foothills Pkwy, State Hwy 157]
+    to: [-105.2350, 39.9850] # US-36
+  - road: US-36
+    names: [US Hwy 36]
+    to: [-104.9813, 39.8274] # I-25
+  - road: I-25
+    names: [I- 25]
+    to: [-104.9990, 39.7670] # Park Ave West
+  - road: Park Ave West
+    names: [Park Ave W, 22nd St]
+    to: [-104.9873, 39.7527] # Broadway, Denver
+  - road: Broadway
+    names: [Broadway]
+    to: [-104.9875, 39.7255] # 6th Ave
+  - road: 6th Ave and US-6
+    names: [W 6th Ave, US Hwy 6]
+    to: [-105.2364, 39.7546] # CO-93, Golden
+
+fusion-canyon:
+  - road: US-287
+    names: [US Hwy 287]
+    to: [-105.0760, 40.5895] # CO-14 leaves College Ave, Fort Collins
+  - road: CO-14
+    names: [State Hwy 14]
+    to: [-104.9077, 40.5816] # CO-257
+  - road: CO-257
+    names: [State Hwy 257]
+    to: [-104.8698, 40.4064] # US-34
+  - road: US-34
+    names: [US Hwy 34]
+    to: [-105.0744, 40.4072] # US-287, Loveland
+
+space-peak:
+  - road: I-25
+    names: [I- 25]
+    to: [-104.8125, 38.9910] # Interquest Pkwy
+  - road: Interquest Pkwy
+    names: [Interquest Pkwy]
+    to: [-104.7810, 38.9988] # Powers Blvd
+  - road: Powers Blvd
+    names: [State Hwy 21, N Powers Blvd, S Powers Blvd]
+    to: [-104.6823, 38.7212] # Mesa Ridge Pkwy
+  - road: Mesa Ridge Pkwy
+    names: [State Hwy 16]
+    to: [-104.7200, 38.7235] # US-85
+  - road: US-85
+    names: [N Santa Fe Ave, S Santa Fe Ave, Santa Fe Ave]
+    to: [-104.7130, 38.6650] # I-25, Fountain
+
+silicon-valley:
+  - road: I-280
+    names: [I- 280]
+    to: [-122.2432, 37.4355] # CA-84
+  - road: CA-84
+    names: [State Rte 84]
+    to: [-122.1805, 37.4834] # US-101
+  - road: US-101
+    names: [US Hwy 101]
+    to: [-121.8521, 37.3397] # I-280, San Jose

@@ -6,8 +6,9 @@
 //   2. the live map (colorado-map.client.ts): MapLibre over OpenFreeMap,
 //      loaded when the figure nears the screen. It hides the drawing once it
 //      has drawn.
-// Zones come from data/geo/regions.geojson (US Census places). The region
-// chips or links beside the map are its list alternative.
+// Zones come from data/geo/regions.geojson: each is the loop its named roads
+// close, traced along US Census road lines. The region chips or links beside
+// the map are its list alternative.
 //
 // `zone` zooms both layers to one region and dims the other two: the drawing
 // at build time, the live map when it fits to the zone's bounds.
@@ -18,7 +19,7 @@
 // such as the home page, ships none of it.
 import type { RegionId } from "@cs/shared";
 
-import { zoneById } from "../../lib/regions/colorado-geo";
+import { ZONES, zoneById } from "../../lib/regions/colorado-geo";
 import { coloradoMapSvg, MAP_HEIGHT, MAP_WIDTH } from "../../lib/regions/colorado-map";
 import { andList } from "../../lib/text";
 
@@ -45,7 +46,7 @@ const {
 } = Astro.props;
 const description = focus
   ? `${focus.name} covers ${andList(focus.cities)}. The other two regions are dimmed.`
-  : "Photon Mountain covers Boulder, Golden, Arvada and Denver. Fusion Canyon covers Fort Collins, Loveland, Windsor and Greeley. Space Peak covers Colorado Springs.";
+  : ZONES.features.map((z) => `${z.properties.name} covers ${andList(z.properties.cities)}.`).join(" ");
 const svg = coloradoMapSvg({ label, description }, { zone });
 ---
 
@@ -64,7 +65,7 @@ const svg = coloradoMapSvg({ label, description }, { zone });
   <figcaption>
     {caption && <span>{caption}</span>}
     <small>
-      Zones from US Census places, a proposal, not a legal line.{live && " Basemap © OpenMapTiles, data © OpenStreetMap contributors."}
+      Each line follows named roads, from US Census road data. A proposal, not a legal line.{live && " Basemap © OpenMapTiles, data © OpenStreetMap contributors."}
     </small>
   </figcaption>
 </figure>
