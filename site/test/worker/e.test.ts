@@ -59,6 +59,11 @@ function errors() {
   return vi.spyOn(console, "error").mockImplementation(() => {});
 }
 
+// Each console.error call as the one line it prints.
+function lines(spy: ReturnType<typeof errors>): string[] {
+  return spy.mock.calls.map((c) => c.map(String).join(" "));
+}
+
 describe("POST /api/e", () => {
   it("is wired in the route table and refuses GET", async () => {
     const res = await SELF.fetch(URL_, { method: "GET" });
@@ -96,17 +101,13 @@ describe("POST /api/e", () => {
     const log = errors();
     const res = await handle(post({ name: "join_click" }), env as unknown as Env, undefined, DAY1);
     expect(res.status).toBe(503);
-    expect(log).toHaveBeenCalledTimes(1);
-    expect(log.mock.calls[0][0]).toContain("POSTHOG_PROJECT_TOKEN");
-    expect(log.mock.calls[0][0]).toContain("ANON_ID_SALT");
+    expect(lines(log)).toEqual(["/api/e: secret not set: POSTHOG_PROJECT_TOKEN, ANON_ID_SALT; event dropped"]);
 
     log.mockClear();
     const noSalt = { ...configured, ANON_ID_SALT: undefined } as unknown as Env;
     expect((await handle(post({ name: "join_click" }), noSalt, undefined, DAY1)).status).toBe(503);
-    expect(log.mock.calls[0][0]).toContain("ANON_ID_SALT");
-    expect(log.mock.calls[0][0]).not.toContain("POSTHOG_PROJECT_TOKEN");
-    expect(log.mock.calls[0][0]).not.toContain("test-salt");
-    expect(log.mock.calls[0][0]).not.toContain("phc_test_token");
+    expect(lines(log)).toEqual(["/api/e: secret not set: ANON_ID_SALT; event dropped"]);
+    expect(lines(log).join("\n")).not.toContain("phc_test_token");
     expect(seen).toHaveLength(0);
   });
 
@@ -118,8 +119,8 @@ describe("POST /api/e", () => {
     const res = await handle(req, configured, undefined, DAY1);
     expect(res.status).toBe(204);
     expect(seen).toHaveLength(0);
-    expect(log).toHaveBeenCalledTimes(1);
-    expect(log.mock.calls[0][0]).toContain("CF-Connecting-IP");
+    expect(lines(log)).toEqual(["/api/e: no CF-Connecting-IP; event dropped"]);
+    expect(lines(log).join("\n")).not.toContain(UA);
   });
 
   it("forwards one anonymous event with no IP, cookie or visitor header", async () => {
@@ -158,8 +159,7 @@ describe("POST /api/e", () => {
       const log = errors();
       const res = await handle(post({ name: "step_done" }), configured, undefined, DAY1);
       expect(res.status).toBe(204);
-      expect(log).toHaveBeenCalledTimes(1);
-      expect(log.mock.calls[0][0]).toContain(`PostHog answered ${status}`);
+      expect(lines(log)).toEqual([`/api/e: PostHog answered ${status}`]);
       log.mockRestore();
     }
   });
@@ -169,8 +169,9 @@ describe("POST /api/e", () => {
     const log = errors();
     const res = await handle(post({ name: "step_done" }), configured, undefined, DAY1);
     expect(res.status).toBe(204);
-    expect(log).toHaveBeenCalledTimes(1);
-    expect(log.mock.calls[0][0]).toContain("forward failed");
+    expect(lines(log)).toHaveLength(1);
+    expect(lines(log)[0]).toMatch(/^\/api\/e: forward failed: \S/);
+    for (const value of [IP, UA, "session=abc"]) expect(lines(log)[0]).not.toContain(value);
   });
 
   it("gives up on a PostHog that never answers, then answers 204 and logs", async () => {
@@ -190,8 +191,9 @@ describe("POST /api/e", () => {
     const res = await handle(post({ name: "step_done" }), configured, undefined, DAY1);
     expect(res.status).toBe(204);
     expect(asked).toHaveBeenCalledWith(3000);
-    expect(log).toHaveBeenCalledTimes(1);
-    expect(log.mock.calls[0][0]).toContain("forward failed");
+    expect(lines(log)).toHaveLength(1);
+    expect(lines(log)[0]).toMatch(/^\/api\/e: forward failed: \S/);
+    for (const value of [IP, UA, "session=abc"]) expect(lines(log)[0]).not.toContain(value);
   });
 });
 
