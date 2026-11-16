@@ -1,0 +1,261 @@
+---
+// What is in a region, beside its map in the first screen (step R1): labels
+// and numbers, all from data. In order:
+//   counts      the home map's three (zone-counts.ts), each a link to its list
+//               and dated: Leaderboard companies as of the edition's date,
+//               events and Startup Resources as of the build, in Denver time;
+//   core cities the region's YAML, as chips;
+//   next event  the soonest event placed here (placeRegion, as the events
+//               count places them), pruned on the visitor's clock as
+//               NextEvents does (prune.ts); left out when none is listed;
+//   open seat   the organizer seat, only while it is open;
+//   nearby      the towns around the core cities, and the region's size.
+// Regions are equals: nothing here compares this region with another.
+// The painting's hotspot cards (hotspots.ts) reach the same lists in their
+// own words, further down the page. Owner: L8.
+import { WAYS_IN, type Region } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { cardPlace, endsAt, SNAPSHOT, upcomingEvents, whenText } from "../../events/events";
+import { CALENDAR_TIMEZONE } from "../../info/links";
+import { COUNT_LABELS, zoneCounts } from "../../map/zone-counts";
+import { takesApplications } from "../../positions/positions";
+import { placeRegion } from "../../../lib/data/open-data";
+import { latestEdition } from "../../../lib/leaderboard/board";
+import { REGIONS } from "../../../lib/regions/match";
+import { andList, organizerFor, regionFilterHref } from "../../../lib/regions/page";
+import { seatPagePath } from "../../../lib/seats/page";
+import RegionSize from "../RegionSize.astro";
+
+interface Props {
+  region: Region;
+  /** The build's clock, for the counts and the next event. */
+  now?: Date;
+}
+
+const { region, now = new Date() } = Astro.props;
+const regions = [...REGIONS];
+
+const counts = (await zoneCounts(now)).find((z) => z.id === region.id);
+if (!counts) throw new Error(`no counts for region "${region.id}"`);
+const edition = latestEdition((await getCollection("editions")).map((e) => e.data));
+if (!edition) throw new Error("no Leaderboard edition in data/leaderboard/editions/");
+
+const longDate = new Intl.DateTimeFormat("en-US", { timeZone: CALENDAR_TIMEZONE, month: "short", day: "numeric", year: "numeric" });
+const isoDay = new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR_TIMEZONE });
+// An edition's date is a calendar day; read it at noon UTC so every US zone shows the same day.
+const published = new Date(`${edition.published}T12:00:00Z`);
+const built = { day: isoDay.format(now), text: longDate.format(now) };
+const asOf = {
+  companies: { day: edition.published, text: longDate.format(published) },
+  events: built,
+  resources: built,
+};
+const hrefs = {
+  companies: regionFilterHref("/leaderboard/", region.id),
+  events: `${WAYS_IN.events}?region=${encodeURIComponent(region.id)}`,
+  resources: regionFilterHref("/ecosystem-canvas/", region.id),
+};
+
+/** Events kept in the HTML behind the first, for prune.ts to move along. */
+const KEEP = 6;
+const upcoming = upcomingEvents(SNAPSHOT, now)
+  .filter((e) => placeRegion(e.location, regions) === region.id)
+  .slice(0, KEEP);
+
+const positions = (await getCollection("positions")).map((e) => e.data);
+const people = (await getCollection("people")).map((e) => e.data);
+const { position } = organizerFor(region.id, positions, people);
+const seatOpen = position.status === "open";
+// A seat that takes applications has its own page; otherwise the seat's card on this page.
+const seatHref = takesApplications(position) ? seatPagePath(position.id) : "#organizer";
+---
+
+<div class="here">
+  <h2 id="where">What's here</h2>
+  <ul class="here__counts" role="list" data-region-counts data-as-of={now.toISOString()}>
+    {
+      COUNT_LABELS.map(([key, label]) => (
+        <li data-count={key}>
+          <a href={hrefs[key]}>
+            <span class="here__n">{counts[key]}</span>
+            <span class="here__label">{label}</span>
+          </a>
+          <span class="here__as-of">
+            As of <time datetime={asOf[key].day}>{asOf[key].text}</time>
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h3>Core cities</h3>
+  <ul class="cities" role="list">
+    {region.cities.map((city) => <li class="hall-badge">{city}</li>)}
+  </ul>
+
+  {
+    upcoming.length > 0 && (
+      <div class="here__next" data-region-next data-count="1">
+        <h3 id="next-event">Next event</h3>
+        <ol class="here__events" role="list">
+          {upcoming.map((e, i) => {
+            const when = whenText(e);
+            return (
+              <li data-ends={new Date(endsAt(e)).toISOString()} hidden={i >= 1}>
+                {e.url ? (
+                  <a href={e.url} rel="nofollow noopener">
+                    {e.title}
+                  </a>
+                ) : (
+                  <span class="here__event-title">{e.title}</span>
+                )}
+                <span class="here__meta">
+                  <time datetime={e.start}>{when.day}</time>, {when.time}
+                  {e.location && <>, {cardPlace(e.location)}</>}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+        <p class="here__meta" data-events-empty hidden>
+          None listed now.
+        </p>
+      </div>
+    )
+  }
+
+  {
+    seatOpen && (
+      <>
+        <h3>Open seat</h3>
+        <p class="here__seat">
+          <a href={seatHref} data-open-seat>
+            {position.title}
+          </a>
+        </p>
+      </>
+    )
+  }
+
+  {
+    region.nearby.length > 0 && (
+      <>
+        <h3>Nearby towns</h3>
+        <p class="nearby">{andList(region.nearby)}</p>
+      </>
+    )
+  }
+  <h3>Size</h3>
+  <RegionSize region={region.id} />
+</div>
+
+<script>
+  // The build lists every upcoming event here; on the visitor's clock, drop
+  // those that ended and show the next one (prune.ts, as NextEvents does).
+  import { showNext } from "../../events/prune";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-region-next]")) {
+    showNext(root, Date.now(), Number(root.dataset.count));
+  }
+</script>
+
+<style>
+  .here h2 {
+    margin: 0 0 var(--s-3);
+  }
+  .here h3 {
+    font-size: var(--t-step-0);
+    margin: var(--s-5) 0 var(--s-2);
+  }
+  /* A list gets the reading measure by default (global.css); these are rows. */
+  .here__counts,
+  .cities,
+  .here__events {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .here__counts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+  .here__counts li {
+    display: grid;
+    align-content: start;
+    gap: var(--s-1);
+    padding: var(--s-3);
+    border-left: var(--line-bold) solid var(--region-color);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+  }
+  .here__counts a {
+    display: grid;
+    min-height: var(--size-tap);
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .here__counts a:hover .here__label,
+  .here__counts a:focus-visible .here__label {
+    text-decoration: underline;
+    text-decoration-thickness: var(--line-edge);
+  }
+  .here__n {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-2);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .here__label {
+    color: var(--c-link);
+    font-size: var(--t-step--1);
+    font-weight: 700;
+    line-height: 1.25;
+    text-decoration: underline;
+  }
+  .here__as-of,
+  .here__meta,
+  .nearby {
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+  }
+  .cities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  .here__events li {
+    display: grid;
+    gap: var(--s-1);
+  }
+  .here__events li[hidden] {
+    display: none;
+  }
+  .here__events a,
+  .here__seat a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    font-weight: 700;
+  }
+  .here__seat,
+  .nearby,
+  .here__next p {
+    margin: 0;
+  }
+  /* A phone: one count a row, the number beside its label. 30rem is 480 px. */
+  @media (max-width: 30rem) {
+    .here__counts {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s-2);
+    }
+    .here__counts a {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: var(--s-3);
+    }
+  }
+</style>
