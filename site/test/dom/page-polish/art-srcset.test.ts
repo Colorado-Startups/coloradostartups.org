@@ -37,7 +37,8 @@ describe("art srcsets", () => {
     expect(seen).toBeGreaterThan(0);
   });
 
-  it("reach the source width on the home hero, for 2x screens", () => {
+  // Golden's painting left home's hero for the Keepers band on 2026-11-16.
+  it("reach the source width on home's painting, for 2x screens", () => {
     const img = doc("index.html").querySelector('[data-art="brand/golden"] img')!;
     expect(img).not.toBeNull();
     expect(Math.max(...srcsetWidths(img))).toBe(Number(img.getAttribute("width")));

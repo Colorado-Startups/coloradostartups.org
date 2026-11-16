@@ -130,9 +130,12 @@ describe("home budget", () => {
     for (const s of stats) expect(text(s.querySelector(".stat__source")).length, text(s)).toBeGreaterThan(0);
   });
 
-  it("keeps the bands in the order they had before the split into sections", () => {
+  // The map band moved up to follow the hero on 2026-11-16 (Paul: "The
+  // homepage should lead with the Colorado map too"); the rest keep the order
+  // they had before the split into sections.
+  it("keeps the bands in order, the map's band right after the hero", () => {
     const outline = [...main.querySelectorAll("h1, h2")].map((h) => `${h.tagName} ${text(h)}`);
-    expect(outline).toEqual(["H1 Colorado Startups", "H2 This week", "H2 Three regions along the Front Range", "H2 Why Colorado", "H2 Pick your door", "H2 Explore", "H2 Ask"]);
+    expect(outline).toEqual(["H1 Colorado Startups", "H2 Three regions along the Front Range", "H2 This week", "H2 Why Colorado", "H2 Pick your door", "H2 Explore", "H2 Ask"]);
     expect(main.lastElementChild?.matches("section.keepers"), "the keepers last").toBe(true);
   });
 });
