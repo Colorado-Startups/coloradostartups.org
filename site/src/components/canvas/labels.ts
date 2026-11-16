@@ -2,6 +2,8 @@
 // from @cs/shared; only their display text lives here.
 import type { ResourceCard, Stage } from "@cs/shared";
 
+import type { PickReason } from "./top-picks";
+
 export const STAGE_LABELS: Record<Stage, string> = {
   idea: "Idea",
   launch: "Launch",
@@ -48,4 +50,19 @@ export function cityLabel(city: string): string {
   if (city === "statewide") return "Statewide";
   if (city === "online") return "Online";
   return city;
+}
+
+// Plain words for why topPicks() chose a card (top-picks.ts). They name the
+// rule that placed it, never its quality: the page must not read as a vendor
+// directory, so no label ranks or endorses.
+export const PICK_REASON_LABELS: Record<PickReason, string> = {
+  "your-region": "In your region",
+  statewide: "Serves all of Colorado",
+  "first-need": "A first need at this stage",
+  spread: "Adds another kind of help",
+};
+
+/** "Show all 501 resources", the control that opens the full list. */
+export function showAllText(n: number): string {
+  return `Show all ${n} ${n === 1 ? "resource" : "resources"}`;
 }
