@@ -232,9 +232,7 @@ describe("coloradoMapSvg", () => {
   });
 
   it("draws in the region tokens, never a hex", () => {
-    expect(svg).toMatch(/var\(--c-accent-deep\)/);
-    expect(svg).toMatch(/var\(--c-community\)/);
-    expect(svg).toMatch(/var\(--c-fire\)/);
+    for (const id of REGION_IDS) expect(svg, id).toContain(`var(--c-region-${id})`);
     expect(svg).not.toMatch(/#[0-9a-fA-F]{6}\b/);
   });
 });

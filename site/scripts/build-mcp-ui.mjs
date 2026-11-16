@@ -24,8 +24,24 @@ const read = (path) => readFileSync(resolve(root, path), "utf8");
 /** The cap on one card's HTML, in bytes. test/unit/mcp/ui.test.ts checks it too. */
 export const MAX_HTML_BYTES = 40 * 1024;
 
+// The regions a region card's map can fill, each with its brand fill token
+// (brand v4.4.0): region-<id> in brand_tokens.yaml.
+export const REGION_FILLS = ["photon-mountain", "space-peak", "fusion-canyon"];
 // The token roles the cards use, by their name in brand_tokens.yaml.
-export const COLOR_ROLES = ["ground", "surface", "surface-2", "rule", "border", "text", "text-dim", "accent", "on-accent", "link", "focus"];
+export const COLOR_ROLES = [
+  "ground",
+  "surface",
+  "surface-2",
+  "rule",
+  "border",
+  "text",
+  "text-dim",
+  "accent",
+  "on-accent",
+  "link",
+  "focus",
+  ...REGION_FILLS.map((id) => `region-${id}`),
+];
 export const SPACE_STEPS = ["1", "2", "3", "4", "5"];
 export const RADII = ["chisel", "card"];
 
@@ -91,7 +107,9 @@ const CARD_CSS = [
   `.map svg{display:block;width:100%;max-width:${MAP_MAX_PX}px;height:auto;background:var(--c-surface);border:1px solid var(--c-rule);border-radius:var(--r-card)}`,
   `.map .st{fill:var(--c-ground);stroke:var(--c-border);stroke-width:2}`,
   `.map .zo{fill:var(--c-text-dim);stroke:none}`,
-  `.map .zf{fill:var(--c-accent);stroke:var(--c-text);stroke-width:3;stroke-linejoin:round}`,
+  // The region in its own fill, a shape, with its name in the card's heading and caption.
+  `.map .zf{stroke:var(--c-text);stroke-width:3;stroke-linejoin:round}`,
+  ...REGION_FILLS.map((id) => `.map .zf--${id}{fill:var(--c-region-${id})}`),
   `.map .lc{fill:none;stroke:var(--c-text);stroke-width:6}`,
   `.map .cy{fill:var(--c-text);stroke:var(--c-ground);stroke-width:3}`,
   `.map text{font:600 ${LABEL_PX}px system-ui,sans-serif;fill:var(--c-text);stroke:var(--c-ground);stroke-width:5px;paint-order:stroke;stroke-linejoin:round}`,
@@ -162,14 +180,17 @@ const INSET_SCALE = 0.22;
 const overlaps = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 
 /**
- * One region's map: its loop, filled Yellow, and its cities, in the region's
- * own frame; a locator of the whole state in the corner the drawing leaves
- * most open, with the three regions at their true size and this one ringed.
+ * One region's map: its loop, filled in its region color, and its cities, in
+ * the region's own frame; a locator of the whole state in the corner the
+ * drawing leaves most open, with the three regions at their true size and
+ * this one ringed.
  */
 export function regionMapSvg(id, views, zones, outline) {
   const frame = views[`zone-${id}`];
   const zone = zones.features.find((z) => z.id === id);
   if (!frame || !zone) throw new Error(`data/geo has no frame or zone for ${id}`);
+  if (!REGION_FILLS.includes(id)) throw new Error(`no region fill for ${id}: add it to REGION_FILLS`);
+  const filled = `zf zf--${id}`;
   const { width: W, height: H } = frame;
   const ring = simplify(zone.geometry.coordinates[0].map((p) => toPx(frame, p)), 1);
   const cities = zone.properties.cityPoints.map((c) => ({ name: c.name, at: toPx(frame, [c.lon, c.lat]) }));
@@ -205,11 +226,11 @@ export function regionMapSvg(id, views, zones, outline) {
     labels.push(`<text x="${r0(fit.x)}" y="${r0(fit.y)}" text-anchor="${fit.anchor}">${escXml(name)}</text>`);
   }
 
-  // The locator: the state, the other two regions in grey, this one Yellow and ringed.
+  // The locator: the state, the other two regions in grey, this one in its color and ringed.
   const statePath = pathOf(outline.features[0].geometry.coordinates[0].map((p) => toPx(state, p)));
   const zonePaths = zones.features.map((z) => {
     const p = simplify(z.geometry.coordinates[0].map((q) => toPx(state, q)), 0.5);
-    return `<path class="${z.id === id ? "zf" : "zo"}" d="${pathOf(p)}"/>`;
+    return `<path class="${z.id === id ? filled : "zo"}" d="${pathOf(p)}"/>`;
   });
   const [cx, cy] = toPx(state, [
     zone.properties.cityPoints.reduce((s, c) => s + c.lon, 0) / zone.properties.cityPoints.length,
@@ -219,7 +240,7 @@ export function regionMapSvg(id, views, zones, outline) {
   const name = zone.properties.name;
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of ${escXml(name)}: ${escXml(zone.properties.cities.join(", "))}">`,
-    `<path class="zf" d="${pathOf(ring)}"/>`,
+    `<path class="${filled}" d="${pathOf(ring)}"/>`,
     ...cities.map(({ at: [x, y] }) => `<circle class="cy" cx="${r0(x)}" cy="${r0(y)}" r="7"/>`),
     ...labels,
     `<g transform="translate(${r0(ix)} ${r0(iy)}) scale(${INSET_SCALE})">`,

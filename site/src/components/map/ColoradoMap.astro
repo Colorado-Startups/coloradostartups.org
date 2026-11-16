@@ -279,11 +279,13 @@ const hits = zone
   }
 
   /* A zone as the entrance to its region: a ring in its color marks it, and
-     interest lifts it and makes it glow. Tap counts too (:active). */
+     interest lifts it and makes it glow. Tap counts too (:active). The ring is
+     the region's token at full strength, which meets 3:1 on the light grounds
+     (brand_tokens.yaml), and the zone's name is drawn beside it. */
   .colorado-map__hit--zone {
     z-index: 1;
     box-shadow:
-      0 0 0 var(--line-edge) color-mix(in oklab, var(--region-color) 70%, transparent),
+      0 0 0 var(--line-edge) var(--region-color),
       inset 0 0 0 var(--line-edge) color-mix(in oklab, var(--c-ground) 60%, transparent);
   }
   .colorado-map__hit--zone:is(:hover, :focus-visible, :active) {

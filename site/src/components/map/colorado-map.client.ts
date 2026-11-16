@@ -12,7 +12,7 @@
 //   style, and `style.load` re-adds the relief and the zones, which setStyle wipes.
 // - cooperativeGestures: the page scrolls past the map; a pinch or a held
 //   key zooms it. Zoom buttons cover single-pointer use (WCAG 2.5.1).
-// - Zone colors are read off the site's tokens, so they follow the theme. Each
+// - Zone colors are the region tokens, read off the page, so they follow the theme. Each
 //   zone line is three strokes, as in the drawing: a glow, a dark casing, the line.
 // - A figure with data-zone (ColoradoMap's `zone`) fits that zone's bounds and
 //   dims the other two. The basemap names its towns, and the zone fills the
@@ -21,6 +21,7 @@ import type { RegionId } from "@cs/shared";
 import type { ExpressionSpecification, GeoJSONSourceSpecification, Map as MlMap, RasterDEMSourceSpecification } from "maplibre-gl";
 
 import { COLORADO, COLORADO_BOUNDS, DIM, ZONES, zoneBounds, zoneLabelPoint } from "../../lib/regions/colorado-geo";
+import { REGION_TOKENS } from "../../lib/regions/map";
 
 const STYLES = {
   light: "https://tiles.openfreemap.org/styles/positron",
@@ -36,13 +37,6 @@ const TERRAIN: RasterDEMSourceSpecification = {
   maxzoom: 14,
   attribution: '<a href="https://mapterhorn.com/attribution">© Mapterhorn</a>',
 };
-
-// REGION_COLORS (lib/regions/map.ts) as token names, so the live map and the drawing agree.
-const ZONE_TOKEN = {
-  "photon-mountain": "--c-accent-deep",
-  "space-peak": "--c-community",
-  "fusion-canyon": "--c-fire",
-} as const;
 
 function scheme(): keyof typeof STYLES {
   const forced = document.documentElement.dataset.theme;
@@ -67,7 +61,8 @@ function addOverlay(map: MlMap, zone: RegionId | undefined) {
   const below = firstSymbolId(map);
   const zones = {
     type: "FeatureCollection" as const,
-    features: ZONES.features.map((z) => ({ ...z, properties: { id: z.id, color: token(ZONE_TOKEN[z.id]) } })),
+    // The same region tokens the drawing paints (REGION_TOKENS), read in the current theme.
+    features: ZONES.features.map((z) => ({ ...z, properties: { id: z.id, color: token(REGION_TOKENS[z.id]) } })),
   };
   const cities = {
     type: "FeatureCollection" as const,
