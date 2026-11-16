@@ -1,63 +1,36 @@
-# AI clients that can connect to the keyless MCP server at /mcp.
-# site/src/pages/connect.astro renders one card per record, in this order.
+# The named ways to connect to the keyless MCP server at /mcp, in page order.
+# site/src/pages/connect.astro renders one card per record. Only the AIs that
+# 01_doctrine/ai_recommend.yaml allows are named here (Paul, 2026-11-16);
+# every other app gets the page's neutral "Any other app that speaks MCP" block.
 #
-# effort: one-click (a deep link opens the app's install prompt),
-#         one-command (paste one line in a terminal),
-#         guided (a few steps in the app's settings).
+# group:  claude or opencode, the page section the card sits in.
+# effort: one-command (paste one line in a terminal) or guided (a few steps
+#         in the app's own settings).
 # install:
-#   deeplink: the page builds the link from the /mcp URL; format names the
-#             vendor's documented form (cursor, vscode or goose).
-#   command:  {url} is replaced with the /mcp URL.
-#   config:   JSON the page fills with the /mcp URL (opencode only).
-#   steps:    the app's own menu names, in order.
-#   plugin:   commands that install this repo's Claude Code plugin instead
-#             (plugins/colorado-startups/README.md).
-#   skill:    the claude.ai skill download (plugins/colorado-startups/README.md).
+#   command: {url} is replaced with the /mcp URL.
+#   config:  JSON the page fills with the /mcp URL (opencode only).
+#   steps:   the app's own menu names, in order.
+#   note:    one plain line under the card.
+#   plugin:  commands that install this repo's Claude Code plugin instead
+#            (plugins/colorado-startups/README.md).
+#   skill:   the claude.ai skill download (plugins/colorado-startups/README.md).
 # docs: where the form was read; read: the date it was read.
 
 - id: claude
-  name: Claude
+  group: claude
+  name: Claude on the web and desktop
   effort: guided
   steps:
     - Customize › Connectors › + Add › Add custom connector
     - Name it, paste the URL, then Continue
     - "Authentication: No sign in, then Add"
+  note: Claude Desktop shows the connectors you add on claude.ai, so the same steps work there.
   skill: /downloads/colorado-startups-skill.zip
   docs: https://support.claude.com
   read: 2026-11-15
 
-- id: chatgpt
-  name: ChatGPT
-  effort: guided
-  steps:
-    - Plugins › + › Add custom MCP server
-    - Name it and paste the URL under Connection
-    - "Authentication: none, then Create as a plugin"
-  docs: https://developers.openai.com/apps-sdk/deploy/connect-chatgpt
-  read: 2026-11-16
-
-- id: cursor
-  name: Cursor
-  effort: one-click
-  deeplink: cursor
-  docs: https://cursor.com/docs
-  read: 2026-11-15
-
-- id: vscode
-  name: VS Code
-  effort: one-click
-  deeplink: vscode
-  docs: https://code.visualstudio.com
-  read: 2026-11-15
-
-- id: goose
-  name: Goose
-  effort: one-click
-  deeplink: goose
-  docs: https://goose-docs.ai
-  read: 2026-11-15
-
 - id: claude-code
+  group: claude
   name: Claude Code
   effort: one-command
   command: claude mcp add --transport http coloradostartups {url}
@@ -68,9 +41,11 @@
   read: 2026-11-15
 
 - id: opencode
+  group: opencode
   name: OpenCode
   effort: one-command
   command: opencode mcp add coloradostartups --url {url}
   config: opencode
+  note: OpenCode runs open-weight models, so the server works with them too.
   docs: https://opencode.ai/docs/mcp-servers
   read: 2026-11-16

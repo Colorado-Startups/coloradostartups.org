@@ -1,61 +1,45 @@
 // Step A1a over the built site (run `npm run build` first; test:content does):
-// /connect/ shows one card per AI client in data/ai-clients.yaml, 7 in all
-// (3 one click, 2 one command, 2 guided), the /mcp URL, and 5 things to ask.
-// Each deep link decodes to the vendor's documented form, pointing at /mcp.
-// Claude Code also offers the repo's plugin, Claude the skill download, and
-// each ask opens in Claude or ChatGPT with the shared Ask-your-AI prompt.
+// /connect/ names only Claude and OpenCode (Paul, 2026-11-16,
+// 01_doctrine/ai_recommend.yaml), then one neutral block for any other app
+// that speaks MCP, then 5 asks in the shared Ask-your-AI row. The page's tool
+// and prompt counts are read from worker/mcp/server.ts, so they cannot drift.
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
-import { readDist } from "./pages";
+import { readDist, SITE_DIR } from "./pages";
 
 const page = new DOMParser().parseFromString(readDist("connect/index.html"), "text/html");
 const MCP_URL = "https://coloradostartups.org/mcp";
 const cards = [...page.querySelectorAll<HTMLElement>("[data-client]")];
 const card = (id: string) => page.querySelector<HTMLElement>(`[data-client="${id}"]`)!;
-const href = (id: string) => card(id).querySelector("a")!.getAttribute("href")!;
+const server = readFileSync(path.join(SITE_DIR, "worker", "mcp", "server.ts"), "utf8");
+const count = (re: RegExp) => (server.match(re) ?? []).length;
+const fact = (name: string) =>
+  [...page.querySelectorAll("[data-facts] > div")].find((d) => d.querySelector("dt")?.textContent === name)?.querySelector("dd")
+    ?.textContent;
 
 describe("/connect/", () => {
-  it("has 7 client cards: 3 one click, 2 one command, 2 guided", () => {
-    expect(cards.map((c) => c.dataset.client)).toEqual([
+  it("names Claude, Claude Code and OpenCode, in that order, in two groups", () => {
+    expect(cards.map((c) => c.dataset.client)).toEqual(["claude", "claude-code", "opencode"]);
+    expect([...page.querySelectorAll<HTMLElement>("[data-group]")].map((g) => g.dataset.group)).toEqual([
       "claude",
-      "chatgpt",
-      "cursor",
-      "vscode",
-      "goose",
-      "claude-code",
       "opencode",
     ]);
-    const effort = (e: string) => cards.filter((c) => c.dataset.effort === e).length;
-    expect([effort("one-click"), effort("one-command"), effort("guided")]).toEqual([3, 2, 2]);
+  });
+
+  it("pins its tool and prompt counts to the server", () => {
+    expect(fact("Tools")).toBe(String(count(/server\.registerTool\(/g)));
+    expect(fact("Prompts")).toBe(String(count(/server\.registerPrompt\(/g)));
+    expect(fact("Key or sign in")).toBe("None");
   });
 
   it("shows the /mcp URL with a copy button", () => {
     expect(page.querySelector("[data-mcp-url]")?.textContent).toBe(MCP_URL);
     expect(page.querySelector('button[data-copy="mcp-url"]')).not.toBeNull();
-  });
-
-  it("builds each deep link in the vendor's form", () => {
-    const cursor = new URL(href("cursor"));
-    expect(cursor.protocol + "//" + cursor.host + cursor.pathname).toBe("cursor://anysphere.cursor-deeplink/mcp/install");
-    expect(cursor.searchParams.get("name")).toBe("coloradostartups");
-    expect(JSON.parse(atob(cursor.searchParams.get("config")!))).toEqual({ url: MCP_URL });
-
-    const vscode = href("vscode");
-    expect(vscode.startsWith("vscode:mcp/install?")).toBe(true);
-    expect(JSON.parse(decodeURIComponent(vscode.slice("vscode:mcp/install?".length)))).toEqual({
-      name: "coloradostartups",
-      type: "http",
-      url: MCP_URL,
-    });
-
-    const goose = new URL(href("goose"));
-    expect(goose.protocol).toBe("goose:");
-    expect(Object.fromEntries(goose.searchParams)).toEqual({
-      url: MCP_URL,
-      type: "streamable_http",
-      id: "coloradostartups",
-      name: "Colorado Startups",
-    });
+    expect(page.body.textContent).toContain("io.github.Colorado-Startups/coloradostartups");
+    expect(page.body.textContent).toContain("in apps that support MCP Apps");
   });
 
   it("gives Claude Code and OpenCode one command each, and OpenCode's config turns OAuth off", () => {
@@ -65,29 +49,41 @@ describe("/connect/", () => {
     expect(page.getElementById("cmd-opencode")?.textContent).toBe(`opencode mcp add coloradostartups --url ${MCP_URL}`);
     const config = JSON.parse(page.getElementById("cfg-opencode")!.textContent!);
     expect(config.mcp.servers.coloradostartups).toEqual({ type: "remote", url: MCP_URL, oauth: false });
+    expect(card("opencode").textContent).toContain("open-weight models");
   });
 
-  it("offers the Claude Code plugin and the claude.ai skill", () => {
+  it("gives claude.ai steps with no sign in, the skill and the Claude Code plugin", () => {
+    expect(card("claude").textContent).toContain("No sign in");
+    expect(card("claude").querySelectorAll("ol li").length).toBeGreaterThan(0);
+    expect(card("claude").querySelector('a[href="/downloads/colorado-startups-skill.zip"]')).not.toBeNull();
     expect(page.getElementById("plugin-claude-code")?.textContent).toBe(
       "claude plugin marketplace add Colorado-Startups/coloradostartups.org\n" +
         "claude plugin install colorado-startups@colorado-startups",
     );
-    expect(card("claude").querySelector('a[href="/downloads/colorado-startups-skill.zip"]')).not.toBeNull();
   });
 
-  it("gives Claude and ChatGPT guided steps with no sign in", () => {
-    expect(card("claude").textContent).toContain("No sign in");
-    expect(card("chatgpt").textContent).toContain("Add custom MCP server");
-    for (const id of ["claude", "chatgpt"]) expect(card(id).querySelectorAll("ol li").length).toBeGreaterThan(0);
+  it("has one neutral block for any other MCP app, with the URL and a copy button", () => {
+    const any = page.querySelector<HTMLElement>("[data-any-mcp]")!;
+    expect(any.querySelector("h2")?.textContent).toBe("Any other app that speaks MCP");
+    expect(any.querySelector("code")?.textContent).toBe(MCP_URL);
+    expect(any.querySelector("button[data-copy]")).not.toBeNull();
+    expect(any.textContent).toContain("no key and no sign in");
+    expect(any.textContent).toContain("streamable HTTP");
+    // It names no product: no links out, and only the generic words.
+    expect(any.querySelectorAll("a")).toHaveLength(0);
   });
 
-  it("lists 5 things to ask, each opening in Claude and ChatGPT with the /mcp prompt", () => {
-    const asks = [...page.querySelectorAll("[data-asks] li")];
+  it("lists 5 asks, each a shared row with Copy prompt and Open in Claude only", () => {
+    const asks = [...page.querySelectorAll("[data-asks] > li")];
     expect(asks).toHaveLength(5);
     for (const ask of asks) {
-      const links = [...ask.querySelectorAll("a")].map((a) => a.getAttribute("href")!);
-      expect(links.map((h) => h.split("?")[0])).toEqual(["https://claude.ai/new", "https://chatgpt.com/"]);
-      for (const h of links) expect(new URL(h).searchParams.get("q")).toContain(MCP_URL);
+      const row = ask.querySelector("[data-ask-ai]")!;
+      const actions = [...row.querySelectorAll(".btn-row > button, .btn-row > a")].map((a) => a.textContent?.trim());
+      expect(actions).toEqual(["Copy prompt", "Open in Claude"]);
+      const link = row.querySelector("a")!.getAttribute("href")!;
+      expect(link.startsWith("https://claude.ai/new?q=")).toBe(true);
+      expect(new URL(link).searchParams.get("q")).toContain(MCP_URL);
+      expect(row.querySelector("textarea")?.textContent).toContain(row.querySelector("h3")!.textContent!);
     }
   });
 

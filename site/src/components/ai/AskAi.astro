@@ -18,18 +18,29 @@ interface Props {
   question?: string;
   /** The heading's id, unique on the page. */
   id?: string;
+  /**
+   * A short row for a list of example asks (/connect/): the question is the
+   * h3 heading, and the intro line and long note become one short note.
+   */
+  compact?: boolean;
 }
 
-const { subject, path, question, id = "ask-ai" } = Astro.props;
+const { subject, path, question, id = "ask-ai", compact = false } = Astro.props;
 const { prompt, claude } = askAiLinks({ subject, path, question });
 const field = `${id}-prompt`;
+const COMPACT_NOTE = "In OpenCode or an open-weight model, paste the copied prompt.";
+const NOTE = `Open in Claude fills the prompt in a new tab. ${COMPACT_NOTE}`;
 ---
 
-<div class="ask-ai" data-ask-ai>
-  <h2 id={id}>Ask your AI about this page</h2>
-  <p>
-    The prompt tells your AI to look things up on our public MCP server, so its answer uses this site's listings.
-  </p>
+<div class:list={["ask-ai", compact && "ask-ai--compact"]} data-ask-ai>
+  {compact ? <h3 id={id}>{question}</h3> : <h2 id={id}>Ask your AI about this page</h2>}
+  {
+    !compact && (
+      <p>
+        The prompt tells your AI to look things up on our public MCP server, so its answer uses this site's listings.
+      </p>
+    )
+  }
   <div class="btn-row">
     <button type="button" class="btn btn--gold" data-ask-copy hidden>Copy prompt</button>
     <a class="btn btn--stone" href={claude} data-ask-claude target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
@@ -38,7 +49,7 @@ const field = `${id}-prompt`;
   </div>
   <p class="meta" role="status" data-ask-status></p>
   <p class="meta" id={`${id}-note`}>
-    Open in Claude fills the prompt in a new tab. In OpenCode or an open-weight model, paste the copied prompt.
+    {compact ? COMPACT_NOTE : NOTE}
   </p>
   <details data-ask-details>
     <summary>See the prompt</summary>
@@ -56,7 +67,8 @@ const field = `${id}-prompt`;
 </script>
 
 <style>
-  .ask-ai h2 {
+  .ask-ai h2,
+  .ask-ai h3 {
     margin-top: 0;
   }
   .ask-ai .meta {

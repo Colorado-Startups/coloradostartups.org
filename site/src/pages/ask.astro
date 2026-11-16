@@ -3,8 +3,8 @@
 // searches every page, filtered by the type each page tags (type:Resources,
 // Companies, Guides, Events). Then the Resourcus box, then a link to
 // /connect/, which connects an AI client to the keyless /mcp server
-// (worker/mcp/). #connect stays: the worker sends a browser that opens /mcp
-// here. Pagefind indexes dist/ after the build, so the search is empty in
+// (worker/mcp/). #connect stays for old links; the worker now sends a browser
+// that opens /mcp to /connect/. Pagefind indexes dist/ after the build, so the search is empty in
 // `astro dev`.
 import ResourcusPanel from "../components/resourcus/ResourcusPanel.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -40,7 +40,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <section class="section section--lit" id="connect" aria-labelledby="connect-title" data-pagefind-ignore>
     <div class="wrap stack">
       <h2 id="connect-title">Connect your AI</h2>
-      <p>Seven AI apps, free, no key. <a href="/connect/">See how to connect yours</a>.</p>
+      <p>Claude, OpenCode or any MCP app. Free, no key. <a href="/connect/">See how to connect yours</a>.</p>
     </div>
   </section>
 </BaseLayout>

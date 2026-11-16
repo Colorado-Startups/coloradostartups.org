@@ -14,7 +14,7 @@ import { mcpHandler } from "./server";
 export const MCP_PATH = "/mcp";
 
 /** Where a person who opens /mcp in a browser lands: the connect steps. */
-const MCP_HUMAN_PAGE = "/ask/#connect";
+const MCP_HUMAN_PAGE = "/connect/";
 
 export async function handleMcp(request: Request, env: Env): Promise<Response> {
   const accept = request.headers.get("Accept") ?? "";
