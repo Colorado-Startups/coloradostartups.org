@@ -1,5 +1,5 @@
-// L29g: the Worker's weekly scheduled() handler runs all four retention jobs,
-// each logs a count only, and one failing job never stops the other three.
+// L29g: the Worker's weekly scheduled() handler runs all five retention jobs,
+// each logs a count only, and one failing job never stops the others.
 // Real D1 with every migration applied; a failure is simulated by a DB wrapper
 // that refuses statements for one table. Fixtures use example.org only.
 import { createExecutionContext, createScheduledController, waitOnExecutionContext } from "cloudflare:test";
@@ -90,6 +90,19 @@ const JOBS: Job[] = [
     done: async () => (await count("SELECT COUNT(*) AS n FROM csp_reports WHERE signature = 'old'")) === 0,
     kept: async () => (await count("SELECT COUNT(*) AS n FROM csp_reports WHERE signature = 'recent'")) === 1,
   },
+  {
+    name: "slack_join_requests purge",
+    table: "slack_join_requests",
+    log: /^slack_join_requests purge: \d+ deleted$/,
+    seed: () =>
+      env.DB.prepare(
+        "INSERT INTO slack_join_requests (created_at, first_name, last_name, email, linkedin, based, describes) VALUES (?, 'Old', 'Requester', 'sweep@example.org', 'https://www.linkedin.com/in/sweep', 'other', 'other'), (?, 'Recent', 'Requester', 'sweep@example.org', 'https://www.linkedin.com/in/sweep', 'other', 'other')",
+      )
+        .bind(OLD, RECENT)
+        .run(),
+    done: async () => (await count("SELECT COUNT(*) AS n FROM slack_join_requests WHERE first_name = 'Old'")) === 0,
+    kept: async () => (await count("SELECT COUNT(*) AS n FROM slack_join_requests WHERE first_name = 'Recent'")) === 1,
+  },
 ];
 
 /** env.DB, except that any statement naming `table` throws, the way a D1 outage would. */
@@ -114,7 +127,7 @@ const lines = (spy: { mock: { calls: unknown[][] } }) => spy.mock.calls.map((arg
 
 describe("the weekly scheduled() handler", () => {
   beforeEach(async () => {
-    for (const table of ["ask_logs", "ask_sessions", "applications", "nominations", "csp_reports"]) {
+    for (const table of ["ask_logs", "ask_sessions", "applications", "nominations", "csp_reports", "slack_join_requests"]) {
       await env.DB.prepare(`DELETE FROM ${table}`).run();
     }
     for (const job of JOBS) await job.seed();
@@ -124,7 +137,7 @@ describe("the weekly scheduled() handler", () => {
     vi.restoreAllMocks();
   });
 
-  it("runs all four jobs: each clears its old rows and keeps its recent ones", async () => {
+  it("runs all five jobs: each clears its old rows and keeps its recent ones", async () => {
     await runScheduled();
     for (const job of JOBS) {
       expect(await job.done(), `${job.name} cleared old rows`).toBe(true);
