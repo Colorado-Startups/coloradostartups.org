@@ -36,7 +36,9 @@
 // the page lists the same counts beside the map, so it adds nothing a phone,
 // a pointer or a screen reader would miss. A page that passes `zones` sets
 // data-dismissed on the figure to close the card with Escape
-// (home/sections/Where.astro).
+// (home/sections/Where.astro). Home's statewide map is also its first-screen
+// image, so it passes `priority` too (Paul, 2026-11-16: "The homepage should
+// lead with the Colorado map too").
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
 

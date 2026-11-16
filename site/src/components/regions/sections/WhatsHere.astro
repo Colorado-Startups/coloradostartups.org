@@ -5,37 +5,32 @@
 //               and dated: Leaderboard companies as of the edition's date,
 //               events and Startup Resources as of the build, in Denver time;
 //   core cities the region's YAML, as chips;
-//   next event  the soonest event placed here (placeRegion, as the events
-//               count places them), pruned on the visitor's clock as
-//               NextEvents does (prune.ts); left out when none is listed;
 //   open seat   the organizer seat, only while it is open;
 //   nearby      the towns around the core cities, and the region's size.
+// The next events are the This week band's, right after this section (step
+// P2b), so this panel does not name one too.
 // Regions are equals: nothing here compares this region with another.
 // The painting's hotspot cards (hotspots.ts) reach the same lists in their
 // own words, further down the page. Owner: L8.
 import { WAYS_IN, type Region } from "@cs/shared";
 import { getCollection } from "astro:content";
 
-import { cardPlace, endsAt, SNAPSHOT, upcomingEvents, whenText } from "../../events/events";
 import { filterQuery, NEXT_7_DAYS } from "../../events/list-filter";
 import { CALENDAR_TIMEZONE } from "../../info/links";
 import { COUNT_LABELS, zoneCounts } from "../../map/zone-counts";
 import { takesApplications } from "../../positions/positions";
-import { placeRegion } from "../../../lib/data/open-data";
 import { latestEdition } from "../../../lib/leaderboard/board";
-import { REGIONS } from "../../../lib/regions/match";
 import { andList, organizerFor, regionFilterHref } from "../../../lib/regions/page";
 import { seatPagePath } from "../../../lib/seats/page";
 import RegionSize from "../RegionSize.astro";
 
 interface Props {
   region: Region;
-  /** The build's clock, for the counts and the next event. */
+  /** The build's clock, for the counts. */
   now?: Date;
 }
 
 const { region, now = new Date() } = Astro.props;
-const regions = [...REGIONS];
 
 const counts = (await zoneCounts(now)).find((z) => z.id === region.id);
 if (!counts) throw new Error(`no counts for region "${region.id}"`);
@@ -60,12 +55,6 @@ const hrefs = {
   events: `${WAYS_IN.events}${filterQuery({ region: region.id, when: NEXT_7_DAYS, type: "" })}#all-events`,
   resources: regionFilterHref("/ecosystem-canvas/", region.id),
 };
-
-/** Events kept in the HTML behind the first, for prune.ts to move along. */
-const KEEP = 6;
-const upcoming = upcomingEvents(SNAPSHOT, now)
-  .filter((e) => placeRegion(e.location, regions) === region.id)
-  .slice(0, KEEP);
 
 const positions = (await getCollection("positions")).map((e) => e.data);
 const people = (await getCollection("people")).map((e) => e.data);
@@ -99,37 +88,6 @@ const seatHref = takesApplications(position) ? seatPagePath(position.id) : "#org
   </ul>
 
   {
-    upcoming.length > 0 && (
-      <div class="here__next" data-region-next data-count="1">
-        <h3 id="next-event">Next event</h3>
-        <ol class="here__events" role="list">
-          {upcoming.map((e, i) => {
-            const when = whenText(e);
-            return (
-              <li data-ends={new Date(endsAt(e)).toISOString()} hidden={i >= 1}>
-                {e.url ? (
-                  <a href={e.url} rel="nofollow noopener">
-                    {e.title}
-                  </a>
-                ) : (
-                  <span class="here__event-title">{e.title}</span>
-                )}
-                <span class="here__meta">
-                  <time datetime={e.start}>{when.day}</time>, {when.time}
-                  {e.location && <>, {cardPlace(e.location)}</>}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-        <p class="here__meta" data-events-empty hidden>
-          None listed now.
-        </p>
-      </div>
-    )
-  }
-
-  {
     seatOpen && (
       <>
         <h3>Open seat</h3>
@@ -154,16 +112,6 @@ const seatHref = takesApplications(position) ? seatPagePath(position.id) : "#org
   <RegionSize region={region.id} />
 </div>
 
-<script>
-  // The build lists every upcoming event here; on the visitor's clock, drop
-  // those that ended and show the next one (prune.ts, as NextEvents does).
-  import { showNext } from "../../events/prune";
-
-  for (const root of document.querySelectorAll<HTMLElement>("[data-region-next]")) {
-    showNext(root, Date.now(), Number(root.dataset.count));
-  }
-</script>
-
 <style>
   .here h2 {
     margin: 0 0 var(--s-3);
@@ -174,8 +122,7 @@ const seatHref = takesApplications(position) ? seatPagePath(position.id) : "#org
   }
   /* A list gets the reading measure by default (global.css); these are rows. */
   .here__counts,
-  .cities,
-  .here__events {
+  .cities {
     max-width: none;
     margin: 0;
     padding: 0;
@@ -221,7 +168,6 @@ const seatHref = takesApplications(position) ? seatPagePath(position.id) : "#org
     text-decoration: underline;
   }
   .here__as-of,
-  .here__meta,
   .nearby {
     color: var(--c-text-dim);
     font-size: var(--t-step--1);
@@ -231,14 +177,6 @@ const seatHref = takesApplications(position) ? seatPagePath(position.id) : "#org
     flex-wrap: wrap;
     gap: var(--s-2);
   }
-  .here__events li {
-    display: grid;
-    gap: var(--s-1);
-  }
-  .here__events li[hidden] {
-    display: none;
-  }
-  .here__events a,
   .here__seat a {
     display: inline-flex;
     align-items: center;
@@ -246,8 +184,7 @@ const seatHref = takesApplications(position) ? seatPagePath(position.id) : "#org
     font-weight: 700;
   }
   .here__seat,
-  .nearby,
-  .here__next p {
+  .nearby {
     margin: 0;
   }
   /* A phone: one count a row, the number beside its label. 30rem is 480 px. */

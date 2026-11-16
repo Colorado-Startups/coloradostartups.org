@@ -1,22 +1,24 @@
 ---
 // Home. A first-time visitor's Colorado, in the order Paul set on 2026-11-15
-// and signed off as a mockup. Each band is one file in
-// components/home/sections/; the ones marked "slot" render nothing yet, and
-// the engagement plan step named in each file fills it.
+// and signed off as a mockup, with the map moved up to lead on 2026-11-16
+// (Paul: "The homepage should lead with the Colorado map too. Everything
+// leads with Colorado"). Each band is one file in components/home/sections/;
+// the ones marked "slot" render nothing yet, and the engagement plan step
+// named in each file fills it.
 //
 // | Band | File | Filled by |
 // | --- | --- | --- |
 // | Join | Hero | today |
+// | Where, the first screen's map | Where | today |
 // | Builders | Builders | P1 |
 // | Founder spotlights | Spotlights (slot) | P3b |
 // | This week | ThisWeek (components/events/ThisWeek.astro) | P2a |
-// | Where | Where | today |
 // | Why Colorado | Why | today |
 // | Pick your door | PickDoor | P4 |
 // | Explore | Explore | today |
 // | Ask | Ask | today |
 // | First steps | FirstSteps (slot) | W5 |
-// | Keepers | Keepers | today |
+// | Keepers, with Golden's painting as an accent | Keepers | today |
 //
 // At most 60 visible words a band and 450 a page, a source under every figure,
 // no member count, and 75 KB of gzipped JavaScript up front:
@@ -42,10 +44,10 @@ const description = `${DESCRIPTOR} Join the Slack and the LinkedIn Group, see Co
 
 <BaseLayout title="Colorado Startups" description={description} ogImage="home" jsonLd={homeJsonLd(site)}>
   <Hero />
+  <Where />
   <Builders />
   <Spotlights />
   <ThisWeek />
-  <Where />
   <Why />
   <PickDoor />
   <Explore />

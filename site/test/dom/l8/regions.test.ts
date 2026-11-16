@@ -1,21 +1,25 @@
 // L8 over the built site (run `npm run build` first; test:content does):
 // /regions/ shows the three zones on the live map, with chips and the theme
 // panels; each region page leads with the map zoomed to it and what is there
-// (step R1), then four sourced figures, its Connector seat, six resources and
-// six honorees that really belong to it, each with a "see all" link, and its
-// painting as an extra further down; Fusion Canyon's copy rule holds; and
+// (step R1), then four sourced figures, This week with the region's next
+// events and the weekly threads (step P2b), its Connector seat, six resources
+// and six honorees that really belong to it, each with a "see all" link, and
+// its painting as an extra further down; Fusion Canyon's copy rule holds; and
 // MapLibre stays out of every page's entry JavaScript.
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 
 import { REGION_IDS, regionLede, WAYS_IN } from "@cs/shared";
+import axe from "axe-core";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
-import { type CalendarEvent, startsAt } from "../../../src/components/events/events";
+import { type CalendarEvent, endsAt, startsAt } from "../../../src/components/events/events";
 import { applyFilter, NEXT_7_DAYS, readFilter } from "../../../src/components/events/list-filter";
+import { refreshBand } from "../../../src/components/events/this-week";
 import { CALENDAR_TIMEZONE } from "../../../src/components/info/links";
+import { SLACK_JOIN } from "../../../src/lib/communitas/join";
 import { regionForCity, REGIONS } from "../../../src/lib/regions/match";
 import { summaryAfterLede } from "../../../src/lib/regions/page";
 import { INSIDE_A_CANYON } from "../../unit/l8/canyon-rule";
@@ -35,6 +39,29 @@ const positions = parse(readFileSync(path.resolve(SITE_DIR, "..", "data", "team"
   status: string;
   apply?: { open?: boolean };
 }[];
+const threads = parse(readFileSync(path.resolve(SITE_DIR, "..", "data", "communitas", "threads.yaml"), "utf8")) as {
+  day: string;
+  title: string;
+}[];
+/** The events /data/events.json lists, each with the region placeRegion() gives it. */
+const openEvents = () => JSON.parse(readDist("data/events.json")) as (CalendarEvent & { region: string })[];
+// COUNT in src/components/events/ThisWeek.astro.
+const THIS_WEEK = 3;
+
+// Words as test/dom/home/this-week.test.ts counts them: text nodes joined with a space.
+const WORD = /[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu;
+function words(root: Element): string[] {
+  const parts: string[] = [];
+  const walk = (node: Node) => {
+    for (const child of node.childNodes) {
+      if (child.nodeType === child.TEXT_NODE) parts.push(child.textContent ?? "");
+      else if (child.nodeType === child.ELEMENT_NODE && !(child as Element).matches("script, style, svg, [hidden], .visually-hidden"))
+        walk(child);
+    }
+  };
+  walk(root);
+  return parts.join(" ").match(WORD) ?? [];
+}
 
 describe("/regions/", () => {
   it("shows the three zones on one live map, with the drawing as its no-JavaScript layer", () => {
@@ -106,7 +133,8 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
   // Step R0 split the page into sections/; the outline is the one the page
   // had before the split, plus the slots as they fill (A3a: Ask your AI). Step
   // R1 put "What's here" beside the map in the first section, and moved the
-  // painting after the honorees and the Slack, before Ask your AI.
+  // painting after the honorees and the Slack, before Ask your AI. Step P2b
+  // filled the This week slot, and took the next event out of What's here.
   it("has one h1, and its headings in order", () => {
     const position = positions.find((p) => p.region === id)!;
     expect(page.querySelectorAll("h1")).toHaveLength(1);
@@ -115,6 +143,7 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
       `H1 ${region.name}`,
       "H2 What's here",
       `H2 ${region.name} in numbers`,
+      "H2 This week",
       expect.stringMatching(/^H2 (?:Your|The) /),
       "H2 Startup Resources",
       "H2 Leaderboard honorees",
@@ -123,14 +152,13 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
       "H2 Ask your AI about this page",
       "H2 The other regions",
     ]);
-    expect(outline[3], "the seat heading names the seat").toContain(position.title);
+    expect(outline[4], "the seat heading names the seat").toContain(position.title);
     // No level is skipped: each heading is at most one level below the one before.
     const levels = [...page.querySelectorAll("main h1, main h2, main h3, main h4")].map((h) => Number(h.tagName[1]));
     for (const [i, n] of levels.entries()) if (i > 0) expect(n, `heading ${i + 1}`).toBeLessThanOrEqual(levels[i - 1]! + 1);
     const here = [...(page.getElementById("where")?.parentElement?.querySelectorAll("h3") ?? [])].map(text);
     expect(here).toEqual([
       "Core cities",
-      ...(page.querySelector("[data-region-next]") ? ["Next event"] : []),
       ...(position.status === "open" ? ["Open seat"] : []),
       ...(region.nearby.length > 0 ? ["Nearby towns"] : []),
       "Size",
@@ -227,25 +255,136 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
     expect(String(shown)).toBe(text(list.querySelector("li[data-count='events'] .here__n")));
   });
 
-  it("names the next event here, pruned on the visitor's clock, and the seat only while it is open", () => {
+  // Step P2b: This week, right below, carries the next events, so What's here
+  // names none (the page shows each event once).
+  it("leaves the next event to This week, and names the seat only while it is open", () => {
     const here = page.getElementById("where")!.parentElement!;
-    const next = here.querySelector<HTMLElement>("[data-region-next]");
-    const asOf = Date.parse(here.querySelector<HTMLElement>("[data-region-counts]")!.dataset.asOf!);
-    const events = JSON.parse(readDist("data/events.json")) as (CalendarEvent & { region: string })[];
-    const placedHere = events.filter((e) => e.region === id);
-    expect(Boolean(next), "the block shows when an event is placed here").toBe(placedHere.length > 0);
-    if (next) {
-      const items = [...next.querySelectorAll<HTMLElement>("li[data-ends]")];
-      expect(items.length).toBeGreaterThan(0);
-      expect(items.filter((li) => !li.hidden), "one shows").toHaveLength(1);
-      for (const li of items) expect(Date.parse(li.dataset.ends!), "not ended at build").toBeGreaterThan(asOf);
-      expect(next.querySelector("[data-events-empty]")?.hasAttribute("hidden")).toBe(true);
-      expect(text(items[0]), "the soonest event placed here").toContain(placedHere[0]!.title);
-    }
+    expect(here.querySelector("[data-region-next], [data-this-week]")).toBeNull();
     const position = positions.find((p) => p.region === id)!;
     const seat = here.querySelector("a[data-open-seat]");
     if (position.status === "open") expect(text(seat)).toBe(position.title);
     else expect(seat).toBeNull();
+  });
+
+  // Step P2b: home's This week strip (components/events/ThisWeek.astro), with
+  // only the events placed in this region, the same weekly threads and the one
+  // Slack join link.
+  describe("This week", () => {
+    const band = page.querySelector<HTMLElement>('section[aria-labelledby="this-week"]')!;
+    const list = () => band.querySelector<HTMLElement>("[data-this-week]")!;
+    const items = () => [...list().querySelectorAll<HTMLElement>("li[data-ends]")];
+    const shown = () => items().filter((li) => !li.hidden);
+    const asOf = () => Date.parse(page.querySelector<HTMLElement>("[data-region-counts]")!.dataset.asOf!);
+    /** The events placed here that had not ended at the build, soonest first. */
+    const placedHere = () => openEvents().filter((e) => e.region === id && endsAt(e) > asOf());
+    const listHref = `${WAYS_IN.events}?region=${id}#all-events`;
+
+    it("is the section right after the first one, headed This week", () => {
+      expect(band).not.toBeNull();
+      expect(text(band.querySelector("h2#this-week"))).toBe("This week");
+      const sections = [...page.querySelectorAll("main section")];
+      expect(sections.indexOf(band)).toBe(sections.indexOf(page.querySelector("h1")!.closest("section")!) + 1);
+    });
+
+    it("lists only the events placed here, at most three, soonest first, as /data/events.json places them", () => {
+      const expected = placedHere();
+      expect(shown()).toHaveLength(Math.min(THIS_WEEK, expected.length));
+      expect(shown(), "the first ones show; the rest wait for prune.ts").toEqual(items().slice(0, shown().length));
+      const starts = items().map((li) => Date.parse(li.dataset.starts!));
+      expect(starts).toEqual([...starts].sort((a, b) => a - b));
+      for (const [i, li] of items().entries()) {
+        const e = expected[i]!;
+        expect(li.dataset.eventRegion, e.title).toBe(id);
+        expect(Date.parse(li.dataset.ends!), "not ended at build").toBeGreaterThan(asOf());
+        expect(li.querySelector("time[data-countdown]")?.getAttribute("datetime")).toBe(e.start);
+        expect(text(li.querySelector("time")), e.title).toMatch(/^(on now|today|tomorrow|in \d+ days)$/);
+        // A cut title keeps its full text for assistive tech, with the date.
+        const link = li.querySelector("a")!;
+        const label = link.getAttribute("aria-label") ?? "";
+        expect(label.startsWith(`${e.title}, `), label).toBe(true);
+        expect(label.startsWith(text(link).replace(/…$/, ""))).toBe(true);
+        expect(link.getAttribute("href"), "a title opens the region's event list").toBe(listHref);
+      }
+    });
+
+    it("links on to the region's event list when fewer than three show, and says none in one plain line", () => {
+      const n = shown().length;
+      const empty = list().querySelector<HTMLElement>("[data-events-empty]")!;
+      const more = list().querySelector<HTMLElement>("[data-events-more]")!;
+      expect(empty.hidden).toBe(n > 0);
+      expect(text(empty)).toBe("No events listed here yet.");
+      expect(empty.querySelector("a"), "a plain line, the link is its own").toBeNull();
+      expect(more.hidden).toBe(n >= THIS_WEEK);
+      const link = more.querySelector("a")!;
+      expect(text(link)).toBe(`Events in ${region.name}`);
+      expect(link.getAttribute("href")).toBe(listHref);
+      expect(readFilter(new URL(listHref, "https://coloradostartups.org").search)).toEqual({ region: id, when: "", type: "" });
+      const calendar = doc(readDist("event-calendar/index.html"));
+      expect(calendar.querySelector(`[data-event-list] input[name='region'][value='${id}']`), "the list has this region's chip").not.toBeNull();
+      expect(calendar.getElementById("all-events")).not.toBeNull();
+    });
+
+    it("drops past events on the visitor's clock, then offers the region's list", () => {
+      const root = list().cloneNode(true) as HTMLElement;
+      const all = [...root.querySelectorAll<HTMLElement>("li[data-ends]")];
+      if (all.length > 0) {
+        const at = Date.parse(all[0]!.dataset.ends!);
+        refreshBand(root, at);
+        expect(all[0]!.hidden, "the first event has ended").toBe(true);
+        const left = all.filter((li) => Date.parse(li.dataset.ends!) > at);
+        expect(all.filter((li) => !li.hidden)).toEqual(left.slice(0, THIS_WEEK));
+      }
+      expect(refreshBand(root, Number.MAX_SAFE_INTEGER)).toBe(0);
+      expect(root.querySelector<HTMLElement>("[data-events-empty]")!.hidden).toBe(false);
+      expect(root.querySelector<HTMLElement>("[data-events-more]")!.hidden).toBe(false);
+    });
+
+    it("shows home's weekly threads, Monday, Wednesday and Friday", () => {
+      const rows = [...band.querySelectorAll<HTMLElement>("[data-threads] li[data-day]")];
+      expect(rows.map((r) => r.dataset.day)).toEqual(["mon", "wed", "fri"]);
+      for (const r of rows) expect(text(r)).toContain(threads.find((t) => t.day === r.dataset.day)!.title);
+      const home = doc(readDist("index.html")).querySelectorAll('section[aria-labelledby="this-week"] [data-threads] li[data-day]');
+      expect(rows.map(text)).toEqual([...home].map(text));
+    });
+
+    it("has one Slack link, the page's one join link, described by the hero's note", () => {
+      const slack = [...band.querySelectorAll("a")].filter((a) => a.getAttribute("href") === SLACK_JOIN.href);
+      expect(slack).toHaveLength(1);
+      expect(slack[0]!.dataset.link).toBe("slack");
+      const note = page.getElementById(slack[0]!.getAttribute("aria-describedby") ?? "");
+      expect(text(note)).toBe(SLACK_JOIN.note);
+      expect(note?.closest("section"), "the note is the first screen's").toBe(page.querySelector("main section"));
+      // One way in: every on-site Slack link on the page goes to the same place.
+      const slackLinks = [...page.querySelectorAll("main a[href^='/']")].filter((a) => /slack/i.test(a.getAttribute("href")!));
+      expect(new Set(slackLinks.map((a) => a.getAttribute("href")))).toEqual(new Set([SLACK_JOIN.href]));
+      expect(band.querySelector(`a[data-link="linkedin-group"]`)?.getAttribute("href")).toBe(WAYS_IN["linkedin-group"]);
+    });
+
+    it("shows no event twice on the page", () => {
+      const keys = shown().map((li) => `${li.dataset.starts} ${li.querySelector("a")!.getAttribute("aria-label")}`);
+      expect(new Set(keys).size).toBe(keys.length);
+      // What a visitor sees outside the band: no hidden queue, closed popover or closed details.
+      const rest = page.querySelector("main")!.cloneNode(true) as HTMLElement;
+      rest.querySelector('section[aria-labelledby="this-week"]')!.remove();
+      for (const el of rest.querySelectorAll("[hidden], [popover], script, style, template")) el.remove();
+      for (const d of rest.querySelectorAll("details:not([open])")) for (const c of [...d.children]) if (c.tagName !== "SUMMARY") c.remove();
+      for (const e of placedHere().slice(0, shown().length)) expect(text(rest), e.title).not.toContain(e.title);
+    });
+
+    it("stays short: about 50 visible words besides the event titles, in the site's words", () => {
+      const all = words(band).length;
+      const titles = shown().reduce((n, li) => n + words(li.querySelector("a")!).length, 0);
+      console.info(`regions/${id}/: ${all} visible words in This week, ${titles} of them event titles`);
+      expect(all - titles).toBeGreaterThan(0);
+      expect(all - titles).toBeLessThanOrEqual(50);
+      expect(text(band)).not.toMatch(/\b\d[\d,.]*\s*\+?\s*(members|startupers|founders|people|attendees|going)\b/i);
+      expect(text(band)).not.toMatch(/—| – |\bOutpost\b|\bHQ\b|\bHall\b/);
+    });
+
+    it("passes axe (structure and ARIA; color contrast runs in the browser e2e)", async () => {
+      const results = await axe.run(band, { rules: { "color-contrast": { enabled: false } } });
+      expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+    });
   });
 
   it("zooms the map to the region, names its core cities, and lists its towns", () => {

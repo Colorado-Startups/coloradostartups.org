@@ -1,17 +1,64 @@
 ---
 // Keepers: the AI agents, disclosed, last on the page (KeeperStrip, an
-// ai-disclosure surface).
+// ai-disclosure surface). Beside them, Golden's painting, the fantasy Colorado
+// as an accent with a plain one-line label (Paul, 2026-11-16: "The fantasy is
+// the additional theme to make it feel really cool"). It led the home page
+// until then; the map leads now (Where.astro), so the painting loads lazily
+// here, far below the first screen. Its crowds are community folk, not the
+// keepers, so its alt carries no AI-agent line (keepers.ts, PLACE_ART_ALT).
+import { brandArt } from "../../art/art-assets";
+import { HALL_ART_ALT } from "../../art/keepers";
 import KeeperStrip from "../KeeperStrip.astro";
+
+const art = brandArt("brand/golden");
+if (!art) throw new Error("no brand/golden in public/art/brand/sizes.json; run scripts/brand/pull.mjs");
 ---
 
 <section class="section section--band keepers" aria-label="The keepers">
-  <div class="wrap">
+  <div class="wrap keepers__row">
     <KeeperStrip />
+    <figure class="keepers__art" data-art="brand/golden">
+      <img
+        src={art.src}
+        srcset={art.srcset}
+        sizes="(max-width: 47.5rem) calc(100vw - 3rem), 24rem"
+        width={art.width}
+        height={art.height}
+        alt={HALL_ART_ALT}
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption class="meta">Our art paints Golden's Table Mountain as a fantasy Colorado.</figcaption>
+    </figure>
   </div>
 </section>
 
 <style>
   .keepers {
     padding-block: var(--s-6);
+  }
+  .keepers__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    gap: var(--s-5) var(--s-7);
+    align-items: center;
+  }
+  .keepers__art {
+    margin: 0;
+  }
+  .keepers__art img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--r-card);
+  }
+  .keepers__art figcaption {
+    margin: var(--s-2) 0 0;
+    text-wrap: pretty;
+  }
+  /* A media query cannot read CSS variables: 47.5rem is the 760 px breakpoint. */
+  @media (max-width: 47.5rem) {
+    .keepers__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>
