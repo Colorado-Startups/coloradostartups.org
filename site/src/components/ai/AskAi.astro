@@ -1,0 +1,109 @@
+---
+// The "Ask your AI" row (step A3a, 2026-11-15): Copy prompt, Open in Claude,
+// Open in ChatGPT, all made from the page's subject (prompt.ts). Copy prompt
+// comes first because it works with any AI; the two links are best effort.
+// The prompt sits in a box too, so a visitor without JavaScript, or whose
+// browser refuses the copy, can select it by hand. The copy button stays
+// hidden until the bundled script runs. Owner: A3a.
+import { askAiLinks } from "./prompt";
+
+interface Props {
+  /** What the page is about: a guide's title or a region's name. */
+  subject: string;
+  /** The page's path, such as /guides/funding-programs/. */
+  path: string;
+  /** The question to ask; prompt.ts has the default. */
+  question?: string;
+  /** The heading's id, unique on the page. */
+  id?: string;
+}
+
+const { subject, path, question, id = "ask-ai" } = Astro.props;
+const { prompt, claude, chatgpt } = askAiLinks({ subject, path, question });
+const field = `${id}-prompt`;
+---
+
+<div class="ask-ai" data-ask-ai>
+  <h2 id={id}>Ask your AI about this page</h2>
+  <p>
+    The prompt tells your AI to look things up on our public MCP server, so its answer uses this site's listings.
+  </p>
+  <div class="btn-row">
+    <button type="button" class="btn btn--gold" data-ask-copy hidden>Copy prompt</button>
+    <a class="btn btn--stone" href={claude} target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
+      Open in Claude
+    </a>
+    <a class="btn btn--stone" href={chatgpt} target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
+      Open in ChatGPT
+    </a>
+  </div>
+  <p class="meta" role="status" data-ask-status></p>
+  <p class="meta" id={`${id}-note`}>
+    Each opens in a new tab with the prompt filled in. If the chat opens empty, copy the prompt and paste it.
+  </p>
+  <details data-ask-details>
+    <summary>See the prompt</summary>
+    <label class="visually-hidden" for={field}>The prompt</label>
+    <textarea id={field} readonly rows="5" data-ask-prompt>{prompt}</textarea>
+  </details>
+</div>
+
+<script>
+  import { copyText } from "../kit/copy";
+  import { COPIED, COPY_FAILED } from "./prompt";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-ask-ai]")) {
+    const button = root.querySelector<HTMLButtonElement>("[data-ask-copy]");
+    const field = root.querySelector<HTMLTextAreaElement>("[data-ask-prompt]");
+    const details = root.querySelector<HTMLDetailsElement>("[data-ask-details]");
+    const status = root.querySelector<HTMLElement>("[data-ask-status]");
+    if (!button || !field) continue;
+    field.addEventListener("focus", () => field.select());
+    button.hidden = false;
+    button.addEventListener("click", async () => {
+      let ok = await copyText(field.value, navigator.clipboard);
+      if (!ok) {
+        // The older path: show the box, select the prompt and copy the
+        // selection. Either way the prompt is one keystroke from copied.
+        if (details) details.open = true;
+        field.select();
+        try {
+          ok = document.execCommand("copy");
+        } catch {
+          ok = false;
+        }
+      }
+      if (status) status.textContent = ok ? COPIED : COPY_FAILED;
+    });
+  }
+</script>
+
+<style>
+  .ask-ai h2 {
+    margin-top: 0;
+  }
+  .ask-ai .meta {
+    margin: var(--s-3) 0 0;
+  }
+  .ask-ai details {
+    margin-top: var(--s-4);
+  }
+  .ask-ai summary {
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .ask-ai textarea {
+    width: 100%;
+    max-width: 60ch;
+    font-size: var(--t-step--1);
+    line-height: 1.5;
+    resize: vertical;
+  }
+  /* .btn sets display, which beats the browser's own [hidden] rule. Without
+     this line the copy button shows, and does nothing, before the script runs. */
+  .ask-ai .btn[hidden] {
+    display: none;
+  }
+</style>

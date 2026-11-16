@@ -1,9 +1,23 @@
 ---
-// A slot on the region page that renders nothing yet. Step A3a of the
-// 2026-11-15 engagement plan fills it. Owner: L8.
+// The region page's "Ask your AI" section: the A3a row (components/ai),
+// made from the region's name. Owner: L8; the row itself is A3a's.
 import type { Region } from "@cs/shared";
+
+import AskAiRow from "../../ai/AskAi.astro";
 
 interface Props {
   region: Region;
 }
+
+const { region } = Astro.props;
 ---
+
+<section class="section" aria-labelledby="ask-ai">
+  <div class="wrap">
+    <AskAiRow
+      subject={`${region.name}, a Colorado startup region`}
+      path={`/regions/${region.id}/`}
+      question={`Who builds, invests and meets in ${region.name}, and where should a founder here start?`}
+    />
+  </div>
+</section>
