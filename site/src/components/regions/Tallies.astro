@@ -1,7 +1,8 @@
 ---
 // The three regions side by side as equals (step W6 of the 2026-11-15
 // engagement plan): one column per region, in data order, each headed by its
-// crest and name; one row per tally, each naming its source. Regions are
+// crest and name; one row per tally, each naming its source. Under 40rem the
+// table stacks: each tally is a block of three region rows. Regions are
 // never ranked (brand decisions 12 and 58): the order is the data's, never
 // the counts', and no copy names a winner. Each bar scales within its own row
 // and carries its number as text. Bars share one neutral token; a region's
@@ -15,6 +16,7 @@ import { brandArt } from "../art/art-assets";
 import { REGION_CREST_ALT, regionCrestKey } from "../art/keepers";
 import { activeCards } from "../canvas/canvas-data";
 import { SNAPSHOT, upcomingEvents } from "../events/events";
+import { CALENDAR_TIMEZONE } from "../info/links";
 import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
 import { REGION_COLORS } from "../../lib/regions/map";
 import { honoreesIn, inRegion } from "../../lib/regions/page";
@@ -34,9 +36,10 @@ if (!edition) throw new Error("no Leaderboard edition in data/leaderboard/editio
 const board = buildBoard(edition, companies).map((row) => row.company);
 const cards = await activeCards();
 const events = startingWithin(upcomingEvents(SNAPSHOT, now), now);
-const positions = (await getCollection("positions")).map((e) => e.data);
 
 const snapshotDay = SNAPSHOT ? SNAPSHOT.fetchedAt.slice(0, 10) : "no snapshot";
+// The page is static, so the window runs from the day it was built, in Denver.
+const buildDay = new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR_TIMEZONE }).format(now);
 
 const tallies = [
   {
@@ -48,7 +51,7 @@ const tallies = [
   {
     id: "events",
     label: `Events in the next ${EVENT_WINDOW_DAYS} days`,
-    source: `the community event calendar, snapshot of ${snapshotDay}, by venue city`,
+    source: `the community event calendar as of ${buildDay}, the day this page was built (calendar snapshot of ${snapshotDay}), by venue city`,
     count: (r: Region) => inRegion(r.id, events, eventCity, regions).length,
   },
   {
@@ -56,12 +59,6 @@ const tallies = [
     label: "Startup Resources",
     source: "the Startup Resources directory, active listings by city",
     count: (r: Region) => inRegion(r.id, cards, (c) => c.city, regions).length,
-  },
-  {
-    id: "seats",
-    label: "Open volunteer seats",
-    source: "the seats listed on Get involved",
-    count: (r: Region) => positions.filter((p) => p.region === r.id && p.status === "open").length,
   },
 ].map((t) => {
   const counts = regions.map(t.count);
@@ -77,7 +74,7 @@ const crests = regions.map((r) => {
 
 <div class="tallies">
   <table class="tallies__table">
-    <caption class="visually-hidden">Four tallies for each region. Regions are listed in their fixed order.</caption>
+    <caption class="visually-hidden">Three tallies for each region. Regions are listed in their fixed order.</caption>
     <thead>
       <tr>
         <td></td>
@@ -114,6 +111,10 @@ const crests = regions.map((r) => {
             </th>
             {regions.map((r, i) => (
               <td data-region={r.id}>
+                <span class="tally__region">
+                  <span class="tallies__swatch" style={`--region-color: ${REGION_COLORS[r.id]}`} aria-hidden="true" />
+                  {r.name}
+                </span>
                 <span class="tally__value">{t.counts[i]}</span>
                 <span class="tally__track" aria-hidden="true">
                   <span class="tally__bar" style={`--share: ${t.shares[i]!.toFixed(3)}`} data-reveal />
@@ -129,16 +130,17 @@ const crests = regions.map((r) => {
 
 <style>
   /* A real table: the regions are its columns, so a screen reader hears the
-     region with every number. Narrow screens scroll it inside its own box. */
+     region with every number. Under 40rem it stacks (below). */
   .tallies {
-    overflow-x: auto;
     margin-top: var(--s-5);
   }
   .tallies__table {
     width: 100%;
-    min-width: 34rem;
     border-collapse: collapse;
     table-layout: fixed;
+  }
+  .tally__region {
+    display: none;
   }
   .tallies__table th,
   .tallies__table td {
@@ -208,5 +210,62 @@ const crests = regions.map((r) => {
     height: 100%;
     border-radius: var(--r-chisel);
     background: var(--c-border);
+  }
+  /* Stacked: the header row becomes a row of three crests, and each tally a
+     block of three region rows, each with the region's name, number and bar. */
+  @media (max-width: 40rem) {
+    .tallies__table,
+    .tallies__table thead,
+    .tallies__table tbody,
+    .tallies__table tr,
+    .tallies__table th,
+    .tallies__table td {
+      display: block;
+      width: auto;
+    }
+    .tallies__table thead tr {
+      display: flex;
+      gap: var(--s-2);
+    }
+    .tallies__table thead td {
+      display: none;
+    }
+    .tallies__table thead th {
+      flex: 1 1 0;
+      padding: var(--s-2) 0;
+    }
+    .tallies__name {
+      font-size: var(--t-step--1);
+    }
+    .tallies__table tbody tr {
+      padding-block: var(--s-3);
+    }
+    .tallies__table tbody tr + tr > * {
+      border-top: 0;
+    }
+    .tallies__table tbody tr + tr {
+      border-top: var(--line-hair) solid var(--c-rule);
+    }
+    .tallies__table tbody th {
+      width: auto;
+      padding: 0 0 var(--s-2);
+    }
+    .tallies__table tbody td {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 0 var(--s-3);
+      padding: var(--s-2) 0;
+    }
+    .tally__region {
+      display: block;
+      font-weight: 700;
+    }
+    .tally__value {
+      font-size: var(--t-step-1);
+    }
+    .tally__track {
+      grid-column: 1 / -1;
+    }
   }
 </style>

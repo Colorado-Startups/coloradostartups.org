@@ -24,9 +24,22 @@ describe("/regions/ tallies", () => {
     }
   });
 
-  it("shows the four tallies, each with a source caption", () => {
-    expect(rows.map((r) => r.dataset.tally)).toEqual(["companies", "events", "resources", "seats"]);
+  it("shows the three tallies, each with a source caption", () => {
+    expect(rows.map((r) => r.dataset.tally)).toEqual(["companies", "events", "resources"]);
     for (const row of rows) expect(text(row.querySelector("th .tally__source")), row.dataset.tally).toMatch(/^Source: \S.+\.$/);
+  });
+
+  it("dates the events window to the build", () => {
+    const events = rows.find((r) => r.dataset.tally === "events");
+    expect(text(events?.querySelector(".tally__source"))).toMatch(/as of \d{4}-\d{2}-\d{2}, the day this page was built/);
+  });
+
+  it("names the region beside every number, for the stacked layout", () => {
+    for (const row of rows) {
+      for (const [i, c] of [...row.querySelectorAll("td[data-region]")].entries()) {
+        expect(text(c.querySelector(".tally__region"))).toBe(REGIONS[i]!.name);
+      }
+    }
   });
 
   it("gives every bar its number as text, in data order, scaled within its own tally", () => {
