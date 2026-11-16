@@ -57,7 +57,7 @@ export const SPOTLIGHT_LIMITS = {
  */
 export const SPOTLIGHT_CONSENT = {
   founder: "I am a founder or cofounder of this company.",
-  show: "Colorado Startups may show my name, role, company, city and this line on its website. I can ask to be removed at any time.",
+  show: "Colorado Startups may show my name, role, company, company website, city and this line on its website, and my LinkedIn link if I give one. I can ask to be removed at any time.",
 } as const;
 export const SPOTLIGHT_CONSENT_VERSION = "2026-11-16";
 
