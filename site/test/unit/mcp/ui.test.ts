@@ -38,10 +38,11 @@ describe("generated cards", () => {
       expect(html).not.toMatch(/url\(\s*["']?(?:https?:)?\/\//i);
       expect(html).not.toMatch(/@import|<link\b|<img\b|<iframe\b|<script\s+src/i);
       expect(html).not.toMatch(/\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|importScripts/);
-      // One inline script, and it parses.
-      const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+      // One inline script, with no attributes, and it parses. Any case, any closing-tag spacing.
+      const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script[^>]*>/gi)];
       expect(scripts).toHaveLength(1);
-      expect(() => new Function(scripts[0]![1]!)).not.toThrow();
+      expect(scripts[0]![1]).toBe("");
+      expect(() => new Function(scripts[0]![2]!)).not.toThrow();
     });
 
     it(`${name}: its colors and lengths are the brand tokens, light and night`, () => {
