@@ -379,6 +379,120 @@ input[type="radio"] {
   }
 }
 
+/* ---------- Motion (step W1) ----------
+   CSS first, no script. Each effect opts in behind its own guard, so a
+   browser without the feature, or a visitor who asks for less motion, gets
+   the still page. Nothing here hides content from a browser that skips it.
+
+   1. Page transitions: a cross-fade between pages, in browsers with
+      cross-document view transitions (Chrome and Edge 126+, Safari 18.2+).
+      Others load the next page as before. No named morphs yet.
+   2. Reveals: an element marked data-reveal rises and fades in as it
+      scrolls into view, on a scroll timeline (Chrome and Edge 115+, Safari
+      26+). It is never hidden where the timeline is missing.
+   3. Count-up: a figure marked data-count-up (count-up.ts decides which)
+      keeps its real number as text in .count__text. A counting copy is drawn
+      over it while it scrolls in, then the text shows again. The copy carries
+      empty alt text, so screen readers read the real number only. */
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-group(root) {
+    animation-duration: 0.25s;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        translate: 0 1.5rem;
+      }
+    }
+    [data-reveal] {
+      /* backwards fill: the start style holds until the element nears the
+         viewport, then it reaches its resting style and stays there. */
+      animation: reveal linear backwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+  }
+}
+
+/* The counter state. Registered so it animates as a whole number; the
+   groups below are derived from it each frame. */
+@property --count {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --count-on {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@counter-style count-pad3 {
+  system: extends decimal;
+  pad: 3 "0";
+}
+
+/* mod() and round() split the count into comma groups (Chrome 125+), so the
+   guard asks for them too. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry) and (order: mod(5, 3))) {
+    @keyframes count-up {
+      from {
+        --count: var(--count-from, 0);
+        --count-on: 1;
+      }
+      99% {
+        --count-on: 1;
+      }
+      to {
+        --count: var(--count-to);
+        --count-on: 0;
+      }
+    }
+    [data-count-up] {
+      position: relative;
+      counter-reset: count-all var(--count) count-g1 mod(var(--count), 1000) count-g2
+        mod(round(down, var(--count) / 1000, 1), 1000) count-g3 mod(round(down, var(--count) / 1000000, 1), 1000)
+        count-g4 round(down, var(--count) / 1000000000, 1);
+      animation: count-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+    [data-count-up] > .count__text {
+      opacity: calc(1 - var(--count-on));
+    }
+    [data-count-up]::after {
+      position: absolute;
+      inset: 0;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      opacity: var(--count-on);
+      pointer-events: none;
+    }
+    [data-count-groups="1"]::after {
+      content: attr(data-count-prefix) counter(count-all) attr(data-count-suffix) / "";
+    }
+    [data-count-groups="2"]::after {
+      content: attr(data-count-prefix) counter(count-g2) "," counter(count-g1, count-pad3) attr(data-count-suffix) / "";
+    }
+    [data-count-groups="3"]::after {
+      content: attr(data-count-prefix) counter(count-g3) "," counter(count-g2, count-pad3) ","
+        counter(count-g1, count-pad3) attr(data-count-suffix) / "";
+    }
+    [data-count-groups="4"]::after {
+      content: attr(data-count-prefix) counter(count-g4) "," counter(count-g3, count-pad3) ","
+        counter(count-g2, count-pad3) "," counter(count-g1, count-pad3) attr(data-count-suffix) / "";
+    }
+  }
+}
+
 /* ---------- Reduced motion ----------
    With reduced motion on, nothing animates or transitions. animation: none
    leaves each element in its resting style. The old rule cut every duration
@@ -393,5 +507,16 @@ input[type="radio"] {
   }
   html {
     scroll-behavior: auto !important;
+  }
+  /* Page transitions off. The opt-in above already sits behind
+     no-preference; this says so outright, and the view-transition
+     pseudo-elements, which * does not reach, stop too. */
+  @view-transition {
+    navigation: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
