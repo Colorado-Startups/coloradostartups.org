@@ -1,8 +1,8 @@
 // S0: the header carries two empty slots, AskButton (K1, "Ask anywhere") and
 // YourRegion (W8, the visitor's region crest). They sit in the nav after the
-// links and before "Join the Slack". Until K1 and W8 fill them they render
-// nothing, so the built header, its layout, the phone menu and the focus order
-// stay as they were. The unit project runs in plain Node and cannot compile
+// links and before "Join the Slack". K1 filled AskButton (the Search button
+// and the Ask dialog); YourRegion renders nothing until W8, so the rest of
+// the header, the phone menu and the focus order stay as they were. The unit project runs in plain Node and cannot compile
 // .astro, so these checks read the source.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -18,6 +18,9 @@ const template = (source: string) => source.split("---").slice(2).join("---");
 
 // The header's markup (template up to its <script>) on main at b2a8277, before
 // S0. K1 and W8 change the header on purpose; they update this hash with it.
+// K1 (2026-11-16) filled AskButton and left SiteHeader's own markup alone: the
+// hash still holds, and the check below on AskButton replaces its "renders
+// nothing" check. The header's styles (after the <script>) gained K1's gaps.
 const MARKUP_BEFORE_S0 = "129944a847f68aa6ad4daee22e2dbf58b793b0a3052821997bd4225e81b81d4e";
 
 const SLOTS = [
@@ -28,12 +31,22 @@ const SLOTS = [
 const header = read("SiteHeader.astro");
 
 describe("header slots", () => {
-  for (const { name, step } of SLOTS) {
-    it(`${name} (${step}) renders nothing yet`, () => {
-      expect(template(read(`header/${name}.astro`)).trim()).toBe("");
-    });
+  it("YourRegion (W8) renders nothing yet", () => {
+    expect(template(read("header/YourRegion.astro")).trim()).toBe("");
+  });
 
-    it(`${name} is imported once and used once`, () => {
+  it("AskButton (K1) renders a link to /ask/, a hidden Search button and the Ask dialog", () => {
+    const ask = template(read("header/AskButton.astro"));
+    expect(ask).toMatch(/<a class="btn btn--stone ask-trigger" href="\/ask\/" data-ask-link>/);
+    expect(ask).toMatch(/<button class="btn btn--stone ask-trigger" type="button"[^>]* data-ask-open hidden>/);
+    expect(ask).toContain('<span class="ask-trigger__label">Search</span>');
+    expect(ask).toContain("<AskDialog />");
+    // Bundled, never inline: no is:inline script in the slot.
+    expect(ask).not.toMatch(/<script[^>]*is:inline/);
+  });
+
+  for (const { name, step } of SLOTS) {
+    it(`${name} (${step}) is imported once and used once`, () => {
       const imports = header.match(new RegExp(`^import ${name} from "\\./header/${name}\\.astro";$`, "gm")) ?? [];
       expect(imports).toHaveLength(1);
       expect(header.match(new RegExp(`<${name}\\b`, "g")) ?? []).toHaveLength(1);

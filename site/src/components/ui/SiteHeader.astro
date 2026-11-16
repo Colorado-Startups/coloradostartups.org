@@ -42,7 +42,7 @@ const here = Astro.url.pathname;
           ))
         }
       </ul>
-      {/* Slots for K1 (Ask anywhere) and W8 (your region). Both render nothing yet. */}
+      {/* Slots for K1 (Ask anywhere: the Search button) and W8 (your region: nothing yet). */}
       <AskButton />
       <YourRegion />
       <a class="btn btn--gold cta" href={WAYS_IN.slack} aria-describedby="header-slack-note">Join the Slack</a>
@@ -165,6 +165,18 @@ const here = Astro.url.pathname;
      JavaScript is off). */
   .menu-toggle {
     display: none;
+  }
+  /* K1's Search button (about 64 px) joins the one row, which had about 60 px
+     to spare at every wide width (the wrap caps at 1180 px; #424). Gaps of
+     12 px beside the button and 16 px between links hold its net cost to
+     about 32 px, so the row stays one row. */
+  @media (min-width: 1200px) {
+    nav {
+      gap: var(--s-3);
+    }
+    nav ul {
+      column-gap: var(--s-4);
+    }
   }
   /* While the menu is open the toggle stays pressed: the slab sits on its
      ledge, as .btn:active draws a press in hall.css. */

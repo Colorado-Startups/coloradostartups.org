@@ -30,10 +30,10 @@ const field = `${id}-prompt`;
   </p>
   <div class="btn-row">
     <button type="button" class="btn btn--gold" data-ask-copy hidden>Copy prompt</button>
-    <a class="btn btn--stone" href={claude} target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
+    <a class="btn btn--stone" href={claude} data-ask-claude target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
       Open in Claude
     </a>
-    <a class="btn btn--stone" href={chatgpt} target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
+    <a class="btn btn--stone" href={chatgpt} data-ask-chatgpt target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
       Open in ChatGPT
     </a>
   </div>
@@ -49,33 +49,11 @@ const field = `${id}-prompt`;
 </div>
 
 <script>
-  import { copyText } from "../kit/copy";
-  import { COPIED, COPY_FAILED } from "./prompt";
+  // The row's behavior lives in ask-ai.ts, which the Ask dialog shares. The
+  // dialog's copy sits in a <template>, so this loop never sees it.
+  import { initAskAi } from "./ask-ai";
 
-  for (const root of document.querySelectorAll<HTMLElement>("[data-ask-ai]")) {
-    const button = root.querySelector<HTMLButtonElement>("[data-ask-copy]");
-    const field = root.querySelector<HTMLTextAreaElement>("[data-ask-prompt]");
-    const details = root.querySelector<HTMLDetailsElement>("[data-ask-details]");
-    const status = root.querySelector<HTMLElement>("[data-ask-status]");
-    if (!button || !field) continue;
-    field.addEventListener("focus", () => field.select());
-    button.hidden = false;
-    button.addEventListener("click", async () => {
-      let ok = await copyText(field.value, navigator.clipboard);
-      if (!ok) {
-        // The older path: show the box, select the prompt and copy the
-        // selection. Either way the prompt is one keystroke from copied.
-        if (details) details.open = true;
-        field.select();
-        try {
-          ok = document.execCommand("copy");
-        } catch {
-          ok = false;
-        }
-      }
-      if (status) status.textContent = ok ? COPIED : COPY_FAILED;
-    });
-  }
+  for (const root of document.querySelectorAll<HTMLElement>("[data-ask-ai]")) initAskAi(root);
 </script>
 
 <style>
