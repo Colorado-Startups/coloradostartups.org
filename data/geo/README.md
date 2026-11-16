@@ -1,16 +1,23 @@
 # Colorado geography for the site's maps
 
-Built by [`scripts/geo/build.mjs`](../../scripts/geo/build.mjs). Do not edit the built files by hand: change [`boundaries.yaml`](boundaries.yaml) or `data/regions/*.yaml`, then run the script.
+Built by [`scripts/geo/build.mjs`](../../scripts/geo/build.mjs) and [`scripts/geo/views.mjs`](../../scripts/geo/views.mjs). Do not edit the built files by hand: change [`boundaries.yaml`](boundaries.yaml) or `data/regions/*.yaml`, then run the scripts.
 
 ```mermaid
 flowchart LR
-  T("🏛 Census TIGERweb<br/>road lines · places · outline") --> B("scripts/geo/build.mjs")
+  T("🏛 Census TIGERweb<br/>road lines · places · outline") --> B("build.mjs")
   Y("boundaries.yaml<br/>named roads per loop") --> B
   G("data/regions/*.yaml<br/>cities · nearby") --> B
   B --> L("roads.geojson") --> R("regions.geojson") & S("silicon-valley.geojson")
   B --> P("places.csv") & C("colorado.geojson")
+  R --> V("views.mjs")
+  C --> V
+  T --> V
+  U("⛰ USGS 3DEP<br/>shaded relief") --> V
+  V --> F("views.json") & H("highways.geojson") & I("relief-*.jpg")
   R --> M("🗺 ColoradoMap")
-  C --> M
+  F --> M
+  H --> M
+  I --> M
 ```
 
 ## The loops
@@ -36,6 +43,19 @@ Photon Mountain's eight roads are the ones its own corridor map locked ([photon-
 | `silicon-valley.geojson` | The yardstick loop and its size | `roads.geojson` |
 | `places.csv` | 485 Colorado places (incorporated places and CDPs): GEOID, name, kind, interior point | TIGERweb layers 4 and 5 |
 | `colorado.geojson` | The state outline, simplified to 0.01° | TIGERweb `State_County` layer 0 |
+| `views.json` | Each map view's frame, in Web Mercator: the state, one zoomed view and one 16:9 thumbnail per region | `regions.geojson`, `colorado.geojson` |
+| `highways.geojson` | The numbered highways inside each view | TIGERweb Transportation layers 0 and 3 (state), 2 and 6 (regions) |
+| [`site/src/assets/maps/relief-*.jpg`](../../site/src/assets/maps/) | A grey shaded relief that fills each view's frame | USGS 3DEP `Hillshade Gray` |
+
+## How a map is drawn
+
+| Layer | Made by | Shows |
+| --- | --- | --- |
+| Relief image | `views.mjs`, lazy-loaded | Mountains and plains, tinted by the page's own colors |
+| Drawing, no JavaScript | [`colorado-map.ts`](../../site/src/lib/regions/colorado-map.ts) | Highways, each zone's line with its roads named, cities, a mile bar |
+| Live map, on demand | [`colorado-map.client.ts`](../../site/src/components/map/colorado-map.client.ts) | MapLibre over OpenFreeMap with Mapterhorn relief, behind "Explore the live map" |
+
+Every view is Web Mercator, so the three layers line up.
 
 ## How a loop is traced
 
@@ -65,8 +85,17 @@ Photon Mountain's eight roads are the ones its own corridor map locked ([photon-
 | `node scripts/geo/build.mjs --check` | Offline: rebuilds the zones and the yardstick from the committed files and fails on drift |
 | `node scripts/geo/build.mjs --self-test` | Known-good and known-bad geometry samples |
 | `node scripts/geo/build.mjs` | Also refetches `places.csv` and `colorado.geojson` |
+| `node scripts/geo/views.mjs` | Fetches each view's highways and relief image. Run it after the zones change |
+| `node scripts/geo/views.mjs --check` | Offline: fails when `views.json` no longer matches the zones |
 | `site/test/unit/geo/regions-geo.test.ts` | The same checks in CI |
 
 ## License and credit
 
-US Census Bureau data is not copyrighted (17 U.S.C. §105), and the Bureau asks to be credited: **Source: US Census Bureau, TIGERweb.** City centres are USGS GNIS points, also public domain. These derived files are CC0 1.0. No OpenStreetMap data is stored here. The basemap that `ColoradoMap` draws on is OpenFreeMap (© OpenMapTiles, data © OpenStreetMap contributors), and it is credited on the map itself.
+| Data | Source | Terms |
+| --- | --- | --- |
+| Roads, places, outline | US Census Bureau, TIGERweb | Not copyrighted (17 U.S.C. §105). The Bureau asks to be credited |
+| City centres | USGS GNIS, in `data/positions/geo.yaml` | Public domain |
+| Relief images | USGS 3D Elevation Program | Public domain. USGS asks to be credited |
+| These derived files | Colorado Startups | CC0 1.0 |
+
+No OpenStreetMap data is stored here. The live map's basemap is OpenFreeMap (© OpenMapTiles, data © OpenStreetMap contributors) and its relief is Mapterhorn; both are fetched in the browser and credited on the map itself.

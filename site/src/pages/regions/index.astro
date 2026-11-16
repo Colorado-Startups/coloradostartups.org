@@ -1,11 +1,13 @@
 ---
 // /regions/: the three zones, map first (step H of the 2026-11-15 redesign).
-//   1. The big live map (ColoradoMap and LiveMaps): MapLibre loads only when
-//      the map nears the screen, so the page's entry script stays small; the
-//      drawing is the whole map without JavaScript. The chips under it are its
-//      legend and list alternative: color, cities and the Connector seat.
+//   1. The big map (ColoradoMap and LiveMaps): a real-map drawing over shaded
+//      relief, the whole map without JavaScript. MapLibre loads only when a
+//      visitor presses "Explore the live map", so the page's entry script
+//      stays small. The chips under it are its legend and list alternative:
+//      color, cities and the Connector seat.
 //   2. What each region builds: the home page's three theme panels
-//      (ThemePanel and themes()), each figure with its source.
+//      (ThemePanel and themes()), each headed by its region's map, each figure
+//      with its source.
 //   3. How the regions work, in captions, and a line for founders elsewhere in
 //      Colorado (decision 45).
 // Each region's Connector seat is a person's; the keepers, AI agents, never
