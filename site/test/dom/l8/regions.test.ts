@@ -14,6 +14,7 @@ import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
 import { type CalendarEvent, startsAt } from "../../../src/components/events/events";
+import { applyFilter, NEXT_7_DAYS, readFilter } from "../../../src/components/events/list-filter";
 import { CALENDAR_TIMEZONE } from "../../../src/components/info/links";
 import { regionForCity, REGIONS } from "../../../src/lib/regions/match";
 import { summaryAfterLede } from "../../../src/lib/regions/page";
@@ -190,7 +191,9 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
       expect(li.querySelector(".here__as-of time")?.getAttribute("datetime")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
     expect(list.querySelector("li[data-count='companies'] a")?.getAttribute("href")).toBe(`/leaderboard/?region=${id}`);
-    expect(list.querySelector("li[data-count='events'] a")?.getAttribute("href")).toBe(`${WAYS_IN.events}?region=${id}`);
+    expect(list.querySelector("li[data-count='events'] a")?.getAttribute("href")).toBe(
+      `${WAYS_IN.events}?region=${id}&when=${NEXT_7_DAYS}#all-events`,
+    );
     expect(list.querySelector("li[data-count='resources'] a")?.getAttribute("href")).toBe(`/ecosystem-canvas/?region=${id}`);
     // The same numbers the page's own lists tally, and the home map's table.
     expect(n("companies")).toBe(text(page.querySelector("[data-region-honorees] .tally__n")));
@@ -205,6 +208,23 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
     expect(list.querySelector("li[data-count='events'] time")?.getAttribute("datetime")).toBe(day);
     // Regions are equals.
     expect(text(here)).not.toMatch(/\b(?:top|best|leading|biggest|largest|ranked)\b/i);
+  });
+
+  // Review of #115: the events count's link lands on a list that shows the same
+  // number. The list filters on the visitor's clock; held at the count's own
+  // build instant (data-as-of), it must show exactly the count.
+  it("links the events count to a list that shows the same number at the count's instant", () => {
+    const list = page.querySelector<HTMLElement>("[data-region-counts]")!;
+    const asOf = Date.parse(list.dataset.asOf!);
+    const href = list.querySelector("li[data-count='events'] a")!.getAttribute("href")!;
+    const filter = readFilter(new URL(href, "https://coloradostartups.org").search);
+    expect(filter).toEqual({ region: id, when: NEXT_7_DAYS, type: "" });
+    const calendar = doc(readDist("event-calendar/index.html")).querySelector("[data-event-list]")!;
+    // The region has a chip on the list even with no event, so the link never falls back to every region.
+    expect(calendar.querySelector(`input[name='region'][value='${id}']`)).not.toBeNull();
+    expect(calendar.querySelector(`input[name='when'][value='${NEXT_7_DAYS}']`)).not.toBeNull();
+    const { shown } = applyFilter(calendar, filter, asOf);
+    expect(String(shown)).toBe(text(list.querySelector("li[data-count='events'] .here__n")));
   });
 
   it("names the next event here, pruned on the visitor's clock, and the seat only while it is open", () => {

@@ -17,6 +17,7 @@ import { WAYS_IN, type Region } from "@cs/shared";
 import { getCollection } from "astro:content";
 
 import { cardPlace, endsAt, SNAPSHOT, upcomingEvents, whenText } from "../../events/events";
+import { filterQuery, NEXT_7_DAYS } from "../../events/list-filter";
 import { CALENDAR_TIMEZONE } from "../../info/links";
 import { COUNT_LABELS, zoneCounts } from "../../map/zone-counts";
 import { takesApplications } from "../../positions/positions";
@@ -53,7 +54,10 @@ const asOf = {
 };
 const hrefs = {
   companies: regionFilterHref("/leaderboard/", region.id),
-  events: `${WAYS_IN.events}?region=${encodeURIComponent(region.id)}`,
+  // The list's "Next 7 days" filter (list-filter.ts) applies the count's own
+  // rule, on the visitor's clock rather than the build's: the count says
+  // "As of" its build day, and the list counts from the day it is opened.
+  events: `${WAYS_IN.events}${filterQuery({ region: region.id, when: NEXT_7_DAYS, type: "" })}#all-events`,
   resources: regionFilterHref("/ecosystem-canvas/", region.id),
 };
 

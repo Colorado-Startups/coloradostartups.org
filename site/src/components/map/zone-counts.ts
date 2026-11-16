@@ -8,7 +8,9 @@
 //              (RegionResources.astro);
 //   events     upcomingEvents() and placeRegion(), as /data/events.json gives
 //              each event its region, kept to those that start in the next
-//              seven days.
+//              seven days (startsWithinWeek in list-filter.ts, the rule the
+//              /event-calendar/ "Next 7 days" filter applies on the visitor's
+//              clock).
 // Regions come back in REGIONS order, the data's fixed order: regions are
 // equals, so nothing here sorts them by a count.
 import type { RegionId } from "@cs/shared";
@@ -16,13 +18,14 @@ import { getCollection } from "astro:content";
 
 import { activeCards } from "../canvas/canvas-data";
 import { SNAPSHOT, startsAt, upcomingEvents } from "../events/events";
+import { startsWithinWeek, WEEK_MS } from "../events/list-filter";
 import { placeRegion } from "../../lib/data/open-data";
 import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
 import { REGIONS } from "../../lib/regions/match";
 import { honoreesIn, inRegion } from "../../lib/regions/page";
 
 /** "Next 7 days": events that have not ended and start within seven days of the build. */
-export const WEEK_MS = 7 * 86_400_000;
+export { WEEK_MS };
 
 export interface ZoneCounts {
   id: RegionId;
@@ -45,7 +48,7 @@ export async function zoneCounts(now = new Date()): Promise<ZoneCounts[]> {
   const companies = (await getCollection("companies")).map((e) => e.data);
   const edition = latestEdition((await getCollection("editions")).map((e) => e.data));
   const board = edition ? buildBoard(edition, companies).map((row) => row.company) : [];
-  const week = upcomingEvents(SNAPSHOT, now).filter((e) => startsAt(e) < now.getTime() + WEEK_MS);
+  const week = upcomingEvents(SNAPSHOT, now).filter((e) => startsWithinWeek(startsAt(e), now.getTime()));
   return regions.map((r) => ({
     id: r.id,
     name: r.name,
