@@ -181,9 +181,21 @@ async function mount(figure: HTMLElement) {
     el.textContent = z.properties.name;
     new maplibregl.Marker({ element: el, anchor: west ? "right" : "left" }).setLngLat(zoneLabelPoint(z, west ? "west" : "east")).addTo(map);
   }
-  map.once("load", () => figure.classList.add("is-live"));
   // "idle": every tile in view has loaded and drawn. Tests and screenshots wait for it.
   map.once("idle", () => (figure.dataset.map = "idle"));
+  // The map is live once its style has loaded. A style or tile host that fails
+  // first never gets there: take the map down, so the drawing shows again and
+  // the caller can offer another try.
+  try {
+    await new Promise<void>((resolve, reject) => {
+      map.once("load", () => resolve());
+      map.once("error", (e) => reject(e.error ?? new Error("the live map did not load")));
+    });
+  } catch (err) {
+    map.remove();
+    throw err;
+  }
+  figure.classList.add("is-live");
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => map.setStyle(STYLES[scheme()], { diff: false }));
 }
 
@@ -211,12 +223,15 @@ export function mountColoradoMaps() {
     open.addEventListener("click", () => {
       open.disabled = true;
       open.textContent = "Loading the live map";
-      // A failed load leaves the drawing in place, which is the whole map without the basemap.
+      // A failed load leaves the drawing in place, which is the whole map
+      // without the basemap, says why in the console, and offers another try.
       mount(figure)
         .then(() => (open.hidden = true))
-        .catch(() => {
+        .catch((err: unknown) => {
+          console.error("The live map did not load:", err);
           figure.dataset.map = "failed";
-          open.hidden = true;
+          open.disabled = false;
+          open.textContent = "Try the live map again";
         });
     });
   }

@@ -75,3 +75,24 @@ test("/regions/fusion-canyon/ map: zoomed to the zone, drawing then live map", a
   await expect(map).toHaveAttribute("data-map", "idle", { timeout: 30_000 });
   expect(errors).toEqual([]);
 });
+
+// A Why Colorado card's map thumbnail is a link at the top of a card that
+// clips its overflow. Its focus ring draws inside the link's own box, so the
+// card cannot cut it.
+test("/ map thumbnails keep their focus ring inside the card", async ({ page }) => {
+  await page.goto("/");
+  const link = page.locator("a.colorado-map--thumb").first();
+  // Reach it by keyboard, as a visitor tabbing through the page does: a ring shows on keyboard focus.
+  for (let i = 0; i < 80; i++) {
+    await page.keyboard.press("Tab");
+    if (await link.evaluate((a) => a === document.activeElement)) break;
+  }
+  const ring = await link.evaluate((a) => {
+    const style = getComputedStyle(a);
+    return { visible: a.matches(":focus-visible"), offset: parseFloat(style.outlineOffset), width: parseFloat(style.outlineWidth), drawn: style.outlineStyle };
+  });
+  expect(ring.visible).toBe(true);
+  expect(ring.drawn).not.toBe("none");
+  expect(ring.width).toBeGreaterThan(0);
+  expect(ring.offset, "a ring outside the link would be clipped by the card").toBeLessThan(0);
+});

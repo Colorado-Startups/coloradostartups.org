@@ -160,6 +160,11 @@ const hits = zone
     border-radius: 0;
     box-shadow: none;
   }
+  /* A thumbnail fills the top of a card that clips its overflow, so the focus
+     ring draws inside the link's own box, where nothing cuts it. */
+  .colorado-map--thumb:focus-visible {
+    outline-offset: calc(-1 * var(--line-bold));
+  }
   .colorado-map__relief,
   .colorado-map__drawing,
   .colorado-map__live {

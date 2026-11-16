@@ -80,7 +80,10 @@ const json = (o) => `${JSON.stringify(o, null, 1)}\n`;
 async function getJson(url) {
   const res = await fetch(url, { headers: AGENT });
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  return res.json();
+  const data = await res.json();
+  // ArcGIS reports a bad query as HTTP 200 with an error body.
+  if (data?.error) throw new Error(`${url}: ${data.error.message ?? JSON.stringify(data.error)}`);
+  return data;
 }
 
 const KIND = { I: "interstate", U: "us", S: "state" };
@@ -107,7 +110,8 @@ async function fetchHighways(view, box, layers, types, tolKm) {
     });
     const d = await getJson(`${TIGER_ROADS}/${layer}/query?${q}`);
     if (d.exceededTransferLimit || d.properties?.exceededTransferLimit) throw new Error(`road layer ${layer}: more lines than one page for ${view}`);
-    for (const { properties: p, geometry: g } of d.features ?? []) {
+    if (!Array.isArray(d.features)) throw new Error(`road layer ${layer}: no feature list for ${view}`);
+    for (const { properties: p, geometry: g } of d.features) {
       // A business route, a spur or an express lane is not the road itself.
       if (!g || !/^(I- |US Hwy |State Hwy )\d+$/.test(p.NAME ?? "")) continue;
       const road = byName.get(p.NAME) ?? { kind: KIND[p.RTTYP], lines: [] };
@@ -125,7 +129,7 @@ async function fetchHighways(view, box, layers, types, tolKm) {
       }
     }
   }
-  return [...byName.entries()]
+  const roads = [...byName.entries()]
     .filter(([, road]) => road.lines.length)
     .sort(([a], [b]) => a.localeCompare(b, "en", { numeric: true }))
     .map(([name, road]) => ({
@@ -133,6 +137,9 @@ async function fetchHighways(view, box, layers, types, tolKm) {
       properties: { view, name: roadLabel(name), kind: road.kind },
       geometry: { type: "MultiLineString", coordinates: road.lines },
     }));
+  // Every view here has Interstate 25 in it: a view with no highway is a failed fetch, not a quiet place.
+  if (!roads.length) throw new Error(`no highways found for ${view} inside [${box}]`);
+  return roads;
 }
 
 /** A grey shaded relief that fills a frame exactly, as JPEG bytes, at twice the frame's px. */
@@ -189,6 +196,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       // A px is 100 to 150 m in these views.
       features.push(...(await fetchHighways(z.id, both, [2, 6], ["I", "U", "S"], 0.1)));
     }
+    // Fetch every relief before writing anything: a failed fetch then leaves the frames, roads and images that were there, still matching.
+    const reliefs = [];
+    for (const [id, v] of Object.entries(views)) reliefs.push([id, await fetchRelief(v)]);
     writeFileSync(
       join(OUT, "highways.geojson"),
       format({
@@ -200,7 +210,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       }),
     );
     writeFileSync(join(OUT, "views.json"), json(views));
-    for (const [id, v] of Object.entries(views)) writeFileSync(join(ASSETS, `relief-${id}.jpg`), await fetchRelief(v));
+    for (const [id, image] of reliefs) writeFileSync(join(ASSETS, `relief-${id}.jpg`), image);
     console.log(`geo: ${Object.keys(views).length} views, ${features.length} highways and ${Object.keys(views).length} relief images written`);
   } catch (err) {
     console.error(`geo: ${err instanceof Error ? err.message : String(err)}`);
