@@ -1,10 +1,22 @@
 ---
 // The Google Calendar embed on /event-calendar/, with the cookie note the
 // privacy policy promises ("The event calendar" in data/legal/privacy.md).
-// No JavaScript: the iframe loads lazily, and a plain link opens the same
-// calendar on Google for anyone whose browser blocks the frame. Owner: L13.
+// The iframe loads lazily, and a plain link opens the same calendar on Google
+// for anyone whose browser blocks the frame. Owner: L13.
+//
+// `deferred` (L2a, 2026-11-16): Chrome loads a lazy iframe even inside a
+// closed <details>, so a deferred embed holds its URL in data-src, and the
+// script below sets src when the enclosing <details> opens. Without
+// JavaScript the open frame stays empty and the note behind it and the
+// caption link still open the calendar on Google.
 import { calendarEmbedUrl, GOOGLE_PRIVACY } from "./links";
 
+interface Props {
+  /** Wait to load Google's frame until the enclosing <details> opens. */
+  deferred?: boolean;
+}
+
+const { deferred = false } = Astro.props;
 const src = calendarEmbedUrl();
 ---
 
@@ -20,7 +32,8 @@ const src = calendarEmbedUrl();
       </p>
     </div>
     <iframe
-      src={src}
+      src={deferred ? undefined : src}
+      data-src={deferred ? src : undefined}
       title="Colorado Startups event calendar, from Google Calendar"
       loading="lazy"
       referrerpolicy="strict-origin-when-cross-origin"
@@ -32,6 +45,12 @@ const src = calendarEmbedUrl();
     says what we collect. <a href={src} rel="noopener">Open the calendar on Google</a>.
   </figcaption>
 </figure>
+
+<script>
+  import { wireDeferredFrames } from "./calendar-defer";
+
+  wireDeferredFrames(document);
+</script>
 
 <style>
   .calendar {

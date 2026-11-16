@@ -115,7 +115,9 @@ describe("/event-calendar/", () => {
 
   it("embeds the Google Calendar with a title and lazy loading", () => {
     const frame = main(d).querySelector("iframe")!;
-    expect(frame.getAttribute("src")).toBe(calendarEmbedUrl());
+    // Deferred behind the "Full calendar" disclosure since L2a: the URL waits
+    // in data-src until the disclosure opens (test/dom/events-list.test.ts).
+    expect(frame.getAttribute("data-src")).toBe(calendarEmbedUrl());
     expect(frame.getAttribute("title")).toMatch(/calendar/i);
     expect(frame.getAttribute("loading")).toBe("lazy");
   });
