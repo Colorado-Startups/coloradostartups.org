@@ -20,8 +20,8 @@
   "south": 39.62508,
   "east": -104.55372,
   "north": 40.12317,
-  "width": 384,
-  "height": 216
+  "width": 368,
+  "height": 207
  },
  "zone-space-peak": {
   "west": -105.17817,
@@ -36,8 +36,8 @@
   "south": 38.56387,
   "east": -104.1392,
   "north": 39.10715,
-  "width": 384,
-  "height": 216
+  "width": 368,
+  "height": 207
  },
  "zone-fusion-canyon": {
   "west": -105.23128,
@@ -52,7 +52,7 @@
   "south": 40.3333,
   "east": -104.60111,
   "north": 40.65501,
-  "width": 384,
-  "height": 216
+  "width": 368,
+  "height": 207
  }
 }

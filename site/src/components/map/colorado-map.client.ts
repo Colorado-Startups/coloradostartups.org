@@ -204,7 +204,7 @@ export function mountColoradoMaps() {
         const link = document.createElement("link");
         link.rel = "preconnect";
         link.href = "https://tiles.openfreemap.org";
-        document.head.append(link);
+        document.head.appendChild(link);
       },
       { once: true },
     );

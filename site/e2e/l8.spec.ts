@@ -8,6 +8,8 @@
 // to the new drawing: labels inside the map, no label over another label or
 // another city's dot, and labels at 15 px or more (#329). The drawing scales
 // to about half on a phone, so the 15 px rule is fixme there until #54.
+// /regions/ has four drawings (the state map and each theme panel's map
+// thumbnail), so each check reads every drawing on the page.
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -27,45 +29,51 @@ for (const width of [360, 375, 480, 1280]) {
     for (const path of PAGES) {
       test(`${path} keeps every label inside the map`, async ({ page }) => {
         await page.goto(path);
-        const outside = await page.locator(".colorado-map__drawing svg").evaluate((svg) => {
-          const box = svg.getBoundingClientRect();
-          return [...svg.querySelectorAll("text")]
-            .map((t) => ({ text: t.textContent, r: t.getBoundingClientRect() }))
-            .filter(({ r }) => r.left < box.left - 0.5 || r.right > box.right + 0.5 || r.top < box.top - 0.5 || r.bottom > box.bottom + 0.5)
-            .map(({ text }) => text);
-        });
+        const outside = await page.locator(".colorado-map__drawing svg").evaluateAll((svgs) =>
+          svgs.flatMap((svg) => {
+            const box = svg.getBoundingClientRect();
+            return [...svg.querySelectorAll("text")]
+              .map((t) => ({ text: t.textContent, r: t.getBoundingClientRect() }))
+              .filter(({ r }) => r.left < box.left - 0.5 || r.right > box.right + 0.5 || r.top < box.top - 0.5 || r.bottom > box.bottom + 0.5)
+              .map(({ text }) => text);
+          }),
+        );
         expect(outside).toEqual([]);
       });
 
       test(`${path} keeps every label off the other labels and off the dots`, async ({ page }) => {
         await page.goto(path);
-        const clashes = await page.locator(".colorado-map__drawing svg").evaluate((svg) => {
-          const labels = [...svg.querySelectorAll("text")].map((t) => ({ text: t.textContent ?? "", r: t.getBoundingClientRect() }));
-          const dots = [...svg.querySelectorAll("circle")].map((c) => {
-            const r = c.getBoundingClientRect();
-            return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-          });
-          const hit = (a: DOMRect, b: DOMRect) => a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
-          const out: string[] = [];
-          labels.forEach((a, i) => {
-            for (const b of labels.slice(i + 1)) if (hit(a.r, b.r)) out.push(`${a.text} / ${b.text}`);
-            for (const d of dots) if (d.x > a.r.left && d.x < a.r.right && d.y > a.r.top && d.y < a.r.bottom) out.push(`${a.text} over a dot`);
-          });
-          return out;
-        });
+        const clashes = await page.locator(".colorado-map__drawing svg").evaluateAll((svgs) =>
+          svgs.flatMap((svg) => {
+            const labels = [...svg.querySelectorAll("text")].map((t) => ({ text: t.textContent ?? "", r: t.getBoundingClientRect() }));
+            const dots = [...svg.querySelectorAll("circle")].map((c) => {
+              const r = c.getBoundingClientRect();
+              return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+            });
+            const hit = (a: DOMRect, b: DOMRect) => a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
+            const out: string[] = [];
+            labels.forEach((a, i) => {
+              for (const b of labels.slice(i + 1)) if (hit(a.r, b.r)) out.push(`${a.text} / ${b.text}`);
+              for (const d of dots) if (d.x > a.r.left && d.x < a.r.right && d.y > a.r.top && d.y < a.r.bottom) out.push(`${a.text} over a dot`);
+            });
+            return out;
+          }),
+        );
         expect(clashes).toEqual([]);
       });
 
       test(`${path} draws its labels at 15 px or more`, async ({ page }) => {
         test.fixme(width < 900, "#54: the drawing scales to about half on a phone");
         await page.goto(path);
-        const small = await page.locator(".colorado-map__drawing svg").evaluate((svg) => {
-          const scale = svg.getBoundingClientRect().width / ((svg as SVGSVGElement).viewBox.baseVal.width || svg.getBoundingClientRect().width);
-          return [...svg.querySelectorAll("text")]
-            .map((t) => ({ text: t.textContent, px: parseFloat(getComputedStyle(t).fontSize) * scale }))
-            .filter(({ px }) => px < 15)
-            .map(({ text, px }) => `${text} at ${px.toFixed(1)} px`);
-        });
+        const small = await page.locator(".colorado-map__drawing svg").evaluateAll((svgs) =>
+          svgs.flatMap((svg) => {
+            const scale = svg.getBoundingClientRect().width / ((svg as SVGSVGElement).viewBox.baseVal.width || svg.getBoundingClientRect().width);
+            return [...svg.querySelectorAll("text")]
+              .map((t) => ({ text: t.textContent, px: parseFloat(getComputedStyle(t).fontSize) * scale }))
+              .filter(({ px }) => px < 15)
+              .map(({ text, px }) => `${text} at ${px.toFixed(1)} px`);
+          }),
+        );
         expect(small).toEqual([]);
       });
     }

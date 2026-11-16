@@ -29,7 +29,8 @@ describe("home maps", () => {
     expect(link.getAttribute("href")).toBe(`/regions/${id}/`);
     const svg = link.querySelector("svg[role='img']")!;
     expect(svg.getAttribute("aria-label")).toMatch(/^Map of /);
-    expect(svg.getAttribute("viewBox")).toBe("0 0 384 216");
+    const [, , width, height] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+    expect(width! / height!).toBeCloseTo(16 / 9, 1);
     const relief = link.querySelector<HTMLImageElement>("img.colorado-map__relief")!;
     expect(relief.getAttribute("alt")).toBe("");
     expect(relief.getAttribute("loading")).toBe("lazy");

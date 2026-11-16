@@ -29,10 +29,11 @@ const AGENT = { "User-Agent": "coloradostartups.org geo build" };
 
 /**
  * Frame sizes in px: the statewide and zoomed maps, and the 16:9 thumbnail. A
- * thumbnail draws about 380 px wide, so its frame is that size: type and line
- * weights then read at their own size, not shrunk.
+ * thumbnail draws about 373 px wide in a three-card row at 1280 px, so its
+ * frame is a little under that: its 15 px names then draw at 15 px or more,
+ * the rule e2e/l8.spec.ts checks.
  */
-export const SIZE = { full: [640, 470], thumb: [384, 216] };
+export const SIZE = { full: [640, 470], thumb: [368, 207] };
 /** Air around what a view shows, as a share of the frame on each side. */
 const PAD = { state: 0.03, zone: 0.16, thumb: 0.2 };
 
