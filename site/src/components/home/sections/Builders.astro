@@ -2,21 +2,17 @@
 // Builders (step P1): 12 companies from the latest Leaderboard edition, right
 // under the hero, so the page's first promise ("Meet the founders building
 // companies in Colorado") shows companies at once. lib/home/builders.ts picks
-// them the same way on every build, spread across the regions and their
-// cities. Companies only, never people, and nothing about investing
-// (decision 17).
+// them and turns the pick each ISO week. Companies only, never people, and
+// nothing about investing (decision 17). No logos: other companies' marks are
+// theirs.
 //
-// | Shows | How |
+// | Each tile shows | How |
 // | --- | --- |
-// | Name and city | always, as one link to the company's row on /leaderboard/ |
-// | Region | a peak in the region's color (REGION_COLORS); its name for screen readers |
-// | One line about it | on hover, keyboard focus or a first tap; Escape closes it |
+// | Name | the tile is one link to the company's row on /leaderboard/ |
+// | Sector | one word (SECTOR_WORD), so 12 tiles fit the band's 60 words |
+// | Region | the tile's left edge in the region's color (REGION_COLORS), as on the map legend; its name for screen readers |
 //
-// The line is the link's description (aria-describedby), so a screen reader
-// hears it with the name. Its visible copy is aria-hidden, the way a tooltip
-// repeats a description, and it is not on screen until opened, so the band's
-// word count leaves it out. builders.test.ts caps each line at 20 words.
-// CSS opens the line; the script below only adds Escape and the first tap.
+// Nothing opens on hover or tap, and the band runs no script.
 import { WAYS_IN, type RegionId } from "@cs/shared";
 import { getCollection } from "astro:content";
 
@@ -41,22 +37,18 @@ const color = (region: string) => (region === ELSEWHERE ? "var(--c-text-dim)" : 
         <ul class="builders__list" role="list" data-builders>
           {builders.map((b) => (
             <li class="builder" style={`--region-color: ${color(b.region)}`} data-builder={b.id}>
-              <a class="builder__link" href={`${WAYS_IN.leaderboard}#company-${b.id}`} aria-describedby={`builder-${b.id}-line`}>
-                <span class="builder__peak" aria-hidden="true" />
+              <a class="builder__link" href={`${WAYS_IN.leaderboard}#company-${b.id}`}>
                 <span class="builder__name">{b.name}</span>
-                <span class="builder__city">
-                  {b.city}
+                <span class="builder__sector">
+                  {b.sector}
                   <span class="visually-hidden">, {regionName.get(b.region) ?? "outside the three regions"}</span>
                 </span>
               </a>
-              <span class="builder__line" id={`builder-${b.id}-line`} aria-hidden="true">
-                {b.line}
-              </span>
             </li>
           ))}
         </ul>
         <p class="builders__more">
-          <a href={WAYS_IN.leaderboard}>See all companies</a>{" "}
+          <a href={WAYS_IN.leaderboard}>See the Leaderboard</a>{" "}
           <a href="/leaderboard/nominate/">Nominate a company</a>
         </p>
       </div>
@@ -64,127 +56,46 @@ const color = (region: string) => (region === ELSEWHERE ? "var(--c-text-dim)" : 
   )
 }
 
-<script>
-  // Escape closes an open line (hover content must be dismissible) until the
-  // pointer or focus moves again. On touch, the first tap on a company opens
-  // its line and the second follows the link.
-  const list = document.querySelector<HTMLElement>("[data-builders]");
-  if (list) {
-    let touch = false;
-    const closeAll = () => list.querySelectorAll("[data-open]").forEach((el) => el.removeAttribute("data-open"));
-    list.addEventListener("pointerdown", (e) => {
-      touch = e.pointerType === "touch";
-    });
-    list.addEventListener("click", (e) => {
-      const item = (e.target as Element).closest<HTMLElement>("[data-builder]");
-      if (!touch || !item || item.hasAttribute("data-open")) return;
-      e.preventDefault();
-      closeAll();
-      list.removeAttribute("data-dismissed");
-      item.setAttribute("data-open", "");
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape") return;
-      closeAll();
-      list.setAttribute("data-dismissed", "");
-    });
-    document.addEventListener("pointerdown", (e) => {
-      if (!list.contains(e.target as Node)) closeAll();
-    });
-    const reopen = () => list.removeAttribute("data-dismissed");
-    list.addEventListener("pointerover", reopen);
-    list.addEventListener("focusin", reopen);
-  }
-</script>
-
 <style>
   /* A list gets the reading measure by default (global.css); this one is a grid. */
   .builders__list {
     max-width: none;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0 var(--s-4);
+    gap: var(--s-3);
     margin: var(--s-4) 0 0;
     padding: 0;
     list-style: none;
   }
-  .builder {
-    position: relative;
-    border-top: var(--line-hair) solid var(--c-rule);
-  }
+  /* The card material of the region chips: surface, hairline, a region-colored edge. */
   .builder__link {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    column-gap: var(--s-2);
-    align-items: baseline;
+    align-content: start;
+    gap: var(--s-1);
+    height: 100%;
     min-height: var(--size-tap);
-    padding-block: var(--s-3);
+    padding: var(--s-3) var(--s-3) var(--s-3) var(--s-4);
+    border-radius: var(--r-card);
+    border-left: var(--line-bold) solid var(--region-color);
+    background: var(--c-surface);
+    box-shadow: 0 0 0 var(--line-hair) var(--c-border);
+    color: var(--c-text);
     text-decoration: none;
-  }
-  /* A peak in the region's color: the regions are named for mountains. */
-  .builder__peak {
-    width: 0.8em;
-    height: 0.7em;
-    background: var(--region-color);
-    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    overflow-wrap: anywhere;
   }
   .builder__name {
-    color: var(--c-link);
+    font-family: var(--font-display);
     font-weight: 700;
-    text-decoration: underline;
-    text-decoration-thickness: var(--line-hair);
-    text-underline-offset: 0.15em;
+    line-height: 1.25;
   }
   .builder__link:hover .builder__name,
   .builder__link:focus-visible .builder__name {
+    text-decoration: underline;
     text-decoration-thickness: var(--line-edge);
   }
-  .builder__city {
-    grid-column: 2;
+  .builder__sector {
     color: var(--c-text-dim);
     font-size: var(--t-step--1);
-  }
-
-  /* The line opens over the next row, so nothing below moves (CLS). */
-  .builder__line {
-    position: absolute;
-    inset-inline: 0;
-    top: calc(100% - var(--s-2));
-    z-index: 2;
-    padding: var(--s-2) var(--s-3);
-    border-top: var(--line-bold) solid var(--region-color);
-    border-radius: 0 0 var(--r-card) var(--r-card);
-    background: var(--c-surface);
-    box-shadow: var(--sh-edge);
-    color: var(--c-text);
-    font-size: var(--t-step--1);
-    line-height: 1.4;
-    opacity: 0;
-    visibility: hidden;
-    translate: 0 calc(-1 * var(--s-1));
-    transition:
-      opacity 120ms ease-out,
-      translate 120ms ease-out,
-      visibility 0s linear 120ms;
-    pointer-events: none;
-  }
-  .builder:hover .builder__line,
-  .builder:focus-within .builder__line,
-  .builder[data-open] .builder__line {
-    opacity: 1;
-    visibility: visible;
-    translate: 0 0;
-    transition-delay: 0s;
-  }
-  .builders__list[data-dismissed] .builder .builder__line {
-    opacity: 0;
-    visibility: hidden;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .builder__line {
-      transition: none;
-      translate: none;
-    }
   }
 
   .builders__more {
