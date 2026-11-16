@@ -1,0 +1,212 @@
+---
+// The three regions side by side as equals (step W6 of the 2026-11-15
+// engagement plan): one column per region, in data order, each headed by its
+// crest and name; one row per tally, each naming its source. Regions are
+// never ranked (brand decisions 12 and 58): the order is the data's, never
+// the counts', and no copy names a winner. Each bar scales within its own row
+// and carries its number as text. Bars share one neutral token; a region's
+// color shows only as the swatch beside its name. The bars rise in with the
+// house reveal (data-reveal in global.css); no script. No member count.
+// Owner: L8.
+import type { Region } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { brandArt } from "../art/art-assets";
+import { REGION_CREST_ALT, regionCrestKey } from "../art/keepers";
+import { activeCards } from "../canvas/canvas-data";
+import { SNAPSHOT, upcomingEvents } from "../events/events";
+import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
+import { REGION_COLORS } from "../../lib/regions/map";
+import { honoreesIn, inRegion } from "../../lib/regions/page";
+import { EVENT_WINDOW_DAYS, eventCity, shares, startingWithin } from "./tallies";
+
+interface Props {
+  regions: readonly Region[];
+  /** The build's clock, for the events window. */
+  now?: Date;
+}
+
+const { regions, now = new Date() } = Astro.props;
+
+const companies = (await getCollection("companies")).map((e) => e.data);
+const edition = latestEdition((await getCollection("editions")).map((e) => e.data));
+if (!edition) throw new Error("no Leaderboard edition in data/leaderboard/editions/");
+const board = buildBoard(edition, companies).map((row) => row.company);
+const cards = await activeCards();
+const events = startingWithin(upcomingEvents(SNAPSHOT, now), now);
+const positions = (await getCollection("positions")).map((e) => e.data);
+
+const snapshotDay = SNAPSHOT ? SNAPSHOT.fetchedAt.slice(0, 10) : "no snapshot";
+
+const tallies = [
+  {
+    id: "companies",
+    label: "Leaderboard companies",
+    source: `the Leaderboard's ${edition.title} edition, by headquarters city`,
+    count: (r: Region) => honoreesIn(r.id, board, regions).length,
+  },
+  {
+    id: "events",
+    label: `Events in the next ${EVENT_WINDOW_DAYS} days`,
+    source: `the community event calendar, snapshot of ${snapshotDay}, by venue city`,
+    count: (r: Region) => inRegion(r.id, events, eventCity, regions).length,
+  },
+  {
+    id: "resources",
+    label: "Startup Resources",
+    source: "the Startup Resources directory, active listings by city",
+    count: (r: Region) => inRegion(r.id, cards, (c) => c.city, regions).length,
+  },
+  {
+    id: "seats",
+    label: "Open volunteer seats",
+    source: "the seats listed on Get involved",
+    count: (r: Region) => positions.filter((p) => p.region === r.id && p.status === "open").length,
+  },
+].map((t) => {
+  const counts = regions.map(t.count);
+  return { ...t, counts, shares: shares(counts) };
+});
+
+const crests = regions.map((r) => {
+  const crest = brandArt(regionCrestKey(r.id));
+  if (!crest) throw new Error(`no crest for region "${r.id}"; add it to brand.lock.json`);
+  return crest;
+});
+---
+
+<div class="tallies">
+  <table class="tallies__table">
+    <caption class="visually-hidden">Four tallies for each region. Regions are listed in their fixed order.</caption>
+    <thead>
+      <tr>
+        <td></td>
+        {
+          regions.map((r, i) => (
+            <th scope="col" data-region={r.id} style={`--region-color: ${REGION_COLORS[r.id]}`}>
+              <img
+                class="tallies__crest"
+                src={crests[i]!.src}
+                srcset={crests[i]!.srcset}
+                sizes="40px"
+                width="40"
+                height="40"
+                alt={REGION_CREST_ALT[r.id]}
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="tallies__name">
+                <span class="tallies__swatch" aria-hidden="true" />
+                {r.name}
+              </span>
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        tallies.map((t) => (
+          <tr data-tally={t.id}>
+            <th scope="row">
+              <span class="tally__label">{t.label}</span>
+              <span class="tally__source">Source: {t.source}.</span>
+            </th>
+            {regions.map((r, i) => (
+              <td data-region={r.id}>
+                <span class="tally__value">{t.counts[i]}</span>
+                <span class="tally__track" aria-hidden="true">
+                  <span class="tally__bar" style={`--share: ${t.shares[i]!.toFixed(3)}`} data-reveal />
+                </span>
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  /* A real table: the regions are its columns, so a screen reader hears the
+     region with every number. Narrow screens scroll it inside its own box. */
+  .tallies {
+    overflow-x: auto;
+    margin-top: var(--s-5);
+  }
+  .tallies__table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .tallies__table th,
+  .tallies__table td {
+    padding: var(--s-3) var(--s-3);
+    text-align: start;
+    vertical-align: top;
+  }
+  .tallies__table thead th {
+    border-bottom: var(--line-edge) solid var(--c-rule);
+    vertical-align: bottom;
+  }
+  .tallies__table tbody tr + tr > * {
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .tallies__table tbody th {
+    width: 30%;
+  }
+  .tallies__crest {
+    display: block;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: var(--s-2);
+  }
+  .tallies__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--t-step-0);
+  }
+  .tallies__swatch {
+    display: inline-block;
+    margin-inline-end: var(--s-2);
+    vertical-align: middle;
+    width: 14px;
+    height: 14px;
+    border-radius: var(--r-chisel);
+    background: var(--region-color);
+  }
+  .tally__label {
+    display: block;
+    font-weight: 700;
+  }
+  .tally__source {
+    display: block;
+    margin-top: var(--s-1);
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+    font-weight: 400;
+  }
+  .tally__value {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--t-step-2);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .tally__track {
+    display: block;
+    height: 10px;
+    margin-top: var(--s-2);
+    border-radius: var(--r-chisel);
+    background: var(--c-surface-2);
+  }
+  .tally__bar {
+    display: block;
+    width: calc(var(--share) * 100%);
+    height: 100%;
+    border-radius: var(--r-chisel);
+    background: var(--c-border);
+  }
+</style>
