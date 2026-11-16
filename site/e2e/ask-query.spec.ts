@@ -11,6 +11,7 @@ test("/ask/?q= fills Pagefind's search box with the words", async ({ page }) => 
 test("the home page's Ask box opens /ask/ with the words", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("Search resources, companies, guides and events").fill("accelerator");
-  await page.getByRole("button", { name: "Search" }).click();
+  // In <main>: from 1200 px wide the header's own Search button (K1) shows too.
+  await page.locator("main").getByRole("button", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/ask\/\?q=accelerator$/);
 });
