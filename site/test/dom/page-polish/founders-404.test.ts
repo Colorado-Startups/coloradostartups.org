@@ -1,7 +1,8 @@
 // /founders/ and the 404 page over the built site (run `npm run build`
 // first; test:content does).
-//   - #218: the founders forum's one action, Join the Slack, sits under the
-//     lede in the first section, so it shows in the first screen.
+//   - #218: the founders forum's main action sits under the lede in the
+//     first section, so it shows in the first screen. Since step F1 that is
+//     Join the waitlist, a link to the form; Join the Slack is the second.
 //   - #212: each page shows one piece of Hall art the site already ships,
 //     through ArtImage, after the text in source order so a phone reads the
 //     words and the button first. Neither shows a keeper, so neither adds an
@@ -36,20 +37,38 @@ describe("/founders/ first screen (#218, #212)", () => {
   const doc = parse(html);
   const hero = doc.querySelector("main section")!;
 
-  it("puts Join the Slack in a btn-row under the lede in the first section", () => {
+  it("puts Join the waitlist first and Join the Slack second in a btn-row under the lede (F1)", () => {
     const row = hero.querySelector(".btn-row");
     const lede = hero.querySelector(".lede")!;
-    const link = row?.querySelector<HTMLAnchorElement>(`a[href="${WAYS_IN.slack}"]`);
-    expect(link?.textContent?.trim()).toBe("Join the Slack");
-    expect(link?.classList.contains("btn--gold")).toBe(true);
-    expect(row?.querySelectorAll("a, button")).toHaveLength(1);
+    const actions = [...(row?.querySelectorAll<HTMLAnchorElement>("a, button") ?? [])];
+    expect(actions).toHaveLength(2);
+    const [waitlist, slack] = actions;
+    expect(waitlist?.textContent?.trim()).toBe("Join the waitlist");
+    expect(waitlist?.getAttribute("href")).toBe("#waitlist");
+    expect(waitlist?.classList.contains("btn--gold")).toBe(true);
+    expect(doc.getElementById("waitlist")?.querySelector("form[action='/api/waitlist']")).not.toBeNull();
+    expect(slack?.textContent?.trim()).toBe("Join the Slack");
+    expect(slack?.getAttribute("href")).toBe(WAYS_IN.slack);
+    expect(slack?.classList.contains("btn--gold")).toBe(false);
     expect(lede.compareDocumentPosition(row!) & FOLLOWS).toBeTruthy();
   });
 
-  it("keeps the closing Slack and newsletter buttons", () => {
-    const when = doc.getElementById("when")!.closest("section")!;
-    expect(when.querySelector(`a[href="${WAYS_IN.slack}"]`)).not.toBeNull();
-    expect(when.querySelector(`a[href="${WAYS_IN.newsletter}"]`)).not.toBeNull();
+  it("turns Who it is for into a checklist, and keeps the Slack and LinkedIn Group line (F1)", () => {
+    const who = doc.getElementById("who")!.parentElement!;
+    const items = [...who.querySelectorAll("ul.checklist li")];
+    const words = items.map((li) => li.querySelector("span:not([aria-hidden])")?.textContent?.trim());
+    expect(words).toEqual(["Founder or cofounder", "Building a company in Colorado", "Any stage, from first idea to growth"]);
+    // Each line wears a check mark that assistive tech skips.
+    for (const li of items) expect(li.querySelector("[aria-hidden='true']")?.textContent?.trim()).toBe("✓");
+    expect(who.querySelector("ul.checklist input")).toBeNull();
+    expect(who.textContent).toContain("Talent, investors, lenders and service providers are welcome in the Slack");
+  });
+
+  it("ends with the waitlist and keeps the newsletter link (F1)", () => {
+    const waitlist = doc.getElementById("waitlist")!;
+    expect(waitlist.querySelector("form[action='/api/waitlist']")).not.toBeNull();
+    expect(waitlist.querySelector(`a[href="${WAYS_IN.newsletter}"]`)?.textContent?.trim()).toBe("Get the newsletter");
+    expect(doc.getElementById("when")).toBeNull();
   });
 
   it("shows the founders scene in the first section, after the button", () => {

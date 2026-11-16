@@ -29,9 +29,11 @@ describe("Join the Slack says it opens a Google Form", () => {
     expect(noteFor(doc, cta)).toBe("Opens a Google Form.");
   });
 
-  // Every Join the Slack button in main, not only the first: /founders/ has
+  // Every Join the Slack button in main, not only the first: /founders/ had
   // one in its first screen (#483) and one lower down, and only the lower one
-  // had a note (review of #518). The card links home and /community/ build
+  // had a note (review of #518). Since step F1 the waitlist took the lower
+  // one's place, and the first-screen button keeps its note. The card links
+  // home and /community/ build
   // from channels.ts are plain links with no note yet; #128 tracks them.
   it.each(["/", "/community/", "/founders/"])("%s: every Join the Slack button has a visible note", (route) => {
     const page = contentPages().find((p) => p.route === route)!;

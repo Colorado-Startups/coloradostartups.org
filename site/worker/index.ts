@@ -16,16 +16,18 @@ import { sweepApplications } from "./routes/apply";
 import { purgeCspReports } from "./routes/csp-report";
 import { purgeJoinRequests } from "./routes/join";
 import { sweepNominations } from "./routes/nominate";
+import { purgeWaitlist } from "./routes/waitlist";
 
 export { ResourcusRPC } from "./rpc";
 
-// Weekly retention (wrangler.jsonc triggers). Five jobs, each a deletion the
+// Weekly retention (wrangler.jsonc triggers). Six jobs, each a deletion the
 // privacy policy promises:
 //   - ask_logs past 90 days and ask_sessions past one day (decision 38)
 //   - seat applications still undecided after 180 days (L19)
 //   - nominations no edition claimed, cleared at 180 days (L29g)
 //   - security report types no browser has sent in 90 days (L29g)
 //   - Slack join requests past 90 days, whatever their status (P5a)
+//   - founders forum waitlist entries past 365 days, whatever happened (F1)
 // Each job returns its log line's counts, and nothing else.
 const RETENTION: ReadonlyArray<readonly [label: string, job: (db: D1Database) => Promise<string>]> = [
   [
@@ -39,6 +41,7 @@ const RETENTION: ReadonlyArray<readonly [label: string, job: (db: D1Database) =>
   ["nominations sweep", async (db) => `${await sweepNominations(db)} cleared`],
   ["csp_reports purge", async (db) => `${await purgeCspReports(db)} deleted`],
   ["slack_join_requests purge", async (db) => `${await purgeJoinRequests(db)} deleted`],
+  ["founders_waitlist purge", async (db) => `${await purgeWaitlist(db)} deleted`],
 ];
 
 function withSecurityHeaders(response: Response): Response {

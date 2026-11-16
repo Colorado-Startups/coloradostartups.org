@@ -5,7 +5,7 @@ summary: What Colorado Startups collects on this website, why, who helps us run 
 status: approved
 ---
 
-<!-- Approved at Gate B on 2026-10-18 (decision 71). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. The 2026-11-16 change is the P5a PR, for the orchestrator's merge review. -->
+<!-- Approved at Gate B on 2026-10-18 (decision 71). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. The 2026-11-16 changes are the P5a PR (#92) and the F1 PR, each for the orchestrator's merge review. -->
 
 Colorado Startups, Ltd. runs this website for a community of entrepreneurs building companies in Colorado, and for the wider startup community around them. This page says what we collect, why, and what you can ask us to do with it.
 
@@ -75,6 +75,17 @@ How we use what you send:
 - Deleted requests can stay in Cloudflare's restore points of our database for up to 30 days (Cloudflare's D1 Time Travel documentation, read 2026-10-18).
 - To have your request deleted sooner, write to info@coloradostartups.org.
 
+**Joining the founders forum waitlist.** The waitlist form on the founders forum page (`/founders/`) collects your first and last name, your email and your company's name. It also collects your confirmation that you are a founder or cofounder of a company in Colorado. If you choose, it takes your company's website and its stage. We store entries in our database on Cloudflare (D1), and we do not store your IP address with them.
+
+- We use your entry only to email you once when the forum opens, and then to check that you are a founder. Joining the waitlist does not admit you to the forum.
+- Paul Foley reads the waitlist. We do not sell or share it, and it never leaves Colorado Startups.
+- The site stores your company's website as text and never visits it.
+- A new entry sends no email to anyone. It stays only in our database.
+- One email address holds one entry. If you join again while you are on the list, we keep your first entry.
+- A weekly job deletes each entry 365 days after you join, whether or not the forum has opened (our commitment). No entry stays in our database longer than 372 days (our commitment). If the forum has not opened by then, join again.
+- Deleted entries can stay in Cloudflare's restore points of our database for up to 30 days (Cloudflare's D1 Time Travel documentation, read 2026-10-18).
+- To have your entry deleted or corrected sooner, write to info@coloradostartups.org.
+
 **Communitas in our Slack.** Communitas is an AI agent in the Colorado Startups Slack. It sends one welcome message when you join, and it reads only messages that mention it. When it passes a question to Resourcus, it replaces your Slack user ID with a one-way code first. Slack's own privacy policy covers your Slack account.
 
 **Messages to us.** When you write to info@coloradostartups.org, we keep the conversation so we can reply and follow up. At our monthly check, we delete each conversation whose last message is more than 12 months old (our commitment). The nomination, suggestion and application forms also email Paul a short notice of each new entry. A notice names the company, resource or seat and gives a record number. It never includes your name or contact details.
@@ -109,7 +120,7 @@ Each of these services handles information under its own privacy policy. We do n
 
 When we change this policy in a way that matters, we update the date at the top of this page and tell newsletter subscribers in our next email.
 
-**November 16, 2026.** We added the join request form for our Slack on this site: what it collects, who reads it, and the email Paul gets for each request. A weekly job deletes each request 90 days after it arrives.
+**November 16, 2026.** We added the join request form for our Slack on this site: what it collects, who reads it, and the email Paul gets for each request. A weekly job deletes each request 90 days after it arrives. We also added the founders forum waitlist: what it collects, that it sends no email per entry, and that a weekly job deletes each entry 365 days after you join.
 
 **November 2, 2026.** The nomination form now asks for the company's HQ city and its founding year. We added that we store the city with the nomination, show it in Paul's notice email and use it to check the HQ.
 

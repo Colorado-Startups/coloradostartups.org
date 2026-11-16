@@ -1,0 +1,218 @@
+---
+// The founders forum waitlist form (step F1). A plain HTML form that POSTs to
+// /api/waitlist; field names and stages come from ./waitlist-fields.ts, which
+// the Worker parses with, so the two cannot drift. The script stamps the load
+// time into `ts` (the Worker's speed check), shows the message for ?error=,
+// names the fields the Worker rejected (?field=), and keeps a draft of the
+// answers in this tab so a rejection does not clear them (the apply form's
+// helpers, apply/client.ts). No newsletter box: the page keeps its own
+// "Get the newsletter" link.
+import Turnstile from "../forms/Turnstile.astro";
+import Button from "../ui/Button.astro";
+import {
+  WAITLIST_DRAFT,
+  WAITLIST_ENDPOINT,
+  WAITLIST_FIELDS as F,
+  WAITLIST_LIMITS,
+  WAITLIST_STAGE_CHOICES,
+  WAITLIST_WEBSITE_PATTERN,
+} from "./waitlist-fields";
+
+const ERRORS = {
+  invalid: "Some answers need a fix. Check the required fields and the website, then send the form again.",
+  verification: "We could not confirm the form came from a person. Wait a few seconds, finish the check, then send it again.",
+  ratelimit: "Too many tries from your connection. Wait a minute, then send the form again.",
+  delivery:
+    "We could not save your details, so you are not on the waitlist yet. Try again later, or write to info@coloradostartups.org.",
+  unavailable:
+    "The waitlist is closed for a moment on our side. Nothing was saved. Try again later, or write to info@coloradostartups.org.",
+} as const;
+// Replaces the invalid message when the Worker names the fields to fix.
+const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then send the form again.";
+---
+
+<div class="waitlist">
+  {
+    Object.entries(ERRORS).map(([code, text]) => (
+      <p
+        class="form-error"
+        role="alert"
+        data-error={code}
+        data-fields-text={code === "invalid" ? INVALID_FIELDS : undefined}
+        hidden
+      >
+        {text}
+      </p>
+    ))
+  }
+
+  <noscript>
+    <p class="noscript-note">
+      This form needs JavaScript to check that you are a person. Without it, write to info@coloradostartups.org with
+      your name and your company.
+    </p>
+  </noscript>
+
+  <form
+    method="post"
+    action={WAITLIST_ENDPOINT}
+    data-waitlist-form
+    data-draft-key={WAITLIST_DRAFT.key}
+    data-draft-skip={[...WAITLIST_DRAFT.skip].join(" ")}
+    aria-describedby="waitlist-after"
+  >
+    <input type="hidden" name="ts" value="" data-load-stamp />
+    <div class="hp" aria-hidden="true">
+      <label for="wl-website-hp">Leave this empty</label>
+      <input id="wl-website-hp" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <fieldset>
+      <legend>About you</legend>
+      <div class="field">
+        <label for="wl-first-name">First name</label>
+        <input
+          id="wl-first-name"
+          name={F.firstName}
+          required
+          maxlength={WAITLIST_LIMITS.name}
+          autocomplete="given-name"
+        />
+      </div>
+      <div class="field">
+        <label for="wl-last-name">Last name</label>
+        <input
+          id="wl-last-name"
+          name={F.lastName}
+          required
+          maxlength={WAITLIST_LIMITS.name}
+          autocomplete="family-name"
+        />
+      </div>
+      <div class="field">
+        <label for="wl-email">Email</label>
+        <input
+          id="wl-email"
+          name={F.email}
+          type="email"
+          required
+          maxlength={WAITLIST_LIMITS.email}
+          autocomplete="email"
+          aria-describedby="wl-email-hint"
+        />
+        <span class="hint" id="wl-email-hint">We email you here once, when the forum opens.</span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your company</legend>
+      <div class="field">
+        <label for="wl-company">Company name</label>
+        <input
+          id="wl-company"
+          name={F.company}
+          required
+          maxlength={WAITLIST_LIMITS.company}
+          autocomplete="organization"
+        />
+      </div>
+      <div class="field">
+        <label for="wl-company-website">Company website (optional)</label>
+        <input
+          id="wl-company-website"
+          name={F.companyWebsite}
+          type="text"
+          inputmode="url"
+          autocomplete="url"
+          maxlength={WAITLIST_LIMITS.link}
+          pattern={WAITLIST_WEBSITE_PATTERN}
+          placeholder="https://"
+          title="An https address, like https://example.com"
+          aria-describedby="wl-company-website-hint"
+        />
+        <span class="hint" id="wl-company-website-hint">An https address. The site never opens it.</span>
+      </div>
+      <div class="field">
+        <label for="wl-stage">Stage (optional)</label>
+        <select id="wl-stage" name={F.stage}>
+          <option value="">Choose one</option>
+          {WAITLIST_STAGE_CHOICES.map(([id, label]) => <option value={id}>{label}</option>)}
+        </select>
+      </div>
+      <div class="check">
+        <input id="wl-founder" name={F.founder} type="checkbox" required />
+        <label for="wl-founder">I am a founder or cofounder of a company in Colorado</label>
+      </div>
+    </fieldset>
+
+    <Turnstile />
+    <Button type="submit">Join the waitlist</Button>
+    <p class="meta after" id="waitlist-after">
+      We email you once, when the forum opens. We keep your details for up to 12 months. If it has not opened by then,
+      join again.
+    </p>
+  </form>
+</div>
+
+<script>
+  import { clearDraft, draftFrom, markInvalidFields, readDraft, saveDraft } from "../apply/client";
+  import { showErrorMessage, stampLoadTime } from "../forms/form-status";
+
+  stampLoadTime(document);
+
+  const search = window.location.search;
+  const code = new URLSearchParams(search).get("error");
+  const form = document.querySelector<HTMLFormElement>("[data-waitlist-form]");
+  let labels: string[] = [];
+  if (form) {
+    // The draft's key and skipped fields come from WAITLIST_DRAFT, rendered
+    // into the form, so this script never bundles the parser or zod.
+    const store = { key: form.dataset.draftKey ?? "", skip: new Set((form.dataset.draftSkip ?? "").split(" ")) };
+    // After a rejected entry (?error=), bring back this tab's draft. Any other
+    // visit starts clean and drops an old draft.
+    const draft = code ? readDraft(store) : null;
+    if (!draft) clearDraft(store);
+    for (const [name, value] of Object.entries(draft ?? {})) {
+      const el = form.elements.namedItem(name);
+      if ((el instanceof HTMLInputElement && el.type !== "checkbox") || el instanceof HTMLSelectElement) {
+        el.value = value;
+      }
+    }
+
+    if (code === "invalid") labels = markInvalidFields(form, search);
+    form.addEventListener("submit", () => saveDraft(draftFrom(new FormData(form), store), store));
+  }
+
+  // An invalid entry names the fields the Worker flagged.
+  showErrorMessage(document, code, (message) => {
+    if (labels.length > 0 && message.dataset.fieldsText) {
+      message.textContent = message.dataset.fieldsText.replace("{fields}", labels.join(", "));
+    }
+  });
+</script>
+
+<style>
+  /* Fieldsets, hints, checks and hidden fields: the Forms section of
+     global.css (#195). */
+  .noscript-note {
+    max-width: 42rem;
+    font-weight: 700;
+  }
+  .after {
+    max-width: 42rem;
+    margin: var(--s-3) 0 0;
+  }
+  /* The founder box and its label make one 44 px target on a phone. */
+  .check {
+    min-height: var(--size-tap);
+    align-items: center;
+  }
+  .check label {
+    padding-block: var(--s-2);
+    cursor: pointer;
+  }
+  /* A field the Worker named after a rejection (?field=). */
+  :is(input, select)[aria-invalid="true"] {
+    border-color: var(--c-danger);
+  }
+</style>
