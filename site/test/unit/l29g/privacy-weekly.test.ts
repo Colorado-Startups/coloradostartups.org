@@ -60,7 +60,7 @@ describe("Bot protection: Turnstile receives your IP address", () => {
     const checks = /\b(?:verifyTurnstile|turnstileError)\(/;
     const routes = filesUnder("worker/routes").filter((f) => checks.test(read(f)));
     expect(routes.map((f) => path.basename(f)).sort()).toEqual(
-      ["apply.ts", "ask.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts"],
+      ["apply.ts", "ask.ts", "join.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts"],
     );
     expect(bot).toContain("Our forms and the Resourcus question box use Cloudflare Turnstile");
   });

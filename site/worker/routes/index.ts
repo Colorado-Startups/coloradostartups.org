@@ -6,6 +6,7 @@ import * as apply from "./apply"; // L19 Seat applications
 import * as ask from "./ask"; // L4 Resourcus
 import * as cspReport from "./csp-report"; // orchestrator
 import * as health from "./health"; // L4 Worker
+import * as join from "./join"; // L6 Comms, Slack join requests (P5a)
 import * as nominate from "./nominate"; // L2 Leaderboard
 import * as subscribe from "./subscribe"; // L6 Comms
 import * as suggestResource from "./suggest-resource"; // L3 Canvas
@@ -23,6 +24,7 @@ export const ROUTES: Readonly<Record<string, Route>> = {
   "/api/nominate": { methods: ["POST"], handle: nominate.handle },
   "/api/suggest-resource": { methods: ["POST"], handle: suggestResource.handle },
   "/api/apply": { methods: ["POST"], handle: apply.handle },
+  "/api/join": { methods: ["POST"], handle: join.handle },
   "/api/csp-report": { methods: ["POST"], handle: cspReport.handle },
   "/api/health": { methods: ["GET", "HEAD"], handle: health.handle },
 };
