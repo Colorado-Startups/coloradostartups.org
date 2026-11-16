@@ -5,12 +5,14 @@
 // answer sends ask_used, kind "resourcus"; each card link carries a
 // resource_out mark for the click listener; the keyword search sends
 // search_used with its hit count. Never the question. track() and Pagefind
-// are mocked, and /api/ask is a stubbed fetch.
+// are mocked, and /api/ask is a stubbed fetch. On any page the events'
+// `where` ends in "-resourcus" (panelWhere).
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { initResourcusPanels } from "../../../src/components/resourcus/panel";
+import { PROP_TOKEN } from "../../../../packages/shared/src/events";
+import { initResourcusPanels, panelWhere } from "../../../src/components/resourcus/panel";
 import { track } from "../../../src/lib/track";
-import { shortSlug } from "../../../src/lib/track-attrs";
+import { shortSlug, whereOf } from "../../../src/lib/track-attrs";
 
 vi.mock("../../../src/lib/track", () => ({ track: vi.fn(() => true) }));
 vi.mock("../../../src/lib/pagefind", () => ({
@@ -104,5 +106,27 @@ describe("the Resourcus panel's events", () => {
     root.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
     await vi.waitFor(() => expect(root.querySelector("[data-status]")!.textContent).toContain("quickly"));
     expect(track).not.toHaveBeenCalled();
+  });
+});
+
+// The panel's `where` keeps its "-resourcus" suffix on any page: a long page
+// slug is cut instead, so a guide's panel still reads as the panel's.
+describe("panelWhere", () => {
+  it("is the page's slug and -resourcus", () => {
+    expect(panelWhere("/ask/")).toBe("ask-resourcus");
+    expect(panelWhere("/")).toBe("home-resourcus");
+  });
+
+  it("cuts a long page slug, never the suffix, and stays a valid prop", () => {
+    for (const path of [
+      "/guides/how-to-find-a-technical-cofounder-in-colorado/",
+      "/regions/photon-mountain/founders-and-builders-near-boulder/",
+      `/${"a".repeat(60)}/`,
+    ]) {
+      const where = panelWhere(path);
+      expect(where, path).toMatch(/-resourcus$/);
+      expect(where, path).toMatch(PROP_TOKEN);
+      expect(where.startsWith(whereOf(path).slice(0, 10)), path).toBe(true);
+    }
   });
 });

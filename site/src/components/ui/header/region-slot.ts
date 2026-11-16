@@ -7,6 +7,8 @@
 // dialog does (ask-dialog.ts). There it also escapes the phone menu, which
 // hides the nav the slot sits in. A pick is saved on this device only
 // (lib/your-region.ts) and announced to the page, so This week follows it.
+// Where the device keeps no site data, a pick still lasts for the page view,
+// and the chooser's note says that instead of its promise to keep it.
 import {
   clearRegion,
   deviceStore,
@@ -39,6 +41,8 @@ export function initRegionSlot(root: HTMLElement, store: RegionStore | null = de
   let current: string | null = null;
   let dialog: HTMLDialogElement | null = null;
   let opener: HTMLElement | null = null;
+  /** Whether this device keeps the pick: it has storage, and no save or forget failed. The chooser's note says which. */
+  let kept = store !== null;
 
   /** Shows the picked region, or the Pick your region button when there is none. */
   const show = (id: string | null) => {
@@ -60,9 +64,10 @@ export function initRegionSlot(root: HTMLElement, store: RegionStore | null = de
   };
 
   const pick = (id: string | null) => {
-    // Storage that refuses still leaves the pick on this page view.
-    if (id === null) clearRegion(store);
-    else saveRegion(store, id, ids);
+    // Storage that refuses still leaves the pick on this page view. From
+    // then on the chooser's note says so, instead of promising the device keeps it.
+    const saved = id === null ? clearRegion(store) : saveRegion(store, id, ids);
+    if (!saved) kept = false;
     show(parseRegion(id, ids));
     dialog?.close();
     (current ? page : open).focus();
@@ -108,6 +113,9 @@ export function initRegionSlot(root: HTMLElement, store: RegionStore | null = de
     }
     const forget = dialog.querySelector<HTMLElement>("[data-region-forget-row]");
     if (forget) forget.hidden = current === null;
+    for (const note of dialog.querySelectorAll<HTMLElement>("[data-region-note]")) {
+      note.hidden = (note.dataset.regionNote === "kept") !== kept;
+    }
     dialog.showModal();
     (dialog.querySelector<HTMLElement>('[aria-pressed="true"]') ?? dialog.querySelector<HTMLElement>(PICK))?.focus();
   };

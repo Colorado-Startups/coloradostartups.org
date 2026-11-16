@@ -29,6 +29,8 @@
 // Your region (step W8). On home, a region picked on this device puts its
 // events first, and a hidden line comes up to say so, with a Show all button
 // (initRegionFirst in this-week.ts). With no pick the build's order stands.
+// The hidden line keeps its row, so a restored pick moves nothing
+// (e2e/your-region.spec.ts).
 //
 import { WAYS_IN, type Region } from "@cs/shared";
 import { getCollection } from "astro:content";
@@ -195,9 +197,14 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
   /* display: flex would beat the hidden attribute's own rule. */
   .this-week__list li[hidden],
   .this-week__empty[hidden],
-  .this-week__more[hidden],
-  .this-week__first[hidden] {
+  .this-week__more[hidden] {
     display: none;
+  }
+  /* Hidden, the region line keeps its row, so a pick restored on load
+     moves nothing below it. visibility also takes it out of the tab order
+     and the accessibility tree. */
+  .this-week__first[hidden] {
+    visibility: hidden;
   }
   .this-week__when {
     padding: var(--s-1) var(--s-2);
@@ -218,11 +225,17 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
   .this-week__first {
     margin: var(--s-2) 0 0;
   }
+  /* One row whatever the region's name: the words wrap beside the button,
+     never under it, and two lines of them fit the button's height. So the
+     row the hidden line keeps is the row it needs when it shows. */
   .this-week__first {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, max-content) auto;
+    justify-content: start;
     align-items: center;
     gap: 0 var(--s-2);
     max-width: none;
+    font-size: var(--t-step--1);
+    line-height: 1.25;
   }
 </style>

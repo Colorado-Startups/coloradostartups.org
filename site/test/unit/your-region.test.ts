@@ -112,7 +112,9 @@ const SLOT = `<div data-your-region data-region-ids="${REGION_IDS.join(" ")}">
     <button type="button" data-region-change>Change your region</button>
   </div>
   <template data-region-template>
-    <dialog aria-labelledby="t"><h2 id="t">Pick your region</h2><ul>
+    <dialog aria-labelledby="t"><h2 id="t">Pick your region</h2>
+    <p data-region-note="kept">Your browser keeps your pick on this device.</p>
+    <p data-region-note="view" hidden>Your pick lasts until you leave this page.</p><ul>
       ${choice("fusion-canyon", "Fusion Canyon")}${choice("photon-mountain", "Photon Mountain")}${choice("space-peak", "Space Peak")}
     </ul><p data-region-forget-row hidden><button type="button" data-region-forget>Forget my region</button></p></dialog>
   </template>
@@ -195,6 +197,39 @@ describe("the header slot", () => {
     $<HTMLButtonElement>("[data-region-open]").click();
     expect(() => dialog()!.querySelector<HTMLButtonElement>('[data-region-pick="space-peak"]')!.click()).not.toThrow();
     expect($("[data-region-mine]").hidden).toBe(false);
+  });
+
+  // The chooser's note and the slot agree: it promises the device keeps the
+  // pick only while that holds.
+  const notes = (dialog: HTMLDialogElement) =>
+    [...dialog.querySelectorAll<HTMLElement>("[data-region-note]")].filter((n) => !n.hidden).map((n) => n.dataset.regionNote);
+
+  it("promises the device keeps the pick when storage saves it", () => {
+    const { $, dialog } = setUp(memory().store);
+    $<HTMLButtonElement>("[data-region-open]").click();
+    expect(notes(dialog()!)).toEqual(["kept"]);
+    dialog()!.querySelector<HTMLButtonElement>('[data-region-pick="space-peak"]')!.click();
+    $<HTMLButtonElement>("[data-region-change]").click();
+    expect(notes(dialog()!)).toEqual(["kept"]);
+  });
+
+  it("says the pick lasts for this page where there is no storage", () => {
+    const { $, dialog } = setUp(null);
+    $<HTMLButtonElement>("[data-region-open]").click();
+    expect(notes(dialog()!)).toEqual(["view"]);
+    dialog()!.querySelector<HTMLButtonElement>('[data-region-pick="space-peak"]')!.click();
+    expect($("[data-region-mine]").hidden).toBe(false);
+    $<HTMLButtonElement>("[data-region-change]").click();
+    expect(notes(dialog()!)).toEqual(["view"]);
+  });
+
+  it("stops promising once storage refuses a save, while the pick stays for the page view", () => {
+    const { $, dialog } = setUp(blocked);
+    $<HTMLButtonElement>("[data-region-open]").click();
+    dialog()!.querySelector<HTMLButtonElement>('[data-region-pick="space-peak"]')!.click();
+    expect($("[data-region-mine] [data-region-name]").textContent).toBe("Space Peak");
+    $<HTMLButtonElement>("[data-region-change]").click();
+    expect(notes(dialog()!)).toEqual(["view"]);
   });
 
   it("keeps Escape inside the chooser, so the phone menu stays open", () => {

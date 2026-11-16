@@ -35,6 +35,9 @@ const SLOTS = [
 
 const header = read("SiteHeader.astro");
 
+/** A request or a click event: a data-track mark, the track helper, fetch, a beacon or XHR. */
+const SENDS = /data-track|dataset\.track|lib\/track|fetch\(|sendBeacon|XMLHttpRequest/;
+
 describe("header slots", () => {
   it("YourRegion (W8) renders a link to /regions/, a hidden chooser button, a hidden picked state and the chooser", () => {
     const region = template(read("header/YourRegion.astro"));
@@ -43,10 +46,23 @@ describe("header slots", () => {
     expect(region).toContain('<span class="your-region__label">Pick your region</span>');
     expect(region).toMatch(/<div class="your-region__mine" data-region-mine hidden>/);
     expect(region).toMatch(/<template data-region-template>\s*<dialog class="region-chooser"/);
-    // Bundled, never inline, and nothing sent: no is:inline script, no fetch, no data-track.
+    // Bundled, never inline: no is:inline script.
     expect(region).not.toMatch(/<script[^>]*is:inline/);
-    expect(region).not.toMatch(/data-track|fetch\(|sendBeacon/);
   });
+
+  // The pick never leaves the browser: no fetch, no beacon and no click mark
+  // in the slot's template, its island or the pick's store.
+  for (const [file, source] of [
+    ["header/YourRegion.astro", () => template(read("header/YourRegion.astro"))],
+    ["header/region-slot.ts", () => read("header/region-slot.ts")],
+    ["lib/your-region.ts", () => readFileSync(path.resolve(UI, "../../lib/your-region.ts"), "utf8")],
+  ] as const) {
+    it(`YourRegion (W8): ${file} sends nothing`, () => {
+      const code = source();
+      expect(code.length).toBeGreaterThan(0);
+      expect(code).not.toMatch(SENDS);
+    });
+  }
 
   it("AskButton (K1) renders a link to /ask/, a hidden Search button and the Ask dialog", () => {
     const ask = template(read("header/AskButton.astro"));

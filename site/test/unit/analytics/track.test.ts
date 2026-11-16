@@ -17,6 +17,7 @@ import {
   install,
   isLiveHost,
   onClick,
+  onSubmit,
   track,
   TRACK_CONTENT_TYPE,
   TRACK_PATH,
@@ -236,6 +237,38 @@ describe("click delegation", () => {
   it("onClick never throws, even for an odd event", () => {
     expect(() => onClick(new Event("click"))).not.toThrow();
     expect(() => onClick({ target: {} } as unknown as Event)).not.toThrow();
+  });
+
+  // The Ask dialog's and home's Search buttons (AskDialog.astro, Ask.astro).
+  it("counts a marked submit button when its form submits, and not for a submit the browser refuses", async () => {
+    document.body.innerHTML = `
+      <form id="ask" action="/ask/" method="get">
+        <input id="q" name="q" type="search" required />
+        <button id="go" type="submit" data-track="ask_used" data-track-where="ask-dialog" data-track-kind="search">Search</button>
+      </form>`;
+    install();
+    const form = document.getElementById("ask") as HTMLFormElement;
+    // jsdom cannot navigate: each accepted submit stops after the listener saw it.
+    form.addEventListener("submit", (e) => e.preventDefault());
+    const go = document.getElementById("go") as HTMLButtonElement;
+    // The required box is empty: the click fires, the browser refuses the submit.
+    go.click();
+    expect(beacon).not.toHaveBeenCalled();
+    (document.getElementById("q") as HTMLInputElement).value = "coworking";
+    go.click();
+    expect(beacon).toHaveBeenCalledTimes(1);
+    expect(await sentBody()).toEqual({ name: "ask_used", props: { where: "ask-dialog", kind: "search" } });
+    // Enter in the box submits by the same button, and counts once more.
+    form.requestSubmit(go);
+    expect(beacon).toHaveBeenCalledTimes(2);
+    // A submit by no marked button sends nothing.
+    form.requestSubmit();
+    expect(beacon).toHaveBeenCalledTimes(2);
+  });
+
+  it("onSubmit never throws, even for an odd event", () => {
+    expect(() => onSubmit(new Event("submit"))).not.toThrow();
+    expect(() => onSubmit({ submitter: {} } as unknown as Event)).not.toThrow();
   });
 });
 

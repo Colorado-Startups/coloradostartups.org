@@ -12,7 +12,8 @@
 import { EVENT_PROPS, isEventName, PROP_TOKEN, REGION_IDS, WAYS_IN } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
-import { shortSlug } from "../../src/lib/track-attrs";
+import { STARTUP_COMMUNITY_PROJECT_URL } from "../../src/components/hall/channels";
+import { eventSource, shortSlug } from "../../src/lib/track-attrs";
 import { contentPages, readDist } from "./pages";
 
 const parse = (html: string) => new DOMParser().parseFromString(html, "text/html");
@@ -156,6 +157,11 @@ const NEEDS: Need[] = [
   },
   { route: "/links/", selector: `[data-slack-entry] a[href="${WAYS_IN.slack}"]`, want: { event: "join_click", where: "links" } },
   {
+    route: "/links/",
+    selector: `a.row[href="${STARTUP_COMMUNITY_PROJECT_URL}"]`,
+    want: { event: "event_out", where: "links", source: eventSource(STARTUP_COMMUNITY_PROJECT_URL) },
+  },
+  {
     route: "/founders/",
     selector: `a.btn[aria-describedby="slack-form-note-top"]`,
     want: { event: "join_click", where: "founders" },
@@ -197,6 +203,21 @@ const NEEDS: Need[] = [
       route: "/",
       selector: `tr[data-zone-row="${id}"] a.region-link`,
       want: { event: "map_region_open", where: "home-map-list", region: id },
+    },
+    {
+      route: "/",
+      selector: `section[aria-labelledby="why"] a.colorado-map--thumb[data-zone="${id}"]`,
+      want: { event: "map_region_open", where: "home-why", region: id },
+    },
+    {
+      route: "/regions/",
+      selector: `#regions-map a.colorado-map__hit[href="/regions/${id}/"]`,
+      want: { event: "map_region_open", where: "regions-map", region: id },
+    },
+    {
+      route: "/regions/",
+      selector: `section[aria-labelledby="builds"] a.colorado-map--thumb[data-zone="${id}"]`,
+      want: { event: "map_region_open", where: "regions-themes", region: id },
     },
   ]),
 ];
@@ -265,6 +286,9 @@ describe("the required controls", () => {
       where: "ask-dialog",
       kind: "search",
     });
+    // That mark counts when its form submits (track.ts), and an empty box never submits.
+    const search = dialog!.querySelector(".ask-dialog__search button[type='submit']")!.closest("form");
+    expect(search?.querySelector<HTMLInputElement>("input[name='q']")?.required).toBe(true);
     expect(mark(dialog!.querySelector(".ask-dialog__resourcus a"))).toEqual({ event: "ask_used", where: "ask-dialog", kind: "resourcus" });
     expect(mark(dialog!.querySelector("[data-ask-copy]"))).toEqual({ event: "ask_used", where: "ask-dialog", kind: "copy" });
     expect(mark(dialog!.querySelector("[data-ask-claude]"))).toEqual({ event: "connect_click", where: "ask-dialog", target: "claude" });
