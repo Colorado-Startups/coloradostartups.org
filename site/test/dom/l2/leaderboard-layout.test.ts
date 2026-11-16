@@ -102,9 +102,24 @@ describe("/leaderboard/ city map", () => {
     }
   });
 
-  it("has a panel with a polite live status that the dots' buttons point at", () => {
+  it("has a panel with a polite live status, apart from the aria-hidden copy hover writes", () => {
     expect(panel.id).toBe("chart-map-panel");
     expect(panel.querySelector("[data-city-status]")?.getAttribute("aria-live")).toBe("polite");
+    const visual = panel.querySelector("[data-city-visual]")!;
+    expect(visual.getAttribute("aria-hidden")).toBe("true");
+    expect(visual.hasAttribute("aria-live")).toBe(false);
+  });
+
+  // Review of #84: the phone row has one button per dot, in the panel's order.
+  it("draws one phone-row button per mapped city, each pointing at the panel", () => {
+    const chips = [...figure.querySelectorAll<HTMLButtonElement>("[data-city-chips] button")];
+    const narrow = [...figure.querySelectorAll(".plot--narrow circle")].map((c) => c.getAttribute("data-city"));
+    expect(chips.map((b) => b.dataset.city).sort()).toEqual(narrow.sort());
+    expect(chips.map((b) => b.dataset.city)).toEqual(templates.map((t) => t.getAttribute("data-city")));
+    for (const b of chips) {
+      expect(b.getAttribute("aria-controls")).toBe(panel.id);
+      expect(b.textContent?.trim()).toMatch(/^.+ \(\d+\)$/);
+    }
   });
 
   it("lists each dot's companies, as many as the dot counts, each linking to a table row", () => {
@@ -121,7 +136,7 @@ describe("/leaderboard/ city map", () => {
     }
   });
 
-  it("adds no button before the script runs", () => {
-    expect(figure.querySelector("button")).toBeNull();
+  it("puts no button over the dots before the script runs", () => {
+    expect(figure.querySelector(".plot button")).toBeNull();
   });
 });

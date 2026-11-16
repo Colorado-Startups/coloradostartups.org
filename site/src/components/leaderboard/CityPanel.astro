@@ -7,8 +7,10 @@
 // lists every company.
 //
 // The panel has a fixed height and scrolls, so a list that grows never moves
-// the page under it (CLS). It shows only when scripting is on.
+// the page under it (CLS). It shows only when scripting is on. Below 40rem
+// the row of city buttons above it replaces the dots' buttons.
 import type { CityCompanies } from "../../lib/leaderboard/board";
+import { chipLabel } from "./city-map";
 
 interface Props {
   id: string;
@@ -19,8 +21,22 @@ const { id, cities } = Astro.props;
 const prompt = "Choose a city on the map to list its companies.";
 ---
 
+{/* The phone row of city buttons. Drawn here, not by the script, so it takes
+    its room at load (no layout shift); it shows only with scripting on and
+    below 40rem, and city-map.ts wires it. */}
+<div class="city-map__chips" role="toolbar" aria-label="Cities on the map" data-city-chips>
+  {
+    cities.map(({ city, companies }) => (
+      <button type="button" class="city-map__chip" data-city={city} aria-controls={id} aria-expanded="false">
+        {chipLabel(city, companies.length)}
+      </button>
+    ))
+  }
+</div>
 <div class="city-panel" id={id} data-city-panel data-prompt={prompt}>
-  <p class="city-panel__status" aria-live="polite" data-city-status>{prompt}</p>
+  {/* The live node hears focus, click and Escape only; hover writes the aria-hidden copy (city-map.ts). */}
+  <p class="visually-hidden" aria-live="polite" data-city-status></p>
+  <p class="city-panel__status" aria-hidden="true" data-city-visual>{prompt}</p>
   <ul class="city-panel__list" data-city-list></ul>
   {
     cities.map(({ city, companies }) => (
@@ -101,6 +117,41 @@ const prompt = "Choose a city on the map to list its companies.";
   :global(.city-map__hit:focus-visible) {
     outline-offset: var(--line-hair);
   }
+  /* Below 40rem the dots sit too close for 24 px targets, so the dots stop
+     taking input and a wrapping row of city buttons under the map does it. */
+  :global(.city-map__chips) {
+    display: none;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-block: var(--s-3);
+  }
+  @media (max-width: 40rem) {
+    :global(.city-map__layer) {
+      display: none;
+    }
+  }
+  @media (max-width: 40rem) and (scripting: enabled) {
+    :global(.city-map__chips) {
+      display: flex;
+    }
+  }
+  :global(.city-map__chip) {
+    min-block-size: var(--s-6);
+    padding: var(--s-1) var(--s-3);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    background: var(--c-ground);
+    color: var(--c-text);
+    font: inherit;
+    cursor: pointer;
+  }
+  /* Yellow is a fill: the chosen city's button takes it, with navy text. */
+  :global(.city-map__chip[aria-expanded="true"]) {
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+    border-color: var(--c-text);
+  }
+
   /* The chosen city's dot lifts: full gold, a heavier edge. */
   :global([data-city-map] circle.is-active) {
     fill-opacity: 1;
