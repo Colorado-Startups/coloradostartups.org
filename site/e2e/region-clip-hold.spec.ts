@@ -138,7 +138,16 @@ test("an open hotspot card holds the clip, and the Pause button tells the truth"
   expect(clear, "a card that leaves the Pause button uncovered").toBeDefined();
   await expect.poll(() => paused(page)).toBe(true);
   await resetPlays(page);
-  await toggle.click();
+  // Playwright waits for an aria-disabled button to enable, so force the
+  // click: still a real mouse press at the button's center, which the card
+  // leaves uncovered (checked above).
+  await expect(toggle).toHaveAttribute("aria-disabled", "true");
+  const hit = await toggle.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+  });
+  expect(hit, "the press lands on the Pause button").toBe(true);
+  await toggle.click({ force: true });
   await expect.poll(() => isOpen(clear!)).toBe(false);
   await expect(media).not.toHaveAttribute("data-card-open", /.*/);
   await expect(toggle).toHaveText("Play");
