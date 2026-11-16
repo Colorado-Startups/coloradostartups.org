@@ -1,5 +1,6 @@
-// The statewide map's geography (data/geo/, built by scripts/geo/build.mjs)
-// and its build-time drawing (lib/regions/colorado-map.ts).
+// The statewide map's geography (data/geo/, built by scripts/geo/build.mjs):
+// each zone is the loop its named roads close, about Silicon Valley's size.
+// And its build-time drawing (lib/regions/colorado-map.ts).
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -8,7 +9,23 @@ import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 import YAML from "yaml";
 
-import { buildRegions, findPlace, insideRing, readPlaces, readRegions, ringsOverlap } from "../../../../scripts/geo/build.mjs";
+import {
+  buildRegions,
+  buildYardstick,
+  format,
+  insideRing,
+  milesToRing,
+  ON_THE_LINE_MI,
+  readBoundaries,
+  readCentres,
+  readPlaces,
+  readRegions,
+  readRoads,
+  ringsOverlap,
+  roadsDrift,
+  selfCrossing,
+  SIZE_BAND,
+} from "../../../../scripts/geo/build.mjs";
 import { COLORADO, COLORADO_BOUNDS, DIM, ZONES, zoneBounds, zoneById } from "../../../src/lib/regions/colorado-geo";
 import { clockwise, coloradoMapSvg, signedArea } from "../../../src/lib/regions/colorado-map";
 import { REGION_COLORS as REGION_COLOR } from "../../../src/lib/regions/map";
@@ -16,26 +33,54 @@ import { REGION_COLORS as REGION_COLOR } from "../../../src/lib/regions/map";
 const ROOT = path.join(__dirname, "../../../..");
 const places = readPlaces(path.join(ROOT, "data/geo/places.csv"));
 const regions = readRegions(path.join(ROOT, "data/regions"));
+const roads = readRoads(path.join(ROOT, "data/geo/roads.geojson"));
+const boundaries = readBoundaries(path.join(ROOT, "data/geo/boundaries.yaml")) as Record<string, { road: string }[]>;
+const centres = readCentres(path.join(ROOT, "data/positions/geo.yaml"));
+const yardstick = buildYardstick(roads).features[0]!.properties as { area_sq_mi: number; span_mi: number };
 
 describe("data/geo/regions.geojson", () => {
-  // The same check as `node scripts/geo/build.mjs --check`, in CI.
-  it("matches what data/regions and places.csv build to (run scripts/geo/build.mjs if not)", () => {
-    const want = `${JSON.stringify(buildRegions(places, regions), null, 1)}\n`;
-    expect(readFileSync(path.join(ROOT, "data/geo/regions.geojson"), "utf8")).toBe(want);
+  // The same checks as `node scripts/geo/build.mjs --check`, in CI.
+  it("matches what data/regions, roads.geojson and places.csv build to (run scripts/geo/build.mjs --roads if not)", () => {
+    expect(readFileSync(path.join(ROOT, "data/geo/regions.geojson"), "utf8")).toBe(format(buildRegions(places, regions, roads, centres)));
+  });
+
+  it("comes from roads traced for today's boundaries.yaml", () => {
+    expect(roadsDrift(boundaries, roads)).toBeNull();
   });
 
   it("has one zone per region, in the shared region ids", () => {
     expect(ZONES.features.map((z) => z.id).sort()).toEqual([...REGION_IDS].sort());
   });
 
-  it("puts every city and nearby town inside its own zone", () => {
-    for (const r of regions) {
-      const ring = ZONES.features.find((z) => z.id === r.id)!.geometry.coordinates[0]!;
-      for (const town of [...r.cities, ...(r.nearby ?? [])]) {
-        const p = findPlace(places, town)!;
-        expect(insideRing([p.lon, p.lat], ring), `${town} in ${r.id}`).toBe(true);
+  it("follows the roads boundaries.yaml names, in order", () => {
+    for (const z of ZONES.features) {
+      expect(z.properties.roads, z.id).toEqual(boundaries[z.id]!.map((leg) => leg.road));
+      expect(z.properties.roads.length, z.id).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("closes each loop without crossing itself", () => {
+    for (const z of ZONES.features) {
+      const ring = z.geometry.coordinates[0]!;
+      expect(ring[0], z.id).toEqual(ring.at(-1));
+      expect(selfCrossing(ring), z.id).toBeNull();
+    }
+  });
+
+  // Cities sit on the corners: inside the loop, or on its line.
+  it("puts every city inside its loop or on its line", () => {
+    for (const z of ZONES.features) {
+      const ring = z.geometry.coordinates[0]!;
+      expect(z.properties.cityPoints.map((c) => c.name), z.id).toEqual(z.properties.cities);
+      for (const c of z.properties.cityPoints) {
+        const miles = insideRing([c.lon, c.lat], ring) ? 0 : milesToRing([c.lon, c.lat], ring);
+        expect(miles, `${c.name} in ${z.id}`).toBeLessThanOrEqual(ON_THE_LINE_MI);
       }
     }
+  });
+
+  it("gives every nearby town a dot", () => {
+    for (const z of ZONES.features) expect(z.properties.townPoints.map((t) => t.name), z.id).toEqual(z.properties.towns);
   });
 
   it("keeps the zones apart", () => {
@@ -43,8 +88,25 @@ describe("data/geo/regions.geojson", () => {
     for (let i = 0; i < rings.length; i++) for (let j = i + 1; j < rings.length; j++) expect(ringsOverlap(rings[i], rings[j])).toBe(false);
   });
 
+  // Paul, 2026-11-15: each region is about the size of Silicon Valley.
+  it("keeps each loop about Silicon Valley's size", () => {
+    for (const z of ZONES.features) {
+      expect(z.properties.vs_silicon_valley, z.id).toBeCloseTo(z.properties.area_sq_mi / yardstick.area_sq_mi, 2);
+      expect(z.properties.vs_silicon_valley, z.id).toBeGreaterThanOrEqual(SIZE_BAND[0]);
+      expect(z.properties.vs_silicon_valley, z.id).toBeLessThanOrEqual(SIZE_BAND[1]);
+    }
+  });
+
   it("says each zone is a proposal, not a legal line", () => {
     for (const z of ZONES.features) expect(z.properties.note).toMatch(/proposal, not a legal line/);
+  });
+});
+
+describe("data/geo/silicon-valley.geojson", () => {
+  it("matches what roads.geojson builds to, and is a real loop", () => {
+    expect(readFileSync(path.join(ROOT, "data/geo/silicon-valley.geojson"), "utf8")).toBe(format(buildYardstick(roads)));
+    expect(yardstick.area_sq_mi).toBeGreaterThan(50);
+    expect(yardstick.span_mi).toBeGreaterThan(10);
   });
 });
 
@@ -130,13 +192,13 @@ describe.each(REGION_IDS)("coloradoMapSvg zoomed to %s", (id) => {
     expect(svg).toContain(`fill="${REGION_COLOR[id]}" fill-opacity="0.18"`);
   });
 
-  it("fits the zone's bounds, which hold every core city", () => {
+  it("fits the zone's bounds, which hold its loop and every city", () => {
     const [[west, south], [east, north]] = zoneBounds(id);
-    for (const c of zone.properties.cityPoints) {
-      expect(c.lon).toBeGreaterThan(west);
-      expect(c.lon).toBeLessThan(east);
-      expect(c.lat).toBeGreaterThan(south);
-      expect(c.lat).toBeLessThan(north);
+    for (const [lon, lat] of [...zone.geometry.coordinates[0]!, ...zone.properties.cityPoints.map((c) => [c.lon, c.lat] as const)]) {
+      expect(lon).toBeGreaterThanOrEqual(west);
+      expect(lon).toBeLessThanOrEqual(east);
+      expect(lat).toBeGreaterThanOrEqual(south);
+      expect(lat).toBeLessThanOrEqual(north);
     }
     const [[sw, ss], [se, sn]] = COLORADO_BOUNDS;
     expect(west).toBeGreaterThan(sw);

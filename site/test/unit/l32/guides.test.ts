@@ -272,9 +272,15 @@ describe("a city guide on fixtures", () => {
   });
 
   it("names the nearby towns instead when the city is its region's only core city", () => {
-    const springs = buildGuide("startups-in-colorado-springs", fixture);
+    // Space Peak as it was before Fountain joined Colorado Springs (2026-11-15): one core city.
+    const nearby = ["Manitou Springs", "Monument", "Fountain", "Woodland Park", "Cascade"];
+    const alone = REGIONS.map((r) => (r.id === "space-peak" ? { ...r, cities: ["Colorado Springs"], nearby } : r));
+    const springs = buildGuide("startups-in-colorado-springs", { ...fixture, regions: alone });
     expect(sentences(plainText(springs.answer))[1]).toBe(
       "Colorado Springs is in Space Peak, the Colorado Startups region that also takes in Manitou Springs, Monument, Fountain, Woodland Park and Cascade.",
+    );
+    expect(sentences(plainText(buildGuide("startups-in-colorado-springs", fixture).answer))[1]).toBe(
+      "Colorado Springs is in Space Peak, the Colorado Startups region that also takes in Fountain.",
     );
     expect(sectionIds(springs, "nearby")).toEqual(["monument-cowork"]);
     expect(links(springs.sections.find((s) => s.id === "nearby")!.intro)).toEqual([]);

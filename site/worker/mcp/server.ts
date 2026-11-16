@@ -15,7 +15,7 @@ export const INSTRUCTIONS = [
   "Colorado Startups (coloradostartups.org) is a community of entrepreneurs building companies in Colorado.",
   "This server is read-only and needs no key.",
   "It searches the site's open data: Startup Resources (programs, investors, coworking and services for founders), the Leaderboard's honoree companies, the guides for founders, and the event calendar.",
-  "The community has three regions: Photon Mountain (Boulder, Golden, Arvada and Denver), Space Peak (Colorado Springs) and Fusion Canyon (Fort Collins, Loveland, Windsor and Greeley).",
+  "The community has three regions: Photon Mountain (Boulder, Golden, Arvada and Denver), Space Peak (Colorado Springs and Fountain) and Fusion Canyon (Fort Collins, Loveland and Windsor).",
   `Each tool returns at most ${MAX_RESULTS} results, each with a link to its page on the site.`,
   "The data is free under CC BY 4.0: credit Colorado Startups and link https://coloradostartups.org/data/.",
   "Listings change, so tell people to check each organization's own site.",

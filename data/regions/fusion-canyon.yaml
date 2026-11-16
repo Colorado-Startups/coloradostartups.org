@@ -1,17 +1,19 @@
 # Seeded by the orchestrator in Wave 0b (decision 45). L8 owns this file.
-# Core cities: Fusion Canyon project_context.md (Fort Collins core; the Larimer
-# and Weld ring of Loveland, Windsor and Greeley). Its standing rule is in note,
-# and test/unit/l8/match.test.ts and test/dom/l8/regions.test.ts check it.
+# Cities: Paul, 2026-11-15. They sit on the corners of the road loop in
+# data/geo/boundaries.yaml, which is about Silicon Valley's size. Greeley, 22.6
+# miles east of Fort Collins (GNIS points), moved to nearby. Its standing rule
+# is in note, and test/unit/l8/match.test.ts and test/dom/l8/regions.test.ts
+# check it.
 # The summary leaves the organizer out: the seat's state lives in
 # data/team/positions.yaml, and the region page shows it.
 id: fusion-canyon
 name: Fusion Canyon
 summary: >-
-  Fusion Canyon is the Colorado Startups region for Fort Collins, Loveland, Windsor
-  and Greeley. It is named for the canyon and built on the plain, across Larimer
-  and Weld counties.
-cities: [Fort Collins, Loveland, Windsor, Greeley]
-nearby: [Timnath, Wellington, Berthoud, Johnstown, Evans, Estes Park]
+  Fusion Canyon is the Colorado Startups region for Fort Collins, Loveland and
+  Windsor. It is named for the canyon and built on the plain, in Larimer and
+  Weld counties. Greeley and Berthoud are nearby.
+cities: [Fort Collins, Loveland, Windsor]
+nearby: [Greeley, Timnath, Wellington, Berthoud, Johnstown, Evans, Estes Park]
 note: Named for the canyon. Built on the plain. Copy never places the region inside a canyon.
 art: brand/fortcollins
 order: 3

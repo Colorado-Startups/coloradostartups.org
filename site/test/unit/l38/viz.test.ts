@@ -73,10 +73,11 @@ describe("frontRangeMap", () => {
     expect(frontRangeMap("photon-mountain", geo)).toBe(frontRangeMap("photon-mountain", geo));
   });
 
-  // The core cities are data/regions' four, not the kit's narrower set (#180).
+  // The core cities are data/regions' own, not the kit's narrower set (#180).
   it.each([
     ["photon-mountain", ["Boulder", "Golden", "Arvada", "Denver"]],
-    ["fusion-canyon", ["Fort Collins", "Loveland", "Windsor", "Greeley"]],
+    ["fusion-canyon", ["Fort Collins", "Loveland", "Windsor"]],
+    ["space-peak", ["Colorado Springs", "Fountain"]],
   ] as const)("draws %s's core cities as core", (region, cities) => {
     const svg = svgOf(frontRangeMap(region, geo));
     expect(svg.querySelectorAll(".sv-city-core")).toHaveLength(cities.length);

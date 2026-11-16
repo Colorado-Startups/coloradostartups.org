@@ -1,41 +1,72 @@
 # Colorado geography for the site's maps
 
-Built by [`scripts/geo/build.mjs`](../../scripts/geo/build.mjs). Do not edit these files by hand: change `data/regions/*.yaml`, then run the script.
+Built by [`scripts/geo/build.mjs`](../../scripts/geo/build.mjs). Do not edit the built files by hand: change [`boundaries.yaml`](boundaries.yaml) or `data/regions/*.yaml`, then run the script.
 
 ```mermaid
 flowchart LR
-  T("🏛 Census TIGERweb<br/>places · state outline") --> B("scripts/geo/build.mjs")
-  Y("data/regions/*.yaml<br/>cities · nearby") --> B
-  B --> P("places.csv") & C("colorado.geojson") & R("regions.geojson")
+  T("🏛 Census TIGERweb<br/>road lines · places · outline") --> B("scripts/geo/build.mjs")
+  Y("boundaries.yaml<br/>named roads per loop") --> B
+  G("data/regions/*.yaml<br/>cities · nearby") --> B
+  B --> L("roads.geojson") --> R("regions.geojson") & S("silicon-valley.geojson")
+  B --> P("places.csv") & C("colorado.geojson")
   R --> M("🗺 ColoradoMap")
   C --> M
 ```
 
+## The loops
+
+Cities sit on the corners. Major roads between them are the edges. Each loop is about Silicon Valley's size (Paul, 2026-11-15). Sizes are measured from the Census road lines, 2026-11-15; one block is 10 sq mi.
+
+| Loop | Roads | Area | Widest span | |
+| --- | --- | --- | --- | --- |
+| Silicon Valley, the yardstick | US-101 · I-280 · CA-84 | 95 sq mi | 22.5 mi | ▇▇▇▇▇▇▇▇▇▇ |
+| Space Peak | I-25 · Interquest Pkwy · Powers Blvd · Mesa Ridge Pkwy · US-85 | 89 sq mi | 22.7 mi | ▇▇▇▇▇▇▇▇▇ |
+| Fusion Canyon | US-287 · CO-14 · CO-257 · US-34 | 113 sq mi | 16.7 mi | ▇▇▇▇▇▇▇▇▇▇▇ |
+| Photon Mountain | CO-93 and Broadway · Pearl · Foothills Pkwy · US-36 · I-25 · Park Ave West · Broadway · 6th Ave and US-6 | 170 sq mi | 25.4 mi | ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ |
+
+Photon Mountain's eight roads are the ones its own corridor map locked ([photon-mountain `MAP_NOTES.md`](https://github.com/Colorado-Startups/photon-mountain/blob/main/03_deliverables/maps/MAP_NOTES.md)). A zone is **a proposal, not a legal line**.
+
+## Files
+
 | File | Holds | From |
 | --- | --- | --- |
+| `boundaries.yaml` | Each loop's roads, in order, by hand | Paul's rule above |
+| `roads.geojson` | One traced line per road | TIGERweb Transportation layers 2, 6 and 8 |
+| `regions.geojson` | One zone per region: its loop, cities, town dots and size | `roads.geojson`, `data/regions/*.yaml`, `places.csv`, [`data/positions/geo.yaml`](../positions/geo.yaml) |
+| `silicon-valley.geojson` | The yardstick loop and its size | `roads.geojson` |
 | `places.csv` | 485 Colorado places (incorporated places and CDPs): GEOID, name, kind, interior point | TIGERweb layers 4 and 5 |
 | `colorado.geojson` | The state outline, simplified to 0.01° | TIGERweb `State_County` layer 0 |
-| `regions.geojson` | One zone per region, plus its core cities | `places.csv` and `data/regions/*.yaml` |
 
-## How a zone is drawn
+## How a loop is traced
 
 | Step | Rule |
 | --- | --- |
-| 1 | Take the region's `cities` and `nearby` towns |
-| 2 | Find each town's Census place: incorporated place first, then CDP; `ALIASES` maps local names, such as Cascade to Cascade-Chipita Park |
-| 3 | Draw a 5 km circle around each point, and take the convex hull |
-| 4 | Fail if a town has no place or two zones overlap |
+| 1 | Fetch the Census lines that carry each road's names |
+| 2 | Find where each road meets the next: their closest points, within 3 km of the `to` hint |
+| 3 | Follow each road between its two junctions by the shortest way along its own lines |
+| 4 | Bridge a gap the lines leave, such as an interchange, with a straight stitch of 500 m at most |
+| 5 | Close the ring and drop every bend under 10 m |
 
-A zone is **a proposal, not a legal line**. Census boundaries are statistical, not jurisdictional.
+## What fails the build
 
-## Checks
+| Check | Limit |
+| --- | --- |
+| Two roads do not meet, or a road does not connect its junctions | 500 m |
+| A loop crosses itself, or two zones overlap | never |
+| A city sits off its loop | 3 miles outside the line |
+| A loop is the wrong size | 0.75 to 2 times Silicon Valley's area |
+| A town has no centre and no Census place | never |
+
+## Commands
 
 | Command | Does |
 | --- | --- |
-| `node scripts/geo/build.mjs --check` | Offline: rebuilds `regions.geojson` from the committed files and fails on drift |
+| `node scripts/geo/build.mjs --roads` | Fetches and traces the roads, then rebuilds the zones and the yardstick. Prints each loop's size |
+| `node scripts/geo/build.mjs --check` | Offline: rebuilds the zones and the yardstick from the committed files and fails on drift |
 | `node scripts/geo/build.mjs --self-test` | Known-good and known-bad geometry samples |
-| `site/test/unit/geo/regions-geo.test.ts` | The same drift check in CI, plus containment, overlap and outline bounds |
+| `node scripts/geo/build.mjs` | Also refetches `places.csv` and `colorado.geojson` |
+| `site/test/unit/geo/regions-geo.test.ts` | The same checks in CI |
 
 ## License and credit
 
-US Census Bureau data is not copyrighted (17 U.S.C. §105), and the Bureau asks to be credited: **Source: US Census Bureau, TIGERweb.** These derived files are CC0 1.0. No OpenStreetMap data is stored here. The basemap that `ColoradoMap` draws on is OpenFreeMap (© OpenMapTiles, data © OpenStreetMap contributors), and it is credited on the map itself.
+US Census Bureau data is not copyrighted (17 U.S.C. §105), and the Bureau asks to be credited: **Source: US Census Bureau, TIGERweb.** City centres are USGS GNIS points, also public domain. These derived files are CC0 1.0. No OpenStreetMap data is stored here. The basemap that `ColoradoMap` draws on is OpenFreeMap (© OpenMapTiles, data © OpenStreetMap contributors), and it is credited on the map itself.
