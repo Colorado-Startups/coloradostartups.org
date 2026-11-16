@@ -11,12 +11,11 @@
 // (site/test/dom/l1/hall.test.ts). A long title is cut on screen; the link's
 // aria-label carries it in full, with the date.
 //
-// Region. An event whose city belongs to a region carries data-region with
-// the region's id, for the region filter a later step adds (W8). Online and
-// unlisted places carry none.
+// Region. An event whose city belongs to a region carries data-event-region
+// with the region's id, for the region filter a later step adds (W8). Online
+// and unlisted places carry none. Not data-region: on home that attribute
+// marks a hall card (site/test/dom/l1/hall.test.ts).
 //
-// Newest Startup Resources are left out: only two records carry an `added`
-// date, and both are commercial, which home never features (PR for P2a).
 import { WAYS_IN } from "@cs/shared";
 import { getCollection } from "astro:content";
 
@@ -70,7 +69,7 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
                   <li
                     data-ends={new Date(endsAt(event)).toISOString()}
                     data-starts={new Date(start).toISOString()}
-                    data-region={regionOf(event.location)}
+                    data-event-region={regionOf(event.location)}
                     hidden={i >= COUNT}
                   >
                     <time class="this-week__when" datetime={event.start} data-countdown>
@@ -101,8 +100,8 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
           }
         </ul>
         <p class="this-week__ways">
-          Weekly in the <a href={SLACK_JOIN.href} aria-describedby={SLACK_JOIN.noteId} data-way="slack">Slack</a> and the{" "}
-          <a href={WAYS_IN["linkedin-group"]} rel="noopener" data-way="linkedin-group">LinkedIn Group</a>
+          Weekly in the <a href={SLACK_JOIN.href} aria-describedby={SLACK_JOIN.noteId} data-link="slack">Slack</a> and the{" "}
+          <a href={WAYS_IN["linkedin-group"]} rel="noopener" data-link="linkedin-group">LinkedIn Group</a>
         </p>
       </div>
     </div>

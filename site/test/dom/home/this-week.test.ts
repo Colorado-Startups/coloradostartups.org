@@ -11,6 +11,7 @@ import { parse } from "yaml";
 
 import { countdown, daysUntil } from "../../../src/components/events/countdown";
 import { showNext } from "../../../src/components/events/prune";
+import { SLACK_JOIN } from "../../../src/lib/communitas/join";
 import { readDist, SITE_DIR } from "../pages";
 
 const threads = parse(
@@ -138,9 +139,9 @@ describe("This week on home", () => {
 
   it("tags an event with its region only by a real region id", () => {
     for (const li of events().querySelectorAll<HTMLElement>(
-      "li[data-region]",
+      "li[data-event-region]",
     )) {
-      expect(REGION_IDS as readonly string[]).toContain(li.dataset.region);
+      expect(REGION_IDS as readonly string[]).toContain(li.dataset.eventRegion);
     }
   });
 
@@ -156,9 +157,9 @@ describe("This week on home", () => {
   });
 
   it("links the Slack and the LinkedIn Group through WAYS_IN", () => {
-    const slack = band.querySelector('a[data-way="slack"]')!;
-    const group = band.querySelector('a[data-way="linkedin-group"]')!;
-    expect(slack.getAttribute("href")).toBe(WAYS_IN.slack);
+    const slack = band.querySelector('a[data-link="slack"]')!;
+    const group = band.querySelector('a[data-link="linkedin-group"]')!;
+    expect(slack.getAttribute("href")).toBe(SLACK_JOIN.href);
     expect(group.getAttribute("href")).toBe(WAYS_IN["linkedin-group"]);
     // The Slack link opens a Google Form; the hero's note says so.
     expect(
@@ -166,8 +167,8 @@ describe("This week on home", () => {
     ).toBe("Join the Slack opens a Google Form.");
   });
 
-  it("links only to WAYS_IN, so no resource or vendor sits on the strip", () => {
-    const ways = new Set(Object.values(WAYS_IN));
+  it("links only to WAYS_IN and the Slack join link, so no vendor sits on the strip", () => {
+    const ways = new Set([...Object.values(WAYS_IN), SLACK_JOIN.href]);
     for (const a of band.querySelectorAll("a"))
       expect(ways.has(a.getAttribute("href")!), a.getAttribute("href")!).toBe(
         true,
