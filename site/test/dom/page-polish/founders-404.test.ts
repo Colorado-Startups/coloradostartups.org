@@ -53,6 +53,12 @@ describe("/founders/ first screen (#218, #212)", () => {
     expect(lede.compareDocumentPosition(row!) & FOLLOWS).toBeTruthy();
   });
 
+  it("keeps a space between the waitlist intro and its privacy link", () => {
+    // Seen live on 2026-11-16: "share them.Read the privacy policy". The build drops the line break before the link.
+    const intro = doc.getElementById("waitlist")!.querySelector("p")!;
+    expect(intro.textContent?.replace(/\s+/g, " ")).toContain("share them. Read the privacy policy.");
+  });
+
   it("turns Who it is for into a checklist, and keeps the Slack and LinkedIn Group line (F1)", () => {
     const who = doc.getElementById("who")!.parentElement!;
     const items = [...who.querySelectorAll("ul.checklist li")];
