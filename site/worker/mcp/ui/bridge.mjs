@@ -16,7 +16,10 @@
 //   the `appCapabilities` field." Params: appInfo, appCapabilities, protocolVersion.
 // "Lifecycle", step 2: "UI ->> H: ui/initialize", then
 //   "UI ->> H: ui/notifications/initialized".
-// "Notifications (Host -> View)": "`ui/notifications/tool-result` - Tool
+// "Notifications (Host -> View)": "`ui/notifications/tool-input` - Host MUST
+//   send this notification with the complete tool arguments", params { arguments };
+//   the region card's fallback reads the region id from it.
+//   "`ui/notifications/tool-result` - Tool
 //   execution result", params: CallToolResult. "`ui/notifications/host-context-changed`
 //   ... the View SHOULD merge received fields with its current context state."
 // "`ui/resource-teardown` - Host notifies View before teardown" is a request:
@@ -71,7 +74,8 @@ export function createBridge(win, handlers) {
       else post({ jsonrpc: "2.0", id: m.id, error: { code: -32601, message: "Method not found" } });
       return;
     }
-    if (m.method === "ui/notifications/tool-result") handlers.toolResult(m.params ?? {});
+    if (m.method === "ui/notifications/tool-input") handlers.toolInput?.(m.params ?? {});
+    else if (m.method === "ui/notifications/tool-result") handlers.toolResult(m.params ?? {});
     else if (m.method === "ui/notifications/host-context-changed") handlers.context(m.params ?? {});
   }
   win.addEventListener("message", onMessage);
@@ -114,12 +118,41 @@ export function applyContext(doc, ctx) {
   }
 }
 
-/** Wires a card: renders each tool result into #app, opens links through the host, reports size. */
-export function startCard(win, doc, render) {
+/** How long the card waits for the handshake, and then again for the first tool result. */
+export const WAIT_MS = 3000;
+
+/**
+ * Wires a card: renders each tool result into #app, opens links through the
+ * host, reports size. `render(result, input)` gives the card's HTML;
+ * `fallback(input)` gives the one-line card for when the host never answers,
+ * never sends a result, or sends one `render` cannot read. A result that
+ * arrives after the fallback still renders.
+ */
+export function startCard(win, doc, render, fallback) {
   const app = doc.getElementById("app");
+  let input = null;
+  let rendered = false;
+  let timer = null;
+  const later = (fn) => {
+    if (timer !== null) win.clearTimeout(timer);
+    timer = win.setTimeout(fn, WAIT_MS);
+  };
+  const showFallback = () => {
+    if (!rendered) app.innerHTML = fallback(input);
+  };
   const bridge = createBridge(win, {
+    toolInput: (params) => {
+      input = params && typeof params.arguments === "object" ? params.arguments : null;
+    },
     toolResult: (result) => {
-      app.innerHTML = render(result);
+      rendered = true;
+      if (timer !== null) win.clearTimeout(timer);
+      try {
+        app.innerHTML = render(result, input);
+      } catch {
+        app.innerHTML = fallback(input);
+      }
+      measure();
     },
     context: (ctx) => applyContext(doc, ctx),
   });
@@ -134,7 +167,7 @@ export function startCard(win, doc, render) {
   });
   // The size the SDK reports: the content's own height, the window's width.
   let last = "";
-  const measure = () => {
+  function measure() {
     const el = doc.documentElement;
     const before = el.style.height;
     el.style.height = "max-content";
@@ -146,8 +179,27 @@ export function startCard(win, doc, render) {
       last = key;
       bridge.reportSize(width, height);
     }
-  };
+  }
   if (typeof win.ResizeObserver === "function") new win.ResizeObserver(measure).observe(doc.documentElement);
-  bridge.connect().then(measure, () => {});
+  // No answer to ui/initialize in time: the fallback. After the handshake, the same wait for a result.
+  later(() => {
+    showFallback();
+    measure();
+  });
+  bridge.connect().then(
+    () => {
+      if (!rendered) {
+        later(() => {
+          showFallback();
+          measure();
+        });
+      }
+      measure();
+    },
+    () => {
+      showFallback();
+      measure();
+    },
+  );
   return bridge;
 }

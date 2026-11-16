@@ -4,14 +4,35 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import YAML from "yaml";
 
-import { MAX_HTML_BYTES, renderCards, renderModule, TARGET, toPx } from "../../../scripts/build-mcp-ui.mjs";
+import {
+  APP_PAD_PX,
+  LABEL_PX,
+  LABELS_MIN_VIEWPORT,
+  MAP_MAX_PX,
+  MAX_HTML_BYTES,
+  MIN_LABEL_PX,
+  renderCards,
+  renderModule,
+  TARGET,
+  toPx,
+} from "../../../scripts/build-mcp-ui.mjs";
 import { inFrame, VIEWS } from "../../../src/lib/regions/colorado-views";
 import { REGION_HTML, THIS_WEEK_HTML } from "../../../worker/mcp/ui/apps.generated";
-import { APP_INFO, createBridge, PROTOCOL_VERSION } from "../../../worker/mcp/ui/bridge.mjs";
-import { renderRegion, renderWeek, safeUrl, toolData } from "../../../worker/mcp/ui/view.mjs";
+import { APP_INFO, createBridge, PROTOCOL_VERSION, startCard, WAIT_MS } from "../../../worker/mcp/ui/bridge.mjs";
+import {
+  fallbackHtml,
+  own,
+  regionName,
+  regionPage,
+  renderRegion,
+  renderWeek,
+  safeUrl,
+  toolData,
+  WEEK_PAGE,
+} from "../../../worker/mcp/ui/view.mjs";
 
 const ROOT = path.resolve(__dirname, "../../../..");
 const TOKENS = YAML.parse(readFileSync(path.join(ROOT, "01_doctrine/brand_tokens.yaml"), "utf8"));
@@ -144,9 +165,33 @@ describe("renderWeek", () => {
     expect(html).not.toContain('class="cards"');
   });
 
-  it("shows a plain line for a result it cannot read", () => {
-    expect(renderWeek(toolData({ isError: true, content: [{ type: "text", text: "{}" }] }), NAMES)).toContain("could not be read");
-    expect(renderWeek(toolData({ content: [{ type: "text", text: "not json" }] }), NAMES)).toContain("could not be read");
+  it("shows the fallback, with the calendar as text, for a result it cannot read", () => {
+    const fallback = `<p class="note">This card could not load here. The same listing is at <span class="url">${WEEK_PAGE}</span>.</p>`;
+    expect(WEEK_PAGE).toBe("coloradostartups.org/event-calendar/");
+    expect(renderWeek(toolData({ isError: true, content: [{ type: "text", text: "{}" }] }), NAMES)).toBe(fallback);
+    expect(renderWeek(toolData({ content: [{ type: "text", text: "not json" }] }), NAMES)).toBe(fallback);
+  });
+
+  it("skips null and incomplete entries, and shows the empty state when none are left", () => {
+    const messy = { ...WEEK, events: [null, 7, "x", {}, { title: "No start" }, { start: "2026-11-16" }, { title: "Bad day", start: "soon" }, EVENTS[2]] };
+    const html = renderWeek(messy, NAMES);
+    expect([...html.matchAll(/<li class="ev">/g)]).toHaveLength(1);
+    expect(html).toContain("Demo Day");
+    const none = renderWeek({ ...WEEK, events: [null, {}, { title: "" }] }, NAMES);
+    expect(none).toContain("No events on the calendar this week.");
+    // Not an array at all: the empty state too, never a throw.
+    for (const events of [null, "x", { a: 1 }, 3]) expect(renderWeek({ ...WEEK, events }, NAMES)).toContain("No events on the calendar this week.");
+  });
+
+  it("finds no region for a key from Object's prototype", () => {
+    for (const key of ["constructor", "__proto__", "toString", "hasOwnProperty"]) {
+      expect(regionName(key, NAMES)).toBe("Elsewhere in Colorado");
+      expect(own(NAMES, key)).toBeNull();
+      const html = renderWeek({ ...WEEK, region: key, events: [{ ...EVENTS[2], region: key }] }, NAMES);
+      expect(html).toContain("<h1>This week</h1>");
+      expect(html).toContain('<span class="tag">Elsewhere in Colorado</span>');
+      expect(html).not.toContain("function");
+    }
   });
 });
 
@@ -169,7 +214,7 @@ describe("renderRegion", () => {
     const html = renderRegion(toolData(asResult(REGION)), NAMES, MAPS);
     expect(html).toContain("<h1>Space Peak</h1>");
     expect(html).toContain('<p class="sub">Colorado Springs &#183; Fountain</p>');
-    expect(html).toContain('<figure class="map"><svg>map</svg></figure>');
+    expect(html).toContain('<figure class="map"><svg>map</svg><figcaption>Space Peak in yellow; the corner map shows where it sits in Colorado.</figcaption></figure>');
     expect(html).toContain("Space Pitch Night");
     expect(html).toContain('data-link="https://coloradostartups.org/leaderboard/#company-peak-robotics"');
     expect(html).toContain('data-link="https://coloradostartups.org/regions/space-peak/"');
@@ -185,12 +230,32 @@ describe("renderRegion", () => {
   });
 
   it("draws no map for an id it has no map for", () => {
-    expect(renderRegion({ ...REGION, id: "__proto__" }, NAMES, MAPS)).not.toContain("<figure");
+    for (const id of ["__proto__", "constructor", "toString"]) expect(renderRegion({ ...REGION, id }, NAMES, MAPS)).not.toContain("<figure");
   });
 
-  it("reads an error result as a plain line", () => {
+  it("shows the fallback, with the region's page as text, for an error or non-JSON result", () => {
     const err = { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "No data for region space-peak" }) }] };
-    expect(renderRegion(toolData(err), NAMES, MAPS)).toBe('<p class="note">This region could not be read.</p>');
+    expect(renderRegion(toolData(err), NAMES, MAPS, { id: "space-peak" })).toContain('<span class="url">coloradostartups.org/regions/space-peak/</span>');
+    const junk = { content: [{ type: "text", text: "<html>oops" }] };
+    expect(renderRegion(toolData(junk), NAMES, MAPS, { id: "constructor" })).toContain('<span class="url">coloradostartups.org/regions/</span>');
+    expect(regionPage(null, NAMES)).toBe("coloradostartups.org/regions/");
+  });
+
+  it("skips null and incomplete events, companies and cities", () => {
+    const messy = {
+      ...REGION,
+      cities: ["Colorado Springs", null, 4, ""],
+      events: [null, { title: "x" }, "y", EVENTS[0]],
+      companies: [null, { id: "a" }, { id: "b", name: "Bee Labs", sector: { bad: 1 }, city: 7 }],
+    };
+    const html = renderRegion(messy, NAMES, MAPS);
+    expect(html).toContain('<p class="sub">Colorado Springs</p>');
+    expect([...html.matchAll(/<li class="ev">/g)]).toHaveLength(1);
+    expect(html).toContain(">Bee Labs</a></li>");
+    expect(html).not.toContain("[object Object]");
+    const none = renderRegion({ ...REGION, events: { length: 2 }, companies: "x", cities: null }, NAMES, MAPS);
+    expect(none).toContain("No events on the calendar here yet.");
+    expect(none).not.toContain("Leaderboard companies");
   });
 });
 
@@ -283,5 +348,101 @@ describe("bridge", () => {
     const { win, sent } = fakeWindow();
     createBridge(win, { toolResult: () => {}, context: () => {} }).reportSize(480, 312);
     expect(sent[0].m).toEqual({ jsonrpc: "2.0", method: "ui/notifications/size-changed", params: { width: 480, height: 312 } });
+  });
+});
+
+// A fake card page: the window above with timers, and the few DOM parts startCard touches.
+function fakeCard() {
+  const w = fakeWindow();
+  const app = { innerHTML: '<p class="note">Loading</p>', addEventListener: () => {} };
+  const el = { style: { height: "" }, getBoundingClientRect: () => ({ height: 100 }), setAttribute: () => {} };
+  const doc = { getElementById: () => app, documentElement: el, body: { style: {} } };
+  const win = Object.assign(w.win, { innerWidth: 400, setTimeout, clearTimeout, open: () => {} });
+  return { ...w, win, doc, app };
+}
+const WEEK_RESULT = { content: [{ type: "text", text: JSON.stringify(WEEK) }] };
+const weekCard = (c: ReturnType<typeof fakeCard>) =>
+  startCard(c.win, c.doc, (r: unknown) => renderWeek(toolData(r), NAMES), () => fallbackHtml(WEEK_PAGE));
+
+describe("startCard", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("shows the fallback when the host never answers ui/initialize", async () => {
+    vi.useFakeTimers();
+    const c = fakeCard();
+    weekCard(c);
+    await vi.advanceTimersByTimeAsync(WAIT_MS - 1);
+    expect(c.app.innerHTML).toContain("Loading");
+    await vi.advanceTimersByTimeAsync(1);
+    expect(c.app.innerHTML).toBe(fallbackHtml(WEEK_PAGE));
+    expect(c.app.innerHTML).toContain("coloradostartups.org/event-calendar/");
+  });
+
+  it("shows the fallback when the handshake ends but no tool result follows", async () => {
+    vi.useFakeTimers();
+    const c = fakeCard();
+    weekCard(c);
+    await vi.advanceTimersByTimeAsync(WAIT_MS - 1000);
+    c.deliver({ jsonrpc: "2.0", id: 1, result: { hostCapabilities: {}, hostContext: {} } });
+    await vi.advanceTimersByTimeAsync(WAIT_MS - 1);
+    expect(c.app.innerHTML).toContain("Loading");
+    await vi.advanceTimersByTimeAsync(1);
+    expect(c.app.innerHTML).toBe(fallbackHtml(WEEK_PAGE));
+  });
+
+  it("renders a result that arrives after the fallback", async () => {
+    vi.useFakeTimers();
+    const c = fakeCard();
+    weekCard(c);
+    await vi.advanceTimersByTimeAsync(WAIT_MS);
+    expect(c.app.innerHTML).toBe(fallbackHtml(WEEK_PAGE));
+    c.deliver({ jsonrpc: "2.0", id: 1, result: { hostCapabilities: {}, hostContext: {} } });
+    c.deliver({ jsonrpc: "2.0", method: "ui/notifications/tool-result", params: WEEK_RESULT });
+    expect(c.app.innerHTML).toContain("<h1>This week</h1>");
+    // And no later timer puts the fallback back.
+    await vi.advanceTimersByTimeAsync(WAIT_MS * 3);
+    expect(c.app.innerHTML).toContain("<h1>This week</h1>");
+  });
+
+  it("shows the fallback when render throws, never Loading", () => {
+    const c = fakeCard();
+    startCard(c.win, c.doc, () => {
+      throw new Error("shape");
+    }, () => "FALLBACK");
+    c.deliver({ jsonrpc: "2.0", method: "ui/notifications/tool-result", params: { content: [] } });
+    expect(c.app.innerHTML).toBe("FALLBACK");
+  });
+
+  it("names the region's page in the fallback from the tool input", async () => {
+    vi.useFakeTimers();
+    const c = fakeCard();
+    startCard(c.win, c.doc, (r: unknown, input: unknown) => renderRegion(toolData(r), NAMES, {}, input), (input: unknown) =>
+      fallbackHtml(regionPage(input, NAMES)),
+    );
+    c.deliver({ jsonrpc: "2.0", method: "ui/notifications/tool-input", params: { arguments: { id: "fusion-canyon" } } });
+    await vi.advanceTimersByTimeAsync(WAIT_MS);
+    expect(c.app.innerHTML).toContain('<span class="url">coloradostartups.org/regions/fusion-canyon/</span>');
+    // A non-JSON result after that keeps the fallback, with the same page.
+    c.deliver({ jsonrpc: "2.0", method: "ui/notifications/tool-result", params: { content: [{ type: "text", text: "nope" }] } });
+    expect(c.app.innerHTML).toContain("coloradostartups.org/regions/fusion-canyon/");
+  });
+});
+
+describe("map labels", () => {
+  // The map's drawn width at a viewport width: the card's padding and border off, up to the cap.
+  const drawn = (viewport: number) => Math.min(MAP_MAX_PX, viewport - 2 * APP_PAD_PX - 2);
+  const labelPx = (viewport: number) => (LABEL_PX * drawn(viewport)) / VIEWS["zone-space-peak"].width;
+
+  it("are 12 px or more wherever they show, and hidden below that width", () => {
+    expect(MIN_LABEL_PX).toBe(12);
+    expect(APP_PAD_PX).toBe(Number.parseInt(TOKENS.space["4"], 10));
+    for (const id of Object.keys(NAMES)) expect(VIEWS[`zone-${id}` as keyof typeof VIEWS].width).toBe(VIEWS["zone-space-peak"].width);
+    for (let vw = LABELS_MIN_VIEWPORT; vw <= 1200; vw += 4) expect(labelPx(vw), `${vw}px`).toBeGreaterThanOrEqual(MIN_LABEL_PX);
+    // At 320 px they would be about 11 px, so the CSS hides them there.
+    expect(labelPx(320)).toBeLessThan(MIN_LABEL_PX);
+    expect(REGION_HTML).toContain(`.map text{font:600 ${LABEL_PX}px`);
+    expect(REGION_HTML).toContain(`@media (max-width:${LABELS_MIN_VIEWPORT - 0.02}px){.map text{display:none}}`);
+    expect(REGION_HTML).toContain(`max-width:${MAP_MAX_PX}px`);
+    expect(REGION_HTML).toContain(`#app{padding:${APP_PAD_PX}px`);
   });
 });

@@ -85,15 +85,45 @@ export function timeLabel(event) {
   return `${h % 12 === 0 ? 12 : h % 12}:${m[2]} ${h < 12 ? "am" : "pm"}`;
 }
 
+/** An own string property of a lookup table, so a key such as "constructor" finds nothing. */
+export function own(table, key) {
+  if (typeof key !== "string" || !table || !Object.prototype.hasOwnProperty.call(table, key)) return null;
+  return typeof table[key] === "string" ? table[key] : null;
+}
+
 /** A region's display name, from the names the generator read from data/geo/regions.geojson. */
 export function regionName(id, names) {
-  if (id && names[id]) return names[id];
-  return "Elsewhere in Colorado";
+  return own(names, id) ?? "Elsewhere in Colorado";
+}
+
+/** The list at `value`, or an empty one when it is not an array. */
+const list = (value) => (Array.isArray(value) ? value : []);
+const text = (value) => typeof value === "string" && value.trim() !== "";
+
+/** An event has what a card needs: a title and a start that begins with a day. */
+export function isEvent(e) {
+  return !!e && typeof e === "object" && text(e.title) && typeof e.start === "string" && /^\d{4}-\d{2}-\d{2}/.test(e.start);
+}
+
+/**
+ * The card for a host where the card could not load: one plain line and the
+ * page as readable text, since a link may not open without the host.
+ */
+export function fallbackHtml(page) {
+  return `<p class="note">This card could not load here. The same listing is at <span class="url">${esc(page)}</span>.</p>`;
+}
+
+export const WEEK_PAGE = "coloradostartups.org/event-calendar/";
+
+/** The region card's fallback page: the region's own when the tool input names a known one. */
+export function regionPage(input, names) {
+  const id = input && typeof input === "object" ? input.id : null;
+  return own(names, id) ? `coloradostartups.org/regions/${id}/` : "coloradostartups.org/regions/";
 }
 
 /** One event as a compact card: day, time, title, place or online, region. */
 export function eventCard(event, names, calendar) {
-  const where = event.inPerson ? event.location || "In person" : "Online";
+  const where = event.inPerson ? (text(event.location) ? event.location : "In person") : "Online";
   // An event's own page is its https link; without one, the card links the calendar.
   const url = safeUrl(event.url) ?? safeUrl(calendar);
   return [
@@ -109,36 +139,42 @@ const CREDIT = `<p class="credit">Open data from Colorado Startups, CC BY 4.0</p
 
 /** The this_week card: the week's events, soonest first, or one line and the calendar. */
 export function renderWeek(data, names) {
-  if (!data || !Array.isArray(data.events)) return `<p class="note">The week's events could not be read.</p>`;
+  if (!data) return fallbackHtml(WEEK_PAGE);
   const calendar = safeUrl(data.calendar);
-  const place = data.region ? ` in ${esc(regionName(data.region, names))}` : "";
-  const range = data.from && data.to ? `${esc(dayLabel(data.from))} to ${esc(dayLabel(data.to))}` : "";
+  const place = own(names, data.region) ? ` in ${esc(regionName(data.region, names))}` : "";
+  const range = dayLabel(data.from) && dayLabel(data.to) ? `${esc(dayLabel(data.from))} to ${esc(dayLabel(data.to))}` : "";
   const head = `<header><h1>This week${place}</h1>${range ? `<p class="sub">${range}, Mountain Time</p>` : ""}</header>`;
-  if (data.events.length === 0) {
+  // Entries without a title or a start are skipped; with none left, the empty state.
+  const events = list(data.events).filter(isEvent);
+  if (events.length === 0) {
     return `${head}<p class="note">No events on the calendar this week. ${link("See the calendar", calendar)}</p>${CREDIT}`;
   }
-  const events = [...data.events].sort((a, b) => String(a.start).localeCompare(String(b.start)));
+  events.sort((a, b) => a.start.localeCompare(b.start));
   const more =
-    typeof data.moreEvents === "number" && data.moreEvents > 0
+    Number.isInteger(data.moreEvents) && data.moreEvents > 0
       ? `<p class="more">${link(`${data.moreEvents} more on the calendar`, calendar)}</p>`
       : `<p class="more">${link("See the calendar", calendar)}</p>`;
   return `${head}<ul class="cards">${events.map((e) => eventCard(e, names, calendar)).join("")}</ul>${more}${CREDIT}`;
 }
 
 /** The region card: name, cities, map, next events and a few companies, with links. */
-export function renderRegion(data, names, maps) {
-  if (!data || typeof data.id !== "string" || !data.name) return `<p class="note">This region could not be read.</p>`;
+export function renderRegion(data, names, maps, input) {
+  if (!data || typeof data.id !== "string" || !text(data.name)) return fallbackHtml(regionPage(input ?? data, names));
   const page = safeUrl(data.url);
   const calendar = onSite("/event-calendar/", page);
-  const cities = Array.isArray(data.cities) ? data.cities : [];
-  const events = Array.isArray(data.events) ? data.events.slice(0, 5) : [];
-  const companies = Array.isArray(data.companies) ? data.companies.slice(0, 5) : [];
+  const cities = list(data.cities).filter(text);
+  const events = list(data.events).filter(isEvent).slice(0, 5);
+  const companies = list(data.companies).filter((c) => !!c && typeof c === "object" && text(c.name)).slice(0, 5);
   const parts = [
     `<header><h1>${esc(data.name)}</h1>${cities.length ? `<p class="sub">${cities.map(esc).join(" &#183; ")}</p>` : ""}</header>`,
   ];
   // The maps are the generator's own SVG, drawn from data/geo/, never from the tool result.
-  if (Object.prototype.hasOwnProperty.call(maps, data.id)) parts.push(`<figure class="map">${maps[data.id]}</figure>`);
-  if (data.summary) parts.push(`<p class="summary">${esc(data.summary)}</p>`);
+  // The caption names the region in words, since a narrow card hides the map's city labels.
+  const map = own(maps, data.id);
+  if (map) {
+    parts.push(`<figure class="map">${map}<figcaption>${esc(data.name)} in yellow; the corner map shows where it sits in Colorado.</figcaption></figure>`);
+  }
+  if (text(data.summary)) parts.push(`<p class="summary">${esc(data.summary)}</p>`);
   parts.push(`<h2>Next events</h2>`);
   parts.push(
     events.length
@@ -149,7 +185,7 @@ export function renderRegion(data, names, maps) {
     parts.push(`<h2>Leaderboard companies</h2>`);
     const rows = companies.map((c) => {
       const url = onSite(`/leaderboard/#company-${encodeURIComponent(String(c.id ?? ""))}`, page);
-      const meta = [c.sector, c.city].filter(Boolean).map(esc).join(" &#183; ");
+      const meta = [c.sector, c.city].filter(text).map(esc).join(" &#183; ");
       return `<li>${link(c.name, url)}${meta ? ` <span class="meta">${meta}</span>` : ""}</li>`;
     });
     parts.push(`<ul class="list">${rows.join("")}</ul>`);

@@ -50,11 +50,22 @@ export function tokenCss(doc) {
   ].join("");
 }
 
+// Map label sizing. A label is LABEL_PX in the map's own units; the map is
+// drawn at most MAP_MAX_PX wide, inside #app's padding (space token 4) and a
+// 1 px border. Below LABELS_MIN_VIEWPORT the labels would render under
+// MIN_LABEL_PX, so they are hidden there and the caption names the region.
+// test/unit/mcp/ui.test.ts checks the arithmetic.
+export const LABEL_PX = 22;
+export const MIN_LABEL_PX = 12;
+export const MAP_MAX_PX = 416;
+export const APP_PAD_PX = 16;
+export const LABELS_MIN_VIEWPORT = 400;
+
 const CARD_CSS = [
   `*{box-sizing:border-box}`,
   `html,body{margin:0;background:var(--c-ground);color:var(--c-text)}`,
   `body{font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}`,
-  `#app{padding:var(--s-4);max-width:40rem}`,
+  `#app{padding:${APP_PAD_PX}px;max-width:40rem}`,
   `h1{font-size:1.15rem;margin:0}`,
   `h2{font-size:.95rem;margin:var(--s-4) 0 var(--s-2)}`,
   `p{margin:0}`,
@@ -75,13 +86,16 @@ const CARD_CSS = [
   `.more{margin-top:var(--s-3)}`,
   `.credit{margin-top:var(--s-4);font-size:.75rem}`,
   `.map{margin:var(--s-3) 0 0}`,
-  `.map svg{display:block;width:100%;max-width:26rem;height:auto;background:var(--c-surface);border:1px solid var(--c-rule);border-radius:var(--r-card)}`,
+  `.map figcaption{margin-top:var(--s-1);font-size:.85rem;color:var(--c-text-dim)}`,
+  `.url{font-weight:600;overflow-wrap:anywhere}`,
+  `.map svg{display:block;width:100%;max-width:${MAP_MAX_PX}px;height:auto;background:var(--c-surface);border:1px solid var(--c-rule);border-radius:var(--r-card)}`,
   `.map .st{fill:var(--c-ground);stroke:var(--c-border);stroke-width:2}`,
   `.map .zo{fill:var(--c-text-dim);stroke:none}`,
   `.map .zf{fill:var(--c-accent);stroke:var(--c-text);stroke-width:3;stroke-linejoin:round}`,
   `.map .lc{fill:none;stroke:var(--c-text);stroke-width:6}`,
   `.map .cy{fill:var(--c-text);stroke:var(--c-ground);stroke-width:3}`,
-  `.map text{font:600 22px system-ui,sans-serif;fill:var(--c-text);stroke:var(--c-ground);stroke-width:5px;paint-order:stroke;stroke-linejoin:round}`,
+  `.map text{font:600 ${LABEL_PX}px system-ui,sans-serif;fill:var(--c-text);stroke:var(--c-ground);stroke-width:5px;paint-order:stroke;stroke-linejoin:round}`,
+  `@media (max-width:${LABELS_MIN_VIEWPORT - 0.02}px){.map text{display:none}}`,
 ].join("");
 
 // --- The map: the site's own geography, in the frames the site's maps use. ---
@@ -143,7 +157,6 @@ const r0 = (n) => Math.round(n);
 const pathOf = (pts) => `M${pts.map(([x, y]) => `${r0(x)} ${r0(y)}`).join("L")}Z`;
 const escXml = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 
-const LABEL_PX = 22;
 const CHAR_W = 0.56 * LABEL_PX;
 const INSET_SCALE = 0.22;
 const overlaps = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
@@ -230,7 +243,9 @@ const scriptSafe = (js) => js.replace(/<\/(script)/gi, "<\\/$1");
 function cardHtml({ title, kind, css, script, names, maps }) {
   const boot =
     `const NAMES=${JSON.stringify(names)};const MAPS=${JSON.stringify(maps)};` +
-    `startCard(window,document,(result)=>${kind === "week" ? "renderWeek(toolData(result),NAMES)" : "renderRegion(toolData(result),NAMES,MAPS)"});`;
+    (kind === "week"
+      ? `startCard(window,document,(result)=>renderWeek(toolData(result),NAMES),()=>fallbackHtml(WEEK_PAGE));`
+      : `startCard(window,document,(result,input)=>renderRegion(toolData(result),NAMES,MAPS,input),(input)=>fallbackHtml(regionPage(input,NAMES)));`);
   return [
     `<!doctype html><html lang="en"><head><meta charset="utf-8">`,
     `<meta name="viewport" content="width=device-width,initial-scale=1">`,
