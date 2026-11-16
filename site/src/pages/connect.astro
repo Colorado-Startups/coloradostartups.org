@@ -1,0 +1,282 @@
+---
+// /connect/: how to connect an AI app to the keyless /mcp server (worker/mcp/).
+// Paul's rule (2026-11-16, 01_doctrine/ai_recommend.yaml): the page names
+// Claude and OpenCode only. Every other app gets one neutral block, "Any other
+// app that speaks MCP", that names no product. The named cards come from
+// data/ai-clients.yaml; Claude Code also gets this repo's plugin and Claude
+// the skill download (plugins/colorado-startups/README.md). The 5 asks are
+// compact shared Ask-your-AI rows (components/ai/AskAi.astro): Copy prompt
+// and Open in Claude. A bad record throws, so the build stops before a card
+// ships wrong. test/dom/connect.test.ts pins the tool and prompt counts to
+// worker/mcp/server.ts.
+import { parse } from "yaml";
+import { z } from "zod";
+
+import clientsRaw from "../../../data/ai-clients.yaml?raw";
+import AskAi from "../components/ai/AskAi.astro";
+import Button from "../components/ui/Button.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const SERVER_ID = "coloradostartups";
+const mcpUrl = new URL("/mcp", Astro.site!).toString();
+
+// The server's counts, read from worker/mcp/server.ts by the DOM test.
+const TOOLS = 7;
+const PROMPTS = 2;
+
+const Client = z
+  .object({
+    id: z.string().regex(/^[a-z0-9-]+$/),
+    group: z.enum(["claude", "opencode"]),
+    name: z.string().min(1),
+    effort: z.enum(["one-command", "guided"]),
+    command: z.string().includes("{url}").optional(),
+    config: z.literal("opencode").optional(),
+    steps: z.array(z.string().min(1)).min(1).optional(),
+    note: z.string().min(1).optional(),
+    plugin: z.array(z.string().min(1)).min(1).optional(),
+    skill: z.string().regex(/^\/downloads\/[a-z0-9-]+\.zip$/).optional(),
+    docs: z.string().url(),
+    read: z.union([z.string(), z.date()]),
+  })
+  .strict()
+  .refine((c) => (c.effort === "one-command") === Boolean(c.command), "one-command needs a command, and only it")
+  .refine((c) => (c.effort === "guided") === Boolean(c.steps), "guided needs steps, and only it");
+const clients = z.array(Client).min(1).parse(parse(clientsRaw));
+
+const GROUPS = [
+  { id: "claude", title: "Claude" },
+  { id: "opencode", title: "OpenCode" },
+] as const;
+
+const openCodeConfig = JSON.stringify(
+  {
+    $schema: "https://opencode.ai/config.json",
+    mcp: { servers: { [SERVER_ID]: { type: "remote", url: mcpUrl, oauth: false } } },
+  },
+  null,
+  2,
+);
+
+const EFFORT = { "one-command": "One command", guided: "A few steps" } as const;
+
+const facts = [
+  ["Cost", "Free"],
+  ["Key or sign in", "None"],
+  ["Access", "Read-only"],
+  ["Tools", String(TOOLS)],
+  ["Prompts", String(PROMPTS)],
+] as const;
+
+const asks = [
+  "What startup events are on in Colorado this week?",
+  "I have an idea and no customers yet. What should I do first?",
+  "Find Colorado resources for hardware founders.",
+  "Which guide covers free startup credits?",
+  "Show me a Leaderboard company in my sector, with its sources.",
+];
+---
+
+<BaseLayout
+  title="Connect your AI"
+  description="Connect Claude, Claude Code, OpenCode or any app that speaks MCP to the free Colorado Startups MCP server. No key."
+  ogImage="connect"
+>
+  <section class="section section--band" aria-labelledby="page-title">
+    <div class="wrap stack">
+      <h1 id="page-title">Connect your AI</h1>
+      <p class="lede">One public server for Colorado startup resources, events, guides and companies.</p>
+      <dl class="connect-facts" data-facts>
+        {
+          facts.map(([k, v]) => (
+            <div class="panel">
+              <dt class="meta">{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="connect-url">
+        <pre class="connect-code"><code id="mcp-url" data-mcp-url>{mcpUrl}</code></pre>
+        <Button variant="secondary" data-copy="mcp-url">Copy URL</Button>
+      </div>
+      <p class="meta">
+        The this_week and region tools also show a card in apps that support MCP Apps. Listed in the MCP Registry as{" "}
+        <code>io.github.Colorado-Startups/coloradostartups</code>.
+      </p>
+    </div>
+  </section>
+
+  {
+    GROUPS.map((g) => (
+      <section class="section section--lit" aria-labelledby={`group-${g.id}`} data-group={g.id}>
+        <div class="wrap stack">
+          <h2 id={`group-${g.id}`}>{g.title}</h2>
+          <ul class="connect-cards" role="list">
+            {clients
+              .filter((c) => c.group === g.id)
+              .map((c) => (
+                <li class="panel stack connect-card" data-client={c.id} data-effort={c.effort}>
+                  <h3>{c.name}</h3>
+                  <p class="meta">{EFFORT[c.effort]}</p>
+                  {c.command && (
+                    <>
+                      <pre class="connect-code"><code id={`cmd-${c.id}`}>{c.command.replace("{url}", mcpUrl)}</code></pre>
+                      <Button variant="secondary" data-copy={`cmd-${c.id}`}>
+                        Copy command
+                      </Button>
+                    </>
+                  )}
+                  {c.steps && (
+                    <ol>
+                      {c.steps.map((s) => (
+                        <li>{s}</li>
+                      ))}
+                    </ol>
+                  )}
+                  {c.plugin && (
+                    <details>
+                      <summary>Or install the plugin</summary>
+                      <pre class="connect-code"><code id={`plugin-${c.id}`}>{c.plugin.join("\n")}</code></pre>
+                      <Button variant="secondary" data-copy={`plugin-${c.id}`}>
+                        Copy commands
+                      </Button>
+                    </details>
+                  )}
+                  {c.config === "opencode" && (
+                    <details>
+                      <summary>Or add it to opencode.jsonc</summary>
+                      <pre class="connect-code"><code id="cfg-opencode">{openCodeConfig}</code></pre>
+                      <Button variant="secondary" data-copy="cfg-opencode">
+                        Copy config
+                      </Button>
+                    </details>
+                  )}
+                  {c.skill && (
+                    <p>
+                      Then <a href={c.skill}>download the skill</a> and add it as a skill.
+                    </p>
+                  )}
+                  {c.note && <p class="meta">{c.note}</p>}
+                </li>
+              ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section section--lit" aria-labelledby="any-title" data-any-mcp>
+    <div class="wrap stack">
+      <h2 id="any-title">Any other app that speaks MCP</h2>
+      <ul class="connect-any" role="list">
+        <li>Add a remote server with this URL.</li>
+        <li>It needs no key and no sign in.</li>
+        <li>It is a streamable HTTP server.</li>
+      </ul>
+      <div class="connect-url">
+        <pre class="connect-code"><code id="mcp-url-any">{mcpUrl}</code></pre>
+        <Button variant="secondary" data-copy="mcp-url-any">Copy URL</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="asks-title">
+    <div class="wrap stack">
+      <h2 id="asks-title">5 things to ask</h2>
+      <ol class="connect-asks" data-asks>
+        {
+          asks.map((question, i) => (
+            <li class="panel">
+              <AskAi subject="Connect your AI" path="/connect/" question={question} id={`ask-${i + 1}`} compact />
+            </li>
+          ))
+        }
+      </ol>
+      <p class="meta"><a href="/data/">The open data</a> behind it is free under CC BY 4.0.</p>
+    </div>
+  </section>
+  <p class="visually-hidden" role="status" data-copy-status></p>
+</BaseLayout>
+
+<script>
+  // Each copy button copies the element its data-copy names. The buttons stay
+  // hidden until this runs, so a visitor without JavaScript sees only the text,
+  // which they can select and copy by hand. The result is announced in one
+  // status line for screen readers. If the browser refuses the copy, the text
+  // is selected so the visitor can copy it from the keyboard.
+  import { copyText } from "../components/kit/copy";
+
+  const status = document.querySelector<HTMLElement>("[data-copy-status]");
+  for (const button of document.querySelectorAll<HTMLButtonElement>("button[data-copy]")) {
+    const label = button.textContent ?? "";
+    button.dataset.ready = "";
+    button.addEventListener("click", async () => {
+      const target = document.getElementById(button.dataset.copy ?? "");
+      const ok = await copyText(target?.textContent ?? "", navigator.clipboard);
+      if (!ok && target) {
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+      const message = ok ? "Copied." : "Your browser blocked the copy. The text is selected; copy it from the keyboard.";
+      button.textContent = ok ? "Copied" : "Copy blocked";
+      if (status) status.textContent = message;
+      setTimeout(() => (button.textContent = label), 2000);
+    });
+  }
+</script>
+
+<style>
+  /* Copy buttons wait for their script (data-ready), so they never show when they cannot work. */
+  :global(button[data-copy]:not([data-ready])) {
+    display: none;
+  }
+  .connect-facts {
+    display: grid;
+    gap: var(--s-3);
+    margin: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  }
+  .connect-facts dd {
+    margin: 0;
+    font-size: var(--t-step-1);
+  }
+  .connect-url {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .connect-cards,
+  .connect-asks {
+    display: grid;
+    gap: var(--s-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+  .connect-card ol,
+  .connect-any {
+    margin: 0;
+    padding-left: var(--s-4);
+  }
+  .connect-card summary {
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .connect-code {
+    margin: 0;
+    padding: var(--s-3);
+    overflow-x: auto;
+    border: var(--line-hair) solid var(--c-border);
+    background: var(--c-surface);
+    border-radius: var(--r-chisel);
+    font-size: var(--t-step--1);
+  }
+</style>

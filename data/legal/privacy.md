@@ -5,7 +5,7 @@ summary: What Colorado Startups collects on this website, why, who helps us run 
 status: approved
 ---
 
-<!-- Approved at Gate B on 2026-10-18 (decision 71). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. The 2026-11-16 changes are the P5a PR (#92), the F1 PR (#98) and the P3a PR, each for the orchestrator's merge review. -->
+<!-- Approved at Gate B on 2026-10-18 (decision 71). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. The 2026-11-16 changes are the P5a PR (#92), the F1 PR (#98), the P3a PR and the M1b PR, each for the orchestrator's merge review. -->
 
 Colorado Startups, Ltd. runs this website for a community of entrepreneurs building companies in Colorado, and for the wider startup community around them. This page says what we collect, why, and what you can ask us to do with it.
 
@@ -105,9 +105,17 @@ How we use what you send:
 
 - **Bot protection.** Our forms and the Resourcus question box use Cloudflare Turnstile to check that a person, not a bot, is using them. Turnstile receives your IP address from your browser when the check runs, and from us when we confirm the result. Cloudflare uses it to tell people from bots and to improve its bot detection, not to identify, profile or target you (Cloudflare's Turnstile Privacy Addendum, read 2026-10-22).
 - **Abuse limits.** We use your IP address for a short time to limit how often a form can be sent from one connection. We do not store it with anything you send.
-- **Request logs.** Cloudflare logs each request that reaches our server code, with its headers, which include your IP address, and the approximate location Cloudflare matches to that address. That code runs for every address under `/api/`, which carries our forms, Resourcus questions and security reports. It also runs for `/mcp`, where AI clients search our open data. It also runs for some requests to addresses where no page or file exists. Requests for our pages and files skip it and are not in these logs. We use these logs only to find and fix errors, and Cloudflare keeps them for up to 7 days (Cloudflare's Workers Logs documentation, read 2026-10-22).
+- **Request logs.** Cloudflare logs each request that reaches our server code, with its headers, which include your IP address, and the approximate location Cloudflare matches to that address. That code runs for every address under `/api/`, which carries our forms, Resourcus questions, click events and security reports. It also runs for `/mcp`, where AI clients search our open data. It also runs for some requests to addresses where no page or file exists. Requests for our pages and files skip it and are not in these logs. We use these logs only to find and fix errors, and Cloudflare keeps them for up to 7 days (Cloudflare's Workers Logs documentation, read 2026-10-22).
 - **Security reports.** If your browser blocks something on our pages for security reasons, it may send us a report of what was blocked and on which page. We keep only the rule that was broken, the site or type of content it blocked, and the path of our page. We count repeats of the same report instead of storing each one. These records live in our database on Cloudflare (D1), with no IP address, and we use them to fix our site. A weekly job deletes each type of report that no browser has sent in the last 90 days (our commitment).
 - **Analytics.** We use Cloudflare Web Analytics, which counts visits without cookies and without tracking you across other sites.
+- **Click events.** Some buttons, such as a join button, can record a click as an anonymous event. When they do, we use these counts only to see which parts of the site help people.
+  - An event holds a name from a fixed list and up to two short labels, such as which page the button is on. It never holds free text, an email address, a web address or anything you typed.
+  - Your browser sends the event to our own server, which passes it on to PostHog, a product analytics service.
+  - Our server sets no cookie. It does not store your IP address with the event, and it does not send your IP address to PostHog.
+  - PostHog gets only a random-looking id in place of you. The id changes each day, and PostHog cannot trace it back to you.
+  - If your browser sends Global Privacy Control or Do Not Track, the site sends no click events at all.
+  - PostHog keeps events for one year on its free plan, which we use, and may delete them at any time after that (PostHog's events retention documentation, read 2026-11-16).
+  - The request that carries an event is in Cloudflare's request logs above, like every request to `/api/`.
 - **The event calendar.** Our events page shows a Google Calendar. Google provides it and may collect information when it loads, under Google's privacy policy.
 
 ## Who helps us run the site
@@ -118,6 +126,7 @@ How we use what you send:
 | Kit | Sends the Startupers newsletter and holds the subscriber list |
 | Slack | Hosts our community workspace, where Communitas runs |
 | Google | Our email (Google Workspace), the embedded event calendar, and the form you fill in to join our Slack (Google Forms) |
+| PostHog | Counts the anonymous click events our server passes on |
 
 Each of these services handles information under its own privacy policy. We do not share your information with anyone else unless the law requires it.
 
@@ -131,7 +140,7 @@ Each of these services handles information under its own privacy policy. We do n
 
 When we change this policy in a way that matters, we update the date at the top of this page and tell newsletter subscribers in our next email.
 
-**November 16, 2026.** We added the join request form for our Slack on this site: what it collects, who reads it, and the email Paul gets for each request. A weekly job deletes each request 90 days after it arrives. We also added the founders forum waitlist: what it collects, that it sends no email per entry, and that a weekly job deletes each entry 365 days after you join. We also added the "Get featured" form: what it collects, the two confirmations it records, and what becomes public, only with your agreement. We added the email Paul gets for each request, and that a weekly job deletes each request 180 days after it arrives.
+**November 16, 2026.** We added the join request form for our Slack on this site: what it collects, who reads it, and the email Paul gets for each request. A weekly job deletes each request 90 days after it arrives. We also added the founders forum waitlist: what it collects, that it sends no email per entry, and that a weekly job deletes each entry 365 days after you join. We also added the "Get featured" form: what it collects, the two confirmations it records, and what becomes public, only with your agreement. We added the email Paul gets for each request, and that a weekly job deletes each request 180 days after it arrives. The policy now also describes click events, which some buttons can record, and what an event holds. It says an event reaches PostHog through our own server, with a daily id and no IP address. Browsers sending Global Privacy Control or Do Not Track send none. We said how long PostHog keeps events, and added PostHog to the services that help run the site.
 
 **November 2, 2026.** The nomination form now asks for the company's HQ city and its founding year. We added that we store the city with the nomination, show it in Paul's notice email and use it to check the HQ.
 

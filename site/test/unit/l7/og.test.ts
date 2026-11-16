@@ -47,6 +47,7 @@ const REQUIRED = [
   "get-involved",
   "founders",
   "dispatches",
+  "connect",
   "default",
 ];
 

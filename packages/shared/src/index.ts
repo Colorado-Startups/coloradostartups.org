@@ -10,3 +10,4 @@ export * from "./feed";
 export * from "./regions";
 export * from "./apply";
 export * from "./open-data";
+export * from "./events";

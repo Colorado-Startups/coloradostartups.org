@@ -188,6 +188,24 @@ test("without the Popover API the clip still plays, the list opens, and nothing 
   expect(errors).toEqual([]);
 });
 
+// Step R1: the map leads and the painting sits far below the first screen, so
+// on load the clip and the painting fetch nothing; scrolling to it starts both.
+test("the clip and the painting load only once the painting nears the screen", async ({ page }) => {
+  const media: string[] = [];
+  page.on("request", (r) => {
+    if (/\/art\/brand\/photonics\.(?:webm|mp4)|\/art\/brand\/boulder/.test(r.url())) media.push(r.url());
+  });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(ROUTE);
+  await page.waitForLoadState("load");
+  expect(media, "nothing of the painting loads with the first screen").toEqual([]);
+  const box = page.locator(".region-art__media").first();
+  await box.scrollIntoViewIfNeeded();
+  await expect(box).toHaveAttribute("data-playing", "true", { timeout: 20_000 });
+  expect(media.some((u) => /photonics\.(?:webm|mp4)/.test(u)), "the clip loads on screen").toBe(true);
+});
+
 test("under reduced motion the still shows and no clip logic runs", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(ROUTE);

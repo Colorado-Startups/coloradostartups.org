@@ -6,7 +6,18 @@
 import { REGION_IDS } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
-import { applyFilter, denverDay, filterQuery, initEventList, NO_FILTER, readFilter, weekEnd } from "../../src/components/events/list-filter";
+import {
+  applyFilter,
+  denverDay,
+  filterQuery,
+  initEventList,
+  NEXT_7_DAYS,
+  NO_FILTER,
+  readFilter,
+  startsWithinWeek,
+  WEEK_MS,
+  weekEnd,
+} from "../../src/components/events/list-filter";
 import { loadFrames, wireDeferredFrames } from "../../src/components/info/calendar-defer";
 import { calendarEmbedUrl } from "../../src/components/info/links";
 import { readDist } from "./pages";
@@ -98,10 +109,12 @@ describe("the filter chips", () => {
     }
   });
 
-  it("offer This week, and a region or format only when the data has it", () => {
-    expect(group("when").map((r) => r.value)).toEqual(["", "week"]);
+  it("offer This week and Next 7 days, every region, and Elsewhere or a format only when the data has it", () => {
+    expect(group("when").map((r) => r.value)).toEqual(["", "week", NEXT_7_DAYS]);
+    expect(text(group("when")[2]!.closest("label"))).toBe("Next 7 days");
+    // Step R1: each region page links its events count here, so every region has a chip.
     const inData = new Set(items(list).map((li) => li.dataset.region).filter(Boolean));
-    for (const r of group("region").filter((r) => r.value)) expect(inData.has(r.value)).toBe(true);
+    expect(group("region").map((r) => r.value)).toEqual(["", ...REGION_IDS, ...(inData.has("elsewhere") ? ["elsewhere"] : [])]);
     const types = new Set(items(list).flatMap((li) => (li.dataset.type ?? "").split(" ").filter(Boolean)));
     expect(group("type").length > 0).toBe(types.size > 1);
   });
@@ -143,6 +156,24 @@ describe("filtering the built list", () => {
     expect(visible(root).length).toBeGreaterThan(0);
     expect(visible(root).every((li) => (li.dataset.day ?? "") <= last)).toBe(true);
     expect(items(root).filter((li) => li.hidden).every((li) => (li.dataset.day ?? "") > last)).toBe(true);
+  });
+
+  it("by next 7 days keeps events that start within seven days of now, and leaves This week as it was", () => {
+    const root = fresh().querySelector("[data-event-list]")!;
+    applyFilter(root, { ...NO_FILTER, when: NEXT_7_DAYS }, NOW);
+    expect(visible(root).length).toBeGreaterThan(0);
+    for (const li of items(root)) {
+      const starts = Date.parse(li.dataset.starts!);
+      expect(Number.isNaN(starts), "every row carries its start").toBe(false);
+      expect(!li.hidden, li.dataset.starts).toBe(starts < NOW + WEEK_MS);
+    }
+    // The rule is strict at the edge, as zone-counts.ts counts.
+    expect(startsWithinWeek(NOW + WEEK_MS - 1, NOW)).toBe(true);
+    expect(startsWithinWeek(NOW + WEEK_MS, NOW)).toBe(false);
+    // This week still ends on Sunday.
+    const week = fresh().querySelector("[data-event-list]")!;
+    applyFilter(week, { ...NO_FILTER, when: "week" }, NOW);
+    expect(visible(week).every((li) => (li.dataset.day ?? "") <= weekEnd(denverDay(NOW)))).toBe(true);
   });
 
   it("drops events that have ended, and says so when none are left", () => {
