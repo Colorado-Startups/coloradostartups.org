@@ -1,22 +1,24 @@
 // The live layer of ColoradoMap: MapLibre GL JS over OpenFreeMap tiles, with
-// the three zones and the core cities drawn on top. Ported from Fusion
-// Canyon's corridor map (Colorado-Startups/fusion-canyon PR #11).
+// shaded relief, the three zones and the cities drawn on top. Ported from
+// Fusion Canyon's corridor map (Colorado-Startups/fusion-canyon PR #11).
 //
-// - Loads only when a map scrolls near the screen, so the first screen pays
-//   nothing (MapLibre is about 250 KB compressed).
+// - Loads only when a visitor presses the map's "Explore the live map" button:
+//   the drawing is the map until then, and the page pays nothing (MapLibre is
+//   about 250 KB compressed). The button shows only where WebGL2 exists.
 // - MapLibre 6 is ES modules only. Its worker is one self-contained file, and
 //   setWorkerUrl points at our same-origin copy, which MapLibre 6 starts as a
 //   module worker directly: script-src and worker-src stay 'self', no blob:.
 // - Light or dark basemap from the page's theme; switching themes swaps the
-//   style, and `style.load` re-adds the zones, which setStyle wipes.
+//   style, and `style.load` re-adds the relief and the zones, which setStyle wipes.
 // - cooperativeGestures: the page scrolls past the map; a pinch or a held
 //   key zooms it. Zoom buttons cover single-pointer use (WCAG 2.5.1).
-// - Zone colors are read off the site's tokens, so they follow the theme.
+// - Zone colors are read off the site's tokens, so they follow the theme. Each
+//   zone line is three strokes, as in the drawing: a glow, a dark casing, the line.
 // - A figure with data-zone (ColoradoMap's `zone`) fits that zone's bounds and
-//   dims the other two, as the drawing does. The basemap names its towns, and
-//   the zone fills the frame, so it draws no zone names.
+//   dims the other two. The basemap names its towns, and the zone fills the
+//   frame, so it draws no zone names.
 import type { RegionId } from "@cs/shared";
-import type { ExpressionSpecification, GeoJSONSourceSpecification, Map as MlMap } from "maplibre-gl";
+import type { ExpressionSpecification, GeoJSONSourceSpecification, Map as MlMap, RasterDEMSourceSpecification } from "maplibre-gl";
 
 import { COLORADO, COLORADO_BOUNDS, DIM, ZONES, zoneBounds, zoneLabelPoint } from "../../lib/regions/colorado-geo";
 
@@ -24,6 +26,16 @@ const STYLES = {
   light: "https://tiles.openfreemap.org/styles/positron",
   dark: "https://tiles.openfreemap.org/styles/dark",
 } as const;
+
+// Shaded relief: Mapterhorn's open terrain tiles, as Fusion Canyon's map uses them.
+const TERRAIN: RasterDEMSourceSpecification = {
+  type: "raster-dem",
+  tiles: ["https://tiles.mapterhorn.com/{z}/{x}/{y}.webp"],
+  encoding: "terrarium",
+  tileSize: 512,
+  maxzoom: 14,
+  attribution: '<a href="https://mapterhorn.com/attribution">© Mapterhorn</a>',
+};
 
 // REGION_COLORS (lib/regions/map.ts) as token names, so the live map and the drawing agree.
 const ZONE_TOKEN = {
@@ -69,12 +81,49 @@ function addOverlay(map: MlMap, zone: RegionId | undefined) {
         })),
       ),
   };
+  const dark = scheme() === "dark";
+  map.addSource("cs-terrain", TERRAIN);
   map.addSource("cs-state", { type: "geojson", data: COLORADO as unknown as GeoJSONSourceSpecification["data"] });
   map.addSource("cs-zones", { type: "geojson", data: zones as unknown as GeoJSONSourceSpecification["data"] });
   map.addSource("cs-cities", { type: "geojson", data: cities });
+  map.addLayer(
+    {
+      id: "cs-relief",
+      type: "hillshade",
+      source: "cs-terrain",
+      paint: {
+        "hillshade-exaggeration": dark ? 0.7 : 0.45,
+        "hillshade-shadow-color": dark ? "#000000" : token("--c-text-dim"),
+        "hillshade-highlight-color": dark ? token("--c-border") : "#ffffff",
+        "hillshade-accent-color": dark ? "#000000" : token("--c-text-dim"),
+      },
+    },
+    below,
+  );
   map.addLayer({ id: "cs-state-line", type: "line", source: "cs-state", paint: { "line-color": token("--c-border"), "line-width": 1.5 } }, below);
   map.addLayer(
-    { id: "cs-zones-fill", type: "fill", source: "cs-zones", paint: { "fill-color": ["get", "color"], "fill-opacity": byFocus(zone, 0.16, DIM.fill) } },
+    { id: "cs-zones-fill", type: "fill", source: "cs-zones", paint: { "fill-color": ["get", "color"], "fill-opacity": byFocus(zone, 0.18, DIM.fill) } },
+    below,
+  );
+  const round = { "line-join": "round", "line-cap": "round" } as const;
+  map.addLayer(
+    {
+      id: "cs-zones-glow",
+      type: "line",
+      source: "cs-zones",
+      layout: round,
+      paint: { "line-color": ["get", "color"], "line-width": zone ? 14 : 10, "line-blur": 6, "line-opacity": byFocus(zone, 0.45, 0) },
+    },
+    below,
+  );
+  map.addLayer(
+    {
+      id: "cs-zones-casing",
+      type: "line",
+      source: "cs-zones",
+      layout: round,
+      paint: { "line-color": token("--c-night"), "line-width": zone ? 5.5 : 4.5, "line-opacity": byFocus(zone, 0.6, 0) },
+    },
     below,
   );
   map.addLayer(
@@ -82,6 +131,7 @@ function addOverlay(map: MlMap, zone: RegionId | undefined) {
       id: "cs-zones-line",
       type: "line",
       source: "cs-zones",
+      layout: round,
       paint: { "line-color": ["get", "color"], "line-width": byFocus(zone, zone ? 3 : 2.5, 1.5), "line-opacity": byFocus(zone, 1, DIM.line) },
     },
     below,
@@ -131,26 +181,58 @@ async function mount(figure: HTMLElement) {
     el.textContent = z.properties.name;
     new maplibregl.Marker({ element: el, anchor: west ? "right" : "left" }).setLngLat(zoneLabelPoint(z, west ? "west" : "east")).addTo(map);
   }
-  map.once("load", () => figure.classList.add("is-live"));
   // "idle": every tile in view has loaded and drawn. Tests and screenshots wait for it.
   map.once("idle", () => (figure.dataset.map = "idle"));
+  // The map is live once its style has loaded. A style or tile host that fails
+  // first never gets there: take the map down, so the drawing shows again and
+  // the caller can offer another try.
+  try {
+    await new Promise<void>((resolve, reject) => {
+      map.once("load", () => resolve());
+      map.once("error", (e) => reject(e.error ?? new Error("the live map did not load")));
+    });
+  } catch (err) {
+    map.remove();
+    throw err;
+  }
+  figure.classList.add("is-live");
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => map.setStyle(STYLES[scheme()], { diff: false }));
 }
 
-/** Mounts every ColoradoMap on the page when it nears the screen. */
+/**
+ * Arms every ColoradoMap's "Explore the live map" button. The drawing is the
+ * map until a visitor presses it; then MapLibre loads and takes over. Hovering
+ * the button warms up the connection to the tile host.
+ */
 export function mountColoradoMaps() {
-  const figures = document.querySelectorAll<HTMLElement>("[data-colorado-map]");
-  if (!figures.length || !("IntersectionObserver" in window)) return;
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        io.unobserve(e.target);
-        // A failed load leaves the drawing in place, which is the whole map without the basemap.
-        mount(e.target as HTMLElement).catch(() => ((e.target as HTMLElement).dataset.map = "failed"));
-      }
-    },
-    { rootMargin: "200px" },
-  );
-  for (const f of figures) io.observe(f);
+  if (!hasWebGl2()) return;
+  for (const figure of document.querySelectorAll<HTMLElement>("[data-colorado-map]")) {
+    const open = figure.querySelector<HTMLButtonElement>("[data-map-open]");
+    if (!open) continue;
+    open.hidden = false;
+    open.addEventListener(
+      "pointerenter",
+      () => {
+        const link = document.createElement("link");
+        link.rel = "preconnect";
+        link.href = "https://tiles.openfreemap.org";
+        document.head.appendChild(link);
+      },
+      { once: true },
+    );
+    open.addEventListener("click", () => {
+      open.disabled = true;
+      open.textContent = "Loading the live map";
+      // A failed load leaves the drawing in place, which is the whole map
+      // without the basemap, says why in the console, and offers another try.
+      mount(figure)
+        .then(() => (open.hidden = true))
+        .catch((err: unknown) => {
+          console.error("The live map did not load:", err);
+          figure.dataset.map = "failed";
+          open.disabled = false;
+          open.textContent = "Try the live map again";
+        });
+    });
+  }
 }

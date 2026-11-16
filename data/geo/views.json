@@ -1,0 +1,58 @@
+{
+ "state": {
+  "west": -109.28907,
+  "south": 36.86133,
+  "east": -101.81293,
+  "north": 41.12619,
+  "width": 640,
+  "height": 470
+ },
+ "zone-photon-mountain": {
+  "west": -105.52051,
+  "south": 39.65448,
+  "east": -104.74072,
+  "north": 40.09397,
+  "width": 640,
+  "height": 470
+ },
+ "thumb-photon-mountain": {
+  "west": -105.70751,
+  "south": 39.62508,
+  "east": -104.55372,
+  "north": 40.12317,
+  "width": 368,
+  "height": 207
+ },
+ "zone-space-peak": {
+  "west": -105.17817,
+  "south": 38.59594,
+  "east": -104.34016,
+  "north": 39.07531,
+  "width": 640,
+  "height": 470
+ },
+ "thumb-space-peak": {
+  "west": -105.37913,
+  "south": 38.56387,
+  "east": -104.1392,
+  "north": 39.10715,
+  "width": 368,
+  "height": 207
+ },
+ "zone-fusion-canyon": {
+  "west": -105.23128,
+  "south": 40.35227,
+  "east": -104.723,
+  "north": 40.63613,
+  "width": 640,
+  "height": 470
+ },
+ "thumb-fusion-canyon": {
+  "west": -105.35317,
+  "south": 40.3333,
+  "east": -104.60111,
+  "north": 40.65501,
+  "width": 368,
+  "height": 207
+ }
+}

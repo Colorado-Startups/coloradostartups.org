@@ -1,7 +1,8 @@
 // The statewide map's geography (data/geo/, built by scripts/geo/build.mjs):
 // each zone is the loop its named roads close, about Silicon Valley's size.
-// And its build-time drawing (lib/regions/colorado-map.ts).
-import { readFileSync } from "node:fs";
+// Its views (scripts/geo/views.mjs): frames, highways and relief images. And
+// its build-time drawing (lib/regions/colorado-map.ts).
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { REGION_IDS } from "@cs/shared";
@@ -26,8 +27,10 @@ import {
   selfCrossing,
   SIZE_BAND,
 } from "../../../../scripts/geo/build.mjs";
-import { COLORADO, COLORADO_BOUNDS, DIM, ZONES, zoneBounds, zoneById } from "../../../src/lib/regions/colorado-geo";
-import { clockwise, coloradoMapSvg, signedArea } from "../../../src/lib/regions/colorado-map";
+import { buildViews } from "../../../../scripts/geo/views.mjs";
+import { COLORADO, COLORADO_BOUNDS, ZONES, zoneBounds, zoneById } from "../../../src/lib/regions/colorado-geo";
+import { clockwise, coloradoMapSvg, signedArea, viewOf } from "../../../src/lib/regions/colorado-map";
+import { HIGHWAYS, inFrame, LOOP_ROADS, VIEWS, YARDSTICK } from "../../../src/lib/regions/colorado-views";
 import { REGION_COLORS as REGION_COLOR } from "../../../src/lib/regions/map";
 
 const ROOT = path.join(__dirname, "../../../..");
@@ -137,20 +140,65 @@ describe("data/geo/colorado.geojson", () => {
   });
 });
 
+describe("data/geo/views.json", () => {
+  // The same check as `node scripts/geo/views.mjs --check`, in CI.
+  it("matches what the zones and the outline build to (run scripts/geo/views.mjs if not)", () => {
+    expect(readFileSync(path.join(ROOT, "data/geo/views.json"), "utf8")).toBe(`${JSON.stringify(buildViews(COLORADO, ZONES), null, 1)}\n`);
+  });
+
+  it("has the statewide view, and a zoomed view and a 16:9 thumbnail for each region", () => {
+    expect(Object.keys(VIEWS).sort()).toEqual(["state", ...REGION_IDS.flatMap((id) => [`thumb-${id}`, `zone-${id}`])].sort());
+    for (const id of REGION_IDS) expect(VIEWS[`thumb-${id}`].width / VIEWS[`thumb-${id}`].height).toBeCloseTo(16 / 9, 2);
+  });
+
+  it("holds each zone's loop and cities well inside its frames", () => {
+    for (const z of ZONES.features) {
+      for (const view of [VIEWS[`zone-${z.id}`], VIEWS[`thumb-${z.id}`]]) {
+        for (const [lon, lat] of [...z.geometry.coordinates[0]!, ...z.properties.cityPoints.map((c) => [c.lon, c.lat] as [number, number])]) {
+          const [x, y] = inFrame(view, [lon, lat]);
+          for (const v of [x, y]) {
+            expect(v, z.id).toBeGreaterThan(0.1);
+            expect(v, z.id).toBeLessThan(0.9);
+          }
+        }
+      }
+    }
+  });
+
+  it("has a relief image for every view", () => {
+    for (const id of Object.keys(VIEWS)) expect(existsSync(path.join(ROOT, `site/src/assets/maps/relief-${id}.jpg`)), id).toBe(true);
+  });
+
+  it("has highways for every view, Interstate 25 among them", () => {
+    for (const view of ["state", ...REGION_IDS]) {
+      expect(HIGHWAYS.filter((h) => h.view === view && h.name === "I-25"), view).toHaveLength(1);
+    }
+  });
+
+  it("carries the yardstick the size rule measures against", () => {
+    expect(YARDSTICK.name).toBe("Silicon Valley");
+    expect(YARDSTICK.area_sq_mi).toBe(yardstick.area_sq_mi);
+  });
+});
+
 describe("coloradoMapSvg", () => {
   const svg = coloradoMapSvg({ label: "Map label", description: "Map description" });
   const root = new JSDOM(svg, { contentType: "image/svg+xml" }).window.document.documentElement;
+  const text = [...root.querySelectorAll("text")].map((t) => t.textContent);
 
   it("is one labelled image to assistive tech", () => {
     expect(root.getAttribute("role")).toBe("img");
     expect(svg).toContain("Map label");
   });
 
-  it("names all three zones and dots every core city", () => {
-    const text = [...root.querySelectorAll("text")].map((t) => t.textContent);
+  it("names all three zones and dots every city", () => {
     for (const z of ZONES.features) expect(text, z.id).toContain(z.properties.name);
     const cities = ZONES.features.flatMap((z) => z.properties.cityPoints).length;
     expect(root.querySelectorAll("circle").length).toBe(cities);
+  });
+
+  it("is a real map: interstates and peaks by name, and a mile bar", () => {
+    for (const name of ["I-25", "I-70", "I-76", "Longs Peak", "Pikes Peak", "100 mi"]) expect(text, name).toContain(name);
   });
 
   // d3-geo needs clockwise exterior rings; a counterclockwise one fills the globe.
@@ -160,11 +208,18 @@ describe("coloradoMapSvg", () => {
     }
   });
 
-  it("fits the zones inside the drawing, well short of its edges", () => {
-    const paths = [...root.querySelectorAll("path")].map((p) => p.getAttribute("d") ?? "");
-    const xs = paths.flatMap((d) => [...d.matchAll(/[ML]\s*(-?[\d.]+)[ ,](-?[\d.]+)/g)].map((m) => Number(m[1])));
-    expect(Math.min(...xs)).toBeGreaterThanOrEqual(0);
-    expect(Math.max(...xs)).toBeLessThanOrEqual(640);
+  it("is drawn to its frame, with every zone well inside it", () => {
+    const { frame } = viewOf();
+    expect(root.getAttribute("viewBox")).toBe(`0 0 ${frame.width} ${frame.height}`);
+    for (const z of ZONES.features) {
+      const [[west, south], [east, north]] = zoneBounds(z.id);
+      for (const corner of [inFrame(frame, [west, south]), inFrame(frame, [east, north])]) {
+        for (const v of corner) {
+          expect(v, z.id).toBeGreaterThan(0.05);
+          expect(v, z.id).toBeLessThan(0.95);
+        }
+      }
+    }
   });
 
   it("draws in the region tokens, never a hex", () => {
@@ -175,28 +230,37 @@ describe("coloradoMapSvg", () => {
   });
 });
 
-// A region page's map: the drawing zoomed to one zone, the other two dimmed,
-// as the live map does it (colorado-map.client.ts reads the same DIM).
+// A region page's map: the drawing zoomed to one zone, as the live map is.
 describe.each(REGION_IDS)("coloradoMapSvg zoomed to %s", (id) => {
   const zone = zoneById(id);
+  const { frame } = viewOf({ zone: id });
   const svg = coloradoMapSvg({ label: "Zone label", description: "Zone description" }, { zone: id });
   const root = new JSDOM(svg, { contentType: "image/svg+xml" }).window.document.documentElement;
   const text = [...root.querySelectorAll("text")].map((t) => t.textContent);
+  const within = (p: { lon: number; lat: number }) => p.lon > frame.west && p.lon < frame.east && p.lat > frame.south && p.lat < frame.north;
 
   it("is one labelled image", () => {
     expect(root.getAttribute("role")).toBe("img");
     expect(svg).toContain("Zone label");
   });
 
-  it("dots and names only the zone's core cities", () => {
-    expect(root.querySelectorAll("circle").length).toBe(zone.properties.cityPoints.length);
-    expect(text.sort()).toEqual(zone.properties.cityPoints.map((c) => c.name).sort());
+  it("names its cities, and dots the nearby towns in the frame", () => {
+    for (const c of zone.properties.cityPoints) expect(text, c.name).toContain(c.name);
+    expect(root.querySelectorAll("circle").length).toBe(zone.properties.cityPoints.length + zone.properties.townPoints.filter(within).length);
   });
 
-  it("dims the other two zones and draws this one at full strength", () => {
-    expect(svg.match(new RegExp(`fill-opacity="${DIM.fill}"`, "g"))).toHaveLength(2);
-    expect(svg.match(new RegExp(`stroke-opacity="${DIM.line}"`, "g"))).toHaveLength(2);
+  // The outline is roads: the map says which.
+  it("names the long roads its line follows, and carries a mile bar", () => {
+    const named = text.filter((t) => zone.properties.roads.includes(t ?? ""));
+    expect(named.length).toBeGreaterThanOrEqual(2);
+    for (const road of named) expect(LOOP_ROADS.some((r) => r.loop === id && r.road === road)).toBe(true);
+    expect(text).toContain("5 mi");
+  });
+
+  it("draws this zone only, in its color, over a dark casing", () => {
     expect(svg).toContain(`fill="${REGION_COLOR[id]}" fill-opacity="0.18"`);
+    expect(svg).toContain('stroke="var(--c-night)"');
+    for (const other of REGION_IDS.filter((o) => o !== id)) expect(svg).not.toContain(REGION_COLOR[other]);
   });
 
   it("fits the zone's bounds, which hold its loop and every city", () => {
@@ -212,6 +276,26 @@ describe.each(REGION_IDS)("coloradoMapSvg zoomed to %s", (id) => {
     expect(east).toBeLessThan(se);
     expect(south).toBeGreaterThan(ss);
     expect(north).toBeLessThan(sn);
+  });
+});
+
+// A Why Colorado card's header: the zone at 16:9, with a state locator.
+describe.each(REGION_IDS)("coloradoMapSvg thumbnail of %s", (id) => {
+  const zone = zoneById(id);
+  const { frame } = viewOf({ zone: id, variant: "thumb" });
+  const svg = coloradoMapSvg({ label: "Thumb label", description: "Thumb description" }, { zone: id, variant: "thumb" });
+  const root = new JSDOM(svg, { contentType: "image/svg+xml" }).window.document.documentElement;
+  const text = [...root.querySelectorAll("text")].map((t) => t.textContent);
+
+  it("is a 16:9 picture that names the zone's cities and nothing else", () => {
+    expect(root.getAttribute("viewBox")).toBe(`0 0 ${frame.width} ${frame.height}`);
+    expect(text.sort()).toEqual(zone.properties.cityPoints.map((c) => c.name).sort());
+  });
+
+  it("shows where the zone is in the state", () => {
+    // The locator: a rounded box with the state's outline and one dot in the region's color.
+    expect(root.querySelectorAll("rect[rx]")).toHaveLength(1);
+    expect(root.querySelectorAll(`circle[fill="${REGION_COLOR[id]}"]`)).toHaveLength(1);
   });
 });
 

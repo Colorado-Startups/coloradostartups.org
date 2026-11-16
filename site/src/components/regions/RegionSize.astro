@@ -1,0 +1,53 @@
+---
+// A region's size, against Silicon Valley's: two silhouettes at one scale and
+// the two numbers. Paul's rule (2026-11-15): each region is about the size of
+// Silicon Valley. Both loops are traced from US Census road lines, so both
+// figures are measured the same way (data/geo/README.md).
+import type { RegionId } from "@cs/shared";
+
+import { zoneById } from "../../lib/regions/colorado-geo";
+import { YARDSTICK } from "../../lib/regions/colorado-views";
+import { sizeSvg } from "../../lib/regions/size";
+
+interface Props {
+  region: RegionId;
+}
+const zone = zoneById(Astro.props.region).properties;
+---
+
+<div class="region-size">
+  <Fragment set:html={sizeSvg(Astro.props.region)} />
+  <p>
+    <strong>{zone.area_sq_mi} sq mi</strong>
+    <span>{zone.vs_silicon_valley} × Silicon Valley's {YARDSTICK.area_sq_mi} sq mi</span>
+    <small>Both loops measured along US Census road lines. Silicon Valley's follows {YARDSTICK.roads.filter((r) => /^(US|I)-/.test(r)).join(" and ")}.</small>
+  </p>
+</div>
+
+<style>
+  .region-size {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-4);
+  }
+  .region-size :global(svg) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  .region-size p {
+    display: grid;
+    gap: var(--s-1);
+    margin: 0;
+  }
+  .region-size strong {
+    font-family: var(--font-display);
+    font-size: var(--t-step-2);
+    line-height: 1.1;
+  }
+  .region-size small {
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+  }
+</style>

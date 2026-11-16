@@ -189,14 +189,13 @@ function provenanceBytes(webp: Buffer): number | null {
 
 // Card "Served art keeps its provenance XMP" (#668): a visitor's copy of each
 // Hall picture carries its record. Phone size, no throttle; every lazy
-// picture is loaded, so the byte count is the whole page's. The theme panels'
-// paintings (home/ThemePanel.astro) are the brand's own files (brandArt), not
-// .art-frame pictures, so the selector names them too: since step H they are
-// the only art on /regions/.
-const ART = ".art-frame img, img.theme__art";
+// picture is loaded, so the byte count is the whole page's. The theme panels
+// (home/ThemePanel.astro) carry maps, not paintings, since 2026-11-15, so
+// /regions/ has no art left; a region page's hero painting stands in for it.
+const ART = ".art-frame img";
 
 test.describe("served art carries its provenance", () => {
-  for (const path of ["/", "/regions/", "/team/"]) {
+  for (const path of ["/", "/regions/photon-mountain/", "/team/"]) {
     test(`${path} art images carry their XMP record`, async ({ browser }) => {
       const context = await browser.newContext({ viewport: LAB.viewport, deviceScaleFactor: LAB.deviceScaleFactor, isMobile: true, hasTouch: true });
       try {

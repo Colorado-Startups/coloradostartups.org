@@ -1,7 +1,8 @@
 ---
 // The live map loader. A page that shows a live ColoradoMap renders this once.
-// It lazy-loads MapLibre (colorado-map.client.ts) when a map nears the screen;
-// a page without it ships none of MapLibre, and its maps stay drawings.
+// It arms each map's "Explore the live map" button (colorado-map.client.ts);
+// MapLibre loads only when a visitor presses one. A page without this ships
+// none of MapLibre, and its maps stay drawings.
 ---
 
 <script>
