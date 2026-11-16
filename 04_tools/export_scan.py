@@ -80,7 +80,9 @@ KEY_RES = [
 LINK_RES = [
     ("claude-artifact", re.compile(r"claude\.ai/(?:public/)?artifacts?/|claude\.ai/code/artifact", re.I)),
     ("google-doc", re.compile(r"docs\.google\.com/(?:spreadsheets|document|presentation|forms)/d/|drive\.google\.com/", re.I)),
-    ("home-path", re.compile(r"/Users/(?!someone\b)[A-Za-z0-9._-]+|/home/(?!someone\b|runner\b)[A-Za-z0-9._-]+"
+    # /home/ counts only at the start of a path: site/src/components/home/sections is a repo folder, not a home
+    # folder, and a pull request body that named it failed the Quality pages build (#93).
+    ("home-path", re.compile(r"/Users/(?!someone\b)[A-Za-z0-9._-]+|(?<![A-Za-z0-9._-])/home/(?!someone\b|runner\b)[A-Za-z0-9._-]+"
                              r"|-Users-(?!someone-)[A-Za-z0-9._]+-|~/(?:Developer|Claude|Documents|Library|Compute)\b")),
     ("session-id", re.compile(r"\blocal_[0-9a-f]{8}-[0-9a-f]{4}-")),
 ]
@@ -357,6 +359,8 @@ def self_test():
             "sub/node_modules/pkg/i.txt": "mail me at nested.person@gmail.com\n",
             "sub/.git/config": "url = https://github.com/Colorado-Startups/secret-repo\n",
             "e.md": "We never name the Zorblax fund.\n",
+            # A home folder after a scheme or a quote is still a home folder.
+            "m.md": "open file:///home/alice/y\n",
         }
         clean = {
             "data/fixtures/team/people.yaml": "- name: Jane Sampleperson\n",
@@ -366,6 +370,8 @@ def self_test():
             # Fiction phones, fake profile slugs, form ids and an SVG's path data stay clean.
             "j.md": "Call (303) 555-0142. linkedin.com/in/someone. Mail a@b.co, x@domain.tld.\n",
             "k.svg": "<path d=\"M303 555 1234\"/>\n",
+            # #93: a repo folder named home, inside a longer path, is not a home folder.
+            "l.md": "See site/src/components/home/sections/Where.astro and site/test/dom/home/home-budget.test.ts.\n",
         }
         for rel, text in list(bad.items()) + list(clean.items()):
             os.makedirs(os.path.dirname(os.path.join(tmp, rel)) or tmp, exist_ok=True)
@@ -398,7 +404,7 @@ def self_test():
         terms = [("sample-fund", re.compile(r"\bzorblax\b", re.I))]
         findings, _ = scan(tmp, names=["Jane Sampleperson"], private_repos=["secret-repo"], terms=terms)
         got = collections.Counter(f[0] for f in findings)
-        want = {"emails": 2, "phones": 1, "names": 1, "profiles": 1, "keys": 1, "private-links": 11,
+        want = {"emails": 2, "phones": 1, "names": 1, "profiles": 1, "keys": 1, "private-links": 12,
                 "private-terms": 1, "image-metadata": 8}
         if dict(got) != want:
             wrong.append("known-bad gave %s, want %s" % (dict(got), want))
