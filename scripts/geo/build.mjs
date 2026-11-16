@@ -450,6 +450,9 @@ export function roadsDrift(boundaries, roads) {
 export function buildYardstick(roads) {
   const legs = loopRoads(roads, YARDSTICK);
   const ring = loopRing(legs);
+  // Every zone's size is measured against this loop, so it must be a sound one.
+  const crossing = selfCrossing(ring);
+  if (crossing) throw new Unsound(`${YARDSTICK}: its loop crosses itself near [${crossing}]`);
   return {
     type: "FeatureCollection",
     source: "US Census Bureau TIGERweb road lines (data/geo/roads.geojson)",
@@ -488,6 +491,7 @@ export function buildRegions(places, regions, roads, centres = new Map()) {
     const point = (town) => {
       const p = centres.get(norm(town)) ?? findPlace(places, town);
       if (!p) faults.push(`${r.id}: no centre and no Census place for ${town}`);
+      else if (!Number.isFinite(p.lon) || !Number.isFinite(p.lat)) faults.push(`${r.id}: ${town} has no usable coordinates`);
       return p ? [{ name: town, lon: p.lon, lat: p.lat }] : [];
     };
     const cityPoints = r.cities.flatMap(point);
@@ -496,9 +500,10 @@ export function buildRegions(places, regions, roads, centres = new Map()) {
     if (crossing) faults.push(`${r.id}: its loop crosses itself near [${crossing}]`);
     for (const c of cityPoints) {
       const miles = insideRing([c.lon, c.lat], ring) ? 0 : milesToRing([c.lon, c.lat], ring);
-      if (miles > ON_THE_LINE_MI) faults.push(`${r.id}: ${c.name} sits ${miles.toFixed(1)} mi outside its loop`);
+      // Written so a NaN fails: a comparison with NaN is always false.
+      if (!(miles <= ON_THE_LINE_MI)) faults.push(`${r.id}: ${c.name} sits ${miles.toFixed(1)} mi outside its loop`);
     }
-    if (ratio < SIZE_BAND[0] || ratio > SIZE_BAND[1]) {
+    if (!(ratio >= SIZE_BAND[0] && ratio <= SIZE_BAND[1])) {
       faults.push(`${r.id}: its loop is ${ratio} times ${yardstick.name}'s; the rule is ${SIZE_BAND.join(" to ")}`);
     }
     return {
@@ -550,7 +555,10 @@ export function format(collection) {
 async function getJson(url) {
   const res = await fetch(url, { headers: { "User-Agent": "coloradostartups.org geo build" } });
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  return res.json();
+  const data = await res.json();
+  // ArcGIS reports a bad query as HTTP 200 with an error body.
+  if (data.error) throw new Error(`${url}: ${data.error.message ?? JSON.stringify(data.error)}`);
+  return data;
 }
 
 async function fetchPlaces() {
@@ -616,6 +624,8 @@ async function fetchLines(names, box) {
       else if (g?.type === "MultiLineString") lines.push(...g.coordinates);
     }
   }
+  // A misspelled name finds nothing: a fetch fault (exit 3), not an unsound loop.
+  if (!lines.length) throw new Error(`no Census lines named ${names.join(" or ")} inside [${box}]; check the names in data/geo/boundaries.yaml`);
   return lines;
 }
 
@@ -730,11 +740,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       );
       writeFileSync(join(OUT, "colorado.geojson"), json(await fetchOutline()));
     }
+    // Build all three before writing any, so a loop that fails its checks leaves the committed files whole.
     const roads = await buildRoads(readBoundaries());
-    writeFileSync(join(OUT, "roads.geojson"), format(roads));
     const yardstick = buildYardstick(roads);
-    writeFileSync(join(OUT, "silicon-valley.geojson"), format(yardstick));
     const regions = buildRegions(readPlaces(), readRegions(), roads, readCentres());
+    writeFileSync(join(OUT, "roads.geojson"), format(roads));
+    writeFileSync(join(OUT, "silicon-valley.geojson"), format(yardstick));
     writeFileSync(join(OUT, "regions.geojson"), format(regions));
     console.log(`geo: ${roads.features.length} roads, ${regions.features.length} zones and the yardstick written to data/geo/\n${sizeTable(roads, regions, yardstick)}`);
   } catch (err) {

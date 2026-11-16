@@ -106,10 +106,17 @@ describe("data/geo/regions.geojson", () => {
 });
 
 describe("data/geo/silicon-valley.geojson", () => {
-  it("matches what roads.geojson builds to, and is a real loop", () => {
-    expect(readFileSync(path.join(ROOT, "data/geo/silicon-valley.geojson"), "utf8")).toBe(format(buildYardstick(roads)));
-    expect(yardstick.area_sq_mi).toBeGreaterThan(50);
-    expect(yardstick.span_mi).toBeGreaterThan(10);
+  it("matches what roads.geojson builds to, and is a sound loop of the size measured", () => {
+    const built = buildYardstick(roads);
+    expect(readFileSync(path.join(ROOT, "data/geo/silicon-valley.geojson"), "utf8")).toBe(format(built));
+    const ring = built.features[0]!.geometry.coordinates[0]! as [number, number][];
+    expect(ring[0]).toEqual(ring.at(-1));
+    expect(selfCrossing(ring)).toBeNull();
+    // US-101 and I-280 from Menlo Park to San Jose, closed by CA-84: 95 sq mi and 22.5 mi across, traced 2026-11-15.
+    expect(yardstick.area_sq_mi).toBeGreaterThanOrEqual(90);
+    expect(yardstick.area_sq_mi).toBeLessThanOrEqual(100);
+    expect(yardstick.span_mi).toBeGreaterThan(20);
+    expect(yardstick.span_mi).toBeLessThan(25);
   });
 });
 
