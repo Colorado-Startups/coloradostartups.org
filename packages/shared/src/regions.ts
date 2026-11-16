@@ -22,6 +22,7 @@ export const HotspotSchema = z
     y: z.number().min(0).max(100),
     label: z
       .string()
+      .trim()
       .min(1)
       .max(40)
       .refine((s) => s.trim().split(/\s+/).length <= HOTSPOT_MAX_WORDS, {
@@ -32,6 +33,9 @@ export const HotspotSchema = z
   })
   .refine((h) => (h.kind === "place") === Boolean(h.landmark), {
     message: "a place hotspot names its landmark, and only a place hotspot does",
+  })
+  .refine((h) => h.kind !== "place" || h.label === h.landmark, {
+    message: "a place hotspot's label is the landmark's name only",
   });
 export type Hotspot = z.infer<typeof HotspotSchema>;
 

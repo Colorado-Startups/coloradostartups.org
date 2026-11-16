@@ -44,12 +44,16 @@ describe("region hotspots: parsing", () => {
     expect(HotspotSchema.safeParse({ ...ok, y: -1 }).success).toBe(false);
     expect(HotspotSchema.safeParse({ ...ok, label: "One two three four five" }).success).toBe(false);
     expect(HotspotSchema.safeParse({ ...ok, href: "/x" }).success).toBe(false);
+    expect(HotspotSchema.safeParse({ ...ok, label: "   " }).success).toBe(false);
+    expect(HotspotSchema.safeParse({ ...ok, label: "" }).success).toBe(false);
   });
 
   it("pairs a landmark with place, and only with place", () => {
     const place = { x: 50, y: 50, kind: "place", label: "Pikes Peak" };
     expect(HotspotSchema.safeParse(place).success).toBe(false);
     expect(HotspotSchema.safeParse({ ...place, landmark: "Pikes Peak" }).success).toBe(true);
+    // A fanciful label on a real landmark fails: the label is the name only.
+    expect(HotspotSchema.safeParse({ ...place, label: "The Sky Forge", landmark: "Pikes Peak" }).success).toBe(false);
     expect(
       HotspotSchema.safeParse({ x: 50, y: 50, kind: "event", label: "Next event", landmark: "Pikes Peak" }).success,
     ).toBe(false);
@@ -61,7 +65,7 @@ describe("region hotspots: data", () => {
     describe(r.id, () => {
       const hs = spots(r.id);
 
-      it("has 4 to 6 hotspots, each non-place kind once", () => {
+      it("has 4 to 6 hotspots, each non-place kind once; a place is optional", () => {
         expect(hs.length).toBeGreaterThanOrEqual(4);
         expect(hs.length).toBeLessThanOrEqual(6);
         for (const k of NON_PLACE) expect(hs.filter((h) => h.kind === k), k).toHaveLength(1);
