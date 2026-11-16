@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import type { OpenData } from "../../../worker/mcp/data";
 import { mcpHandler, SERVER_NAME } from "../../../worker/mcp/server";
+import { region, thisWeek } from "../../../worker/mcp/tools";
+import { REGION_UI, THIS_WEEK_UI, UI_MIME_TYPE } from "../../../worker/mcp/ui/index";
 
 const BASE = "https://coloradostartups.org";
 const HEADERS = { "Content-Type": "application/json", Accept: "application/json, text/event-stream" };
@@ -355,4 +357,60 @@ describe("tools/call", () => {
       expect(body.result).toBeUndefined();
     });
   }
+});
+
+// MCP Apps (worker/mcp/ui/): this_week and region point at a card; the other
+// five tools do not, and every tool's result is what it was before the cards.
+describe("MCP Apps cards", () => {
+  const CARD_CAP = 40 * 1024;
+  const post = (method: string, params: unknown = {}) =>
+    new Request(`${BASE}/mcp`, { method: "POST", headers: HEADERS, body: rpc(method, params) });
+
+  it("lists the card on this_week and region only", async () => {
+    const { result } = await rpcBody(await mcpHandler(DATA, BASE).fetch(post("tools/list")));
+    const meta = Object.fromEntries(result.tools.map((t: { name: string; _meta?: Record<string, any> }) => [t.name, t._meta]));
+    expect(meta.this_week).toEqual({ ui: { resourceUri: THIS_WEEK_UI }, "ui/resourceUri": THIS_WEEK_UI });
+    expect(meta.region).toEqual({ ui: { resourceUri: REGION_UI }, "ui/resourceUri": REGION_UI });
+    for (const name of ["search", "events", "path", "company", "guide"]) {
+      expect(meta[name]?.ui, name).toBeUndefined();
+      expect(meta[name]?.["ui/resourceUri"], name).toBeUndefined();
+    }
+  });
+
+  it("lists both cards as resources with the MCP Apps MIME type", async () => {
+    const { result } = await rpcBody(await mcpHandler(DATA, BASE).fetch(post("resources/list")));
+    const listed = result.resources.map((r: { uri: string; mimeType: string }) => [r.uri, r.mimeType]).sort();
+    expect(listed).toEqual([
+      [REGION_UI, "text/html;profile=mcp-app"],
+      [THIS_WEEK_UI, "text/html;profile=mcp-app"],
+    ]);
+    expect(UI_MIME_TYPE).toBe("text/html;profile=mcp-app");
+  });
+
+  for (const uri of [THIS_WEEK_UI, REGION_UI]) {
+    it(`reads ${uri} as one self-contained HTML document under the cap`, async () => {
+      const { result } = await rpcBody(await mcpHandler(DATA, BASE).fetch(post("resources/read", { uri })));
+      expect(result.contents).toHaveLength(1);
+      const [c] = result.contents;
+      expect(c.uri).toBe(uri);
+      expect(c.mimeType).toBe("text/html;profile=mcp-app");
+      expect(c.text.startsWith("<!doctype html>")).toBe(true);
+      expect(new TextEncoder().encode(c.text).length).toBeLessThan(CARD_CAP);
+      // Nothing loads from the network: no outside script, style, image or frame, and no fetch.
+      expect(c.text).not.toMatch(/\b(?:src|href)\s*=\s*["']?\s*(?:https?:)?\/\//i);
+      expect(c.text).not.toMatch(/url\(\s*["']?(?:https?:)?\/\/|@import|<link\b|<img\b|<iframe\b|<script\b[^>]*\bsrc\b/i);
+      expect(c.text).not.toMatch(/\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource/);
+      // No CSP domains: the host's restrictive default applies.
+      expect(c._meta?.ui?.csp).toBeUndefined();
+    });
+  }
+
+  it("keeps the text results of this_week and region byte for byte", async () => {
+    const week = await rpcBody(await mcpHandler(DATA, BASE, NOW).fetch(call("this_week", { region: "photon-mountain" })));
+    expect(week.result).toEqual({
+      content: [{ type: "text", text: JSON.stringify(thisWeek(DATA, { region: "photon-mountain" }, BASE, NOW())) }],
+    });
+    const r = await rpcBody(await mcpHandler(DATA, BASE, NOW).fetch(call("region", { id: "space-peak" })));
+    expect(r.result).toEqual({ content: [{ type: "text", text: JSON.stringify(region(DATA, "space-peak", BASE, NOW())) }] });
+  });
 });

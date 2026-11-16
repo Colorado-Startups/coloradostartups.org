@@ -1,8 +1,9 @@
 // The /mcp server: keyless, read-only and stateless. Each request gets a
 // fresh McpServer from createMcpHandler, which serves the 2026-07-28 protocol
 // and, for older clients, the stateless 2025 Streamable HTTP fallback. Seven
-// tools, each read-only and capped at 25 results (tools.ts), and two prompts
-// that tell the model which of those tools to call, in order.
+// tools, each read-only and capped at 25 results (tools.ts), two prompts
+// that tell the model which of those tools to call, in order, and two MCP Apps
+// cards (ui/) that this_week and region point at.
 import { REGION_IDS, SlugSchema, STAGES } from "@cs/shared";
 import { createMcpHandler, McpServer, type McpHttpHandler } from "@modelcontextprotocol/server";
 import * as z from "zod";
@@ -22,6 +23,7 @@ import {
   thisWeek,
   WEEK_EVENTS,
 } from "./tools";
+import { REGION_UI, registerUiResources, THIS_WEEK_UI, uiToolMeta } from "./ui/index";
 
 export const SERVER_NAME = "coloradostartups";
 
@@ -38,6 +40,7 @@ export const INSTRUCTIONS = [
   `Each tool returns at most ${MAX_RESULTS} results, each with a link to its page on the site.`,
   "The data is free under CC BY 4.0: credit Colorado Startups and link https://coloradostartups.org/data/.",
   "Listings change, so tell people to check each organization's own site.",
+  "In hosts that support MCP Apps, this_week and region also show their answer as a small card with links.",
 ].join(" ");
 
 const READ_ONLY = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
@@ -96,6 +99,7 @@ export function buildServer(data: OpenData, origin: string, now: () => Date = ()
         "One region: its summary, cities and counts, with up to 10 resources, 10 companies and 5 upcoming events.",
       inputSchema: z.object({ id: RegionArg }),
       annotations: READ_ONLY,
+      _meta: uiToolMeta(REGION_UI),
     },
     async ({ id }) => {
       const r = region(data, id, origin, now());
@@ -160,6 +164,7 @@ export function buildServer(data: OpenData, origin: string, now: () => Date = ()
       description: `The events in the next 7 days, today included, in Mountain Time: up to ${WEEK_EVENTS}, soonest first. Add a region to narrow it.`,
       inputSchema: z.object({ region: RegionArg.optional() }),
       annotations: READ_ONLY,
+      _meta: uiToolMeta(THIS_WEEK_UI),
     },
     async (input) => result(thisWeek(data, input, origin, now())),
   );
@@ -225,6 +230,9 @@ export function buildServer(data: OpenData, origin: string, now: () => Date = ()
       ],
     }),
   );
+
+  // The two MCP Apps cards (ui/index.ts). Read-only HTML, the same for every request.
+  registerUiResources(server);
 
   return server;
 }
