@@ -13,18 +13,24 @@ import { readDist } from "../pages";
 
 const LAB = { width: 412, dpr: 1.75 };
 
-// Evaluates the `sizes` forms RegionArt uses: "(max-width: Npx) length"
-// entries and a bare default; a length is "Npx", "Nvw" or "calc(Avw - Bpx)".
+// Evaluates the `sizes` forms RegionArt uses: "(max-width: N) length"
+// entries and a bare default; a length is "N", "Nvw" or "calc(Avw - B)",
+// where N and B are px or rem. rem in `sizes` is the initial 16 px.
+const PX_PER_REM = 16;
+const toPx = (n: string, unit: string) => Number(n) * (unit === "rem" ? PX_PER_REM : 1);
+
 function drawnWidth(sizes: string, viewport: number): number {
   for (const entry of sizes.split(/,\s*(?![^(]*\))/)) {
-    const m = entry.trim().match(/^(?:\(max-width:\s*(\d+)px\)\s+)?(.+)$/);
+    const m = entry.trim().match(/^(?:\(max-width:\s*([\d.]+)(px|rem)\)\s+)?(.+)$/);
     if (!m) throw new Error(`unreadable sizes entry: ${entry}`);
-    const [, max, length] = m;
-    if (max && viewport > Number(max)) continue;
-    const calc = length!.match(/^calc\((\d+)vw - (\d+)px\)$/);
-    if (calc) return (viewport * Number(calc[1])) / 100 - Number(calc[2]);
+    const [, max, maxUnit, length] = m;
+    if (max && viewport > toPx(max, maxUnit!)) continue;
+    const calc = length!.match(/^calc\((\d+)vw - ([\d.]+)(px|rem)\)$/);
+    if (calc) return (viewport * Number(calc[1])) / 100 - toPx(calc[2]!, calc[3]!);
     if (length!.endsWith("vw")) return (viewport * parseFloat(length!)) / 100;
-    return parseFloat(length!);
+    const fixed = length!.match(/^([\d.]+)(px|rem)$/);
+    if (fixed) return toPx(fixed[1]!, fixed[2]!);
+    throw new Error(`unreadable sizes length: ${length}`);
   }
   throw new Error(`no sizes entry matches ${viewport} px: ${sizes}`);
 }
