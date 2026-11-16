@@ -5,7 +5,7 @@ summary: What Colorado Startups collects on this website, why, who helps us run 
 status: approved
 ---
 
-<!-- Approved at Gate B on 2026-10-18 (decision 71). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. The 2026-11-16 changes are the P5a PR (#92), the F1 PR (#98), the P3a PR and the M1b PR, each for the orchestrator's merge review. -->
+<!-- Approved at Gate B on 2026-10-18 (decision 71). The 2026-10-22 changes are PRs #82 and #98, each approved in the orchestrator's merge review. The 2026-11-02 change is PR #438, approved in the same way. The 2026-11-16 changes are the P5a PR (#92), the F1 PR (#98), the P3a PR, the M1b PR and the W8 PR, each for the orchestrator's merge review. -->
 
 Colorado Startups, Ltd. runs this website for a community of entrepreneurs building companies in Colorado, and for the wider startup community around them. This page says what we collect, why, and what you can ask us to do with it.
 
@@ -108,6 +108,7 @@ How we use what you send:
 - **Request logs.** Cloudflare logs each request that reaches our server code, with its headers, which include your IP address, and the approximate location Cloudflare matches to that address. That code runs for every address under `/api/`, which carries our forms, Resourcus questions, click events and security reports. It also runs for `/mcp`, where AI clients search our open data. It also runs for some requests to addresses where no page or file exists. Requests for our pages and files skip it and are not in these logs. We use these logs only to find and fix errors, and Cloudflare keeps them for up to 7 days (Cloudflare's Workers Logs documentation, read 2026-10-22).
 - **Security reports.** If your browser blocks something on our pages for security reasons, it may send us a report of what was blocked and on which page. We keep only the rule that was broken, the site or type of content it blocked, and the path of our page. We count repeats of the same report instead of storing each one. These records live in our database on Cloudflare (D1), with no IP address, and we use them to fix our site. A weekly job deletes each type of report that no browser has sent in the last 90 days (our commitment).
 - **Analytics.** We use Cloudflare Web Analytics, which counts visits without cookies and without tracking you across other sites.
+- **Your region.** If you pick your region, your browser keeps the pick on this device and never sends it to us.
 - **Click events.** Some buttons, such as a join button, can record a click as an anonymous event. When they do, we use these counts only to see which parts of the site help people.
   - An event holds a name from a fixed list and up to two short labels, such as which page the button is on. It never holds free text, an email address, a web address or anything you typed.
   - Your browser sends the event to our own server, which passes it on to PostHog, a product analytics service.
