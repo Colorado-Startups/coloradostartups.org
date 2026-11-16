@@ -1,0 +1,110 @@
+---
+// The "Where they are" map's city panel (L3a). Goes in ChartFigure's slot.
+// city-map.ts lays one button over each city dot; hover, focus or a tap on a
+// button lists that city's companies here, each linking to its row in the
+// honorees table. Each city's list is a <template>, so without JavaScript
+// nothing here shows: the dots keep their <title>, and the table below still
+// lists every company.
+//
+// The panel has a fixed height and scrolls, so a list that grows never moves
+// the page under it (CLS). It shows only when scripting is on.
+import type { CityCompanies } from "../../lib/leaderboard/board";
+
+interface Props {
+  id: string;
+  cities: CityCompanies[];
+}
+
+const { id, cities } = Astro.props;
+const prompt = "Choose a city on the map to list its companies.";
+---
+
+<div class="city-panel" id={id} data-city-panel data-prompt={prompt}>
+  <p class="city-panel__status" aria-live="polite" data-city-status>{prompt}</p>
+  <ul class="city-panel__list" data-city-list></ul>
+  {
+    cities.map(({ city, companies }) => (
+      <template data-city={city}>
+        {companies.map((c) => (
+          <li>
+            <a href={`#company-${c.id}`}>{c.name}</a>
+          </li>
+        ))}
+      </template>
+    ))
+  }
+</div>
+
+<script>
+  import { initCityMaps } from "./city-map";
+
+  initCityMaps();
+</script>
+
+<style>
+  .city-panel {
+    display: none;
+    max-width: 720px;
+    block-size: 11rem;
+    overflow-y: auto;
+    margin-block: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-card);
+    background: var(--c-ground);
+  }
+  @media (scripting: enabled) {
+    .city-panel {
+      display: block;
+    }
+  }
+  .city-panel__status {
+    margin: 0 0 var(--s-2);
+    font-weight: 700;
+  }
+  .city-panel__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    columns: 14rem;
+    column-gap: var(--s-5);
+  }
+  .city-panel__list li {
+    break-inside: avoid;
+  }
+  /* Each link is a full 24 px row, the smallest target the site allows. */
+  .city-panel__list a {
+    display: inline-block;
+    min-block-size: var(--s-5);
+    padding-block: var(--s-1);
+  }
+
+  /* The button layer city-map.ts adds over each map. The plot shrinks to its
+     SVG, so the buttons' percentages match the drawing at every width. */
+  :global([data-city-map] .plot) {
+    position: relative;
+    inline-size: fit-content;
+    max-inline-size: 100%;
+  }
+  :global(.city-map__hit) {
+    position: absolute;
+    translate: -50% -50%;
+    /* At least 24 by 24 px, and never smaller than the dot it covers. */
+    inline-size: max(var(--s-5), var(--d));
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+  }
+  :global(.city-map__hit:focus-visible) {
+    outline-offset: var(--line-hair);
+  }
+  /* The chosen city's dot lifts: full gold, a heavier edge. */
+  :global([data-city-map] circle.is-active) {
+    fill-opacity: 1;
+    stroke: var(--c-text);
+    stroke-width: var(--line-bold);
+  }
+</style>

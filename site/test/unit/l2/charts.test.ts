@@ -3,6 +3,7 @@
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
+import { cityStatus, nextIndex } from "../../../src/components/leaderboard/city-map";
 import { foundingTimeline, hqMap, hqMapNarrow, sectorBars } from "../../../src/lib/leaderboard/charts";
 
 const text = { label: "A chart", description: "What the chart shows." };
@@ -78,5 +79,57 @@ describe("the HQ maps' contrast", () => {
       expect(inherited(d, "stroke")).toBe("var(--c-text-dim)");
       expect(inherited(d, "fill")).toBe("var(--c-accent)");
     }
+  });
+});
+
+// L3a: city-map.ts lays a button over each dot from these attributes, and the
+// <title> names the city on hover with no script at all.
+describe("the HQ maps' city dots", () => {
+  const cities = [
+    { key: "Denver", count: 40 },
+    { key: "Boulder", count: 31 },
+    { key: "Golden", count: 1 },
+  ];
+  it.each([
+    ["hqMap", hqMap],
+    ["hqMapNarrow", hqMapNarrow],
+  ] as const)("%s tags each circle with its city, count and a title", (_, draw) => {
+    const dots = [...parse(draw(cities, text)).querySelectorAll("circle")];
+    const tags = dots.map((d) => [d.getAttribute("data-city"), Number(d.getAttribute("data-count")), d.querySelector("title")?.textContent]);
+    expect(tags.sort()).toEqual([
+      ["Boulder", 31, "Boulder: 31 companies"],
+      ["Denver", 40, "Denver: 40 companies"],
+      ["Golden", 1, "Golden: 1 company"],
+    ]);
+  });
+
+  it("places dots by cx and cy, with no transform the buttons would miss", () => {
+    const root = parse(hqMap(cities, text));
+    for (const d of root.querySelectorAll("circle")) {
+      for (let e: Element | null = d; e && e !== root; e = e.parentElement) expect(e.hasAttribute("transform")).toBe(false);
+      expect(Number(d.getAttribute("cx"))).toBeGreaterThan(0);
+    }
+    expect(root.getAttribute("viewBox")).toBe("0 0 720 520");
+  });
+});
+
+describe("the city map's keys", () => {
+  it("moves with the arrows and wraps at both ends", () => {
+    expect(nextIndex(0, "ArrowRight", 3)).toBe(1);
+    expect(nextIndex(2, "ArrowDown", 3)).toBe(0);
+    expect(nextIndex(0, "ArrowLeft", 3)).toBe(2);
+    expect(nextIndex(1, "ArrowUp", 3)).toBe(0);
+  });
+
+  it("jumps with Home and End, and ignores other keys and an empty map", () => {
+    expect(nextIndex(1, "Home", 3)).toBe(0);
+    expect(nextIndex(0, "End", 3)).toBe(2);
+    expect(nextIndex(0, "Enter", 3)).toBeUndefined();
+    expect(nextIndex(0, "ArrowRight", 0)).toBeUndefined();
+  });
+
+  it("says the city and its count in the live status", () => {
+    expect(cityStatus("Denver", 40)).toBe("Denver: 40 companies.");
+    expect(cityStatus("Golden", 1)).toBe("Golden: 1 company.");
   });
 });

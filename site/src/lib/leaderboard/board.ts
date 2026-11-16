@@ -66,6 +66,32 @@ export function topWithTies(counts: readonly Count[], n: number): Count[] {
   return cutoff === undefined ? [...counts] : counts.filter((c) => c.count >= cutoff);
 }
 
+export interface CityCompanies {
+  city: string;
+  /** The city's companies, A to Z, each with the id its honorees-table row carries. */
+  companies: { id: string; name: string }[];
+}
+
+/**
+ * The companies in each HQ city, for the map's city panel. Cities run in
+ * countBy() order (largest first, ties A to Z), so the map's focus order and
+ * the data table agree. `keep` picks the cities the map draws.
+ */
+export function companiesByCity(rows: readonly BoardRow[], keep: (city: string) => boolean = () => true): CityCompanies[] {
+  const groups = new Map<string, Company[]>();
+  for (const { company } of rows) {
+    const city = company.hq_city;
+    if (!city || !keep(city)) continue;
+    groups.set(city, [...(groups.get(city) ?? []), company]);
+  }
+  return countBy(rows, (r) => r.company.hq_city)
+    .filter((c) => groups.has(c.key))
+    .map((c) => ({
+      city: c.key,
+      companies: [...groups.get(c.key)!].sort(byName).map(({ id, name }) => ({ id, name })),
+    }));
+}
+
 export interface YearCount {
   year: number;
   count: number;

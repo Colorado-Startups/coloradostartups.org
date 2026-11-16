@@ -16,10 +16,11 @@ import { getCollection } from "astro:content";
 import ArtImage from "../../components/art/ArtImage.astro";
 import { HALL_ART_ALT } from "../../components/art/keepers";
 import ChartFigure from "../../components/leaderboard/ChartFigure.astro";
+import CityPanel from "../../components/leaderboard/CityPanel.astro";
 import HonoreesTable from "../../components/leaderboard/HonoreesTable.astro";
 import Banner from "../../components/ui/Banner.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { buildBoard, countBy, foundingYears, latestEdition, topWithTies } from "../../lib/leaderboard/board";
+import { buildBoard, companiesByCity, countBy, foundingYears, latestEdition, topWithTies } from "../../lib/leaderboard/board";
 import {
   foundingTimeline,
   foundingTimelineNarrow,
@@ -40,6 +41,8 @@ const total = rows.length;
 
 const cities = countBy(rows, (r) => r.company.hq_city);
 const coloradoCities = cities.filter((c) => isColoradoCity(c.key));
+// The map panel lists only the cities the map draws a dot for (L3a).
+const mappedCities = companiesByCity(rows, isColoradoCity);
 const outsideCount = rows.filter((r) => !isColoradoCity(r.company.hq_city)).length;
 const sectors = countBy(rows, (r) => r.company.sector);
 const years = foundingYears(rows);
@@ -126,7 +129,9 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
         columns={["HQ city", "Companies"]}
         rows={cities.map((c) => [c.key, c.count])}
         note="Cities outside Colorado are written with their state."
-      />
+      >
+        <CityPanel id="chart-map-panel" cities={mappedCities} />
+      </ChartFigure>
       <ChartFigure
         id="chart-sectors"
         title="What they build"
