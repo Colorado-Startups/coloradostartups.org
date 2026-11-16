@@ -1,4 +1,128 @@
 ---
-// A slot on the home page that renders nothing yet. Step P4 of the
-// 2026-11-15 engagement plan fills it (Pick your door).
+// Pick your door (engagement plan step P4, the brand value "A door for
+// everyone"). A first-time visitor taps who they are and sees where to start
+// in the Slack and which Startup Resources picks fit them; the next event
+// sits under every door. No typing, no account, nothing stored.
+//
+// The doors are the welcome desk in its compact form (WelcomeDesk.astro):
+// static <details> sharing one name, so one opens at a time with no
+// JavaScript. What each door shows comes from doorPlan() in
+// src/lib/communitas/doors.ts, fed by data/communitas/routes.yaml.
+//
+// The next event is one row for all doors: the calendar has no audience
+// field, so every door would show the same event, and the band's 60-word cap
+// (site/test/dom/home/home-budget.test.ts) counts closed doors too. The build
+// renders the next few events with all but the first hidden; prune.ts, the
+// script /event-calendar/ uses, moves the row along as events end. Without
+// JavaScript the build-time event stands. The title links the event calendar,
+// which lists it with the host's own link: home links only a few known
+// outside hosts (site/test/dom/l1/hall.test.ts), and event hosts vary.
+import { WAYS_IN } from "@cs/shared";
+
+import { clampWords } from "../../../lib/communitas/doors";
+import WelcomeDesk from "../../communitas/WelcomeDesk.astro";
+import { dateParts, endsAt, SNAPSHOT, upcomingEvents } from "../../events/events";
+
+/** Events in the HTML: the next one shows, the rest wait for prune.ts. */
+const KEEP = 6;
+const events = upcomingEvents(SNAPSHOT, new Date()).slice(0, KEEP);
 ---
+
+<section class="section section--stone pick-door" aria-labelledby="pick-door">
+  <div class="wrap">
+    <h2 id="pick-door">Pick your door</h2>
+    <WelcomeDesk compact />
+    <div class="door-event" data-door-event>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+        <path d="M3 10h18M8 3v4M16 3v4" />
+      </svg>
+      <span class="door-event__label">Next event</span>
+      {
+        events.length > 0 && (
+          <ol class="door-event__list" role="list">
+            {events.map((event, i) => {
+              const date = dateParts(event);
+              return (
+                <li data-ends={new Date(endsAt(event)).toISOString()} hidden={i > 0}>
+                  <time class="door-event__date" datetime={event.start}>
+                    {date.month} {date.day}
+                  </time>
+                  <a href={WAYS_IN.events}>{clampWords(event.title)}</a>
+                </li>
+              );
+            })}
+          </ol>
+        )
+      }
+      <p class="door-event__empty" data-events-empty hidden={events.length > 0}>
+        <a href={WAYS_IN.events}>See the event calendar</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { showNext } from "../../events/prune";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-door-event]")) showNext(root, Date.now(), 1);
+</script>
+
+<style>
+  .pick-door h2 {
+    margin-bottom: var(--s-5);
+  }
+  /* The lintel under the doors: the one event every door shares. */
+  .door-event {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+    margin-top: var(--s-5);
+    padding: var(--s-3) var(--s-4);
+    border-top: var(--line-bold) solid var(--c-accent);
+    border-radius: var(--r-chisel);
+    background: var(--c-ground);
+  }
+  .door-event svg {
+    flex: none;
+    color: var(--ink-community, var(--c-community));
+  }
+  .door-event__label {
+    font-weight: 700;
+  }
+  .door-event__list,
+  .door-event__empty {
+    list-style: none;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+    flex: 1 1 16rem;
+  }
+  .door-event__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-1) var(--s-3);
+  }
+  /* display: flex would beat the hidden attribute's own rule. */
+  .door-event__list li[hidden],
+  .door-event__empty[hidden] {
+    display: none;
+  }
+  .door-event__date {
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r-chisel);
+    background: var(--c-surface-2);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .door-event a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    overflow-wrap: anywhere;
+    font-weight: 700;
+  }
+</style>
