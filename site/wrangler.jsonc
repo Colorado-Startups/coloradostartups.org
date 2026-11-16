@@ -11,8 +11,8 @@
   // Gate B, then production.
   //
   // Resource IDs were filled in at Wave 0 step 8 (Cloudflare setup, 2026-10-08).
-  // Secrets are never here: TURNSTILE_SECRET_KEY, KIT_API_KEY and KIT_FORM_ID
-  // are set with `wrangler secret put`. Build var: PUBLIC_TURNSTILE_SITE_KEY,
+  // Secrets are never here: TURNSTILE_SECRET_KEY, KIT_API_KEY, KIT_FORM_ID,
+  // POSTHOG_PROJECT_TOKEN and ANON_ID_SALT are set with `wrangler secret put`. Build var: PUBLIC_TURNSTILE_SITE_KEY,
   // the public site key of the "Colorado Startups site" Turnstile widget.
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "coloradostartups-site",
@@ -58,7 +58,9 @@
     // Resourcus web: 20 questions per 60 s per IP. The budget guard is the spending stop.
     { "name": "ASK_RATE_LIMIT", "namespace_id": "3102", "simple": { "limit": 20, "period": 60 } },
     // MCP: 60 requests per 60 s per IP. Read-only and free; fails open (worker/mcp/index.ts).
-    { "name": "MCP_RATE_LIMIT", "namespace_id": "3103", "simple": { "limit": 60, "period": 60 } }
+    { "name": "MCP_RATE_LIMIT", "namespace_id": "3103", "simple": { "limit": 60, "period": 60 } },
+    // Events (/api/e): 30 per 60 s per IP. Fails open; a lost click costs nothing.
+    { "name": "EVENT_RATE_LIMIT", "namespace_id": "3104", "simple": { "limit": 30, "period": 60 } }
   ],
   "send_email": [
     {
@@ -94,7 +96,8 @@
       "ratelimits": [
         { "name": "FORM_RATE_LIMIT", "namespace_id": "3201", "simple": { "limit": 10, "period": 60 } },
         { "name": "ASK_RATE_LIMIT", "namespace_id": "3202", "simple": { "limit": 20, "period": 60 } },
-        { "name": "MCP_RATE_LIMIT", "namespace_id": "3203", "simple": { "limit": 60, "period": 60 } }
+        { "name": "MCP_RATE_LIMIT", "namespace_id": "3203", "simple": { "limit": 60, "period": 60 } },
+        { "name": "EVENT_RATE_LIMIT", "namespace_id": "3204", "simple": { "limit": 30, "period": 60 } }
       ],
       "send_email": [
         { "name": "FORM_EMAIL", "allowed_sender_addresses": ["forms@email.coloradostartups.org"] }
