@@ -1,0 +1,37 @@
+---
+// /get-featured/thanks/: where /api/spotlight sends a successful post (step
+// P3a). Out of the sitemap (astro.config.mjs SITEMAP_EXCLUDE matches
+// /thanks/ and /get-featured/) and noindex. Clears the form's
+// sessionStorage draft. The links come from WAYS_IN, the community's one list
+// of ways in. No keeper is on it, and it promises no spot.
+import { WAYS_IN } from "@cs/shared";
+
+import { SPOTLIGHT_DRAFT } from "../../components/spotlight/fields";
+import Button from "../../components/ui/Button.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Request received" description="Thank you for asking to be featured by Colorado Startups." noindex>
+  <section class="section section--lit" data-clear-draft={SPOTLIGHT_DRAFT.key}>
+    <div class="wrap stack">
+      <h1>Thank you</h1>
+      <p class="lede">We have your request.</p>
+      <p>
+        A person reads it next and replies to the email you gave. Sending it does not guarantee a spot. Nothing is
+        shown on our website unless we write back and feature you.
+      </p>
+      <p>While you wait, meet the community in two other places.</p>
+      <div class="btn-row">
+        <Button href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
+        <Button variant="secondary" href={WAYS_IN.events}>See upcoming events</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // The request went through, so this tab's draft of it is no longer needed.
+  import { clearNamedDrafts } from "../../components/apply/client";
+
+  clearNamedDrafts(document);
+</script>

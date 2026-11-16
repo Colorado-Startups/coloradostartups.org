@@ -60,7 +60,7 @@ describe("Bot protection: Turnstile receives your IP address", () => {
     const checks = /\b(?:verifyTurnstile|turnstileError)\(/;
     const routes = filesUnder("worker/routes").filter((f) => checks.test(read(f)));
     expect(routes.map((f) => path.basename(f)).sort()).toEqual(
-      ["apply.ts", "ask.ts", "join.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts", "waitlist.ts"],
+      ["apply.ts", "ask.ts", "join.ts", "nominate.ts", "spotlight.ts", "subscribe.ts", "suggest-resource.ts", "waitlist.ts"],
     );
     expect(bot).toContain("Our forms and the Resourcus question box use Cloudflare Turnstile");
   });
@@ -126,6 +126,17 @@ describe("the weekly job", () => {
 
   it("scheduled() runs the founders waitlist purge", () => {
     expect(retention).toContain("purgeWaitlist(db)");
+  });
+
+  it("the Get featured bullet states the code's limit, and the limit plus one week", () => {
+    const days = constant("worker/routes/spotlight.ts", "SPOTLIGHT_RETENTION_DAYS");
+    expect(days).toBe(180);
+    expect(POLICY).toContain(`A weekly job deletes each request ${days} days after you send it, whether or not we featured you.`);
+    expect(POLICY).toContain(`No request stays in our database longer than ${days + 7} days (our commitment). If we feature you`);
+  });
+
+  it("scheduled() runs the Get featured purge", () => {
+    expect(retention).toContain("purgeSpotlightRequests(db)");
   });
 
   it("the security-reports bullet states the code's limit", () => {
