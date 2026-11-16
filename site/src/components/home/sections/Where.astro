@@ -36,7 +36,7 @@ const rows = zones.map((z) => {
         <tbody>
           {
             rows.map((r) => (
-              <tr data-region={r.id} style={`--region-color: ${REGION_COLORS[r.id]}`}>
+              <tr data-zone-row={r.id} style={`--region-color: ${REGION_COLORS[r.id]}`}>
                 <th scope="row">
                   <a class="region-link" href={`/regions/${r.id}/`}>
                     <img class="zones__crest" src={r.crest.src} srcset={r.crest.srcset} sizes="40px" width="40" height="40" alt="" loading="lazy" decoding="async" />

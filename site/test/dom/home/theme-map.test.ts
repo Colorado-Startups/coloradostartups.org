@@ -71,12 +71,12 @@ describe("living home map", () => {
   });
 
   it("lists the regions beside the map in the map's order, each with a crest, a name and the card's numbers", () => {
-    const rows = [...table.querySelectorAll("tbody tr[data-region]")];
-    expect(rows.map((r) => r.getAttribute("data-region")).sort()).toEqual([...REGION_IDS].sort());
+    const rows = [...table.querySelectorAll("tbody tr[data-zone-row]")];
+    expect(rows.map((r) => r.getAttribute("data-zone-row")).sort()).toEqual([...REGION_IDS].sort());
     const cards = [...home.querySelectorAll("#home-map .colorado-map__card")].map((c) => c.getAttribute("data-zone"));
-    expect(rows.map((r) => r.getAttribute("data-region")), "one fixed order for map and table").toEqual(cards);
+    expect(rows.map((r) => r.getAttribute("data-zone-row")), "one fixed order for map and table").toEqual(cards);
     for (const row of rows) {
-      const id = row.getAttribute("data-region")!;
+      const id = row.getAttribute("data-zone-row")!;
       expect(row.querySelector(`a[href='/regions/${id}/'] img[src='/art/brand/${id}-512-512.webp']`), id).not.toBeNull();
       const card = cardOf(id);
       expect(text(row.querySelector(".region-link__name"))).toBe(text(card.querySelector(".colorado-map__card-name")));
@@ -98,7 +98,7 @@ describe("living home map", () => {
 
   it.each(REGION_IDS)("counts the same %s honorees and resources as its region page", (id) => {
     const page = parse(`regions/${id}/index.html`);
-    const row = table.querySelector(`tr[data-region='${id}']`)!;
+    const row = table.querySelector(`tr[data-zone-row='${id}']`)!;
     expect(text(row.querySelector("td[data-count='companies']"))).toBe(text(page.querySelector("[data-region-honorees] .tally__n")));
     expect(text(row.querySelector("td[data-count='resources']"))).toBe(text(page.querySelector("[data-region-resources] .tally__n")));
   });
@@ -107,6 +107,6 @@ describe("living home map", () => {
     const asOf = Date.parse(table.getAttribute("data-as-of")!);
     const events = JSON.parse(readDist("data/events.json")) as (CalendarEvent & { region: string })[];
     const week = events.filter((e) => e.region === id && startsAt(e) < asOf + 7 * 86_400_000);
-    expect(text(table.querySelector(`tr[data-region='${id}'] td[data-count='events']`))).toBe(String(week.length));
+    expect(text(table.querySelector(`tr[data-zone-row='${id}'] td[data-count='events']`))).toBe(String(week.length));
   });
 });
