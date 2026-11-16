@@ -1,10 +1,20 @@
 import { SELF } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { anonId } from "../../worker/lib/anon-id";
-import { cleanProps, EVENT_NAMES, EVENT_PROPS, handle, POSTHOG_CAPTURE_URL } from "../../worker/routes/e";
+import {
+  cleanProps,
+  EVENT_MAX_BYTES,
+  EVENT_NAMES,
+  EVENT_PROPS,
+  handle,
+  POSTHOG_CAPTURE_URL,
+  REFUSED_LOG,
+  REFUSED_LOG_EVERY_MS,
+  resetRefusedLog,
+} from "../../worker/routes/e";
 import { server } from "./server";
 
 const ORIGIN = "https://coloradostartups.org";
@@ -50,9 +60,20 @@ function capture(): { headers: Headers; body: Record<string, unknown> }[] {
   return seen;
 }
 
+beforeEach(() => {
+  resetRefusedLog();
+});
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+// A stand-in for the Worker's ExecutionContext that keeps each waitUntil promise.
+function fakeCtx(): { ctx: ExecutionContext; pending: Promise<unknown>[] } {
+  const pending: Promise<unknown>[] = [];
+  const ctx = { waitUntil: (p: Promise<unknown>) => pending.push(p), passThroughOnException: () => {} };
+  return { ctx: ctx as unknown as ExecutionContext, pending };
+}
 
 // Silences console.error for one test and hands back the spy to assert on.
 function errors() {
@@ -72,11 +93,94 @@ describe("POST /api/e", () => {
 
   it("answers 400 for a name off the allow-list, and forwards nothing", async () => {
     const seen = capture();
+    errors();
     for (const body of [{ name: "page_view" }, { name: "" }, { props: {} }, "{not json", "[]"]) {
       const res = await handle(post(body), configured, undefined, DAY1);
       expect(res.status).toBe(400);
     }
     expect(seen).toHaveLength(0);
+  });
+
+  it("logs one fixed line for a refused name, with no payload, at most once a minute", async () => {
+    const log = errors();
+    await handle(post({ name: "join_clik", props: { where: "home" } }), configured, undefined, DAY1);
+    expect(lines(log)).toEqual(["/api/e: refused event name"]);
+    expect(REFUSED_LOG).toBe("/api/e: refused event name");
+    for (const value of ["join_clik", "home", IP, UA]) expect(lines(log)[0]).not.toContain(value);
+
+    // A second refusal inside the minute stays quiet; the next minute logs again.
+    await handle(post({ name: "page_view" }), configured, undefined, new Date(DAY1.getTime() + 1000));
+    expect(lines(log)).toHaveLength(1);
+    await handle(post({ name: "page_view" }), configured, undefined, new Date(DAY1.getTime() + REFUSED_LOG_EVERY_MS));
+    expect(lines(log)).toEqual([REFUSED_LOG, REFUSED_LOG]);
+  });
+
+  it("logs nothing for a body that is not an event at all", async () => {
+    const log = errors();
+    for (const body of [{ props: {} }, "{not json", "[]", { name: 7 }]) {
+      expect((await handle(post(body), configured, undefined, DAY1)).status).toBe(400);
+    }
+    expect(lines(log)).toEqual([]);
+  });
+
+  it("answers 400 to an oversize body, logs nothing and forwards nothing", async () => {
+    const seen = capture();
+    const log = errors();
+    const big = JSON.stringify({ name: "join_click", props: { where: "home" }, pad: "x".repeat(EVENT_MAX_BYTES) });
+    expect(big.length).toBeGreaterThan(EVENT_MAX_BYTES);
+    expect((await handle(post(big), configured, undefined, DAY1)).status).toBe(400);
+    // The same body as a stream with no Content-Length, so only the read cap stops it.
+    const streamed = new Request(URL_, {
+      method: "POST",
+      body: new Blob([big]).stream(),
+      headers: { Origin: ORIGIN, "Content-Type": "text/plain", "CF-Connecting-IP": IP },
+      duplex: "half",
+    } as RequestInit);
+    expect((await handle(streamed, configured, undefined, DAY1)).status).toBe(400);
+    expect(seen).toHaveLength(0);
+    expect(lines(log)).toEqual([]);
+  });
+
+  it("answers 204 before PostHog does, and forwards inside waitUntil", async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const seen: unknown[] = [];
+    server.use(
+      http.post(POSTHOG_CAPTURE_URL, async ({ request }) => {
+        await gate;
+        seen.push(await request.json());
+        return HttpResponse.json({ status: "Ok" });
+      }),
+    );
+    const { ctx, pending } = fakeCtx();
+    const res = await handle(post({ name: "join_click", props: { where: "home" } }), configured, ctx, DAY1);
+    expect(res.status).toBe(204);
+    expect(pending).toHaveLength(1);
+    expect(seen).toHaveLength(0);
+    release();
+    await Promise.all(pending);
+    expect(seen).toHaveLength(1);
+  });
+
+  it("cancels the PostHog reply body it never reads, ok or not", async () => {
+    for (const status of [200, 500]) {
+      let cancelled = false;
+      const body = new ReadableStream({
+        pull(controller) {
+          controller.enqueue(new TextEncoder().encode("x"));
+        },
+        cancel() {
+          cancelled = true;
+        },
+      });
+      vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(new Response(body, { status }));
+      const log = errors();
+      const res = await handle(post({ name: "step_done" }), configured, undefined, DAY1);
+      expect(res.status).toBe(204);
+      expect(cancelled).toBe(true);
+      expect(lines(log)).toEqual(status === 200 ? [] : ["/api/e: PostHog answered 500"]);
+      vi.restoreAllMocks();
+    }
   });
 
   it("answers 429 when the limiter refuses, before PostHog is called", async () => {
@@ -225,9 +329,12 @@ describe("anonId", () => {
 });
 
 describe("cleanProps", () => {
-  it("lists keys for exactly the 12 event names", () => {
+  it("lists one or two keys for exactly the 12 event names", () => {
     expect(EVENT_NAMES).toHaveLength(12);
-    for (const name of EVENT_NAMES) expect(EVENT_PROPS[name].length).toBeGreaterThan(0);
+    for (const name of EVENT_NAMES) {
+      expect(EVENT_PROPS[name].length).toBeGreaterThan(0);
+      expect(EVENT_PROPS[name].length).toBeLessThanOrEqual(2);
+    }
   });
 
   it("keeps only the keys the event lists", () => {
@@ -250,6 +357,9 @@ describe("cleanProps", () => {
       "x".repeat(41),
       "",
       "dot.ted",
+      "home?x=1",
+      "a?b",
+      "?",
       null,
       { a: 1 },
       ["a"],
