@@ -20,8 +20,10 @@ import { HALL_ART_ALT } from "../art/keepers";
 />
 
 <style>
-  /* ArtImage renders the figure in its own scope, so this reaches it by class. */
-  :global(.hall-seal) {
+  /* ArtImage renders the figure in its own scope, so this reaches it by
+     class. The element and both classes outrank ArtImage's own margin: 0,
+     so the gap above the seal holds. */
+  :global(figure.hall-seal.art-image) {
     width: min(100%, 24rem);
     margin-top: var(--s-6);
     border-radius: var(--r-card);

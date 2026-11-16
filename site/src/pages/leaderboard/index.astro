@@ -96,7 +96,7 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
   <span data-pagefind-filter="type:Companies"></span>
   <section class="section section--lit">
     <div class="wrap">
-      <Banner as="h1" variant="lintel">The Leaderboard</Banner>
+      <Banner as="h1" variant="lintel" class="lb-title">The Leaderboard</Banner>
       <p class="lede">Companies building in Colorado, each verified from public sources.</p>
       <div class="btn-row">
         <a class="btn btn--gold" href="/leaderboard/nominate/">Nominate your company</a>
@@ -208,6 +208,14 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
 </script>
 
 <style>
+  /* "Leaderboard" at the 36 px h1 floor is about 232 px wide. The lintel's
+     48 px side padding leaves less than that inside a 375 px phone's column,
+     so the padding narrows there and the word never breaks. */
+  @media (max-width: 30rem) {
+    .wrap :global(.lb-title .hall-banner__heading) {
+      padding-inline: var(--s-5);
+    }
+  }
   .lb-source {
     margin-bottom: var(--s-6);
   }

@@ -101,6 +101,10 @@ const answer: Part[] = [
     border-radius: var(--r-card);
     box-shadow: var(--sh-glow);
   }
+  /* Outranks ArtImage's own margin: 0, so the gap above the scene holds. */
+  section :global(.guide-art) {
+    margin-top: var(--s-6);
+  }
   .guide-group + .guide-group {
     margin-top: var(--s-7);
   }

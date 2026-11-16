@@ -400,7 +400,11 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
   .credits-head {
     max-width: var(--t-measure);
   }
-  /* The guides scene closes the page (L6's scenes, 2026-11-04). */
+  /* The guides scene closes the page (L6's scenes, 2026-11-04). The id
+     outranks ArtImage's own margin: 0, so the gap above the scene holds. */
+  #about :global(.guide-art) {
+    margin-top: var(--s-6);
+  }
   :global(.guide-art) {
     width: min(100%, 40rem);
     border-radius: var(--r-card);
