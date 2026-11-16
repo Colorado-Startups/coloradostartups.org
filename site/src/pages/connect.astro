@@ -1,0 +1,191 @@
+---
+// /connect/: one card per AI client that can use the keyless /mcp server
+// (worker/mcp/), from data/ai-clients.yaml, then five things to ask it.
+// Each card says how much work it is: one click (a deep link), one command
+// (copy a line) or guided steps (the app's own menus).
+//
+// Link forms read 2026-11-15 in each vendor's docs (the yaml names them):
+//   Cursor   cursor://anysphere.cursor-deeplink/mcp/install?name=…&config=<base64 of {"url":…}>
+//   VS Code  vscode:mcp/install?<url-encoded JSON {name, type: "http", url}>
+//   Goose    goose://extension?url=…&type=streamable_http&id=…&name=…
+// A bad record throws, so the build stops before a card ships wrong.
+import { parse } from "yaml";
+import { z } from "zod";
+
+import clientsRaw from "../../../data/ai-clients.yaml?raw";
+import Button from "../components/ui/Button.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const SERVER_ID = "coloradostartups";
+const SERVER_NAME = "Colorado Startups";
+const mcpUrl = new URL("/mcp", Astro.site!).toString();
+
+const Client = z
+  .object({
+    id: z.string().regex(/^[a-z0-9-]+$/),
+    name: z.string().min(1),
+    effort: z.enum(["one-click", "one-command", "guided"]),
+    deeplink: z.enum(["cursor", "vscode", "goose"]).optional(),
+    command: z.string().includes("{url}").optional(),
+    config: z.literal("opencode").optional(),
+    steps: z.array(z.string().min(1)).min(1).optional(),
+    docs: z.string().url(),
+    read: z.union([z.string(), z.date()]),
+  })
+  .strict()
+  .refine((c) => (c.effort === "one-click") === Boolean(c.deeplink), "one-click needs a deeplink, and only it")
+  .refine((c) => (c.effort === "one-command") === Boolean(c.command), "one-command needs a command, and only it")
+  .refine((c) => (c.effort === "guided") === Boolean(c.steps), "guided needs steps, and only it");
+const clients = z.array(Client).min(1).parse(parse(clientsRaw));
+
+function deeplink(kind: "cursor" | "vscode" | "goose"): string {
+  if (kind === "cursor") {
+    const config = btoa(JSON.stringify({ url: mcpUrl }));
+    return `cursor://anysphere.cursor-deeplink/mcp/install?name=${SERVER_ID}&config=${encodeURIComponent(config)}`;
+  }
+  if (kind === "vscode") {
+    return `vscode:mcp/install?${encodeURIComponent(JSON.stringify({ name: SERVER_ID, type: "http", url: mcpUrl }))}`;
+  }
+  const q = new URLSearchParams({ url: mcpUrl, type: "streamable_http", id: SERVER_ID, name: SERVER_NAME });
+  return `goose://extension?${q.toString().replace(/\+/g, "%20")}`;
+}
+
+const openCodeConfig = JSON.stringify(
+  {
+    $schema: "https://opencode.ai/config.json",
+    mcp: { servers: { [SERVER_ID]: { type: "remote", url: mcpUrl, oauth: false } } },
+  },
+  null,
+  2,
+);
+
+const EFFORT = { "one-click": "One click", "one-command": "One command", guided: "Guided steps" } as const;
+const count = (e: keyof typeof EFFORT) => clients.filter((c) => c.effort === e).length;
+
+const asks = [
+  "What startup events are on in Colorado this week?",
+  "I have an idea and no customers yet. What should I do first?",
+  "Find Colorado resources for hardware founders.",
+  "Which guide covers free startup credits?",
+  "Show me a Leaderboard company in my sector, with its sources.",
+];
+---
+
+<BaseLayout
+  title="Connect your AI"
+  description="Connect Claude, ChatGPT, Cursor, VS Code, Goose, Claude Code or OpenCode to the free Colorado Startups MCP server. No key."
+>
+  <section class="section section--band" aria-labelledby="page-title">
+    <div class="wrap stack">
+      <h1 id="page-title">Connect your AI</h1>
+      <p class="lede">Free, read-only, no key.</p>
+      <p>
+        {count("one-click")} apps take one click, {count("one-command")} take one command and {count("guided")} take a
+        few steps.
+      </p>
+      <div class="connect-url">
+        <pre class="connect-code"><code id="mcp-url" data-mcp-url>{mcpUrl}</code></pre>
+        <Button variant="secondary" data-copy="mcp-url">Copy URL</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="clients-title">
+    <div class="wrap stack">
+      <h2 id="clients-title">Pick your app</h2>
+      <ul class="connect-cards" role="list">
+        {
+          clients.map((c) => (
+            <li class="panel stack connect-card" data-client={c.id} data-effort={c.effort}>
+              <h3>{c.name}</h3>
+              <p class="meta">{EFFORT[c.effort]}</p>
+              {c.deeplink && <Button href={deeplink(c.deeplink)}>Add to {c.name}</Button>}
+              {c.command && (
+                <>
+                  <pre class="connect-code"><code id={`cmd-${c.id}`}>{c.command.replace("{url}", mcpUrl)}</code></pre>
+                  <Button variant="secondary" data-copy={`cmd-${c.id}`}>
+                    Copy command
+                  </Button>
+                </>
+              )}
+              {c.config === "opencode" && (
+                <details>
+                  <summary>Or add it to opencode.jsonc</summary>
+                  <pre class="connect-code"><code id="cfg-opencode">{openCodeConfig}</code></pre>
+                  <Button variant="secondary" data-copy="cfg-opencode">
+                    Copy config
+                  </Button>
+                </details>
+              )}
+              {c.steps && (
+                <ol>
+                  {c.steps.map((s) => (
+                    <li>{s}</li>
+                  ))}
+                </ol>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="asks-title">
+    <div class="wrap stack">
+      <h2 id="asks-title">5 things to ask</h2>
+      <ol class="connect-asks" data-asks>
+        {asks.map((a) => <li>{a}</li>)}
+      </ol>
+      <p class="meta"><a href="/data/">The open data</a> behind it is free under CC BY 4.0.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Each copy button copies the element its data-copy names.
+  for (const button of document.querySelectorAll<HTMLButtonElement>("button[data-copy]")) {
+    const label = button.textContent ?? "";
+    button.addEventListener("click", async () => {
+      const text = document.getElementById(button.dataset.copy ?? "")?.textContent ?? "";
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Select and copy it";
+      }
+      setTimeout(() => (button.textContent = label), 2000);
+    });
+  }
+</script>
+
+<style>
+  .connect-url {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .connect-cards {
+    display: grid;
+    gap: var(--s-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+  .connect-card ol,
+  .connect-asks {
+    margin: 0;
+    padding-left: var(--s-4);
+  }
+  .connect-code {
+    margin: 0;
+    padding: var(--s-3);
+    overflow-x: auto;
+    border: var(--line-hair) solid var(--c-border);
+    background: var(--c-surface);
+    border-radius: var(--r-chisel);
+    font-size: var(--t-step--1);
+  }
+</style>

@@ -1,30 +1,18 @@
 ---
 // /ask/: one page to find anything on the site. Pagefind's Component UI
 // searches every page, filtered by the type each page tags (type:Resources,
-// Companies, Guides, Events). Then the Resourcus box, then two cards that
-// connect an AI client to the keyless /mcp server (worker/mcp/).
-//
-// Connect steps re-read 2026-11-15: Claude's "Get started with custom
-// connectors using remote MCP" (support.claude.com) and OpenCode's MCP servers
-// page (opencode.ai/docs/mcp-servers). Pagefind indexes dist/ after the build,
-// so the search is empty in `astro dev`.
+// Companies, Guides, Events). Then the Resourcus box, then a link to
+// /connect/, which connects an AI client to the keyless /mcp server
+// (worker/mcp/). #connect stays: the worker sends a browser that opens /mcp
+// here. Pagefind indexes dist/ after the build, so the search is empty in
+// `astro dev`.
 import ResourcusPanel from "../components/resourcus/ResourcusPanel.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-
-const mcpUrl = new URL("/mcp", Astro.site!).toString();
-const openCode = JSON.stringify(
-  {
-    $schema: "https://opencode.ai/config.json",
-    mcp: { servers: { coloradostartups: { type: "remote", url: mcpUrl, oauth: false } } },
-  },
-  null,
-  2,
-);
 ---
 
 <BaseLayout
   title="Ask"
-  description="Search Colorado Startups, ask Resourcus, an AI agent, or connect Claude or OpenCode to the site's free MCP server."
+  description="Search Colorado Startups, ask Resourcus, an AI agent, or connect your AI app to the site's free MCP server."
 >
   <section class="section section--band" aria-labelledby="ask-title" data-pagefind-ignore>
     <div class="wrap stack">
@@ -52,26 +40,7 @@ const openCode = JSON.stringify(
   <section class="section section--lit" id="connect" aria-labelledby="connect-title" data-pagefind-ignore>
     <div class="wrap stack">
       <h2 id="connect-title">Connect your AI</h2>
-      <p>Free, read-only, no key.</p>
-      <div class="connect-cards">
-        <article class="panel stack connect-card" data-connect="claude">
-          <h3>Claude</h3>
-          <ol>
-            <li>Customize › Connectors › + Add › Add custom connector</li>
-            <li>Name it, paste the URL, then Continue</li>
-            <li>Authentication: No sign in, then Add</li>
-          </ol>
-          <pre class="connect-code"><code data-copy-source>{mcpUrl}</code></pre>
-          <button type="button" class="btn" data-copy>Copy URL</button>
-        </article>
-        <article class="panel stack connect-card" data-connect="opencode">
-          <h3>OpenCode</h3>
-          <p>Add to <code>opencode.jsonc</code>:</p>
-          <pre class="connect-code"><code data-copy-source>{openCode}</code></pre>
-          <button type="button" class="btn" data-copy>Copy config</button>
-        </article>
-      </div>
-      <p class="meta"><a href="/data/">The open data</a> behind it is free under CC BY 4.0.</p>
+      <p>Seven AI apps, free, no key. <a href="/connect/">See how to connect yours</a>.</p>
     </div>
   </section>
 </BaseLayout>
@@ -94,21 +63,6 @@ const openCode = JSON.stringify(
       fill(30);
     });
   }
-
-  // Each copy button copies the code block in its own card.
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
-    const label = button.textContent ?? "";
-    button.addEventListener("click", async () => {
-      const text = button.closest("article")?.querySelector("[data-copy-source]")?.textContent ?? "";
-      try {
-        await navigator.clipboard.writeText(text);
-        button.textContent = "Copied";
-      } catch {
-        button.textContent = "Select and copy it";
-      }
-      setTimeout(() => (button.textContent = label), 2000);
-    });
-  }
 </script>
 
 <style>
@@ -121,23 +75,5 @@ const openCode = JSON.stringify(
     --pf-font: inherit;
     display: grid;
     gap: var(--s-3);
-  }
-  .connect-cards {
-    display: grid;
-    gap: var(--s-4);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-  }
-  .connect-card ol {
-    margin: 0;
-    padding-left: var(--s-4);
-  }
-  .connect-code {
-    margin: 0;
-    padding: var(--s-3);
-    overflow-x: auto;
-    border: var(--line-hair) solid var(--c-border);
-    background: var(--c-surface);
-    border-radius: var(--r-chisel);
-    font-size: var(--t-step--1);
   }
 </style>
