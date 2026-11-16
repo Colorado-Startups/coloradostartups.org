@@ -11,6 +11,10 @@
 // the tables. Each row shows the program, its amount and what it covers; what
 // it needs and its terms collapse under "Details".
 //
+// Step L4 (2026-11-15): the credits calculator (components/credits/) opens
+// the groups section. It hides itself with JavaScript off, and the tables
+// stay the full list either way.
+//
 // Every figure shares its sentence with its source, because the built-HTML
 // gate reads each cell as its own line. The amount line names the source page
 // and the date it was checked; attributed() names the provider in any other
@@ -20,6 +24,8 @@
 import snapshotRaw from "../../../../data/credits/startup-programs.json?raw";
 import ArtImage from "../../components/art/ArtImage.astro";
 import { GUIDE_ART_IMAGE, GUIDES_SCENE as art } from "../../components/guides/guide-art";
+import Calculator from "../../components/credits/Calculator.astro";
+import { COVER_MEANS } from "../../components/credits/calc";
 import ChartFigure from "../../components/leaderboard/ChartFigure.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
@@ -77,13 +83,8 @@ const chartText = {
     "The legend and the data table mark which credits need a funding round or a partner code.",
 };
 
-// What the programs cover, largest first, with a short meaning for each.
-const COVER_MEANS: Record<Cover, string> = {
-  cpu: "servers for your site, app and database",
-  gpu: "chips that train and run AI models",
-  inference: "calls to a hosted AI model",
-  other: "storage, databases and developer tools",
-};
+// What the programs cover, largest first, with a short meaning for each
+// (COVER_MEANS lives with the calculator, which shows the same words).
 const covers = (Object.keys(COVER_LABELS) as Cover[])
   .map((c) => ({ cover: c, n: programsCovering(programs, c).length }))
   .sort((a, b) => b.n - a.n);
@@ -155,6 +156,8 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
 
   <section class="section section--lit" id="groups" aria-labelledby="groups-title">
     <div class="wrap stack">
+      {/* Step L4: the tool first, the tables below stay the full list. */}
+      <Calculator programs={programs} checked={date.label} />
       <h2 id="groups-title">Which group are you in?</h2>
       <ul class="tiles">
         {
@@ -464,7 +467,8 @@ const GEMINI_TERMS = "https://aistudio.google.com/docs/terms";
   .tile:focus-visible .tile__name {
     text-decoration: underline;
   }
-  .tiles + h2 {
+  .tiles + h2,
+  :global(.calc) + h2 {
     margin-top: var(--s-7);
   }
   /* What the programs cover: a name, a bar and a count per row, bars aligned. */
