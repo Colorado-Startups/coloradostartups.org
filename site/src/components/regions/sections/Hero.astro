@@ -1,11 +1,19 @@
 ---
 // The region page's first section: breadcrumb, name, lede and the main
-// action, in the first screen at 375 and 1280 px (#218). The page puts Art in
-// the slot, so the painting and figures stay inside this section. Owner: L8.
+// action, in the first screen at 375 and 1280 px (#218), then the real map of
+// the region and what is there (step R1, Paul, 2026-11-16: "It should be the
+// map and what's there"). The page fills two slots: `map`, the ColoradoMap
+// zoomed to the region, and `here`, its cities and counts (WhatsHere.astro).
+// On a desktop the title and the counts share the left column and the map
+// fills the right; on a phone the map comes right under the buttons, then the
+// counts. The four sourced figures follow. The place painting is an extra,
+// further down the page (Art.astro). Owner: L8.
 import type { Region } from "@cs/shared";
 import { regionLede, WAYS_IN } from "@cs/shared";
 
+import StatTile from "../../home/StatTile.astro";
 import { REGION_COLORS } from "../../../lib/regions/map";
+import { regionTiles } from "../region-tiles";
 
 interface Props {
   region: Region;
@@ -22,18 +30,31 @@ const { region } = Astro.props;
         <li aria-current="page">{region.name}</li>
       </ol>
     </nav>
-    <h1 id="region-title">{region.name}</h1>
-    <p class="lede">{regionLede(region)}</p>
-    {/* "Meet founders here" below repeats this. Each Slack button says where
-        it goes (#128). */}
-    <div class="first-actions">
-      <div class="btn-row">
-        <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note-top">Join the Slack</a>
-        <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
+    <div class="hero">
+      <div class="hero__intro">
+        <h1 id="region-title">{region.name}</h1>
+        <p class="lede">{regionLede(region)}</p>
+        {/* "Meet founders here" below repeats this. Each Slack button says where
+            it goes (#128). */}
+        <div class="first-actions">
+          <div class="btn-row">
+            <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note-top">Join the Slack</a>
+            <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
+          </div>
+          <p class="meta" id="slack-note-top">Join the Slack opens a Google Form.</p>
+        </div>
       </div>
-      <p class="meta" id="slack-note-top">Join the Slack opens a Google Form.</p>
+      <div class="hero__map">
+        <slot name="map" />
+      </div>
+      <div class="hero__here">
+        <slot name="here" />
+      </div>
     </div>
-    <slot />
+    <h2 class="visually-hidden">{region.name} in numbers</h2>
+    <div class="tiles" data-region-tiles>
+      {regionTiles(region.id).map((t) => <StatTile {...t} />)}
+    </div>
   </div>
 </section>
 
@@ -48,10 +69,54 @@ const { region } = Astro.props;
     display: inline-block;
     padding-bottom: var(--s-1);
   }
+  /* Map right, title and counts left: the map's column is 3 of 5 parts, the
+     width the relief image's `sizes` assumes ([id].astro). */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    grid-template-areas:
+      "intro map"
+      "here map";
+    grid-template-rows: auto 1fr;
+    gap: 0 var(--s-7);
+    align-items: start;
+  }
+  .hero__intro {
+    grid-area: intro;
+  }
+  .hero__map {
+    grid-area: map;
+  }
+  .hero__here {
+    grid-area: here;
+  }
   .first-actions {
-    margin: var(--s-4) 0 var(--s-6);
+    margin: var(--s-4) 0 var(--s-5);
   }
   .first-actions .meta {
     margin: var(--s-3) 0 0;
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5) var(--s-7);
+    margin-top: var(--s-7);
+  }
+  /* A media query cannot read CSS variables: 47.5rem is the 760 px breakpoint. */
+  @media (max-width: 47.5rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "intro"
+        "map"
+        "here";
+      grid-template-rows: auto;
+    }
+    .hero__here {
+      margin-top: var(--s-5);
+    }
+    .tiles {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>

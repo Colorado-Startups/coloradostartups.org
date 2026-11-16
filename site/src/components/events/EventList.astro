@@ -1,9 +1,12 @@
 ---
 // Every upcoming event on /event-calendar/ as a native list, grouped by day
 // in Mountain Time, from the same snapshot as the next-events cards
-// (events.ts). Chips filter it by region, this week, and in person or online
-// without a page load (list-filter.ts), and the choice lives in the URL. A
-// chip group shows only when the data has more than one choice for it.
+// (events.ts). Chips filter it by region, this week, the next 7 days, and in
+// person or online without a page load (list-filter.ts), and the choice lives
+// in the URL. The three regions always have a chip, so a region page's link
+// (?region=<id>&when=next-7-days) lands on that region even when it has no
+// event, and the list says none match; "Elsewhere" and the format group show
+// only when the data has them.
 // Without JavaScript the chips stay hidden and the whole list stands as built.
 // Owner: L2a. Step L2b adds an "Add to calendar" file on each row (ics.ts),
 // the subscribe link at the top, and honest format tags (format.ts): a hybrid
@@ -14,7 +17,7 @@ import { REGION_COLORS } from "../../lib/regions/map";
 import { cardPlace, type CalendarEvent, dateParts, endsAt, startsAt, whenText } from "./events";
 import { formatLabel, formatOf, formatTokens } from "./format";
 import { icsPath } from "./ics";
-import { denverDay } from "./list-filter";
+import { denverDay, NEXT_7_DAYS } from "./list-filter";
 
 interface Props {
   events: CalendarEvent[];
@@ -67,7 +70,7 @@ for (const row of rows) {
 
 const present = new Set(rows.map((r) => r.region));
 const regionChoices = [
-  ...REGIONS.filter((r) => present.has(r.id)).map((r) => ({ value: r.id, label: r.name, hint: r.cities.join(", ") })),
+  ...REGIONS.map((r) => ({ value: r.id, label: r.name, hint: r.cities.join(", ") })),
   ...(present.has("elsewhere") ? [{ value: "elsewhere", label: ELSEWHERE_LABEL, hint: "" }] : []),
 ];
 const types = new Set(rows.flatMap((r) => r.type.split(" ").filter(Boolean)));
@@ -124,6 +127,10 @@ const placeText = (location: string | null, tag: string | null) => {
               <input type="radio" name="when" value="week" />
               <span>This week</span>
             </label>
+            <label class="pick">
+              <input type="radio" name="when" value={NEXT_7_DAYS} />
+              <span>Next 7 days</span>
+            </label>
           </div>
         </fieldset>
         {showTypes && (
@@ -178,6 +185,7 @@ const placeText = (location: string | null, tag: string | null) => {
                   <li
                     class="ev"
                     data-ends={new Date(endsAt(event)).toISOString()}
+                    data-starts={new Date(startsAt(event)).toISOString()}
                     data-day={startDay}
                     data-region={region}
                     data-type={type}

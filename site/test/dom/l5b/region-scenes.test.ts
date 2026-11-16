@@ -10,7 +10,7 @@ import { readDist, SITE_DIR } from "../pages";
 // L5b (#204): each region's painted scene shows wherever its card does. On
 // /get-involved/ a region's Connector seat carries its scene, as on
 // /regions/. On the region's own page the seat card does not repeat it: the
-// page's hero already shows the scene. Built HTML from dist/.
+// page's painting section already shows the scene. Built HTML from dist/.
 
 const positions = parse(readFileSync(path.join(SITE_DIR, "../data/team/positions.yaml"), "utf8")) as {
   id: string;
@@ -38,7 +38,7 @@ describe("/get-involved/ seat cards", () => {
 });
 
 describe.each(REGION_IDS)("/regions/%s/ seat card", (id) => {
-  it("leaves the scene to the page's hero", () => {
+  it("leaves the scene to the page's painting section", () => {
     const section = doc(`regions/${id}/index.html`).getElementById("organizer")!.parentElement!;
     expect(section.querySelector("[data-position] [data-art]")).toBeNull();
   });
