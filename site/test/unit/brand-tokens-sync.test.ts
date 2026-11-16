@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import YAML from "yaml";
 
 import { SOURCE, TARGET, renderTokens } from "../../scripts/sync-brand.mjs";
+import { PENDING_BRAND_ROLES, pendingAndAbsent } from "../brand-pending";
 
 // tokens.css is generated from 01_doctrine/brand_tokens.yaml. A hand edit to the
 // CSS, or a YAML change without a rebuild, fails here.
@@ -22,14 +23,26 @@ describe("brand tokens", () => {
 
   // The color block copies brand v3's light set (Colorado-Startups/brand
   // dist/tokens.json, pulled at the brand.lock.json tag by scripts/brand/pull.mjs).
+  // Only the roles in PENDING_BRAND_ROLES (test/brand-pending.ts) may be missing.
   it("matches the brand's tokens.json, role for role", () => {
     const brand = JSON.parse(readFileSync(path.join(__dirname, "../../public/art/brand/tokens.json"), "utf8")) as {
       color: Record<string, { $value?: { hex: string } }>;
     };
     const site = (YAML.parse(readFileSync(SOURCE, "utf8")) as { color: Record<string, string> }).color;
-    const roles = Object.keys(brand.color).filter((k) => !k.startsWith("$"));
+    const roles = Object.keys(brand.color).filter((k) => !k.startsWith("$") && !pendingAndAbsent(k, site));
     expect(Object.keys(site).sort()).toEqual(roles.sort());
     for (const role of roles) expect(site[role].toUpperCase(), role).toBe(brand.color[role].$value!.hex.toUpperCase());
+  });
+
+  it("lets only real brand roles wait, so the pending list is no blanket pass", () => {
+    const brand = JSON.parse(readFileSync(path.join(__dirname, "../../public/art/brand/tokens.json"), "utf8")) as {
+      color: Record<string, unknown>;
+    };
+    for (const role of PENDING_BRAND_ROLES) expect(Object.hasOwn(brand.color, role), role).toBe(true);
+    // Known bad: a core role is never pending, so dropping it from the site still fails.
+    expect(pendingAndAbsent("ground", {})).toBe(false);
+    expect(pendingAndAbsent("region-space-peak", {})).toBe(true);
+    expect(pendingAndAbsent("region-space-peak", { "region-space-peak": "#C67273" })).toBe(false);
   });
 
   // The night block copies each role's night value from the same tokens.json
@@ -38,10 +51,11 @@ describe("brand tokens", () => {
     const brand = JSON.parse(readFileSync(path.join(__dirname, "../../public/art/brand/tokens.json"), "utf8")) as {
       color: Record<string, { $extensions?: { "org.coloradostartups.brand"?: { night?: { hex: string } } } }>;
     };
-    const night = (YAML.parse(readFileSync(SOURCE, "utf8")) as { night: Record<string, string> }).night;
+    const tokens = YAML.parse(readFileSync(SOURCE, "utf8")) as { color: Record<string, string>; night: Record<string, string> };
+    const night = tokens.night;
     const want = Object.fromEntries(
       Object.entries(brand.color)
-        .filter(([k, v]) => !k.startsWith("$") && v.$extensions?.["org.coloradostartups.brand"]?.night)
+        .filter(([k, v]) => !k.startsWith("$") && v.$extensions?.["org.coloradostartups.brand"]?.night && !pendingAndAbsent(k, tokens.color))
         .map(([k, v]) => [k, v.$extensions!["org.coloradostartups.brand"]!.night!.hex.toUpperCase()]),
     );
     expect(Object.keys(want).length).toBeGreaterThan(0);
