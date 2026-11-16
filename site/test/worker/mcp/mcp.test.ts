@@ -398,7 +398,7 @@ describe("MCP Apps cards", () => {
       expect(new TextEncoder().encode(c.text).length).toBeLessThan(CARD_CAP);
       // Nothing loads from the network: no outside script, style, image or frame, and no fetch.
       expect(c.text).not.toMatch(/\b(?:src|href)\s*=\s*["']?\s*(?:https?:)?\/\//i);
-      expect(c.text).not.toMatch(/url\(\s*["']?(?:https?:)?\/\/|@import|<link\b|<img\b|<iframe\b|<script\s+src/i);
+      expect(c.text).not.toMatch(/url\(\s*["']?(?:https?:)?\/\/|@import|<link\b|<img\b|<iframe\b|<script\b[^>]*\bsrc\b/i);
       expect(c.text).not.toMatch(/\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource/);
       // No CSP domains: the host's restrictive default applies.
       expect(c._meta?.ui?.csp).toBeUndefined();

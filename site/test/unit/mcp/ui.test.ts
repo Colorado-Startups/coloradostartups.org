@@ -36,10 +36,10 @@ describe("generated cards", () => {
     it(`${name}: loads nothing from outside and fetches nothing`, () => {
       expect(html).not.toMatch(/\b(?:src|href|action|poster|srcset)\s*=\s*["']?\s*(?:https?:)?\/\//i);
       expect(html).not.toMatch(/url\(\s*["']?(?:https?:)?\/\//i);
-      expect(html).not.toMatch(/@import|<link\b|<img\b|<iframe\b|<script\s+src/i);
+      expect(html).not.toMatch(/@import|<link\b|<img\b|<iframe\b|<script\b[^>]*\bsrc\b/i);
       expect(html).not.toMatch(/\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|importScripts/);
       // One inline script, with no attributes, and it parses. Any case, any closing-tag spacing.
-      const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script[^>]*>/gi)];
+      const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)];
       expect(scripts).toHaveLength(1);
       expect(scripts[0]![1]).toBe("");
       expect(() => new Function(scripts[0]![2]!)).not.toThrow();
