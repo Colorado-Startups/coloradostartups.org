@@ -5,10 +5,15 @@
 // without a page load (list-filter.ts), and the choice lives in the URL. A
 // chip group shows only when the data has more than one choice for it.
 // Without JavaScript the chips stay hidden and the whole list stands as built.
-// Owner: L2a.
+// Owner: L2a. Step L2b adds an "Add to calendar" file on each row (ics.ts),
+// the subscribe link at the top, and honest format tags (format.ts): a hybrid
+// event is in person and online, and an event with no place says so.
+import { calendarFeedSubscribeUrl } from "../info/links";
 import { regionForCity, REGIONS } from "../../lib/regions/match";
 import { REGION_COLORS } from "../../lib/regions/map";
 import { cardPlace, type CalendarEvent, dateParts, endsAt, startsAt, whenText } from "./events";
+import { formatLabel, formatOf, formatTokens } from "./format";
+import { icsPath } from "./ics";
 import { denverDay } from "./list-filter";
 
 interface Props {
@@ -39,12 +44,18 @@ function regionOf(e: CalendarEvent): string {
 const ELSEWHERE_LABEL = "Elsewhere in Colorado";
 const regionName = (id: string) => REGIONS.find((r) => r.id === id)?.name ?? ELSEWHERE_LABEL;
 
-const rows = events.map((e) => ({
-  event: e,
-  day: denverDay(startsAt(e)),
-  region: regionOf(e),
-  type: e.inPerson ? "in-person" : "online",
-}));
+const rows = events.map((e) => {
+  const format = formatOf(e);
+  return {
+    event: e,
+    day: denverDay(startsAt(e)),
+    region: regionOf(e),
+    type: formatTokens(format),
+    formatTag: formatLabel(format),
+    // Recurring events share a title, so the day keeps each link's name distinct.
+    addName: `${e.title}, ${whenText(e).day}`,
+  };
+});
 
 // One group per Mountain Time start day, in the order the events come (soonest first).
 const days: { day: string; rows: typeof rows }[] = [];
@@ -59,13 +70,23 @@ const regionChoices = [
   ...REGIONS.filter((r) => present.has(r.id)).map((r) => ({ value: r.id, label: r.name, hint: r.cities.join(", ") })),
   ...(present.has("elsewhere") ? [{ value: "elsewhere", label: ELSEWHERE_LABEL, hint: "" }] : []),
 ];
-const types = new Set(rows.map((r) => r.type));
+const types = new Set(rows.flatMap((r) => r.type.split(" ").filter(Boolean)));
 const showRegions = regionChoices.length > 1;
 const showTypes = types.size > 1;
+// The text a row's place shows, unless the format tag already says it ("Online").
+const placeText = (location: string | null, tag: string | null) => {
+  if (!location) return null;
+  const place = cardPlace(location);
+  return tag && place.toLowerCase() === tag.toLowerCase() ? null : place;
+};
 ---
 
 <div class="evlist" data-event-list>
   <h2 id="all-events">Every upcoming event</h2>
+  <p class="evlist__subscribe">
+    <a class="btn btn--stone" href={calendarFeedSubscribeUrl()} data-subscribe-feed>Subscribe to all events</a>
+    <span class="meta">Opens in your calendar app. The feed comes from Google Calendar.</span>
+  </p>
   {
     rows.length > 0 && (
       <form class="evlist__filters" aria-label="Filter the events" data-list-filters>
@@ -153,7 +174,7 @@ const showTypes = types.size > 1;
                 </time>
               </h3>
               <ol class="day__events" role="list">
-                {dayRows.map(({ event, day: startDay, region, type }) => (
+                {dayRows.map(({ event, day: startDay, region, type, formatTag, addName }) => (
                   <li
                     class="ev"
                     data-ends={new Date(endsAt(event)).toISOString()}
@@ -161,7 +182,9 @@ const showTypes = types.size > 1;
                     data-region={region}
                     data-type={type}
                   >
-                    <p class="ev__time">{whenText(event).time}</p>
+                    <p class="ev__time">
+                      <time datetime={event.start}>{whenText(event).time}</time>
+                    </p>
                     <div class="ev__body">
                       <h4 class="ev__title">
                         {event.url ? (
@@ -173,8 +196,10 @@ const showTypes = types.size > 1;
                         )}
                       </h4>
                       <p class="ev__where">
-                        {event.location && <span class="ev__place">{cardPlace(event.location)}</span>}
-                        {region ? (
+                        {placeText(event.location, formatTag) && (
+                          <span class="ev__place">{placeText(event.location, formatTag)}</span>
+                        )}
+                        {region && (
                           <span class="ev__tag">
                             {region !== "elsewhere" && (
                               <span
@@ -185,9 +210,21 @@ const showTypes = types.size > 1;
                             )}
                             {regionName(region)}
                           </span>
-                        ) : (
-                          type === "online" && <span class="ev__tag">Online</span>
                         )}
+                        {formatTag && (
+                          <span class="ev__tag" data-format-tag>
+                            {formatTag}
+                          </span>
+                        )}
+                      </p>
+                      <p class="ev__add">
+                        <a href={icsPath(event)} download data-add-ics>
+                          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+                            <rect x="1.5" y="2.5" width="13" height="12" rx="1.5" fill="none" stroke="currentColor" />
+                            <path d="M1.5 6h13M5 1v3M11 1v3M8 8v5M5.5 10.5h5" fill="none" stroke="currentColor" />
+                          </svg>
+                          Add to calendar<span class="visually-hidden">: {addName}</span>
+                        </a>
                       </p>
                     </div>
                   </li>
@@ -199,7 +236,9 @@ const showTypes = types.size > 1;
       </ol>
     )
   }
-  <p data-events-empty hidden={rows.length > 0}>No events are listed right now. The full calendar below has them all.</p>
+  <p data-events-empty hidden={rows.length > 0}>
+    No events are listed right now. <a href="#full-calendar">The full calendar below</a> has them all.
+  </p>
   <p data-list-none hidden>
     No events match these filters. <button type="button" class="btn btn--stone" data-list-clear>Show every event</button>
   </p>
@@ -392,6 +431,29 @@ const showTypes = types.size > 1;
     align-items: center;
     gap: var(--s-1);
     font-weight: 700;
+  }
+  .evlist__subscribe {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+    margin-bottom: var(--s-4);
+  }
+  /* A small link under the place that is still a 44px target on a phone. */
+  .ev__add a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    font-size: var(--t-step--1);
+    font-weight: 700;
+  }
+  .ev__add svg {
+    flex: none;
+  }
+  @media (max-width: 40rem) {
+    .ev__add a {
+      min-height: var(--size-tap);
+    }
   }
   /* On a phone the time sits over the title. */
   @media (max-width: 40rem) {
