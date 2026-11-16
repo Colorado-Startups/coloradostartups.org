@@ -103,6 +103,7 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
   // <noscript> style shows it when this script cannot run.
   const full = root.querySelector<HTMLElement>("[data-canvas-full]");
   const showAll = root.querySelector<HTMLButtonElement>("[data-canvas-show-all]");
+  const picks = root.querySelector<HTMLElement>("[data-canvas-picks]");
 
   /** Shows the full list and retires its control. True when it was closed. */
   const openList = (): boolean => {
@@ -158,6 +159,11 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     const mine = ++run;
     const hits = state.q.trim() ? await search(state.q, pagePath) : null;
     if (mine !== run) return;
+    // A query opens the list and sets the picks aside, so the results sit
+    // right under the search box; an empty box brings the picks back.
+    const searching = state.q.trim() !== "";
+    if (searching) openList();
+    if (picks) picks.hidden = searching;
     const matched = cards.map(({ facts }) => matches(facts, state, hits));
     if (wanted) {
       limit = limitFor(matched, indexOf.get(wanted) ?? -1, limit);
@@ -225,15 +231,20 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     stage.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" });
   }
 
+  // Listened for on the root: the search box sits above the picks, outside
+  // the form's markup, and joins it through form="canvas-filters" (step
+  // L1b). Only this form's own controls count, not Resourcus's.
+  const ours = (e: Event) => (e.target as HTMLInputElement | null)?.form === form;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  form.addEventListener("change", (e) => {
+  root.addEventListener("change", (e) => {
+    if (!ours(e)) return;
     const menu = (e.target as HTMLElement).tagName === "SELECT";
     void refilter().then(() => {
       if (menu) revealFirstResult();
     });
   });
-  form.addEventListener("input", (e) => {
-    if ((e.target as HTMLElement).getAttribute("name") !== "q") return;
+  root.addEventListener("input", (e) => {
+    if (!ours(e) || (e.target as HTMLElement).getAttribute("name") !== "q") return;
     clearTimeout(timer);
     timer = setTimeout(() => void refilter(), 200);
   });
@@ -269,10 +280,12 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     void apply().then(() => scrollTo(target));
   });
 
-  // "Show all" opens the list and puts the keyboard in its search box, the
-  // first control of the list's filters.
+  // "Show all" opens the list and moves focus to its heading, so a keyboard
+  // or screen reader user carries on at the list's filters.
   showAll?.addEventListener("click", () => {
-    if (openList()) form.querySelector<HTMLElement>("[name=q]")?.focus();
+    if (!openList()) return;
+    const heading = root.querySelector<HTMLElement>("#find-title");
+    (heading ?? form.querySelector<HTMLElement>("input, select"))?.focus();
   });
 
   form.hidden = false;

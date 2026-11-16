@@ -2,12 +2,13 @@
 // so the page can open on a short list instead of all 501 (plan step L1a;
 // L1b renders it). Pure: no DOM, no network, no clock, no randomness.
 //
-// The ranking reads only a card's stage, type, city, name and id. No field
-// for money, sponsorship or self-description enters it, so nothing paid,
-// sponsored or self-promotional can move a resource up (voice.md: founders
-// first, never a vendor directory).
+// The ranking reads only a card's stage, substage, type, city, name and id.
+// No field for money, sponsorship or self-description enters it, so nothing
+// paid, sponsored or self-promotional can move a resource up (voice.md:
+// founders first, never a vendor directory).
 //
-// Commercial types (COMMERCIAL below) are firms that sell to founders. A
+// Commercial cards (isCommercial below: a COMMERCIAL type, or any record in
+// the service-providers substage) are firms that sell to founders. A
 // featured pick reads as an endorsement, so they never appear in a first-need
 // list, and a stage shows one at most, only to fill a slot that its
 // non-commercial cards cannot.
@@ -39,6 +40,18 @@ type ResourceType = ResourceCard["type"];
  * at most between them, and only once no non-commercial card is left.
  */
 export const COMMERCIAL: ReadonlySet<ResourceType> = new Set(["service-provider", "investor", "coworking"]);
+
+/**
+ * The substage of firms that sell to founders. Its records count as
+ * commercial whatever their type: a scoring company typed "accelerator" or an
+ * investor platform typed "event" still sells to founders (PR #89 review).
+ */
+export const COMMERCIAL_SUBSTAGE = "service-providers";
+
+/** True for a card that sells a service, capital or space to founders. */
+export function isCommercial(card: Pick<ResourceCard, "type" | "substage">): boolean {
+  return COMMERCIAL.has(card.type) || card.substage === COMMERCIAL_SUBSTAGE;
+}
 
 /** At most this many commercial picks in one stage. */
 export const COMMERCIAL_PER_STAGE = 1;
@@ -156,8 +169,8 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
       () => true,
     ];
 
-    const nonCommercial = ranked.filter((c) => !COMMERCIAL.has(c.type));
-    const commercialCards = ranked.filter((c) => COMMERCIAL.has(c.type));
+    const nonCommercial = ranked.filter((c) => !isCommercial(c));
+    const commercialCards = ranked.filter(isCommercial);
     let commercial = 0;
     while (picks.length < PICKS_PER_STAGE) {
       const pool =
@@ -177,7 +190,7 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
             ? "first-need"
             : "spread";
       picks.push({ card, reason });
-      if (COMMERCIAL.has(card.type)) commercial += 1;
+      if (isCommercial(card)) commercial += 1;
       types.add(card.type);
       const place = placeOf(card);
       if (place !== null) cities.add(place);

@@ -96,6 +96,28 @@ describe("/ecosystem-canvas/", () => {
     expect(noscript).toMatch(/\.canvas-show\s*\{\s*display:\s*none/);
   });
 
+  // PR #89 review: the search box stays above the picks, so a visitor who
+  // came to search needs no extra click. It joins the filter form by its form
+  // attribute, and hides without JavaScript like the form.
+  it("keeps the search box in the first section, joined to the filter form", () => {
+    const top = canvas.querySelector("section[aria-labelledby='canvas-title']")!;
+    const q = top.querySelector<HTMLInputElement>("input[name=q][type=search]");
+    expect(q?.getAttribute("form")).toBe("canvas-filters");
+    expect(canvas.querySelector("form#canvas-filters[data-canvas-filters]")).not.toBeNull();
+    expect(canvas.querySelector(`label[for='${q?.id}']`)?.textContent?.trim()).toBe("Search");
+    expect(q?.closest("[data-pagefind-ignore]")).not.toBeNull();
+    const noscript = [...canvas.querySelectorAll("noscript")].map((n) => n.textContent ?? "").join(" ");
+    expect(noscript).toMatch(/\.canvas-search\s*\{\s*display:\s*none/);
+  });
+
+  // The list ships hidden for the island; Pagefind reads the built HTML, and
+  // only data-pagefind-ignore keeps text out, so every row stays indexable.
+  it("leaves the hidden list and its rows open to the search index", () => {
+    const full = canvas.querySelector("[data-canvas-full]")!;
+    expect(full.closest("[data-pagefind-ignore]")).toBeNull();
+    for (const card of cards) expect(card.closest("[data-pagefind-ignore]"), card.dataset.id).toBeNull();
+  });
+
   it("counts the real list in the control", () => {
     const text = canvas.querySelector("button[data-canvas-show-all]")?.textContent?.trim();
     expect(text).toBe(`Show all ${cards.length} resources`);

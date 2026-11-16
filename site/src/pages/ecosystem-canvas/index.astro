@@ -3,11 +3,12 @@
 // Canvas. Owner: L3. Decision 46 retitled the page; the URL, the anchors and
 // the dataset's name (the Ecosystem Canvas) stay.
 //
-// One job: find a resource. The page opens on 12 picks, not 501 rows (step
-// L1b, 2026-11-16): the title, one line and Resourcus's "Ask a question
-// instead" disclosure (40 words or fewer), then "Start here", up to 3 picks
-// a stage from topPicks() (StartHere.astro). Under it, "Show all N
-// resources" opens the full list with its search and chips. The stage chips
+// One job: find a resource. The page opens on up to 12 picks, not 501 rows
+// (step L1b, 2026-11-16): the title, one line, the search box and
+// Resourcus's "Ask a question instead" disclosure (40 words or fewer), then
+// "Start here", up to 3 picks a stage from topPicks() (StartHere.astro).
+// Typing a search opens the full list and sets the picks aside. Under the
+// picks, "Show all N resources" opens the full list with its chips. The stage chips
 // are the journey, Idea to Launch to Growth with Support alongside, each with
 // its count. The rows go by stage, A to Z within each substage: the island
 // shows the first 24 matches and a "Show more" button, and every row stays in
@@ -24,6 +25,7 @@
 // page. The "r-" prefix keeps a resource id from colliding with a stage anchor.
 import AskAi from "../../components/ai/AskAi.astro";
 import CanvasFilters from "../../components/canvas/CanvasFilters.astro";
+import CanvasSearch from "../../components/canvas/CanvasSearch.astro";
 import { activeCards, groupByStage } from "../../components/canvas/canvas-data";
 import { groupCountText, moreText, PAGE_SIZE, shownText } from "../../components/canvas/filter-logic";
 import { showAllText, STAGE_LABELS, STAGE_SUMMARIES } from "../../components/canvas/labels";
@@ -50,6 +52,7 @@ const groups = groupByStage(cards);
       <div class="wrap stack">
         <h1 id="canvas-title">Startup Resources</h1>
         <p class="canvas-intro">Programs, events, investors and support for Colorado founders, from a first idea to growth.</p>
+        <div data-pagefind-ignore><CanvasSearch /></div>
         <details class="canvas-ask" data-canvas-ask data-pagefind-ignore>
           <summary>Ask a question instead</summary>
           {/* The panel's own heading is an h3; this keeps the outline whole. */}
@@ -70,7 +73,7 @@ const groups = groupByStage(cards);
         </p>
         <div class="canvas-full" id="all-resources" data-canvas-full hidden>
           <div class="stack canvas-find" data-pagefind-ignore>
-            <h2 id="find-title">Find a resource</h2>
+            <h2 id="find-title" tabindex="-1">Find a resource</h2>
             <CanvasFilters cards={cards} />
           </div>
           {

@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
 import { cityLabel, PICK_REASON_LABELS, showAllText, TYPE_LABELS } from "../../../src/components/canvas/labels";
-import { COMMERCIAL, topPicks } from "../../../src/components/canvas/top-picks";
+import { isCommercial, topPicks } from "../../../src/components/canvas/top-picks";
 
 const DATA = path.resolve(import.meta.dirname, "..", "..", "..", "..", "data", "resources");
 const active = readdirSync(DATA, { withFileTypes: true })
@@ -41,7 +41,20 @@ describe("topPicks on the real records", () => {
   });
 
   it("holds one commercial pick a stage at most", () => {
-    for (const s of result) expect(s.picks.filter((p) => COMMERCIAL.has(p.card.type)).length).toBeLessThanOrEqual(1);
+    for (const s of result) expect(s.picks.filter((p) => isCommercial(p.card)).length).toBeLessThanOrEqual(1);
+  });
+
+  // PR #89 review: a service provider typed "accelerator" or "event" read as
+  // a vendor endorsement. Any service-providers record is commercial now.
+  it("picks no commercial card while a non-commercial card at that stage was left out", () => {
+    for (const s of result) {
+      const picked = new Set(s.picks.map((p) => p.card.id));
+      const leftOut = active.filter((c) => c.stage === s.stage && !isCommercial(c) && !picked.has(c.id));
+      const commercial = s.picks.filter((p) => isCommercial(p.card)).map((p) => p.card.name);
+      if (leftOut.length > 0) expect(commercial, s.stage).toEqual([]);
+      // A stage with no non-commercial card shows one commercial pick at most.
+      else expect(commercial.length, s.stage).toBeLessThanOrEqual(1);
+    }
   });
 
   it("labels each reason and the control without ranking words", () => {

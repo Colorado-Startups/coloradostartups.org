@@ -29,8 +29,35 @@ test.describe("/ecosystem-canvas/", () => {
     await expect(show).toHaveAttribute("aria-expanded", "false");
     await show.focus();
     await page.keyboard.press("Enter");
-    await expect(page.getByLabel("Search")).toBeFocused();
+    await expect(page.getByRole("heading", { name: "Find a resource" })).toBeFocused();
     await expect(visibleCards(page)).toHaveCount(24);
+  });
+
+  test("keeps the search box above the picks; typing opens and filters the list", async ({ page }) => {
+    await page.goto("/ecosystem-canvas/");
+    const search = page.getByRole("searchbox", { name: "Search" });
+    await expect(search).toBeVisible();
+    await search.fill("coworking");
+    await expect(count(page)).toHaveText(/^\d+ of \d+ resources match\.$/);
+    await expect(page.locator("[data-canvas-picks]")).toBeHidden();
+    expect(await visibleCards(page).count()).toBeGreaterThan(0);
+  });
+
+  test("opens the full list on a link to a resource that is not a pick", async ({ page }) => {
+    await page.goto("/ecosystem-canvas/");
+    const id = await page.evaluate(() => {
+      const picked = new Set([...document.querySelectorAll<HTMLElement>("[data-pick]")].map((p) => p.dataset.id));
+      const rows = [...document.querySelectorAll<HTMLElement>("[data-resource]")].filter((r) => !picked.has(r.dataset.id));
+      // The last row sits far past the first page of 24.
+      return rows.at(-1)?.dataset.id ?? "";
+    });
+    expect(id).not.toBe("");
+    const fresh = await page.context().newPage();
+    await fresh.goto(`/ecosystem-canvas/#r-${id}`);
+    await expect(fresh.locator("[data-canvas-full]")).toBeVisible();
+    await expect(fresh.locator(`[data-resource][data-id="${id}"]`)).toBeVisible();
+    await expect(fresh.locator(`#r-${id}`)).toBeInViewport();
+    await fresh.close();
   });
 
   test("shows the full list below the picks without JavaScript", async ({ browser }) => {
