@@ -5,6 +5,8 @@ import { expect, test } from "@playwright/test";
 // usability reviews found each one below the fold.
 
 const PAGES = [
+  // Home's name and join buttons stay in the first screen above the map (2026-11-16).
+  { route: "/", action: { role: "link", name: "Join the Slack" } },
   // Step F1: the waitlist link is the main action; the Slack stays beside it.
   { route: "/founders/", action: { role: "link", name: "Join the waitlist" } },
   { route: "/founders/", action: { role: "link", name: "Join the Slack" } },
