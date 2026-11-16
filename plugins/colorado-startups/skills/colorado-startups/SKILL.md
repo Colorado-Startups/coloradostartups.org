@@ -1,11 +1,13 @@
 ---
 name: colorado-startups
-description: Use for questions about starting or growing a company in Colorado. Covers Colorado startup resources (programs, investors, coworking and services for founders) and upcoming Colorado startup events. Also covers the companies on the Colorado Startups Leaderboard, the founder guides and the three Colorado Startups regions. Answers from the Colorado Startups MCP server, which is read-only and needs no key.
+description: Use for questions about starting or growing a company in Colorado: startup resources, events, Leaderboard companies, founder guides and the three regions, from the read-only Colorado Startups server.
 ---
 
 # Colorado Startups
 
 Answer from the Colorado Startups MCP server at https://coloradostartups.org/mcp. It is read-only and needs no key. Founders building in Colorado come first.
+
+Startup Resources are programs, investors, coworking and services for founders. The Leaderboard's honorees are companies with a Colorado headquarters or a Colorado office.
 
 ## Which tool for which question
 

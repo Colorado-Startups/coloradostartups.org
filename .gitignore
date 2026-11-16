@@ -48,5 +48,3 @@ quality/dist/
 
 # Open Graph cards: built in prebuild by scripts/og/build.mjs (CI and Workers Builds)
 site/public/og/
-# The skill zip for claude.ai: built in prebuild by scripts/skill-zip/build.mjs
-site/public/downloads/

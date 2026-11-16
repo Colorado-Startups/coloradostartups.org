@@ -24,9 +24,9 @@ Inside a session, `/plugin marketplace add Colorado-Startups/coloradostartups.or
 
 | Where | What |
 | --- | --- |
-| Download | https://coloradostartups.org/downloads/colorado-startups-skill.zip, the skill folder as a zip |
+| Download | https://coloradostartups.org/downloads/colorado-startups-skill.zip: a `colorado-startups/` folder with `SKILL.md` inside |
 | Upload | In claude.ai, add it as a skill |
-| Built by | [`scripts/skill-zip/build.mjs`](../../scripts/skill-zip/build.mjs), in the site's prebuild |
+| Built by | [`site/src/pages/downloads/colorado-startups-skill.zip.ts`](../../site/src/pages/downloads/colorado-startups-skill.zip.ts), when the site builds |
 
 The skill needs the MCP server, so add https://coloradostartups.org/mcp as a connector too.
 

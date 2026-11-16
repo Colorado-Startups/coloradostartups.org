@@ -9,8 +9,9 @@ import zlib from "node:zlib";
 import { REGION_IDS, STAGES } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
-import { buildSkillZip, SKILL_DIR, skillFiles } from "../../../../scripts/skill-zip/build.mjs";
 import { MCP_URL } from "../../../src/components/ai/prompt";
+import { skillFiles, skillZip } from "../../../src/lib/skill-zip/skill";
+import { unzip, ZIP_MAGIC } from "../../../src/lib/skill-zip/zip";
 import { INSTRUCTIONS, SERVER_NAME } from "../../../worker/mcp/server";
 import { MAX_RESULTS, PATH_STEPS, WEEK_EVENTS } from "../../../worker/mcp/tools";
 
@@ -68,13 +69,15 @@ describe("the plugin", () => {
 describe("the skill", () => {
   const front = /^---\n([\s\S]*?)\n---\n/.exec(skill);
 
-  it("has frontmatter with only the name and a description", () => {
+  // claude.ai: name up to 64 characters, description up to 200
+  // (support.claude.com, "How to create custom skills", read 2026-11-16).
+  it("has frontmatter with only a name and a description claude.ai accepts", () => {
     expect(front).not.toBeNull();
     const fields = Object.fromEntries(front![1].split("\n").map((l) => [l.slice(0, l.indexOf(":")), l.slice(l.indexOf(":") + 1).trim()]));
     expect(Object.keys(fields)).toEqual(["name", "description"]);
     expect(fields.name).toBe("colorado-startups");
     expect(fields.description.length).toBeGreaterThan(80);
-    expect(fields.description.length).toBeLessThanOrEqual(1024);
+    expect(fields.description.length).toBeLessThanOrEqual(200);
   });
 
   it("stays short", () => {
@@ -122,33 +125,19 @@ describe("the plugin's files", () => {
   });
 });
 
-/** The names and bytes in a zip, read back from its central directory. */
-function unzip(buf: Buffer): { name: string; data: Buffer; crc: number }[] {
-  const end = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
-  const count = buf.readUInt16LE(end + 10);
-  let at = buf.readUInt32LE(end + 16);
-  const out = [];
-  for (let i = 0; i < count; i++) {
-    expect(buf.readUInt32LE(at)).toBe(0x02014b50);
-    const crc = buf.readUInt32LE(at + 16);
-    const size = buf.readUInt32LE(at + 20);
-    const nameLen = buf.readUInt16LE(at + 28);
-    const local = buf.readUInt32LE(at + 42);
-    const name = buf.toString("utf8", at + 46, at + 46 + nameLen);
-    const start = local + 30 + buf.readUInt16LE(local + 26) + buf.readUInt16LE(local + 28);
-    out.push({ name, crc, data: zlib.inflateRawSync(buf.subarray(start, start + size)) });
-    at += 46 + nameLen;
-  }
-  return out;
-}
-
 describe("the skill zip for claude.ai", () => {
-  it("holds the skill folder: colorado-startups/SKILL.md, first", () => {
+  const SKILL_DIR = path.join(PLUGIN, "skills", "colorado-startups");
+
+  it("holds every file in the skill folder, under colorado-startups/, SKILL.md first", () => {
+    const onDisk = filesUnder(SKILL_DIR).map((f) => `colorado-startups/${path.relative(SKILL_DIR, f).split(path.sep).join("/")}`);
     expect(skillFiles().map((f) => f.name)).toEqual(["colorado-startups/SKILL.md"]);
+    expect(skillFiles().map((f) => f.name).sort()).toEqual(onDisk.sort());
   });
 
   it("reads back to the same files, with matching checksums", () => {
-    const entries = unzip(buildSkillZip());
+    const buf = skillZip();
+    expect(buf.subarray(0, 4).equals(ZIP_MAGIC)).toBe(true);
+    const entries = unzip(buf);
     expect(entries.map((e) => e.name)).toEqual(skillFiles().map((f) => f.name));
     for (const e of entries) {
       const original = readFileSync(path.join(SKILL_DIR, e.name.slice("colorado-startups/".length)));
@@ -158,6 +147,6 @@ describe("the skill zip for claude.ai", () => {
   });
 
   it("gives the same bytes every build", () => {
-    expect(buildSkillZip().equals(buildSkillZip())).toBe(true);
+    expect(skillZip().equals(skillZip())).toBe(true);
   });
 });
