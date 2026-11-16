@@ -1,9 +1,11 @@
-// The picture under each guide's answer. The index, the topic guides and the
+// The picture on each guide page. The index, the topic guides and the
 // startup credits guide show the brand's guides scene (brand/guides, from
 // brand v4.0.0 dist/website/guides.jpg, viewed 2026-11-15); no keeper is in
 // it. Each city guide shows its own city's brand place painting
-// (brand/<place>) with the brand's caption as alt (PLACE_ART_ALT). All are
-// 16:9 boxes below the first screen, so they load lazily.
+// (brand/<place>) with the brand's caption as alt (PLACE_ART_ALT). A topic
+// or city guide shows it after its answer chart, so the chart is the page's
+// first picture; the index and the credits guide close the page with it
+// (2026-11-16). All are 16:9 boxes that load lazily.
 import type { GuideSlug } from "../../lib/guides/core";
 import { PLACE_ART_ALT } from "../art/keepers";
 

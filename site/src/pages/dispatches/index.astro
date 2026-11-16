@@ -4,8 +4,11 @@
 // dispatch (hard constraint 11). Publicus's disclosure comes from
 // data/team/dwarves.yaml, because it is named here (hard constraint 10).
 // L7's small portrait of Publicus sits beside the lines that name it (#209);
-// its alt text, from portraitAlt(), says it is an AI agent too. It sits in the
-// first screen, so it loads eagerly (#428).
+// its alt text, from portraitAlt(), says it is an AI agent too. The log leads
+// (Paul, 2026-11-16: "they're supposed to be getting info"): at 375 px the
+// herald block above it pushed the first dispatch to the bottom of the first
+// screen, so the block now closes the page under the log, with its
+// disclosure, and the portrait loads lazily.
 import { getEntry } from "astro:content";
 
 import { portraitAlt } from "../../components/art/keepers";
@@ -29,21 +32,6 @@ if (!publicus) throw new Error("data/team/dwarves.yaml has no publicus entry");
     <div class="wrap stack">
       <h1 id="dispatches-title">Dispatches</h1>
       <p class="lede">News from Colorado Startups, newest first.</p>
-      <div class="herald">
-        <Portrait
-          id="publicus"
-          size="small"
-          alt={portraitAlt("publicus", publicus.data.name, publicus.data.title)}
-          sizes="80px"
-          widths={[80, 160, 320]}
-          loading="eager"
-        />
-        <p>
-          <a href="/team/#publicus">Publicus</a>, our herald, keeps this log and drafts some of what goes in it. A person
-          reviews and publishes every dispatch.
-        </p>
-        <p class="ai-note" data-disclosure>{publicus.data.disclosure}</p>
-      </div>
       <p class="meta">
         Follow along by <a href="/rss.xml">RSS</a> or <a href="/feed.json">JSON Feed</a>.
       </p>
@@ -67,18 +55,34 @@ if (!publicus) throw new Error("data/team/dwarves.yaml has no publicus entry");
           </ol>
         )
       }
+      <div class="herald">
+        <Portrait
+          id="publicus"
+          size="small"
+          alt={portraitAlt("publicus", publicus.data.name, publicus.data.title)}
+          sizes="80px"
+          widths={[80, 160, 320]}
+        />
+        <p>
+          <a href="/team/#publicus">Publicus</a>, our herald, keeps this log and drafts some of what goes in it. A person
+          reviews and publishes every dispatch.
+        </p>
+        <p class="ai-note" data-disclosure>{publicus.data.disclosure}</p>
+      </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* Publicus's portrait beside the lines that name it. It floats, so on a
-     narrow screen the text wraps under it. The disclosure is its own block
-     formatting context, so its rule never runs behind the portrait. */
+  /* Publicus's portrait beside the lines that name it, under the log. It
+     floats, so on a narrow screen the text wraps under it. The disclosure is
+     its own block formatting context, so its rule never runs behind the
+     portrait. */
   .herald {
     --portrait-small: 80px;
     display: flow-root;
     max-width: var(--t-measure);
+    margin-top: var(--s-6);
   }
   .herald :global(.portrait) {
     float: left;

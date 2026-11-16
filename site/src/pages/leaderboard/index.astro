@@ -6,11 +6,12 @@
 // says nothing about investing (decision 17), so the old "Recruit Series B"
 // band is gone. Styled with existing tokens only. Owner: L2.
 //
-// The title is carved in a lintel, and the Great Hall picture sits beside the
-// lede from 64rem (#239, #723). On a phone the picture stays a small seal
-// under the actions, smaller than the lede, so the lede stays the largest
-// thing in the first screen and the mobile LCP stays text. Its alt is
-// HALL_ART_ALT, the brand's caption.
+// The title is carved in a lintel (#239). The page leads with Colorado (Paul,
+// 2026-11-16: "you're supposed to be seeing the map"): the first section
+// holds only the title, the lede and the actions, so the HQ map is the first
+// picture. The Great Hall picture closes the page as a seal in the nominate
+// hearth (HallSeal, lazy, the brand's caption as alt), as it closes the
+// dispatches and the thanks pages.
 //
 // L3b: the honorees list has a Table and Cards switch (HonoreesTable), and
 // the "Ask your AI" row (A3a) sits once on the page, in a band between the
@@ -18,8 +19,7 @@
 import { getCollection } from "astro:content";
 
 import AskAi from "../../components/ai/AskAi.astro";
-import ArtImage from "../../components/art/ArtImage.astro";
-import { HALL_ART_ALT } from "../../components/art/keepers";
+import HallSeal from "../../components/hall/HallSeal.astro";
 import ChartFigure from "../../components/leaderboard/ChartFigure.astro";
 import CityPanel from "../../components/leaderboard/CityPanel.astro";
 import HonoreesTable from "../../components/leaderboard/HonoreesTable.astro";
@@ -95,25 +95,13 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
   {/* The /ask/ search filters by this type (Pagefind). */}
   <span data-pagefind-filter="type:Companies"></span>
   <section class="section section--lit">
-    <div class="wrap lb-hero">
-      <div>
-        <Banner as="h1" variant="lintel">The Leaderboard</Banner>
-        <p class="lede">Companies building in Colorado, each verified from public sources.</p>
-        <div class="btn-row">
-          <a class="btn btn--gold" href="/leaderboard/nominate/">Nominate your company</a>
-          <a class="btn btn--stone" href={`#${edition.id}`}>Find a company</a>
-        </div>
+    <div class="wrap">
+      <Banner as="h1" variant="lintel">The Leaderboard</Banner>
+      <p class="lede">Companies building in Colorado, each verified from public sources.</p>
+      <div class="btn-row">
+        <a class="btn btn--gold" href="/leaderboard/nominate/">Nominate your company</a>
+        <a class="btn btn--stone" href={`#${edition.id}`}>Find a company</a>
       </div>
-      <ArtImage
-        src="brand/golden"
-        alt={HALL_ART_ALT}
-        aspect="21 / 9"
-        widths={[400, 640, 960]}
-        sizes="(min-width: 64rem) 26rem, 14rem"
-        loading="lazy"
-        motion="none"
-        class="lb-hero__art"
-      />
     </div>
   </section>
 
@@ -204,6 +192,7 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
       <div class="btn-row">
         <a class="btn btn--gold" href="/leaderboard/nominate/">Nominate your company</a>
       </div>
+      <HallSeal />
     </div>
   </section>
 </BaseLayout>
@@ -219,29 +208,6 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
 </script>
 
 <style>
-  .lb-hero {
-    display: grid;
-    gap: var(--s-6);
-    align-items: center;
-  }
-  /* A small seal on a phone (14rem); ArtImage renders the figure in its own
-     scope, so this reaches it by class. */
-  .lb-hero :global(.lb-hero__art) {
-    width: min(100%, 14rem);
-    border-radius: var(--r-card);
-    box-shadow: var(--sh-glow);
-  }
-  /* Text and picture side by side from 64rem, the text wider. */
-  @media (min-width: 64rem) {
-    .lb-hero {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--s-7);
-    }
-    .lb-hero :global(.lb-hero__art) {
-      width: min(100%, 26rem);
-      justify-self: end;
-    }
-  }
   .lb-source {
     margin-bottom: var(--s-6);
   }

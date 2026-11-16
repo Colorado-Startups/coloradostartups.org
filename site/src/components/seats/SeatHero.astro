@@ -1,10 +1,10 @@
 ---
-// A seat page's hero (lane L38): the seat's art from the site's own image
-// pipeline, then a plaque with the title, decision 67's unpaid volunteer
-// line, the kit's one-liner and one button. The button jumps to the steps
-// (#how-to-apply), not past them to the form, so a reader sees how to apply
-// before applying.
-import ArtImage from "../art/ArtImage.astro";
+// A seat page's hero (lane L38): a plaque with the title, decision 67's
+// unpaid volunteer line, the kit's one-liner and one button. The button
+// jumps to the steps (#how-to-apply), not past them to the form, so a reader
+// sees how to apply before applying. The words lead (Paul, 2026-11-16:
+// "they're supposed to be getting info"), so the seat's painting left the
+// hero; the page shows it under "Why it matters" ([seat].astro).
 import { UNPAID_VOLUNTEER_LINE } from "../positions/positions";
 import Button from "../ui/Button.astro";
 import { withKeeperDisclosure } from "../../lib/seats/copy";
@@ -27,17 +27,6 @@ const { seat, hero } = Astro.props;
         <li aria-current="page">{seat.title}</li>
       </ol>
     </nav>
-    <ArtImage
-      src={hero.art}
-      alt={hero.alt}
-      aspect="21 / 9"
-      widths={[640, 960, 1280, 1920]}
-      sizes="(max-width: 1180px) 100vw, 1180px"
-      loading="eager"
-      motion="glow"
-      label="Illustration in progress"
-      class="seat-hero__art"
-    />
     <div class="panel panel--raised seat-hero__plaque">
       <p class="kicker">{hero.kicker}</p>
       <h1 id="seat-title">{seat.title}</h1>
