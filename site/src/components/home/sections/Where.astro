@@ -1,33 +1,72 @@
 ---
 // Where: the statewide map as its drawing over shaded relief (ColoradoMap,
 // live={false}: no MapLibre here, for the 75 KB JavaScript goal), each zone
-// a link to its region, and a chip per region.
-import { REGION_COLORS } from "../../../lib/regions/map";
-import { REGIONS } from "../../../lib/regions/match";
+// the entrance to its region (step W2). Hover, focus or tap on a zone lifts
+// it and shows a card with the region's crest, name and three counts. The
+// table beside the map holds the same crest, name and counts, so a phone or a
+// screen reader gets all of it without hover. Counts come from zone-counts.ts,
+// in the regions' fixed data order: regions are equals, never ranked.
+import { brandArt } from "../../art/art-assets";
+import { regionCrestKey } from "../../art/keepers";
 import ColoradoMap from "../../map/ColoradoMap.astro";
+import { COUNT_LABELS, zoneCounts } from "../../map/zone-counts";
+import { REGION_COLORS } from "../../../lib/regions/map";
+
+const now = new Date();
+const zones = await zoneCounts(now);
+const rows = zones.map((z) => {
+  const crest = brandArt(regionCrestKey(z.id));
+  if (!crest) throw new Error(`no crest for region "${z.id}"; add it to brand.lock.json`);
+  return { ...z, crest };
+});
 ---
 
 <section class="section section--lit" aria-labelledby="where">
   <div class="wrap where">
     <div class="where__copy">
       <h2 id="where">Three regions along the Front Range</h2>
-      <ul class="region-links" role="list">
-        {
-          REGIONS.map((r) => (
-            <li>
-              <a class="region-link" href={`/regions/${r.id}/`} style={`--region-color: ${REGION_COLORS[r.id]}`}>
-                <span class="region-link__swatch" aria-hidden="true" />
-                <span class="region-link__name">{r.name}</span>
-                <span class="region-link__cities">{r.cities.slice(0, 2).join(" · ")}</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      <table class="zones" data-zone-counts data-as-of={now.toISOString()}>
+        <caption class="visually-hidden">Each region's counts</caption>
+        <thead>
+          <tr>
+            <th scope="col">Region</th>
+            {COUNT_LABELS.map(([key, label]) => <th scope="col" data-count={key}>{label}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr data-region={r.id} style={`--region-color: ${REGION_COLORS[r.id]}`}>
+                <th scope="row">
+                  <a class="region-link" href={`/regions/${r.id}/`}>
+                    <img class="zones__crest" src={r.crest.src} srcset={r.crest.srcset} sizes="40px" width="40" height="40" alt="" loading="lazy" decoding="async" />
+                    <span class="region-link__name">{r.name}</span>
+                  </a>
+                </th>
+                {COUNT_LABELS.map(([key]) => <td data-count={key}>{r[key]}</td>)}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
     </div>
-    <ColoradoMap id="home-map" live={false} caption="" />
+    <ColoradoMap id="home-map" live={false} caption="" zones={zones} />
   </div>
 </section>
+
+<script>
+  // Escape closes a zone's card (hover content must be dismissible); the next
+  // pointer move onto the map or focus inside it lets the cards show again.
+  const map = document.getElementById("home-map");
+  if (map) {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") map.setAttribute("data-dismissed", "");
+    });
+    const reopen = () => map.removeAttribute("data-dismissed");
+    map.addEventListener("pointerover", reopen);
+    map.addEventListener("focusin", reopen);
+  }
+</script>
 
 <style>
   .where {
@@ -36,52 +75,79 @@ import ColoradoMap from "../../map/ColoradoMap.astro";
     gap: var(--s-6);
     align-items: center;
   }
-  .region-links {
-    display: grid;
-    gap: var(--s-2);
+  .zones {
+    width: 100%;
     margin: var(--s-4) 0 0;
-    padding: 0;
-    list-style: none;
+    border-collapse: separate;
+    border-spacing: 0 var(--s-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .zones thead th {
+    padding: 0 var(--s-2);
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+    font-weight: 400;
+    line-height: 1.2;
+    text-align: end;
+    vertical-align: bottom;
+  }
+  .zones thead th:first-child {
+    text-align: start;
+  }
+  .zones tbody > tr > * {
+    padding: var(--s-2);
+    background: var(--c-surface);
+  }
+  .zones tbody th {
+    padding-inline-start: 0;
+    border-left: var(--line-bold) solid var(--region-color);
+    border-radius: var(--r-card) 0 0 var(--r-card);
+    text-align: start;
+    font-weight: 400;
+  }
+  .zones tbody td {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-1);
+    text-align: end;
+  }
+  .zones tbody td:last-child {
+    border-radius: 0 var(--r-card) var(--r-card) 0;
   }
   .region-link {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: var(--s-1) var(--s-3);
+    gap: var(--s-2);
     min-height: var(--size-tap);
-    padding: var(--s-2) var(--s-3);
-    border-radius: var(--r-card);
-    background: var(--c-surface);
+    padding-inline-start: var(--s-2);
     color: var(--c-text);
     text-decoration: none;
   }
-  .region-link__swatch {
-    width: 14px;
-    height: 14px;
-    border-radius: var(--r-chisel);
-    background: var(--region-color);
+  .zones__crest {
+    flex: none;
+    width: 40px;
+    height: 40px;
   }
   .region-link__name {
     font-weight: 700;
   }
-  .region-link__cities {
-    margin-left: auto;
-    color: var(--c-text-dim);
-    font-size: var(--t-step--1);
-  }
   .region-link:hover .region-link__name,
   .region-link:focus-visible .region-link__name {
     text-decoration: underline;
-  }
-
-  /* A list gets the reading measure by default (global.css); this one is a grid. */
-  .region-links {
-    max-width: none;
+    text-decoration-thickness: var(--line-edge);
   }
 
   @media (max-width: 760px) {
     .where {
       grid-template-columns: 1fr;
+    }
+  }
+  /* At phone width the crest sits above the name, so four columns fit 375 px. */
+  @media (max-width: 420px) {
+    .region-link {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--s-1);
     }
   }
 </style>
