@@ -10,12 +10,9 @@ import { parse } from "yaml";
 import {
   BUILDERS_COUNT,
   pickBuilders,
-  SECTOR_WORD,
-  sectorWord,
   weekIndex,
 } from "../../../src/lib/home/builders";
 import { buildBoard, latestEdition } from "../../../src/lib/leaderboard/board";
-import { SECTORS } from "../../../src/lib/leaderboard/sectors";
 import {
   ELSEWHERE,
   regionForCity,
@@ -115,12 +112,11 @@ describe("the Builders pick", () => {
     ).toEqual(picked);
   });
 
-  it("labels each company with its region and one word for its sector", () => {
-    for (const s of SECTORS) expect(countWords(SECTOR_WORD[s]), s).toBe(1);
-    expect(sectorWord("Space and aerospace")).toBe("Space");
+  it("gives each company its name and region, and nothing else about it", () => {
     for (const b of pickBuilders(board, REGIONS, MONDAY)) {
       const c = board.find((x) => x.id === b.id)!;
-      expect(b.sector).toBe(SECTOR_WORD[c.sector as keyof typeof SECTOR_WORD]);
+      expect(Object.keys(b).sort()).toEqual(["id", "name", "region"]);
+      expect(b.name).toBe(c.name);
       expect(b.region).toBe(regionForCity(c.hq_city, REGIONS));
     }
   });
@@ -129,7 +125,7 @@ describe("the Builders pick", () => {
     let most = 0;
     for (let w = 0; w < WEEKS; w++) {
       const tiles = pickBuilders(board, REGIONS, at(7 * w)).reduce(
-        (n, b) => n + countWords(b.name) + countWords(b.sector),
+        (n, b) => n + countWords(b.name),
         0,
       );
       most = Math.max(most, tiles + BAND_FIXED_WORDS);
@@ -138,8 +134,7 @@ describe("the Builders pick", () => {
       .map((c) => countWords(c.name))
       .sort((a, b) => b - a)
       .slice(0, BUILDERS_COUNT);
-    const worst =
-      longest.reduce((a, b) => a + b, 0) + BUILDERS_COUNT + BAND_FIXED_WORDS;
+    const worst = longest.reduce((a, b) => a + b, 0) + BAND_FIXED_WORDS;
     console.info(
       `Builders band: at most ${most} words in a week; ${worst} with the 12 longest names`,
     );

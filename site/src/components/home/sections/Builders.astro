@@ -9,10 +9,10 @@
 // | Each tile shows | How |
 // | --- | --- |
 // | Name | the tile is one link to the company's row on /leaderboard/ |
-// | Sector | one word (SECTOR_WORD), so 12 tiles fit the band's 60 words |
 // | Region | the tile's left edge in the region's color (REGION_COLORS), as on the map legend; its name for screen readers |
 //
-// Nothing opens on hover or tap, and the band runs no script.
+// A tile makes no claim about the company beyond its name. Nothing opens on
+// hover or tap, and the band runs no script.
 import { WAYS_IN, type RegionId } from "@cs/shared";
 import { getCollection } from "astro:content";
 
@@ -39,10 +39,7 @@ const color = (region: string) => (region === ELSEWHERE ? "var(--c-text-dim)" : 
             <li class="builder" style={`--region-color: ${color(b.region)}`} data-builder={b.id}>
               <a class="builder__link" href={`${WAYS_IN.leaderboard}#company-${b.id}`}>
                 <span class="builder__name">{b.name}</span>
-                <span class="builder__sector">
-                  {b.sector}
-                  <span class="visually-hidden">, {regionName.get(b.region) ?? "outside the three regions"}</span>
-                </span>
+                <span class="visually-hidden">, {regionName.get(b.region) ?? "outside the three regions"}</span>
               </a>
             </li>
           ))}
@@ -92,10 +89,6 @@ const color = (region: string) => (region === ELSEWHERE ? "var(--c-text-dim)" : 
   .builder__link:focus-visible .builder__name {
     text-decoration: underline;
     text-decoration-thickness: var(--line-edge);
-  }
-  .builder__sector {
-    color: var(--c-text-dim);
-    font-size: var(--t-step--1);
   }
 
   .builders__more {

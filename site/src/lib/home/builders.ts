@@ -1,6 +1,7 @@
 // The home page's Builders band (step P1): 12 companies from the latest
-// Leaderboard edition. No Astro imports, so test/dom/home/builders.test.ts
-// runs it in plain Node.
+// Leaderboard edition. A tile names the company and nothing else about it.
+// No Astro imports, so test/unit/home/builders-pick.test.ts runs it in plain
+// Node.
 //
 // | Step | Rule |
 // | --- | --- |
@@ -16,7 +17,6 @@
 import type { Company, Region } from "@cs/shared";
 
 import { countBy } from "../leaderboard/board";
-import { isSector, type Sector } from "../leaderboard/sectors";
 import {
   ELSEWHERE,
   regionForCity,
@@ -30,40 +30,6 @@ export interface Builder {
   id: string;
   name: string;
   region: RegionOrElsewhere;
-  /** One word for the company's sector, the tile's only line under its name. */
-  sector: string;
-}
-
-/** One word for each Leaderboard sector, so 12 tiles fit the band's 60 words. */
-export const SECTOR_WORD: Readonly<Record<Sector, string>> = {
-  "AI and data": "Data",
-  Software: "Software",
-  Cybersecurity: "Cybersecurity",
-  "Cloud and infrastructure": "Cloud",
-  "Space and aerospace": "Space",
-  "Defense and public safety": "Defense",
-  "Energy and climate": "Energy",
-  "Materials and manufacturing": "Manufacturing",
-  "Hardware and robotics": "Hardware",
-  "Quantum and photonics": "Quantum",
-  "Health care": "Health",
-  "Life sciences": "Biotech",
-  "Fintech and insurance": "Fintech",
-  Education: "Education",
-  "Consumer and retail": "Consumer",
-  "Food and beverage": "Food",
-  "Travel, hospitality and events": "Travel",
-  "Real estate and construction": "Property",
-  "Media and entertainment": "Media",
-  "Logistics and mobility": "Logistics",
-  "Nonprofit and community": "Nonprofit",
-};
-
-/** The sector's one word; an unknown sector (the data test forbids one) keeps its first word. */
-export function sectorWord(sector: string): string {
-  return isSector(sector)
-    ? SECTOR_WORD[sector]
-    : (sector.split(/[\s,]+/)[0] ?? sector);
 }
 
 const DAY = 86_400_000;
@@ -113,7 +79,6 @@ export function pickBuilders(
       id: c.id,
       name: c.name,
       region: regionOf(c),
-      sector: sectorWord(c.sector),
     }))
     .sort(byName);
 }

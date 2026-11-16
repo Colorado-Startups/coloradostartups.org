@@ -90,16 +90,16 @@ describe("the Builders band on home", () => {
     expect(text(band.querySelector("h2#builders"))).toBe("Builders");
   });
 
-  it("shows this week's 12, A to Z, each with its name and one word for its sector", () => {
+  it("shows this week's 12, A to Z, each showing its name and nothing more", () => {
     expect(expected).toHaveLength(BUILDERS_COUNT);
     expect(items().map((li) => li.dataset.builder)).toEqual(
       expected.map((b) => b.id),
     );
     for (const [i, li] of items().entries()) {
       expect(text(li.querySelector(".builder__name"))).toBe(expected[i]!.name);
-      expect(words(li.querySelector(".builder__sector")!)).toEqual([
-        expected[i]!.sector,
-      ]);
+      expect(words(li).join(" ")).toBe(
+        words(li.querySelector(".builder__name")!).join(" "),
+      );
     }
   });
 
@@ -107,7 +107,7 @@ describe("the Builders band on home", () => {
     for (const [i, li] of items().entries()) {
       const b = expected[i]!;
       const region = REGIONS.find((r) => r.id === b.region);
-      const sr = text(li.querySelector(".builder__sector .visually-hidden"));
+      const sr = text(li.querySelector(".builder__link .visually-hidden"));
       if (region) {
         expect(li.getAttribute("style"), b.id).toContain(
           REGION_COLORS[region.id],
