@@ -9,6 +9,8 @@ import { readDist } from "../pages";
 // The home page's maps (ColoradoMap.astro): the statewide map as a drawing over
 // its relief image, and each Why Colorado panel's header, the real map of its
 // region as one link to the region's page. No live map and no MapLibre here.
+// Since 2026-11-16 the statewide map is the first screen's image, so its
+// relief loads eagerly at high priority; the panels' maps still wait.
 const parse = (file: string) => new DOMParser().parseFromString(readDist(file), "text/html");
 const home = parse("index.html");
 const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
@@ -16,7 +18,9 @@ const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace
 describe("home maps", () => {
   it("draws the statewide map over its relief, with a focusable link on each zone", () => {
     const map = home.querySelector("figure#home-map")!;
-    expect(map.querySelector("img.colorado-map__relief")?.getAttribute("loading")).toBe("lazy");
+    const relief = map.querySelector("img.colorado-map__relief")!;
+    expect(relief.getAttribute("loading"), "the first screen's image").toBe("eager");
+    expect(relief.getAttribute("fetchpriority")).toBe("high");
     expect(map.querySelector(".colorado-map__drawing svg[role='img']")).not.toBeNull();
     expect(map.hasAttribute("data-colorado-map"), "no live map on the home page").toBe(false);
     const hits = [...map.querySelectorAll<HTMLAnchorElement>("a.colorado-map__hit")];
