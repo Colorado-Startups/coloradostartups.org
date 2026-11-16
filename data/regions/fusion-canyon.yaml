@@ -16,4 +16,15 @@ cities: [Fort Collins, Loveland, Windsor]
 nearby: [Greeley, Timnath, Wellington, Berthoud, Johnstown, Evans, Estes Park]
 note: Named for the canyon. Built on the plain. Copy never places the region inside a canyon.
 art: brand/fortcollins
+# Hotspots on brand/fortcollins (step W3a; W3b draws them). x and y are
+# percent of the painting from its top left. Each sits on a painted feature:
+# the glowing workshop, the stone bridge where gnomes gather, the round
+# green door on the left, and the hill house on the right. No place hotspot
+# until a source shows the landmark is not a place that matters to the Ute
+# or other tribes.
+hotspots:
+  - { x: 30, y: 37, kind: companies, label: Who builds here }
+  - { x: 68, y: 56, kind: event, label: Next event }
+  - { x: 22, y: 68, kind: resources, label: Where to get help }
+  - { x: 85, y: 47, kind: seat, label: The organizer seat }
 order: 3
