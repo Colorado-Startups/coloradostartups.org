@@ -67,7 +67,8 @@ describe.each(REGION_IDS)("%s painting hotspots", (id) => {
     expect(js).toContain(":popover-open");
     const css = pageCss(html);
     expect(declFor(css, ".region-art__media[data-card-open] .region-art__clip", "opacity")).toBe("0");
-    const pulse = rulesFor(css, ".hotspot__mark::after");
+    // The minifier writes ::after as :after.
+    const pulse = [...rulesFor(css, ".hotspot__mark::after"), ...rulesFor(css, ".hotspot__mark:after")];
     expect(pulse.length).toBeGreaterThan(0);
     for (const r of pulse) expect(r.at).toContain("prefers-reduced-motion");
   });
