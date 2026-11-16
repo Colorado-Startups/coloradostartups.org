@@ -11,7 +11,7 @@ export interface ListFilter {
   region: string;
   /** "week" for this week (today through Sunday, Mountain Time), or "". */
   when: string;
-  /** "in-person", "online", or "". */
+  /** "in-person", "online", or "". A row matches when its data-type lists it. */
   type: string;
 }
 
@@ -67,7 +67,8 @@ export function applyFilter(root: Element, filter: ListFilter, now: number): { s
     if (li.hidden) continue;
     const match =
       (!filter.region || li.dataset.region === filter.region) &&
-      (!filter.type || li.dataset.type === filter.type) &&
+      // data-type lists every format a row has ("in-person online" for a hybrid event, L2b).
+      (!filter.type || (li.dataset.type ?? "").split(" ").includes(filter.type)) &&
       (!lastDay || (li.dataset.day ?? "") <= lastDay);
     li.hidden = !match;
     if (match) shown++;
