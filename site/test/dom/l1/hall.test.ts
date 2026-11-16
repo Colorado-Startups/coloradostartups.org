@@ -271,8 +271,13 @@ describe("founders page", () => {
     );
   });
 
-  it("has no form and collects no data", () => {
-    expect(founders.querySelector("form, input, textarea, select")).toBeNull();
+  // Step F1: the page's one form is the waitlist. Every field sits inside it.
+  it("has one form, the waitlist, and no field outside it", () => {
+    const forms = [...main.querySelectorAll("form")];
+    expect(forms.map((f) => f.getAttribute("action"))).toEqual(["/api/waitlist"]);
+    for (const field of main.querySelectorAll("input, textarea, select")) {
+      expect(field.closest("form"), field.outerHTML.slice(0, 80)).toBe(forms[0]);
+    }
   });
 
   it("points to the Slack and the newsletter to hear first", () => {

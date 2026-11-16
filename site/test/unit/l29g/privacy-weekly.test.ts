@@ -60,7 +60,7 @@ describe("Bot protection: Turnstile receives your IP address", () => {
     const checks = /\b(?:verifyTurnstile|turnstileError)\(/;
     const routes = filesUnder("worker/routes").filter((f) => checks.test(read(f)));
     expect(routes.map((f) => path.basename(f)).sort()).toEqual(
-      ["apply.ts", "ask.ts", "join.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts"],
+      ["apply.ts", "ask.ts", "join.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts", "waitlist.ts"],
     );
     expect(bot).toContain("Our forms and the Resourcus question box use Cloudflare Turnstile");
   });
@@ -109,6 +109,23 @@ describe("the weekly job", () => {
 
   it("scheduled() runs the Slack join requests purge", () => {
     expect(retention).toContain("purgeJoinRequests(db)");
+  });
+
+  it("the founders waitlist bullet states the code's limit, and the limit plus one week", () => {
+    const days = constant("worker/routes/waitlist.ts", "WAITLIST_RETENTION_DAYS");
+    expect(days).toBe(365);
+    expect(POLICY).toContain(`A weekly job deletes each entry ${days} days after you join, whether or not the forum has opened (our commitment).`);
+    expect(POLICY).toContain(`No entry stays in our database longer than ${days + 7} days (our commitment).`);
+  });
+
+  it("the waitlist form's line says the same limit in months", () => {
+    // 365 days is the "12 months" the form promises under its button.
+    const days = constant("worker/routes/waitlist.ts", "WAITLIST_RETENTION_DAYS");
+    expect(read("src/components/founders/WaitlistForm.astro")).toContain(`We keep your details for up to ${Math.round(days / 30.4)} months.`);
+  });
+
+  it("scheduled() runs the founders waitlist purge", () => {
+    expect(retention).toContain("purgeWaitlist(db)");
   });
 
   it("the security-reports bullet states the code's limit", () => {

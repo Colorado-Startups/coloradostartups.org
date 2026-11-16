@@ -5,6 +5,8 @@ import { expect, test } from "@playwright/test";
 // usability reviews found each one below the fold.
 
 const PAGES = [
+  // Step F1: the waitlist link is the main action; the Slack stays beside it.
+  { route: "/founders/", action: { role: "link", name: "Join the waitlist" } },
   { route: "/founders/", action: { role: "link", name: "Join the Slack" } },
   { route: "/regions/photon-mountain/", action: { role: "link", name: "Join the Slack" } },
   { route: "/regions/space-peak/", action: { role: "link", name: "Join the Slack" } },

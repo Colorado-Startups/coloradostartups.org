@@ -3,17 +3,25 @@
 // WAYS_IN.discourse points here (L10). The forum does not exist yet, so its
 // copy speaks of it in the future tense.
 //
-// The site is live and the forum opens later. This page explains it and who
-// it is for. It names no date, has no form and collects no data. To hear
-// first, it points to the Slack and the newsletter. The Slack button also
-// sits under the lede, so the page's one action is in the first screen
-// (#218), beside L6's founders scene (#212, #713). No keeper is in it. On a
-// phone the scene draws the width of .wrap, 100vw less two 24 px gutters, so
-// a 412 px screen at 1.75x fetches the 640w file and a 375 px one at 2x the
-// 720w, not the 960w: the scene is the page's LCP there (cloud lab, #758).
+// The site is live and the forum opens later. This page explains it, who it
+// is for, and holds the forum's waitlist (step F1, Paul's decision of
+// 2026-11-15: waitlist now, forum platform later). It names no date. The
+// waitlist form posts to /api/waitlist, which keeps first and last name,
+// email, company name, and optionally the company's website and stage, in
+// D1 for up to 365 days (worker/routes/waitlist.ts, data/legal/privacy.md).
+// Joining it is not admission: we check that people are founders when the
+// forum opens. The first screen's action is "Join the waitlist", a link to
+// the form (#218); "Join the Slack" sits beside it as the second action,
+// with its note. Both are beside L6's founders scene (#212, #713). No keeper
+// is in it. On a phone the scene draws the width of .wrap, 100vw less two
+// 24 px gutters, so a 412 px screen at 1.75x fetches the 640w file and a
+// 375 px one at 2x the 720w, not the 960w: the scene is the page's LCP there
+// (cloud lab, #758). The form sits below it, so it never moves the scene.
 import { WAYS_IN } from "@cs/shared";
 
 import ArtImage from "../../components/art/ArtImage.astro";
+import WaitlistForm from "../../components/founders/WaitlistForm.astro";
+import { WAITLIST_ANCHOR } from "../../components/founders/waitlist-fields";
 import Button from "../../components/ui/Button.astro";
 import Callout from "../../components/ui/Callout.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -33,7 +41,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           A private forum for founders building companies in Colorado. It opens later.
         </p>
         <div class="btn-row">
-          <Button href={WAYS_IN.slack} aria-describedby="slack-form-note-top">Join the Slack</Button>
+          <Button href={`#${WAITLIST_ANCHOR}`}>Join the waitlist</Button>
+          <Button variant="secondary" href={WAYS_IN.slack} aria-describedby="slack-form-note-top">Join the Slack</Button>
         </div>
         <p class="meta" id="slack-form-note-top">Join the Slack opens a Google Form.</p>
       </div>
@@ -53,7 +62,20 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     <div class="wrap grid">
       <div>
         <h2 id="who">Who it is for</h2>
-        <p>Founders and cofounders building a company in Colorado, at any stage, from first idea to growth.</p>
+        <ul class="checklist" role="list">
+          {
+            ["Founder or cofounder", "Building a company in Colorado", "Any stage, from first idea to growth"].map(
+              (line) => (
+                <li>
+                  <span class="checklist__mark" aria-hidden="true">
+                    ✓
+                  </span>
+                  <span>{line}</span>
+                </li>
+              ),
+            )
+          }
+        </ul>
         <p>
           The forum is for founders only. Talent, investors, lenders and service providers are welcome in the Slack
           and the LinkedIn Group.
@@ -76,22 +98,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     </div>
   </section>
 
-  <section class="section section--lit" aria-labelledby="when">
-    <div class="wrap">
-      <h2 id="when">Hear when it opens</h2>
-      <p>We will announce the opening in the Slack and the Startupers newsletter first.</p>
+  <section class="section section--lit" id={WAITLIST_ANCHOR} aria-labelledby="waitlist-title">
+    <div class="wrap stack">
+      <h2 id="waitlist-title">Join the waitlist</h2>
+      <p>
+        Joining the waitlist is not admission. When the forum opens, we check that each person on it is a founder.
+        We use your details only to email you then and to make that check. We never sell or share them.
+        <a href="/privacy/">Read the privacy policy</a>.
+      </p>
+      <WaitlistForm />
+      <p>We will also announce the opening in the Slack and the Startupers newsletter.</p>
       <div class="btn-row">
-        <Button href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
         <Button variant="secondary" href={WAYS_IN.newsletter}>Get the newsletter</Button>
       </div>
-      <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* The note under each Slack button says where it goes (#128). */
-  #slack-form-note,
+  /* The note under the Slack button says where it goes (#128). */
   #slack-form-note-top {
     margin: var(--s-3) 0 0;
   }
@@ -124,6 +149,28 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   }
   .uses li + li {
     margin-top: var(--s-2);
+  }
+  /* Who it is for: a list to scan, each line with a check mark. The mark is
+     decoration, so assistive tech reads only the words. */
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--s-4);
+    display: grid;
+    gap: var(--s-2);
+  }
+  .checklist li {
+    display: grid;
+    grid-template-columns: 1.5em 1fr;
+    align-items: baseline;
+    font-weight: 700;
+  }
+  .checklist__mark {
+    color: var(--c-pine);
+  }
+  /* Room above the form when the first screen's button jumps to it. */
+  #waitlist {
+    scroll-margin-top: var(--s-7);
   }
   @media (max-width: 760px) {
     .grid {

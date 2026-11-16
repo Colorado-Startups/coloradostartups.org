@@ -1,4 +1,4 @@
-// L29g: the Worker's weekly scheduled() handler runs all five retention jobs,
+// L29g: the Worker's weekly scheduled() handler runs all six retention jobs,
 // each logs a count only, and one failing job never stops the others.
 // Real D1 with every migration applied; a failure is simulated by a DB wrapper
 // that refuses statements for one table. Fixtures use example.org only.
@@ -10,7 +10,7 @@ import worker from "../../../worker/index";
 
 const HOUR = 3_600_000;
 const ago = (ms: number) => new Date(Date.now() - ms).toISOString();
-const OLD = ago(200 * 24 * HOUR); // past every limit: 180, 90 and 1 days
+const OLD = ago(400 * 24 * HOUR); // past every limit: 365, 180, 90 and 1 days
 const RECENT = ago(HOUR); // inside every limit
 
 const count = async (sql: string) => (await env.DB.prepare(sql).first<{ n: number }>())?.n ?? -1;
@@ -103,6 +103,19 @@ const JOBS: Job[] = [
     done: async () => (await count("SELECT COUNT(*) AS n FROM slack_join_requests WHERE first_name = 'Old'")) === 0,
     kept: async () => (await count("SELECT COUNT(*) AS n FROM slack_join_requests WHERE first_name = 'Recent'")) === 1,
   },
+  {
+    name: "founders_waitlist purge",
+    table: "founders_waitlist",
+    log: /^founders_waitlist purge: \d+ deleted$/,
+    seed: () =>
+      env.DB.prepare(
+        "INSERT INTO founders_waitlist (created_at, first_name, last_name, email, company, founder) VALUES (?, 'Old', 'Founder', 'old-sweep@example.org', 'Old Co', 1), (?, 'Recent', 'Founder', 'recent-sweep@example.org', 'Recent Co', 1)",
+      )
+        .bind(OLD, RECENT)
+        .run(),
+    done: async () => (await count("SELECT COUNT(*) AS n FROM founders_waitlist WHERE first_name = 'Old'")) === 0,
+    kept: async () => (await count("SELECT COUNT(*) AS n FROM founders_waitlist WHERE first_name = 'Recent'")) === 1,
+  },
 ];
 
 /** env.DB, except that any statement naming `table` throws, the way a D1 outage would. */
@@ -127,7 +140,15 @@ const lines = (spy: { mock: { calls: unknown[][] } }) => spy.mock.calls.map((arg
 
 describe("the weekly scheduled() handler", () => {
   beforeEach(async () => {
-    for (const table of ["ask_logs", "ask_sessions", "applications", "nominations", "csp_reports", "slack_join_requests"]) {
+    for (const table of [
+      "ask_logs",
+      "ask_sessions",
+      "applications",
+      "nominations",
+      "csp_reports",
+      "slack_join_requests",
+      "founders_waitlist",
+    ]) {
       await env.DB.prepare(`DELETE FROM ${table}`).run();
     }
     for (const job of JOBS) await job.seed();
@@ -137,7 +158,7 @@ describe("the weekly scheduled() handler", () => {
     vi.restoreAllMocks();
   });
 
-  it("runs all five jobs: each clears its old rows and keeps its recent ones", async () => {
+  it("runs all six jobs: each clears its old rows and keeps its recent ones", async () => {
     await runScheduled();
     for (const job of JOBS) {
       expect(await job.done(), `${job.name} cleared old rows`).toBe(true);
