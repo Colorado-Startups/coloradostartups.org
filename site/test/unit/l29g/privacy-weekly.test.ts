@@ -60,7 +60,7 @@ describe("Bot protection: Turnstile receives your IP address", () => {
     const checks = /\b(?:verifyTurnstile|turnstileError)\(/;
     const routes = filesUnder("worker/routes").filter((f) => checks.test(read(f)));
     expect(routes.map((f) => path.basename(f)).sort()).toEqual(
-      ["apply.ts", "ask.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts"],
+      ["apply.ts", "ask.ts", "join.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts"],
     );
     expect(bot).toContain("Our forms and the Resourcus question box use Cloudflare Turnstile");
   });
@@ -98,6 +98,17 @@ describe("the weekly job", () => {
       `If your nomination is still waiting for an edition when it is ${days} days old, a weekly job deletes the figures, your name and your email (our commitment).`,
     );
     expect(POLICY).toContain(`keeps its figures, name or email longer than ${days + 7} days (our commitment).`);
+  });
+
+  it("the Slack join requests bullet states the code's limit, and the limit plus one week", () => {
+    const days = constant("worker/routes/join.ts", "JOIN_REQUEST_RETENTION_DAYS");
+    expect(days).toBe(90);
+    expect(POLICY).toContain(`A weekly job deletes each request ${days} days after you send it`);
+    expect(POLICY).toContain(`No request stays in our database longer than ${days + 7} days (our commitment).`);
+  });
+
+  it("scheduled() runs the Slack join requests purge", () => {
+    expect(retention).toContain("purgeJoinRequests(db)");
   });
 
   it("the security-reports bullet states the code's limit", () => {
