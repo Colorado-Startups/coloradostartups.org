@@ -1,29 +1,48 @@
 ---
-// This week on home (engagement plan step P2a): the next three events with a
+// This week (engagement plan steps P2a and P2b): the next three events with a
 // countdown, and the weekly thread rhythm in the Slack and the LinkedIn Group.
+// Home places it statewide (home/sections/ThisWeek.astro); each region page
+// places it with `region` (regions/sections/ThisWeek.astro).
 //
 // Events. Every event that had not ended at build time is in the HTML, up to
 // KEEP; the first COUNT show. On the visitor's clock the script hides what
-// ended (prune.ts, as NextEvents does) and rewrites each countdown
-// (countdown.ts), so a page built days ago still counts from today. Without
-// JavaScript the build-time list stands. Titles link the event calendar, which
-// carries the host's own link: home links only a few known outside hosts
-// (site/test/dom/l1/hall.test.ts). A long title is cut on screen; the link's
-// aria-label carries it in full, with the date.
+// ended and rewrites each countdown (this-week.ts), so a page built days ago
+// still counts from today. Without JavaScript the build-time list stands.
+// Titles link the event calendar, which carries the host's own link: home
+// links only a few known outside hosts (site/test/dom/l1/hall.test.ts). A long
+// title is cut on screen; the link's aria-label carries it in full, with the
+// date.
 //
-// Region. An event whose city belongs to a region carries data-event-region
-// with the region's id, for the region filter a later step adds (W8). Online
-// and unlisted places carry none. Not data-region: on home that attribute
-// marks a hall card (site/test/dom/l1/hall.test.ts).
+// Region. Each event carries data-event-region with the region placeRegion()
+// gives it, the rule the region counts and /data/events.json use
+// (zone-counts.ts). Online and unlisted places carry none. Not data-region: on
+// home that attribute marks a hall card (site/test/dom/l1/hall.test.ts). With
+// `region`, the strip lists only the events placed in that region, and its
+// links go to the event list filtered to it. A link on to that list shows
+// while fewer than COUNT events show; an empty list says so in one line.
 //
-import { WAYS_IN } from "@cs/shared";
+// Slack. One join link (join.ts), described by the page's own visible note:
+// home's hero renders SLACK_JOIN.noteId, and a region page passes its hero's.
+//
+import { WAYS_IN, type Region } from "@cs/shared";
 import { getCollection } from "astro:content";
 
 import { clampWords } from "../../lib/communitas/doors";
 import { SLACK_JOIN } from "../../lib/communitas/join";
-import { ELSEWHERE, regionForCity } from "../../lib/regions/match";
+import { placeRegion } from "../../lib/data/open-data";
+import { ELSEWHERE } from "../../lib/regions/match";
 import { countdown } from "./countdown";
-import { cardPlace, dateParts, endsAt, SNAPSHOT, startsAt, upcomingEvents } from "./events";
+import { dateParts, endsAt, SNAPSHOT, startsAt, upcomingEvents } from "./events";
+import { filterQuery } from "./list-filter";
+
+interface Props {
+  /** A region page's strip: only the events placed in this region. Home passes none. */
+  region?: Region;
+  /** The id of the visible note that says where the Slack link goes. */
+  slackNoteId?: string;
+}
+
+const { region, slackNoteId = SLACK_JOIN.noteId } = Astro.props;
 
 /** Events that show, and how many wait hidden behind them for prune.ts. */
 const COUNT = 3;
@@ -32,15 +51,10 @@ const KEEP = 9;
 const TITLE_WORDS = 5;
 
 const now = Date.now();
-const events = upcomingEvents(SNAPSHOT, new Date(now)).slice(0, KEEP);
-
-/** The event's region id, from the city in its location, or undefined. */
-function regionOf(location: string | null): string | undefined {
-  if (!location) return undefined;
-  const city = cardPlace(location).split(",").pop()!.trim();
-  const region = regionForCity(city);
-  return region === ELSEWHERE ? undefined : region;
-}
+const placed = upcomingEvents(SNAPSHOT, new Date(now)).map((event) => ({ event, place: placeRegion(event.location) }));
+const events = (region ? placed.filter((p) => p.place === region.id) : placed).slice(0, KEEP);
+/** Where the titles go: the event calendar, or on a region page its list filtered to the region. */
+const eventsHref = region ? `${WAYS_IN.events}${filterQuery({ region: region.id, when: "", type: "" })}#all-events` : WAYS_IN.events;
 
 const DAYS = [
   { day: "mon", label: "Mon" },
@@ -62,20 +76,20 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
         {
           events.length > 0 && (
             <ol class="this-week__list" role="list">
-              {events.map((event, i) => {
+              {events.map(({ event, place }, i) => {
                 const date = dateParts(event);
                 const start = startsAt(event);
                 return (
                   <li
                     data-ends={new Date(endsAt(event)).toISOString()}
                     data-starts={new Date(start).toISOString()}
-                    data-event-region={regionOf(event.location)}
+                    data-event-region={place === ELSEWHERE ? undefined : place}
                     hidden={i >= COUNT}
                   >
                     <time class="this-week__when" datetime={event.start} data-countdown>
                       {countdown(start, now)}
                     </time>
-                    <a href={WAYS_IN.events} aria-label={`${event.title}, ${date.weekday} ${date.month} ${date.day}`}>
+                    <a href={eventsHref} aria-label={`${event.title}, ${date.weekday} ${date.month} ${date.day}`}>
                       {clampWords(event.title, TITLE_WORDS)}
                     </a>
                   </li>
@@ -85,8 +99,17 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
           )
         }
         <p class="this-week__empty" data-events-empty hidden={events.length > 0}>
-          <a href={WAYS_IN.events}>See the event calendar</a>
+          {region ? "No events listed here yet." : <a href={WAYS_IN.events}>See the event calendar</a>}
         </p>
+        {
+          region && (
+            <p class="this-week__more" data-events-more hidden={events.length >= COUNT}>
+              <a href={eventsHref} data-link="region-events">
+                Events in {region.name}
+              </a>
+            </p>
+          )
+        }
       </div>
       <div class="this-week__threads" data-threads>
         <ul class="this-week__list" role="list">
@@ -100,7 +123,7 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
           }
         </ul>
         <p class="this-week__ways">
-          Weekly in the <a href={SLACK_JOIN.href} aria-describedby={SLACK_JOIN.noteId} data-link="slack">Slack</a> and the{" "}
+          Weekly in the <a href={SLACK_JOIN.href} aria-describedby={slackNoteId} data-link="slack">Slack</a> and the{" "}
           <a href={WAYS_IN["linkedin-group"]} rel="noopener" data-link="linkedin-group">LinkedIn Group</a>
         </p>
       </div>
@@ -109,18 +132,10 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
 </section>
 
 <script>
-  import { countdown } from "./countdown";
-  import { showNext } from "./prune";
+  import { refreshBand } from "./this-week";
 
   const now = Date.now();
-  for (const root of document.querySelectorAll<HTMLElement>("[data-this-week]")) {
-    showNext(root, now, Number(root.dataset.count));
-    for (const li of root.querySelectorAll<HTMLElement>("li[data-starts]")) {
-      const start = Date.parse(li.dataset.starts ?? "");
-      const when = li.querySelector("[data-countdown]");
-      if (when && !Number.isNaN(start)) when.textContent = countdown(start, now);
-    }
-  }
+  for (const root of document.querySelectorAll<HTMLElement>("[data-this-week]")) refreshBand(root, now);
 </script>
 
 <style>
@@ -155,7 +170,8 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
   }
   /* display: flex would beat the hidden attribute's own rule. */
   .this-week__list li[hidden],
-  .this-week__empty[hidden] {
+  .this-week__empty[hidden],
+  .this-week__more[hidden] {
     display: none;
   }
   .this-week__when {
@@ -172,7 +188,8 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
     overflow-wrap: anywhere;
     font-weight: 700;
   }
-  .this-week__ways {
+  .this-week__ways,
+  .this-week__more {
     margin: var(--s-2) 0 0;
   }
 </style>
