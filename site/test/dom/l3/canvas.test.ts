@@ -130,6 +130,21 @@ describe("/ecosystem-canvas/", () => {
     expect(canvas.querySelector("[data-canvas-count]")?.textContent?.trim()).toBe(`All ${active.length} resources.`);
   });
 
+  // PR #89 review: a browse row's ?substage= had no visible label. The chip
+  // ships hidden beside the count line; the island names it and shows it.
+  it("ships the kind chip hidden beside the count line, with a named remove button", () => {
+    const row = canvas.querySelector<HTMLElement>(".canvas-count-row")!;
+    expect(row.querySelector("[data-canvas-count]")).not.toBeNull();
+    expect(row.querySelector("[data-canvas-count]")?.getAttribute("tabindex")).toBe("-1");
+    const kind = row.querySelector<HTMLElement>("[data-canvas-kind]");
+    expect(kind?.hasAttribute("hidden")).toBe(true);
+    expect(kind?.textContent).toMatch(/^\s*Kind:/);
+    expect(kind?.querySelector("[data-canvas-kind-name]")).not.toBeNull();
+    const remove = kind?.querySelector<HTMLButtonElement>("button[data-canvas-kind-remove]");
+    expect(remove?.getAttribute("type")).toBe("button");
+    expect(remove?.getAttribute("aria-label")).toBe("Remove the kind filter");
+  });
+
   // The brief's first section: the title, one line and Resourcus's
   // disclosure, in 40 words or fewer (step F; since step L1b the picks
   // follow it and the search moved under "Show all"). Resourcus's panel waits

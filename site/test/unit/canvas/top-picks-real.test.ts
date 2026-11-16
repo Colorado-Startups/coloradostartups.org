@@ -1,7 +1,7 @@
 // L1b: topPicks() on the real active records, the picks Startup Resources
 // opens on. Prints the picks for the PR body and pins the rules the page
-// relies on: at most 3 a stage, each an active record, at most one
-// commercial pick a stage, and labels that never rank or endorse.
+// relies on: at most 3 a stage, each an active record, no commercial
+// pick, and labels that never rank or endorse.
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -39,7 +39,7 @@ describe("topPicks on the real records", () => {
     console.log(`${active.length} active\n${lines.join("\n")}`);
   });
 
-  it("holds one commercial pick a stage at most", () => {
+  it("holds no more than one commercial pick a stage (zero is pinned below)", () => {
     for (const s of result) expect(s.picks.filter((p) => isCommercial(p.card)).length).toBeLessThanOrEqual(1);
   });
 

@@ -4,8 +4,9 @@
 export interface FilterState {
   stage: string;
   /**
-   * Only from a link, such as a Start here browse row (step L1b): no control
-   * sets it, so the next filter change clears it.
+   * The kind within a stage. Only from a link, such as a Start here browse
+   * row (step L1b): no control sets it. A chip beside the count line shows
+   * and removes it; a new stage or Clear drops it (canvas-filters.ts).
    */
   substage?: string;
   type: string;
