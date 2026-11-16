@@ -135,7 +135,7 @@ describe("home budget", () => {
   // they had before the split into sections.
   it("keeps the bands in order, the map's band right after the hero", () => {
     const outline = [...main.querySelectorAll("h1, h2")].map((h) => `${h.tagName} ${text(h)}`);
-    expect(outline).toEqual(["H1 Colorado Startups", "H2 Three regions along the Front Range", "H2 This week", "H2 Why Colorado", "H2 Pick your door", "H2 Explore", "H2 Ask"]);
+    expect(outline).toEqual(["H1 Colorado Startups", "H2 Three regions along the Front Range", "H2 Builders", "H2 This week", "H2 Why Colorado", "H2 Pick your door", "H2 Explore", "H2 Ask"]);
     expect(main.lastElementChild?.matches("section.keepers"), "the keepers last").toBe(true);
   });
 });

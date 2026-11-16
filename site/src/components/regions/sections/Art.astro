@@ -1,6 +1,11 @@
 ---
-// The region's place painting and its four sourced figures (region-tiles.ts),
-// inside Hero's section. Owner: L8.
+// The region's place painting, its clip and its hotspots, as an extra in its
+// own section further down the page (step R1, Paul, 2026-11-16: the map
+// first; the painting "shouldn't be like the main focus when someone first
+// lands"). The painting loads lazily now, and the clip, preload="none", only
+// when the painting is on screen (RegionArt.astro), so neither competes with
+// the map's first paint. The heading says plainly what it is (voice.md: the
+// fantasy world is a frame, with a plain label). Owner: L8.
 //
 // Step W3b: the painting's hotspots open real content. This file gathers it
 // at build time with the helpers the region page already uses, and
@@ -15,7 +20,6 @@ import { getCollection } from "astro:content";
 import { activeCards } from "../../canvas/canvas-data";
 import { cityLabel } from "../../canvas/labels";
 import { SNAPSHOT, upcomingEvents, whenText } from "../../events/events";
-import StatTile from "../../home/StatTile.astro";
 import { takesApplications } from "../../positions/positions";
 import { buildBoard, countBy, latestEdition } from "../../../lib/leaderboard/board";
 import { REGIONS } from "../../../lib/regions/match";
@@ -23,7 +27,6 @@ import { firstStops, honoreesIn, inRegion, organizerFor, regionFilterHref, sprea
 import { seatPagePath } from "../../../lib/seats/page";
 import { hotspotCards, CARD_COMPANIES, CARD_RESOURCES } from "../hotspots";
 import RegionArt from "../RegionArt.astro";
-import { regionTiles } from "../region-tiles";
 import { eventCity } from "../tallies";
 
 interface Props {
@@ -75,22 +78,17 @@ const cards = hotspotCards({
 });
 ---
 
-<RegionArt region={region} size="hero" hotspots={cards} />
-<h2 class="visually-hidden">{region.name} in numbers</h2>
-<div class="tiles" data-region-tiles>
-  {regionTiles(region.id).map((t) => <StatTile {...t} />)}
-</div>
+<section class="section section--band" aria-labelledby="painting">
+  <div class="wrap">
+    <h2 id="painting">{region.name} as a painting</h2>
+    <p class="painting__note">Our art shows these real places as a fantasy Colorado. Each marker opens what's here.</p>
+    <RegionArt region={region} size="hero" loading="lazy" hotspots={cards} />
+  </div>
+</section>
 
 <style>
-  .tiles {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-5) var(--s-7);
-    margin-top: var(--s-6);
-  }
-  @media (max-width: 760px) {
-    .tiles {
-      grid-template-columns: minmax(0, 1fr);
-    }
+  .painting__note {
+    margin: 0 0 var(--s-4);
+    color: var(--c-text-dim);
   }
 </style>

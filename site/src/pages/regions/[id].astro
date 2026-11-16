@@ -1,14 +1,18 @@
 ---
 // /regions/<id>/: one zone's hub (step H of the 2026-11-15 redesign), built
-// from sections in components/regions/sections/. In order: Hero, with Art's
-// place painting and four sourced figures; the This week slot; the map zoomed
-// to the zone, the other two dimmed, beside its core cities and nearby towns;
-// the Connector seat, a person's; six Startup Resources and six Leaderboard
-// honorees, each with a link to see all of them; the Spotlights slot; the Slack
-// and events; the Ask your AI slot; and the other two regions. The three slots
-// render nothing until steps P2b, P3b and A3a fill them. Every city goes
-// through regionForCity(), so a city added to the YAML shows up in both lists
-// (decision 45). The title is the region name alone, no hub word (#67). Owner: L8.
+// from sections in components/regions/sections/. In order: Hero, with the
+// region's real map in the first screen (the drawing zoomed to the zone, the
+// other two dimmed; its relief is the page's LCP image) beside what is there
+// (WhatsHere: counts, cities, the next event, an open seat, nearby towns and
+// size) and four sourced figures; the This week slot; the Connector seat, a
+// person's; six Startup Resources and six Leaderboard honorees, each with a
+// link to see all of them; the Spotlights slot; the Slack and events; the
+// place painting as an extra (Art, step R1: Paul, 2026-11-16, "It should be
+// the map and what's there"); the Ask your AI slot; and the other two
+// regions. The slots render nothing until their steps fill them. Every city
+// goes through regionForCity(), so a city added to the YAML shows up in every
+// list (decision 45). The title is the region name alone, no hub word (#67).
+// Owner: L8.
 import { regionLede, WAYS_IN } from "@cs/shared";
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
@@ -20,16 +24,21 @@ import OrganizerCard from "../../components/regions/OrganizerCard.astro";
 import RegionChip from "../../components/regions/RegionChip.astro";
 import RegionHonorees from "../../components/regions/RegionHonorees.astro";
 import RegionResources from "../../components/regions/RegionResources.astro";
-import RegionSize from "../../components/regions/RegionSize.astro";
 import Art from "../../components/regions/sections/Art.astro";
 import AskAi from "../../components/regions/sections/AskAi.astro";
 import Hero from "../../components/regions/sections/Hero.astro";
 import Spotlights from "../../components/regions/sections/Spotlights.astro";
 import ThisWeek from "../../components/regions/sections/ThisWeek.astro";
+import WhatsHere from "../../components/regions/sections/WhatsHere.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
 import { REGIONS } from "../../lib/regions/match";
 import { andList, honoreesIn, inRegion, organizerFor, summaryAfterLede } from "../../lib/regions/page";
+
+// The map draws in the hero's right column, 3 of 5 parts of .wrap (100vw less
+// two 24 px gutters, at most 1180 px) less the 48 px gap; under 760 px, the
+// whole .wrap. `sizes` cannot read CSS variables, so it uses rem (16 px).
+const MAP_SIZES = "(max-width: 47.5rem) calc(100vw - 3rem), (max-width: 76.75rem) calc(60vw - 3.6rem), 42.5rem";
 
 export const getStaticPaths = (async () => {
   const regions = [...REGIONS];
@@ -60,49 +69,27 @@ const others = regions.filter((r) => r.id !== region.id);
 
 <BaseLayout title={region.name} description={`${regionLede(region)} Core cities: ${andList(region.cities)}.`} ogImage={region.id}>
   <Hero region={region}>
-    <Art region={region} />
+    <ColoradoMap slot="map" id="region-map" zone={region.id} caption={summaryAfterLede(region)} sizes={MAP_SIZES} priority />
+    <WhatsHere slot="here" region={region} />
   </Hero>
+  <LiveMaps />
   <ThisWeek region={region} />
 
-  <section class="section section--band" aria-labelledby="where">
-    <div class="wrap where">
-      <ColoradoMap id="region-map" zone={region.id} caption={summaryAfterLede(region)} />
-      <LiveMaps />
-      <div class="where__places">
-        <h2 id="where">Where it is</h2>
-        <h3>Core cities</h3>
-        <ul class="cities" role="list">
-          {region.cities.map((city) => <li class="hall-badge">{city}</li>)}
-        </ul>
-        {
-          region.nearby.length > 0 && (
-            <>
-              <h3>Nearby towns</h3>
-              <p class="nearby">{andList(region.nearby)}</p>
-            </>
-          )
-        }
-        <h3>Size</h3>
-        <RegionSize region={region.id} />
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--lit" aria-labelledby="organizer">
+  <section class="section section--band" aria-labelledby="organizer">
     <div class="wrap">
       <h2 id="organizer">{organizer.holder ? `Your ${organizer.position.title}` : `The ${organizer.position.title} seat`}</h2>
       <OrganizerCard organizer={organizer} />
     </div>
   </section>
 
-  <section class="section section--band" aria-labelledby="resources">
+  <section class="section section--lit" aria-labelledby="resources">
     <div class="wrap">
       <h2 id="resources">Startup Resources</h2>
       <RegionResources region={region} cards={regionCards} statewide={statewide} />
     </div>
   </section>
 
-  <section class="section section--lit" aria-labelledby="honorees">
+  <section class="section section--band" aria-labelledby="honorees">
     <div class="wrap">
       <h2 id="honorees">Leaderboard honorees</h2>
       <RegionHonorees region={region} edition={edition} companies={honorees} />
@@ -111,7 +98,7 @@ const others = regions.filter((r) => r.id !== region.id);
 
   <Spotlights region={region} />
 
-  <section class="section section--band" aria-labelledby="meet">
+  <section class="section section--lit" aria-labelledby="meet">
     <div class="wrap">
       <h2 id="meet">Meet founders here</h2>
       <p>
@@ -125,6 +112,8 @@ const others = regions.filter((r) => r.id !== region.id);
       <p class="meta" id="slack-note">Join the Slack opens a Google Form.</p>
     </div>
   </section>
+
+  <Art region={region} />
 
   <AskAi region={region} />
 
@@ -145,36 +134,11 @@ const others = regions.filter((r) => r.id !== region.id);
   #slack-note {
     margin: var(--s-3) 0 0;
   }
-  .where {
-    display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    gap: var(--s-7);
-    align-items: start;
-  }
-  .where__places h2 {
-    margin-top: 0;
-  }
-  .where__places h3 {
-    font-size: var(--t-step-0);
-    margin: var(--s-5) 0 var(--s-2);
-  }
   /* A list gets the reading measure by default (global.css); these are rows. */
-  .cities,
   .region-chips {
     max-width: none;
     padding: 0;
     list-style: none;
-  }
-  .cities {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2);
-    margin: 0;
-  }
-  .nearby {
-    margin: 0;
-    color: var(--c-text-dim);
-    font-size: var(--t-step--1);
   }
   .region-chips {
     display: grid;
@@ -183,7 +147,6 @@ const others = regions.filter((r) => r.id !== region.id);
     margin: 0 0 var(--s-5);
   }
   @media (max-width: 760px) {
-    .where,
     .region-chips {
       grid-template-columns: minmax(0, 1fr);
     }

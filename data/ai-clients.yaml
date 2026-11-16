@@ -1,0 +1,51 @@
+# The named ways to connect to the keyless MCP server at /mcp, in page order.
+# site/src/pages/connect.astro renders one card per record. Only the AIs that
+# 01_doctrine/ai_recommend.yaml allows are named here (Paul, 2026-11-16);
+# every other app gets the page's neutral "Any other app that speaks MCP" block.
+#
+# group:  claude or opencode, the page section the card sits in.
+# effort: one-command (paste one line in a terminal) or guided (a few steps
+#         in the app's own settings).
+# install:
+#   command: {url} is replaced with the /mcp URL.
+#   config:  JSON the page fills with the /mcp URL (opencode only).
+#   steps:   the app's own menu names, in order.
+#   note:    one plain line under the card.
+#   plugin:  commands that install this repo's Claude Code plugin instead
+#            (plugins/colorado-startups/README.md).
+#   skill:   the claude.ai skill download (plugins/colorado-startups/README.md).
+# docs: where the form was read; read: the date it was read.
+
+- id: claude
+  group: claude
+  name: Claude on the web and desktop
+  effort: guided
+  steps:
+    - Customize › Connectors › + Add › Add custom connector
+    - Name it, paste the URL, then Continue
+    - "Authentication: No sign in, then Add"
+  note: Custom connectors are set up in your Claude account and work in Claude Desktop too.
+  skill: /downloads/colorado-startups-skill.zip
+  docs: https://support.claude.com
+  read: 2026-11-15
+
+- id: claude-code
+  group: claude
+  name: Claude Code
+  effort: one-command
+  command: claude mcp add --transport http coloradostartups {url}
+  plugin:
+    - claude plugin marketplace add Colorado-Startups/coloradostartups.org
+    - claude plugin install colorado-startups@colorado-startups
+  docs: https://code.claude.com/docs
+  read: 2026-11-15
+
+- id: opencode
+  group: opencode
+  name: OpenCode
+  effort: one-command
+  command: opencode mcp add coloradostartups --url {url}
+  config: opencode
+  note: OpenCode runs open-weight models, so the server works with them too.
+  docs: https://opencode.ai/docs/mcp-servers
+  read: 2026-11-16
