@@ -32,6 +32,7 @@ import { COLORADO, COLORADO_BOUNDS, ZONES, zoneBounds, zoneById } from "../../..
 import { clockwise, coloradoMapSvg, signedArea, viewOf } from "../../../src/lib/regions/colorado-map";
 import { HIGHWAYS, inFrame, LOOP_ROADS, VIEWS, YARDSTICK } from "../../../src/lib/regions/colorado-views";
 import { REGION_COLORS as REGION_COLOR } from "../../../src/lib/regions/map";
+import { mapFileSvg } from "../../../src/lib/regions/map-file";
 
 const ROOT = path.join(__dirname, "../../../..");
 const places = readPlaces(path.join(ROOT, "data/geo/places.csv"));
@@ -296,6 +297,42 @@ describe.each(REGION_IDS)("coloradoMapSvg thumbnail of %s", (id) => {
     // The locator: a rounded box with the state's outline and one dot in the region's color.
     expect(root.querySelectorAll("rect[rx]")).toHaveLength(1);
     expect(root.querySelectorAll(`circle[fill="${REGION_COLOR[id]}"]`)).toHaveLength(1);
+  });
+});
+
+// /maps/colorado.svg and /maps/<region>.svg: a map as one standalone file.
+describe.each([undefined, ...REGION_IDS])("mapFileSvg(%s)", (zone) => {
+  const svg = mapFileSvg(zone);
+  const root = new JSDOM(svg, { contentType: "image/svg+xml" }).window.document.documentElement;
+
+  it("is one well-formed SVG that needs nothing from the site", () => {
+    expect(root.nodeName).toBe("svg");
+    expect(root.getAttribute("xmlns")).toBe("http://www.w3.org/2000/svg");
+    // Every token is resolved, and the relief travels inside the file.
+    expect(svg).not.toContain("var(--");
+    expect(root.querySelector("image")?.getAttribute("href")).toMatch(/^data:image\/jpeg;base64,/);
+  });
+
+  it("paints in real colors: the wash's stops and every fill and stroke a token gave", () => {
+    const stops = [...root.querySelectorAll("stop")].map((s) => s.getAttribute("stop-color"));
+    expect(stops).toHaveLength(3);
+    for (const color of stops) expect(color).toMatch(/^#[0-9a-f]{6}$/i);
+    // The relief's base64 can spell anything, so read the file without it.
+    expect(svg.replace(/href="data:[^"]+"/, "")).not.toMatch(/NaN|undefined|\[object/);
+  });
+
+  it("names itself, and credits its sources", () => {
+    expect(root.getAttribute("aria-label")).toMatch(/^Map of /);
+    expect(root.querySelector("title")?.textContent).toBe(root.getAttribute("aria-label"));
+    expect(svg).toContain("Roads: US Census Bureau");
+    expect(svg).toContain("Relief: USGS");
+  });
+
+  it("draws the same view the site does", () => {
+    const { frame } = viewOf({ zone });
+    expect(root.getAttribute("viewBox")).toBe(`0 0 ${frame.width} ${frame.height}`);
+    const names = zone ? zoneById(zone).properties.cities : ZONES.features.map((z) => z.properties.name);
+    for (const name of names) expect(svg, name).toContain(name);
   });
 });
 

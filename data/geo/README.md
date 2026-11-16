@@ -57,6 +57,15 @@ Photon Mountain's eight roads are the ones its own corridor map locked ([photon-
 
 Every view is Web Mercator, so the three layers line up.
 
+## A map as one file
+
+| File | Shows |
+| --- | --- |
+| [`/maps/colorado.svg`](https://coloradostartups.org/maps/colorado.svg) | The state and the three regions |
+| [`/maps/photon-mountain.svg`](https://coloradostartups.org/maps/photon-mountain.svg) · [`fusion-canyon.svg`](https://coloradostartups.org/maps/fusion-canyon.svg) · [`space-peak.svg`](https://coloradostartups.org/maps/space-peak.svg) | One region, its roads named |
+
+Each is the relief and the drawing in one standalone SVG, built with the site by [`map-file.ts`](../../site/src/lib/regions/map-file.ts). A README shows one with an image tag, and it follows the zones.
+
 ## How a loop is traced
 
 | Step | Rule |
