@@ -1,8 +1,8 @@
 // Step H0 over the built site (run `npm run build` first; test:content does):
 // the home page's budget. Home is split into sections (components/home/
-// sections/), five of them empty slots that later steps fill; these checks
+// sections/), some of them empty slots that later steps fill; these checks
 // hold the page to its limits while they do. At most 60 visible words in each
-// band and 600 on the page, no member count, a source line under every figure,
+// band and 450 on the page, no member count, a source line under every figure,
 // and 75 KB of gzipped JavaScript or less up front (PLAN.md, Gates).
 //
 // The cap was 300 words for the page. Step W2 (the living map) adds the map's
@@ -18,13 +18,8 @@
 // a band's 60 nor the page's 450. Each door's body has its own cap instead: at
 // most 30 words. The cap per band is unchanged (orchestrator, 2026-11-16).
 // A band holds at most 8 doors, one for each kind of visitor, so doors cannot
-// become a way to keep a long text out of the count.
-//
-// The page cap is 600, in true words. The 450 above was set while the counter
-// under-read: it joined the words of neighbouring elements, and logged 246 for
-// a page that held 347. In true words the room 450 gave was about 635. With
-// every open slot filled to its band cap the page comes to about 555, so 600
-// holds the page short and still fits the plan (orchestrator, 2026-11-16).
+// become a way to keep a long text out of the count: the most a band can hold
+// behind its doors is 8 times 30, 240 words.
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
@@ -86,11 +81,11 @@ describe("the word counter", () => {
 describe("home budget", () => {
   const main = home.querySelector("main")!;
 
-  it("has at most 600 visible words", () => {
+  it("has at most 450 visible words", () => {
     const words = visibleWords(main);
     console.info(`index.html: ${words.length} visible words in <main>`);
     expect(words.length).toBeGreaterThan(0);
-    expect(words.length).toBeLessThanOrEqual(600);
+    expect(words.length).toBeLessThanOrEqual(450);
   });
 
   it("has at most 60 visible words in each band, its sourced figures aside", () => {
