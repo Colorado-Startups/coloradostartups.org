@@ -1,6 +1,6 @@
 // Step H0 over the built site (run `npm run build` first; test:content does):
 // the home page's budget. Home is split into sections (components/home/
-// sections/), five of them empty slots that later steps fill; these checks
+// sections/), some of them empty slots that later steps fill; these checks
 // hold the page to its limits while they do. At most 60 visible words in each
 // band and 450 on the page, no member count, a source line under every figure,
 // and 75 KB of gzipped JavaScript or less up front (PLAN.md, Gates).
@@ -17,6 +17,9 @@
 // are not on screen until the visitor opens it, so they count toward neither
 // a band's 60 nor the page's 450. Each door's body has its own cap instead: at
 // most 30 words. The cap per band is unchanged (orchestrator, 2026-11-16).
+// A band holds at most 8 doors, one for each kind of visitor, so doors cannot
+// become a way to keep a long text out of the count: the most a band can hold
+// behind its doors is 8 times 30, 240 words.
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
@@ -105,6 +108,13 @@ describe("home budget", () => {
       console.info(`index.html: ${words} words behind the ${label} door`);
       expect(words, label).toBeGreaterThan(0);
       expect(words, label).toBeLessThanOrEqual(30);
+    }
+  });
+
+  it("has at most 8 doors in each band", () => {
+    for (const band of [...main.children].filter((el) => el.matches("section"))) {
+      const name = band.getAttribute("aria-labelledby") ?? band.getAttribute("aria-label") ?? band.className;
+      expect(band.querySelectorAll("details").length, name).toBeLessThanOrEqual(8);
     }
   });
 
