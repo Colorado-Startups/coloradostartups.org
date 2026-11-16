@@ -11,8 +11,13 @@
 // under the actions, smaller than the lede, so the lede stays the largest
 // thing in the first screen and the mobile LCP stays text. Its alt is
 // HALL_ART_ALT, the brand's caption.
+//
+// L3b: the honorees list has a Table and Cards switch (HonoreesTable), and
+// the "Ask your AI" row (A3a) sits once on the page, in a band between the
+// honorees and the nominate hearth. Its question asks about companies only.
 import { getCollection } from "astro:content";
 
+import AskAi from "../../components/ai/AskAi.astro";
 import ArtImage from "../../components/art/ArtImage.astro";
 import { HALL_ART_ALT } from "../../components/art/keepers";
 import ChartFigure from "../../components/leaderboard/ChartFigure.astro";
@@ -180,6 +185,16 @@ const yearText = { label: "Honorees by founding year", description: yearSummary 
           prove its numbers. The Leaderboard shows revenue as a range, never an exact figure.
         </p>
       </details>
+    </div>
+  </section>
+
+  <section class="section section--band" aria-labelledby="ask-ai">
+    <div class="wrap">
+      <AskAi
+        subject="The Leaderboard"
+        path="/leaderboard/"
+        question="Which companies on it build in my city or sector, and what does each one make?"
+      />
     </div>
   </section>
 
