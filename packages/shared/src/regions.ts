@@ -7,6 +7,34 @@ import * as z from "zod";
 export const REGION_IDS = ["photon-mountain", "space-peak", "fusion-canyon"] as const;
 export type RegionId = (typeof REGION_IDS)[number];
 
+// A hotspot on the region's painting (step W3a). x and y are percentages of the
+// painting's width and height, from its top left corner. The label says what
+// opens, in 4 words or fewer. A place hotspot names the real landmark painted
+// there, and its label is that name only. W3b draws them; spacing and the edge
+// margin are checked against the data in test/unit/l8/hotspots.test.ts.
+export const HOTSPOT_KINDS = ["companies", "event", "resources", "seat", "place"] as const;
+export type HotspotKind = (typeof HOTSPOT_KINDS)[number];
+export const HOTSPOT_MAX_WORDS = 4;
+
+export const HotspotSchema = z
+  .strictObject({
+    x: z.number().min(0).max(100),
+    y: z.number().min(0).max(100),
+    label: z
+      .string()
+      .min(1)
+      .max(40)
+      .refine((s) => s.trim().split(/\s+/).length <= HOTSPOT_MAX_WORDS, {
+        message: `a hotspot label has at most ${HOTSPOT_MAX_WORDS} words`,
+      }),
+    kind: z.enum(HOTSPOT_KINDS),
+    landmark: z.string().min(2).max(60).optional(),
+  })
+  .refine((h) => (h.kind === "place") === Boolean(h.landmark), {
+    message: "a place hotspot names its landmark, and only a place hotspot does",
+  });
+export type Hotspot = z.infer<typeof HotspotSchema>;
+
 export const RegionSchema = z.object({
   id: z.enum(REGION_IDS),
   name: z.string().min(3).max(40),
@@ -19,6 +47,8 @@ export const RegionSchema = z.object({
   slack_channel: z.string().max(80).optional(),
   // Art key: a brand v3 place painting such as brand/springs (scripts/brand/pull.mjs).
   art: z.string(),
+  // Points on the painting that open real content (W3a data, W3b UI).
+  hotspots: z.array(HotspotSchema).max(6).optional(),
   order: z.number().int().min(1),
 });
 export type Region = z.infer<typeof RegionSchema>;
