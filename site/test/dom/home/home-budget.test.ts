@@ -12,6 +12,11 @@
 // A band's sourced figures (.stat: value, label and source line) are left out
 // of its cap, though not the page's: Why Colorado holds nine of them by design,
 // each kept honest by the source-line check below, and they are data, not copy.
+//
+// Words behind a closed door (a <details> body, everything but its <summary>)
+// are not on screen until the visitor opens it, so they count toward neither
+// a band's 60 nor the page's 450. Each door's body has its own cap instead: at
+// most 30 words. The cap per band is unchanged (orchestrator, 2026-11-16).
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
@@ -26,12 +31,49 @@ const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace
 // Words a reader sees in <main>. Not counted: scripts, styles, hidden and
 // visually hidden text, and the maps' SVG labels (city and road names on a
 // drawing, not copy).
+//
+// The build strips the whitespace between elements, so the text of two
+// elements can touch ("doorIdea"). The count walks the text nodes and joins
+// them with a space, so words from different elements never merge.
 const UNSEEN = "script, style, template, noscript, svg, [hidden], [aria-hidden='true'], .visually-hidden";
-function visibleWords(root: Element, skip = ""): string[] {
-  const copy = root.cloneNode(true) as Element;
-  for (const el of copy.querySelectorAll(skip ? `${UNSEEN}, ${skip}` : UNSEEN)) el.remove();
-  return text(copy).match(/[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu) ?? [];
+const CLOSED_DOOR = "details:not([open]) > :not(summary)";
+const WORD = /[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu;
+function wordsOf(root: Element, unseen: string): string[] {
+  const parts: string[] = [];
+  const walk = (node: Node) => {
+    for (const child of node.childNodes) {
+      if (child.nodeType === child.TEXT_NODE) parts.push(child.textContent ?? "");
+      else if (child.nodeType === child.ELEMENT_NODE && !(child as Element).matches(unseen)) walk(child);
+    }
+  };
+  walk(root);
+  return parts.join(" ").match(WORD) ?? [];
 }
+/** Words on screen in `root`; closed doors' bodies are left out. */
+const visibleWords = (root: Element, skip = "") => wordsOf(root, [UNSEEN, CLOSED_DOOR, skip].filter(Boolean).join(", "));
+/** Words in a door's body: every child of the <details> but its <summary>. */
+const doorBodyWords = (door: Element) =>
+  [...door.children].filter((c) => !c.matches(`summary, ${UNSEEN}`)).flatMap((c) => wordsOf(c, UNSEEN));
+
+describe("the word counter", () => {
+  it("counts the words of adjacent elements separately, even with no whitespace between them", () => {
+    const fixture = new DOMParser().parseFromString(
+      '<main><h2>Pick your door</h2><ul><li><span>Idea</span><b>Slack,</b><a href="/">Monday</a></li></ul><p hidden>Gone</p></main>',
+      "text/html",
+    );
+    expect(visibleWords(fixture.querySelector("main")!)).toEqual(["Pick", "your", "door", "Idea", "Slack,", "Monday"]);
+  });
+
+  it("leaves a closed door's body out of the visible words, and counts it as the door's body", () => {
+    const fixture = new DOMParser().parseFromString(
+      "<main><details><summary>Idea</summary><ul><li>Join<b>the</b>Slack</li></ul></details><details open><summary>Hiring</summary><p>Open text</p></details></main>",
+      "text/html",
+    );
+    const main = fixture.querySelector("main")!;
+    expect(visibleWords(main)).toEqual(["Idea", "Hiring", "Open", "text"]);
+    expect([...main.querySelectorAll("details")].map(doorBodyWords)).toEqual([["Join", "the", "Slack"], ["Open", "text"]]);
+  });
+});
 
 describe("home budget", () => {
   const main = home.querySelector("main")!;
@@ -51,6 +93,18 @@ describe("home budget", () => {
       const name = band.getAttribute("aria-labelledby") ?? band.getAttribute("aria-label") ?? band.className;
       console.info(`index.html: ${words} visible words in the ${name} band`);
       expect(words, name).toBeLessThanOrEqual(60);
+    }
+  });
+
+  it("has at most 30 words behind each door", () => {
+    const doors = [...main.querySelectorAll("details")];
+    expect(doors.length, "the Pick your door doors").toBeGreaterThan(0);
+    for (const door of doors) {
+      const label = text(door.querySelector("summary"));
+      const words = doorBodyWords(door).length;
+      console.info(`index.html: ${words} words behind the ${label} door`);
+      expect(words, label).toBeGreaterThan(0);
+      expect(words, label).toBeLessThanOrEqual(30);
     }
   });
 

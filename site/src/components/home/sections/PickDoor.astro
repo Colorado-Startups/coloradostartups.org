@@ -10,13 +10,14 @@
 // src/lib/communitas/doors.ts, fed by data/communitas/routes.yaml.
 //
 // The next event is one row for all doors: the calendar has no audience
-// field, so every door would show the same event, and the band's 60-word cap
-// (site/test/dom/home/home-budget.test.ts) counts closed doors too. The build
+// field, so every door would show the same event. The build
 // renders the next few events with all but the first hidden; prune.ts, the
 // script /event-calendar/ uses, moves the row along as events end. Without
 // JavaScript the build-time event stands. The title links the event calendar,
 // which lists it with the host's own link: home links only a few known
-// outside hosts (site/test/dom/l1/hall.test.ts), and event hosts vary.
+// outside hosts (site/test/dom/l1/hall.test.ts), and event hosts vary. A
+// long title is cut on screen; the link's aria-label carries it in full,
+// with the date.
 import { WAYS_IN } from "@cs/shared";
 
 import { clampWords } from "../../../lib/communitas/doors";
@@ -48,7 +49,9 @@ const events = upcomingEvents(SNAPSHOT, new Date()).slice(0, KEEP);
                   <time class="door-event__date" datetime={event.start}>
                     {date.month} {date.day}
                   </time>
-                  <a href={WAYS_IN.events}>{clampWords(event.title)}</a>
+                  <a href={WAYS_IN.events} aria-label={`${event.title}, ${date.weekday} ${date.month} ${date.day}`}>
+                    {clampWords(event.title)}
+                  </a>
                 </li>
               );
             })}
