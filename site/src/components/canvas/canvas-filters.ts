@@ -13,6 +13,11 @@
 // /ecosystem-canvas/?stage=launch. A stage anchor (#launch, decision 33)
 // chooses that stage, and a resource anchor (#r-<id>) shows its row even past
 // the first page.
+//
+// A kind (?substage=, from a Start here browse row) has no control in the
+// form. A chip beside the count line names it and removes it. It holds
+// through type, city and search changes, and goes with a new stage or Clear:
+// each stage has its own kinds.
 
 import { loadPagefind, type Pagefind } from "../../lib/pagefind";
 import {
@@ -33,6 +38,7 @@ import {
   type CardFacts,
   type FilterState,
 } from "./filter-logic";
+import { SUBSTAGE_LABELS } from "./labels";
 
 const CARD_ID_PREFIX = "r-";
 
@@ -105,6 +111,9 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
   const full = root.querySelector<HTMLElement>("[data-canvas-full]");
   const showAll = root.querySelector<HTMLButtonElement>("[data-canvas-show-all]");
   const picks = root.querySelector<HTMLElement>("[data-canvas-picks]");
+  const kindRow = root.querySelector<HTMLElement>("[data-canvas-kind]");
+  const kindName = root.querySelector<HTMLElement>("[data-canvas-kind-name]");
+  const kindRemove = root.querySelector<HTMLButtonElement>("[data-canvas-kind-remove]");
 
   /** Shows the full list and retires its control. True when it was closed. */
   const openList = (): boolean => {
@@ -156,7 +165,9 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     if (!target) return null;
     // A link into the list (#launch, #r-<id>) opens it first.
     if (full?.contains(target)) openList();
-    if (target.matches("section[data-canvas-group]") && allowed.stage.has(id)) state = { ...state, stage: id };
+    if (target.matches("section[data-canvas-group]") && allowed.stage.has(id) && id !== state.stage) {
+      state = { ...state, stage: id, substage: undefined };
+    }
     wanted = target.closest<HTMLElement>("[data-resource]");
     return target;
   }
@@ -195,6 +206,8 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     const nMatched = matched.filter(Boolean).length;
     const nShown = show.filter(Boolean).length;
     status!.textContent = countText(nMatched, cards.length);
+    if (kindRow) kindRow.hidden = !state.substage;
+    if (kindName) kindName.textContent = state.substage ? (SUBSTAGE_LABELS[state.substage] ?? state.substage) : "";
     if (moreRow) moreRow.hidden = nShown >= nMatched;
     if (shownLine) shownLine.textContent = shownText(nShown, nMatched);
     if (moreButton) moreButton.textContent = moreText(nMatched - nShown);
@@ -215,9 +228,11 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     city: control("city")?.value ?? "",
     q: control("q")?.value ?? "",
   });
-  // A new filter starts the list again at its first page.
+  // A new filter starts the list again at its first page. The kind holds
+  // unless the stage changed.
   const refilter = () => {
-    state = read();
+    const next = read();
+    state = next.stage === state.stage && state.substage ? { ...next, substage: state.substage } : next;
     limit = PAGE_SIZE;
     return apply();
   };
@@ -260,8 +275,19 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     void refilter();
   });
   form.addEventListener("reset", () => {
-    // The reset event fires before the controls clear.
-    setTimeout(() => void refilter(), 0);
+    // The reset event fires before the controls clear. Clear drops the kind too.
+    setTimeout(() => {
+      state = { ...state, substage: undefined };
+      void refilter();
+    }, 0);
+  });
+
+  // Removing the kind keeps every other filter. Focus moves to the count
+  // line, which also announces the new count, since the chip is gone.
+  kindRemove?.addEventListener("click", () => {
+    state = { ...state, substage: undefined };
+    limit = PAGE_SIZE;
+    void apply().then(() => status!.focus());
   });
 
   // "Show more" adds a page, then moves focus to the first new row's link, so

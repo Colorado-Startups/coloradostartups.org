@@ -47,10 +47,34 @@ test.describe("/ecosystem-canvas/", () => {
     const link = page.locator("[data-browse-row] a[data-substage]").first();
     const substage = await link.getAttribute("data-substage");
     const n = Number(await link.getAttribute("data-count"));
+    // The link says "27 investors"; the chip says "Investors".
+    const label = (await link.textContent())!.trim().replace(/^\d+\s+/, "");
     await link.click();
     await expect(page.locator("[data-canvas-full]")).toBeVisible();
     await expect(count(page)).toHaveText(new RegExp(`^${n} of \\d+ resources match\\.$`));
     for (const el of await visibleCards(page).all()) await expect(el).toHaveAttribute("data-substage", substage!);
+
+    // The kind shows as a chip with its display name, and removing it keeps
+    // the stage: the count returns to the stage's count in the rail, plus
+    // Support, which shows alongside every stage (#134).
+    const stage = new URL(page.url()).searchParams.get("stage")!;
+    const chip = page.locator("[data-canvas-kind]");
+    await expect(chip).toBeVisible();
+    await expect(page.locator("[data-canvas-kind-name]")).toHaveText(new RegExp(`^${label}s?$`, "i"));
+    const remove = page.getByRole("button", { name: "Remove the kind filter" });
+    const box = await remove.boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+    await remove.focus();
+    await page.keyboard.press("Enter");
+    await expect(chip).toBeHidden();
+    await expect(count(page)).toBeFocused();
+    const rail = async (s: string) => Number(await page.locator(`[data-stage-count="${s}"]`).textContent());
+    const stageN = (await rail(stage)) + (stage === "support" ? 0 : await rail("support"));
+    expect(stageN).toBeGreaterThan(n);
+    await expect(count(page)).toHaveText(new RegExp(`^${stageN} of \\d+ resources match\\.$`));
+    expect(new URL(page.url()).searchParams.get("substage")).toBeNull();
+    expect(new URL(page.url()).searchParams.get("stage")).toBe(stage);
   });
 
   test("opens the full list on a link to a resource that is not a pick", async ({ page }) => {

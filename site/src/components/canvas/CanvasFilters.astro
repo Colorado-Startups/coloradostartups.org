@@ -110,7 +110,22 @@ const LEVELS = STAGES.filter((s) => s !== "support");
     }
   </style>
 </noscript>
-<p class="meta canvas-count" data-canvas-count role="status" aria-live="polite">{countText(cards.length, cards.length)}</p>
+{/* The count line, and beside it the kind filter a browse row's link sets
+    (?substage=, step L1b). No control in the form offers a kind, so this chip
+    names it and removes it; it ships hidden and the island shows it. */}
+<div class="canvas-count-row">
+  <p class="meta canvas-count" data-canvas-count role="status" aria-live="polite" tabindex="-1">
+    {countText(cards.length, cards.length)}
+  </p>
+  <p class="canvas-kind" data-canvas-kind hidden>
+    <span class="canvas-kind__chip">
+      <span class="canvas-kind__label">Kind: <span data-canvas-kind-name></span></span>
+      <button class="canvas-kind__remove" type="button" aria-label="Remove the kind filter" data-canvas-kind-remove>
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </span>
+  </p>
+</div>
 
 <script>
   import { initCanvasFilters } from "./canvas-filters";
@@ -332,14 +347,66 @@ const LEVELS = STAGES.filter((s) => s !== "support");
   .canvas-filters__place .btn {
     min-height: var(--size-control);
   }
-  .canvas-count {
+  .canvas-count-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
     margin-top: var(--s-3);
+  }
+  .canvas-count {
+    margin: 0;
     font-weight: 700;
+  }
+  .canvas-count:focus {
+    outline: none;
+  }
+  .canvas-count:focus-visible {
+    outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+    outline-offset: var(--line-edge);
+  }
+  .canvas-kind {
+    margin: 0;
+  }
+  /* The kind chip: the type chips' chosen look, with its remove button
+     inside as a full tap target. */
+  .canvas-kind__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    min-height: var(--size-tap);
+    padding-left: var(--s-3);
+    border: var(--line-hair) solid var(--c-text);
+    border-radius: var(--r-bevel);
+    background: var(--c-text);
+    color: var(--c-ground);
+    font-weight: 700;
+  }
+  .canvas-kind__remove {
+    display: inline-grid;
+    place-items: center;
+    min-width: var(--size-tap);
+    min-height: var(--size-tap);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-bevel);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--t-step-1);
+    line-height: 1;
+    cursor: pointer;
+  }
+  .canvas-kind__remove:focus-visible {
+    outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+    outline-offset: calc(-1 * var(--line-bold));
   }
   /* Forced colors drop background and border, so the chosen chip takes the system's selected colors. */
   @media (forced-colors: active) {
     .pick:has(input:checked),
-    .journey__node:has(input:checked) {
+    .journey__node:has(input:checked),
+    .canvas-kind__chip {
       background: SelectedItem;
       color: SelectedItemText;
     }
