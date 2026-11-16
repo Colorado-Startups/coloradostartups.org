@@ -35,8 +35,10 @@ concurrency:
 jobs:
   publish:
     name: mcp-registry
-    # ubuntu-slim: a short job that downloads one binary and makes two HTTPS calls.
-    runs-on: ubuntu-slim
+    # ubuntu-latest, not ubuntu-slim: the cosign installer calls envsubst, which the
+    # slim image lacks (the first run, 43819398716, failed on it). The repo is public,
+    # so the standard runner is free.
+    runs-on: ubuntu-latest
     # Publishing writes under the org's name, so only main may run it: the
     # mcp-registry environment's branch policy allows main alone (review of #82).
     environment: mcp-registry

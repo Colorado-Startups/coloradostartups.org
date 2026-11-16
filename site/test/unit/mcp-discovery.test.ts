@@ -73,3 +73,12 @@ describe("the registry publish workflow", () => {
     expect(workflow).toMatch(/^ {4}permissions:\n {6}id-token: write\n {6}contents: read\n/m);
   });
 });
+
+// The cosign installer needs envsubst, which the ubuntu-slim image lacks: the
+// first publish run failed on it. Pin the job to the standard image.
+describe("the registry publish workflow's runner", () => {
+  it("runs on ubuntu-latest, where the cosign installer works", () => {
+    const workflow = readFileSync(new URL("../../../.github/workflows/mcp-registry.yml", import.meta.url), "utf8");
+    expect(workflow).toMatch(/^ {4}runs-on: ubuntu-latest$/m);
+  });
+});
