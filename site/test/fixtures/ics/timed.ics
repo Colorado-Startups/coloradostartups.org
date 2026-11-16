@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Colorado Startups//Event calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:2026-11-03-ad94b87cc540@coloradostartups.org
+DTSTAMP:20261102T235057Z
+DTSTART:20261103T230000Z
+DTEND:20261104T010000Z
+SUMMARY:Let's Vibe AI Meetup at Junkyard Social in Boulder
+LOCATION:Junkyard Social Club\, 2525 Frontier Ave Suite A\, Boulder\, CO 80
+ 301\, USA
+URL:https://letsvibe.org/
+DESCRIPTION:From the Colorado Startups event calendar (https://coloradostar
+ tups.org/event-calendar/). The host's page has the details: https://letsvi
+ be.org/
+END:VEVENT
+END:VCALENDAR

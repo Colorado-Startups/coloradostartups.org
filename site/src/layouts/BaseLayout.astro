@@ -75,6 +75,14 @@ const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado S
         Only a production build carries the tag, so `astro dev` counts no visit, and the test server takes it out of
         every page it sends (scripts/strip-beacon.mjs, #66). */}
     {import.meta.env.PROD && <script is:inline defer data-cs-beacon src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "58c9c5c3a6b843ec87df6970cbbc0d97"}'></script>}{/* gitleaks:allow */}
+    {/* The click-event helper (src/lib/track.ts, step M1b). Astro ships it as one external module script, deferred
+        by nature, as the CSP's script-src 'self' needs. It sends nothing on its own: only a click on an element
+        marked data-track does, and only in a production build on the live host, never under GPC or Do Not Track. */}
+    <script>
+      import { install } from "../lib/track";
+
+      install();
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

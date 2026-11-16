@@ -1,17 +1,36 @@
 // The filters on /event-calendar/'s full events list (EventList.astro): region,
-// "This week" and in person or online. They run on the visitor's clock with no
+// "This week", "Next 7 days" (step R1: the window a region's events count
+// covers, so the count's link lands on the same events) and in person or online. They run on the visitor's clock with no
 // page load, and the choice lives in the URL (?region=space-peak&when=week
 // &type=online) so a filtered list can be shared. Past events drop out first
 // through prune.ts's showNext, as the next-events cards do. Owner: L2a.
 import { CALENDAR_TIMEZONE } from "../info/links";
 import { showNext } from "./prune";
 
+/** "Next 7 days": seven days of milliseconds from now. The map's events count uses it too (zone-counts.ts). */
+export const WEEK_MS = 7 * 86_400_000;
+
+/** The `when` value for the next seven days, the window the map's events count covers. */
+export const NEXT_7_DAYS = "next-7-days";
+
+/**
+ * Whether an event that has not ended counts as "in the next 7 days" at
+ * `now`: it starts before now plus WEEK_MS. The one rule for the map's count
+ * (at build time) and this list's filter (on the visitor's clock).
+ */
+export function startsWithinWeek(startMs: number, now: number): boolean {
+  return startMs < now + WEEK_MS;
+}
+
 export interface ListFilter {
   /** A region id, "elsewhere", or "" for every place. */
   region: string;
-  /** "week" for this week (today through Sunday, Mountain Time), or "". */
+  /**
+   * "week" for this week (today through Sunday, Mountain Time), NEXT_7_DAYS
+   * for events that start within seven days of now, or "".
+   */
   when: string;
-  /** "in-person", "online", or "". */
+  /** "in-person", "online", or "". A row matches when its data-type lists it. */
   type: string;
 }
 
@@ -62,13 +81,16 @@ export function weekEnd(day: string): string {
 export function applyFilter(root: Element, filter: ListFilter, now: number): { shown: number; upcoming: number } {
   const upcoming = showNext(root, now, Number.POSITIVE_INFINITY);
   const lastDay = filter.when === "week" ? weekEnd(denverDay(now)) : "";
+  const nextSeven = filter.when === NEXT_7_DAYS;
   let shown = 0;
   for (const li of root.querySelectorAll<HTMLElement>("li[data-ends]")) {
     if (li.hidden) continue;
     const match =
       (!filter.region || li.dataset.region === filter.region) &&
-      (!filter.type || li.dataset.type === filter.type) &&
-      (!lastDay || (li.dataset.day ?? "") <= lastDay);
+      // data-type lists every format a row has ("in-person online" for a hybrid event, L2b).
+      (!filter.type || (li.dataset.type ?? "").split(" ").includes(filter.type)) &&
+      (!lastDay || (li.dataset.day ?? "") <= lastDay) &&
+      (!nextSeven || startsWithinWeek(Date.parse(li.dataset.starts ?? ""), now));
     li.hidden = !match;
     if (match) shown++;
   }

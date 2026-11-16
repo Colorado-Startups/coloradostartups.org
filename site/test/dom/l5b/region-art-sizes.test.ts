@@ -5,9 +5,10 @@ import { readDist } from "../pages";
 
 // L5b: region art asks for a file no wider than it draws. The Quality page's
 // mobile lab loads each page at 412 px and 1.75x (Lighthouse's mobile
-// settings), where a region page's hero draws 364 px wide: 412 less two 24 px
-// gutters. Brand v3 paintings ship 720w and 1440w webp, so the lab fetches the
-// 720w. /regions/ shows the regions as chips and the home page's theme panels
+// settings), where a region page's map and painting each draw 364 px wide:
+// 412 less two 24 px gutters. Brand v3 paintings ship 720w and 1440w webp, so
+// the lab fetches the 720w; the map's relief ships 640w, 960w and 1280w, so it
+// fetches the 640w. /regions/ shows the regions as chips and the home page's theme panels
 // since step H (2026-11-15), so it has no region cards to size. Built HTML
 // from dist/ (run `npm run build` first).
 
@@ -48,8 +49,18 @@ function pickedWidth(img: Element, viewport = LAB.width, dpr = LAB.dpr): number 
 
 const doc = (file: string) => new DOMParser().parseFromString(readDist(file), "text/html");
 
-describe("region art sizes (mobile LCP on the region pages)", () => {
-  it.each(REGION_IDS)("/regions/%s/: the hero asks for the 720w file at 412 px", (id) => {
+describe("region page image sizes at the mobile lab's 412 px", () => {
+  // Since step R1 the map leads and its relief is the mobile LCP image: it
+  // draws across .wrap, 364 px, so at 1.75x it fetches the 640w file.
+  it.each(REGION_IDS)("/regions/%s/: the map's relief asks for the 640w file at 412 px", (id) => {
+    const img = doc(`regions/${id}/index.html`).querySelector("main #region-map img.colorado-map__relief");
+    expect(img).not.toBeNull();
+    expect(drawnWidth(img!.getAttribute("sizes")!, LAB.width)).toBe(364);
+    expect(pickedWidth(img!)).toBe(640);
+  });
+
+  // The painting, further down the page, still asks for no more than it draws.
+  it.each(REGION_IDS)("/regions/%s/: the painting asks for the 720w file at 412 px", (id) => {
     const img = doc(`regions/${id}/index.html`).querySelector("main .region-art--hero img");
     expect(img).not.toBeNull();
     expect(drawnWidth(img!.getAttribute("sizes")!, LAB.width)).toBe(364);
