@@ -5,7 +5,7 @@
 import { STAGES, type ResourceCard, type Stage } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
-import { FIRST_NEED, topPicks } from "../../../src/components/canvas/top-picks";
+import { COMMERCIAL, FIRST_NEED, topPicks } from "../../../src/components/canvas/top-picks";
 
 type Type = ResourceCard["type"];
 
@@ -86,14 +86,19 @@ describe("topPicks", () => {
       "Statewide Startup Week",
     ]);
     expect(idea.picks.every((p) => p.reason === "statewide")).toBe(true);
-    // Launch has two statewide cards; the third slot goes to its first-need type.
+    // Launch's statewide cards are commercial, so its first-need programs lead
+    // and one commercial card fills the last slot.
     expect(launch.picks.map((p) => p.card.name)).toEqual([
-      "Colorado Seed Fund",
-      "Startup Law Group",
       "Denver Venture Lab",
+      "Loveland Launchpad",
+      "Colorado Seed Fund",
     ]);
-    expect(launch.picks.map((p) => p.reason)).toEqual(["statewide", "statewide", "first-need"]);
-    expect(growth.picks[0].card.type).toBe(FIRST_NEED.growth[0]);
+    expect(launch.picks.map((p) => p.reason)).toEqual(["first-need", "first-need", "statewide"]);
+    expect(growth.picks.map((p) => p.card.name)).toEqual([
+      "Colorado Business News",
+      "Springs Scale Program",
+      "Growth Capital Partners",
+    ]);
     expect(support.picks[0].card.name).toBe("State Office of Economic Development");
   });
 
@@ -174,20 +179,60 @@ describe("topPicks", () => {
     ];
     const result = topPicks(cards);
     expect(result.map((s) => s.picks.length)).toEqual([1, 0, 2, 0]);
-    expect(names(result)).toEqual([["Only Idea"], [], ["First Growth", "Second Growth"], []]);
+    expect(names(result)).toEqual([["Only Idea"], [], ["Second Growth", "First Growth"], []]);
   });
 
   it("returns four empty stages for an empty list", () => {
     expect(topPicks([])).toEqual(STAGES.map((stage) => ({ stage, picks: [] })));
   });
 
-  it("ranks by stage, type, city and name only, so no url or description moves a card", () => {
-    const promoted = FIXTURE.map((c) =>
-      c.name === "Peak Angels"
-        ? { ...c, url: "https://example.org/sponsored", description: "Sponsored. Featured partner. Top rated." }
-        : c,
-    );
-    expect(names(topPicks(promoted))).toEqual(names(topPicks(FIXTURE)));
+  it("ranks by stage, type, city and name only, so no url, description or extra field moves a card", () => {
+    const before = names(topPicks(FIXTURE));
+    const picked = "Startup Basics Course";
+    const notPicked = "Peak Angels";
+    expect(before.flat()).toContain(picked);
+    expect(before.flat()).not.toContain(notPicked);
+    const promote = (c: ResourceCard) =>
+      ({
+        ...c,
+        url: "https://example.org/sponsored",
+        description: "Sponsored. Featured partner. Top rated.",
+        sponsored: true,
+        featured: true,
+        paid: 1000,
+      }) as ResourceCard;
+    const demote = (c: ResourceCard) => ({ ...c, url: "https://example.org/x", description: "x" });
+    const changed = FIXTURE.map((c) => (c.name === notPicked ? promote(c) : c.name === picked ? demote(c) : c));
+    expect(names(topPicks(changed))).toEqual(before);
+    const swapped = FIXTURE.map((c) => (c.name === picked ? promote(c) : c.name === notPicked ? demote(c) : c));
+    expect(names(topPicks(swapped))).toEqual(before);
+  });
+
+  it("keeps commercial types out of every first-need list", () => {
+    for (const stage of STAGES) for (const t of FIRST_NEED[stage]) expect(COMMERCIAL.has(t)).toBe(false);
+  });
+
+  it("gives commercial types at most one pick a stage, after the non-commercial picks", () => {
+    for (const s of topPicks(FIXTURE)) {
+      const flags = s.picks.map((p) => COMMERCIAL.has(p.card.type));
+      expect(flags.filter(Boolean).length).toBeLessThanOrEqual(1);
+      expect(flags.indexOf(true) === -1 || flags.indexOf(true) === flags.length - 1).toBe(true);
+    }
+    const cards = [
+      card("launch", "Aardvark Law", "service-provider", "statewide"),
+      card("launch", "Acme Capital", "investor", "statewide"),
+      card("launch", "Able Desks", "coworking", "statewide"),
+      card("launch", "Zed Accelerator", "accelerator", "Denver"),
+    ];
+    const launch = topPicks(cards)[1];
+    // The statewide firms rank after a local program, and only one appears.
+    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator", "Aardvark Law"]);
+    // A stage with only commercial cards shows one, not three.
+    const onlyCommercial = topPicks(cards.filter((c) => COMMERCIAL.has(c.type)))[1];
+    expect(onlyCommercial.picks).toHaveLength(1);
+    // A region does not lift the cap.
+    const regional = topPicks([...cards, card("launch", "Fort Collins Law", "service-provider", "Fort Collins")], { region: FUSION_CANYON })[1];
+    expect(regional.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator", "Fort Collins Law"]);
   });
 
   it("breaks ties by name", () => {

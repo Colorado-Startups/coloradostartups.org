@@ -7,15 +7,22 @@
 // sponsored or self-promotional can move a resource up (voice.md: founders
 // first, never a vendor directory).
 //
+// Commercial types (COMMERCIAL below) are firms that sell to founders. A
+// featured pick reads as an endorsement, so they never appear in a first-need
+// list, get at most one pick a stage between them, and rank after every
+// non-commercial card.
+//
 // How one stage is picked, slot by slot:
-//   1. Rank its cards: in the visitor's region (when one is given), then
-//      statewide reach, then the stage's first-need type order below, then
-//      name, then id.
-//   2. Take the best-ranked card that adds a new type and a new city. Relax
+//   1. Rank its cards: non-commercial first, then in the visitor's region
+//      (when one is given), then statewide reach, then the stage's
+//      first-need type order below, then name, then id.
+//   2. Skip commercial cards once the stage holds one. The commercial pick
+//      always shows after the non-commercial ones.
+//   3. Take the best-ranked card that adds a new type and a new city. Relax
 //      the rule step by step when no card fits: new type and a new city that
 //      no earlier stage used either, new type and a new city in this stage,
-//      new type, new city, then anything. "statewide" and "online" are not places, so they never
-//      use up a city.
+//      new type, new city, then anything. "statewide" and "online" are not
+//      places, so they never use up a city.
 import { STAGES, type Region, type ResourceCard, type Stage } from "@cs/shared";
 
 import { cityKey, NOT_CITIES } from "../../lib/regions/match";
@@ -26,8 +33,17 @@ export const PICKS_PER_STAGE = 3;
 type ResourceType = ResourceCard["type"];
 
 /**
- * The resource types a founder needs first at each stage, most needed first.
- * Types left out rank after these, in schema order.
+ * Types that sell a service, capital or space to founders. At most one pick
+ * a stage between them, ranked last.
+ */
+export const COMMERCIAL: ReadonlySet<ResourceType> = new Set(["service-provider", "investor", "coworking"]);
+
+/** At most this many commercial picks in one stage. */
+export const COMMERCIAL_PER_STAGE = 1;
+
+/**
+ * The non-commercial resource types a founder needs first at each stage,
+ * most needed first. Types left out rank after these, in schema order.
  */
 export const FIRST_NEED: Record<Stage, readonly ResourceType[]> = {
   idea: [
@@ -39,15 +55,15 @@ export const FIRST_NEED: Record<Stage, readonly ResourceType[]> = {
   launch: [
     "accelerator", // a structured program with mentors, often with first capital
     "incubator", // early support and space for a company not ready for a cohort
-    "investor", // a first round
-    "service-provider", // legal, accounting and banking to form the company
-    "coworking", // a desk and neighbors once the team forms
+    "education", // how to form, fund and run the company
+    "event", // meet first customers, hires and investors
+    "community", // founders a step ahead who have done it
   ],
   growth: [
-    "investor", // growth rounds are the stage's defining need
-    "service-provider", // hiring, legal and finance help to scale
-    "accelerator", // growth-stage programs
+    "accelerator", // growth-stage programs with mentors and a network
     "media", // reach customers and recruits
+    "community", // peers who have scaled
+    "event", // meet partners and later-stage backers
   ],
   support: [
     "government", // state and city programs, grants and the SBDC network
@@ -110,6 +126,7 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
       .filter((c) => c.stage === stage)
       .sort(
         (a, b) =>
+          Number(COMMERCIAL.has(a.type)) - Number(COMMERCIAL.has(b.type)) ||
           Number(inRegion(b)) - Number(inRegion(a)) ||
           Number(isStatewide(b)) - Number(isStatewide(a)) ||
           typeRank(a.type) - typeRank(b.type) ||
@@ -139,7 +156,12 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
     ];
 
     const left = [...ranked];
-    while (picks.length < PICKS_PER_STAGE && left.length > 0) {
+    let commercial = 0;
+    while (picks.length < PICKS_PER_STAGE) {
+      if (commercial >= COMMERCIAL_PER_STAGE) {
+        for (let i = left.length - 1; i >= 0; i--) if (COMMERCIAL.has(left[i].type)) left.splice(i, 1);
+      }
+      if (left.length === 0) break;
       let index = -1;
       for (const rule of rules) {
         index = left.findIndex(rule);
@@ -154,11 +176,15 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
             ? "first-need"
             : "spread";
       picks.push({ card, reason });
+      if (COMMERCIAL.has(card.type)) commercial += 1;
       types.add(card.type);
       const place = placeOf(card);
       if (place !== null) cities.add(place);
     }
     for (const c of cities) usedCities.add(c);
-    return { stage, picks };
+    // Spread can take the commercial card before a non-commercial one; it
+    // still shows last.
+    const shown = [...picks.filter((p) => !COMMERCIAL.has(p.card.type)), ...picks.filter((p) => COMMERCIAL.has(p.card.type))];
+    return { stage, picks: shown };
   });
 }
