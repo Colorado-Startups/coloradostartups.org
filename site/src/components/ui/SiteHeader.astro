@@ -166,16 +166,16 @@ const here = Astro.url.pathname;
   .menu-toggle {
     display: none;
   }
-  /* K1's Search button (48 px) joins the one row. From 1200 to 1439 px the
-     row had about 60 px to spare (#424). Gaps of 16 px beside the button and
-     20 px between links hold its cost to about 36 px, so the row stays one
-     row. */
-  @media (min-width: 1200px) and (max-width: 1439px) {
+  /* K1's Search button (about 64 px) joins the one row, which had about 60 px
+     to spare at every wide width (the wrap caps at 1180 px; #424). Gaps of
+     12 px beside the button and 16 px between links hold its net cost to
+     about 32 px, so the row stays one row. */
+  @media (min-width: 1200px) {
     nav {
-      gap: var(--s-4);
+      gap: var(--s-3);
     }
     nav ul {
-      column-gap: calc(var(--s-4) + var(--s-1));
+      column-gap: var(--s-4);
     }
   }
   /* While the menu is open the toggle stays pressed: the slab sits on its

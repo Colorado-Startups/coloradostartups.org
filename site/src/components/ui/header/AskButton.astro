@@ -3,9 +3,9 @@
 // the Ask dialog, with the "/" key shown beside it on wide screens. The page
 // ships a plain link to /ask/; ask-dialog.ts swaps in the <button>, so without
 // JavaScript the link still goes to the Ask page. On phones the button sits
-// in the open menu with the rest of the nav. Between 1200 and 1439 px the
-// header is one row with little room to spare (#424), so there it shows only
-// the lens; its name stays "Search" for screen readers.
+// in the open menu with the rest of the nav. From 1200 px the header is one
+// row with little room to spare (#424), so there it shows the lens and the
+// "/" key; its name stays "Search" for screen readers.
 import AskDialog from "../../ask/AskDialog.astro";
 ---
 
@@ -63,11 +63,14 @@ import AskDialog from "../../ask/AskDialog.astro";
     font-weight: 400;
     line-height: 1.4;
   }
-  /* The one-row header at its narrowest: the lens alone, 48 px square. */
-  @media (min-width: 1200px) and (max-width: 1439px) {
+  /* The one-row header: the lens and the "/" key, about 64 px. The wrap caps
+     at 1180 px, so every wide screen has the same tight row (#424); the word
+     stays for screen readers. Wide screens have a keyboard, so the key that
+     opens Ask shows here. */
+  @media (min-width: 1200px) {
     .ask-trigger {
-      width: var(--size-control);
-      padding: 0;
+      padding-inline: var(--s-2);
+      gap: var(--s-1);
     }
     .ask-trigger__label {
       position: absolute;
@@ -77,9 +80,6 @@ import AskDialog from "../../ask/AskDialog.astro";
       clip-path: inset(50%);
       white-space: nowrap;
     }
-  }
-  /* Wide screens have a keyboard, so the key that opens Ask shows here. */
-  @media (min-width: 1440px) {
     .ask-trigger__key {
       display: inline-block;
     }
