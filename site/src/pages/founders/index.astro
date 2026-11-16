@@ -26,6 +26,7 @@ import { WAITLIST_ANCHOR } from "../../components/founders/waitlist-fields";
 import Button from "../../components/ui/Button.astro";
 import Callout from "../../components/ui/Callout.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { joinAttrs } from "../../lib/track-attrs";
 ---
 
 <BaseLayout
@@ -42,7 +43,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       </p>
       <div class="btn-row">
         <Button href={`#${WAITLIST_ANCHOR}`}>Join the waitlist</Button>
-        <Button variant="secondary" href={WAYS_IN.slack} aria-describedby="slack-form-note-top">Join the Slack</Button>
+        <Button variant="secondary" href={WAYS_IN.slack} aria-describedby="slack-form-note-top" {...joinAttrs("founders")}>Join the Slack</Button>
       </div>
       <p class="meta" id="slack-form-note-top">Join the Slack opens a Google Form.</p>
     </div>

@@ -7,6 +7,7 @@ import { WAYS_IN } from "@cs/shared";
 import InfoHeader from "../components/info/InfoHeader.astro";
 import { CONTACT_EMAIL, mailto, POSTAL_ADDRESS } from "../components/info/links";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { joinAttrs } from "../lib/track-attrs";
 
 const DOORS = [
   { href: WAYS_IN.slack, label: "Join the Slack", what: "Request an invite to the Colorado Startups Slack." },
@@ -59,7 +60,7 @@ const DOORS = [
         {
           DOORS.map((d) => (
             <li>
-              <a class="tap-target" href={d.href}>{d.label}</a>
+              <a class="tap-target" href={d.href} {...(d.href === WAYS_IN.slack ? joinAttrs("contact") : {})}>{d.label}</a>
               <span class="meta">{d.what}</span>
             </li>
           ))

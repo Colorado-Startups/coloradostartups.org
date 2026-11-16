@@ -26,6 +26,7 @@ import Tallies from "../../components/regions/Tallies.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { REGIONS } from "../../lib/regions/match";
 import { organizerFor } from "../../lib/regions/page";
+import { joinAttrs } from "../../lib/track-attrs";
 
 const positions = (await getCollection("positions")).map((e) => e.data);
 const people = (await getCollection("people")).map((e) => e.data);
@@ -44,7 +45,7 @@ const statewideSeat = positions.find((p) => p.id === "community-organizer");
       <h1 id="regions-title">Regions</h1>
       <p class="lede">Find your region. Meet the founders building near you.</p>
       <div class="hub">
-        <ColoradoMap id="regions-map" />
+        <ColoradoMap id="regions-map" where="regions-map" />
         <LiveMaps />
         <div>
           <h2 class="visually-hidden">The three regions</h2>
@@ -68,7 +69,7 @@ const statewideSeat = positions.find((p) => p.id === "community-organizer");
     <div class="wrap">
       <h2 id="builds">What each region builds</h2>
       <div class="themes">
-        {themes().map((theme) => <ThemePanel theme={theme} />)}
+        {themes().map((theme) => <ThemePanel theme={theme} where="regions-themes" />)}
       </div>
     </div>
   </section>
@@ -82,7 +83,7 @@ const statewideSeat = positions.find((p) => p.id === "community-organizer");
           <li><strong>1 Slack</strong> and <strong>1 event calendar</strong> for all of Colorado.</li>
         </ul>
         <div class="btn-row">
-          <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note">Join the Slack</a>
+          <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note" {...joinAttrs("regions")}>Join the Slack</a>
           <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
         </div>
         <p class="meta" id="slack-note">Join the Slack opens a Google Form.</p>

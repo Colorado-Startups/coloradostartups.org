@@ -2,6 +2,8 @@
 // /newsletter/thanks/: where /api/subscribe sends a successful sign-up
 // (worker/routes/subscribe.ts). The words are the L13 lane contract, verbatim.
 // Out of the sitemap (astro.config.mjs SITEMAP_EXCLUDE) and noindex. Owner: L13.
+// Sends newsletter_submit with ok true, right after the post (form-status.ts,
+// step M1c).
 import HallSeal from "../../components/hall/HallSeal.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
@@ -11,7 +13,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   description="Confirm your email to start getting Startupers, the Colorado Startups newsletter."
   noindex
 >
-  <section class="section section--lit" aria-labelledby="thanks-title">
+  <section class="section section--lit" aria-labelledby="thanks-title" data-submit-event="newsletter_submit">
     <div class="wrap">
       <p class="kicker">News from Colorado Startups</p>
       <h1 id="thanks-title">Check your inbox</h1>
@@ -27,3 +29,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  import { trackAccepted } from "../../components/forms/form-status";
+
+  trackAccepted();
+</script>

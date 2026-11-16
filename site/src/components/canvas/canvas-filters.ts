@@ -18,8 +18,12 @@
 // form. A chip beside the count line names it and removes it. It holds
 // through type, city and search changes, and goes with a new stage or Clear:
 // each stage has its own kinds.
+//
+// Each settled search sends search_used with its match count, never its words
+// (lib/search-used.ts, step M1c).
 
 import { loadPagefind, type Pagefind } from "../../lib/pagefind";
+import { searchReporter } from "../../lib/search-used";
 import {
   countText,
   groupCountText,
@@ -80,7 +84,13 @@ type Search = (q: string, pagePath: string) => Promise<Set<string> | null>;
 // A select, a text box, or a group of radio chips: each reads and sets .value.
 type Control = { value: string };
 
-export function initCanvasFilters(root: HTMLElement, search: Search = pagefindIds): { apply: () => Promise<void> } {
+type Report = (query: string, results: number) => void;
+
+export function initCanvasFilters(
+  root: HTMLElement,
+  search: Search = pagefindIds,
+  report: Report = searchReporter("ecosystem-canvas"),
+): { apply: () => Promise<void> } {
   const form = root.querySelector<HTMLFormElement>("form[data-canvas-filters]");
   const status = root.querySelector<HTMLElement>("[data-canvas-count]");
   if (!form || !status) return { apply: async () => {} };
@@ -206,6 +216,7 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     const nMatched = matched.filter(Boolean).length;
     const nShown = show.filter(Boolean).length;
     status!.textContent = countText(nMatched, cards.length);
+    report(state.q, nMatched);
     if (kindRow) kindRow.hidden = !state.substage;
     if (kindName) kindName.textContent = state.substage ? (SUBSTAGE_LABELS[state.substage] ?? state.substage) : "";
     if (moreRow) moreRow.hidden = nShown >= nMatched;

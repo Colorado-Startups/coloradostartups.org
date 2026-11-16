@@ -3,17 +3,19 @@
 // (step F1). A second sign-up with an email already on the list lands here
 // too, so the page never says whether someone was already on it. Out of the
 // sitemap (astro.config.mjs SITEMAP_EXCLUDE matches /thanks/) and noindex.
-// Clears the form's sessionStorage draft. The links come from WAYS_IN, the
-// community's one list of ways in. No keeper is on it.
+// Clears the form's sessionStorage draft, and sends join_submit with ok true
+// (form-status.ts, step M1c). The links come from WAYS_IN, the community's
+// one list of ways in. No keeper is on it.
 import { WAYS_IN } from "@cs/shared";
 
 import { WAITLIST_DRAFT } from "../../../components/founders/waitlist-fields";
 import Button from "../../../components/ui/Button.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { joinAttrs } from "../../../lib/track-attrs";
 ---
 
 <BaseLayout title="You are on the waitlist" description="Thank you for joining the founders forum waitlist." noindex>
-  <section class="section section--lit" data-clear-draft={WAITLIST_DRAFT.key}>
+  <section class="section section--lit" data-clear-draft={WAITLIST_DRAFT.key} data-submit-event="join_submit">
     <div class="wrap stack">
       <h1>Thank you</h1>
       <p class="lede">You are on the founders forum waitlist.</p>
@@ -22,7 +24,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       </p>
       <p>While you wait, meet Colorado founders in the Slack and at events.</p>
       <div class="btn-row">
-        <Button href={WAYS_IN.slack} aria-describedby="thanks-slack-note">Join the Slack</Button>
+        <Button href={WAYS_IN.slack} aria-describedby="thanks-slack-note" {...joinAttrs("founders-waitlist-thanks")}>Join the Slack</Button>
         <Button variant="secondary" href={WAYS_IN.events}>See upcoming events</Button>
       </div>
       <p class="meta" id="thanks-slack-note">Join the Slack opens a Google Form.</p>
@@ -33,6 +35,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 <script>
   // The entry went through, so this tab's draft of it is no longer needed.
   import { clearNamedDrafts } from "../../../components/apply/client";
+  import { trackAccepted } from "../../../components/forms/form-status";
 
   clearNamedDrafts(document);
+  trackAccepted();
 </script>

@@ -25,6 +25,11 @@
 // Styling uses design v2 role tokens only (never gold as text on a light
 // ground). Visual polish waits for Gate A v2.
 //
+// Each door's summary counts as door_pick, with the door's kind, and each Join
+// the Slack or LinkedIn Group link as join_click (step M1c): "home-doors" on
+// home, "community-doors" on /community/. A click that closes a door counts
+// too, since the summary cannot tell the two apart without a script.
+//
 // L7's small portrait of Communitas sits beside the heading and the line that
 // names it (#209). Its alt text, from portraitAlt(), says it is an AI agent,
 // and the disclosure line from dwarves.yaml stays at the foot of the desk.
@@ -33,6 +38,7 @@ import { getCollection } from "astro:content";
 
 import { doorPlan } from "../../lib/communitas/doors";
 import { deskSteps } from "../../lib/communitas/route";
+import { joinAttrs, trackAttrs } from "../../lib/track-attrs";
 import { portraitAlt } from "../art/keepers";
 import Portrait from "../art/Portrait.astro";
 import { activeCards } from "../canvas/canvas-data";
@@ -58,6 +64,11 @@ const disclosure = communitas?.data.disclosure;
 const variant = compact ? "compact" : "full";
 const headingId = `welcome-desk-heading-${variant}`;
 const group = `welcome-desk-${variant}`;
+/** The band, as door_pick's and join_click's `where`. */
+const where = compact ? "home-doors" : "community-doors";
+/** A step's join mark: the Slack and the LinkedIn Group count, other steps do not. */
+const stepAttrs = (kind: string) =>
+  kind === "slack" ? joinAttrs(where) : kind === "linkedin-group" ? joinAttrs(where, "linkedin-group") : {};
 
 // The compact doors: every route, in VISITOR_KINDS order.
 let plans: ReturnType<typeof doorPlan>[] = [];
@@ -84,7 +95,7 @@ const ICONS = {
         {plans.map((plan) => (
           <li>
             <details class="doorway" name={group} data-kind={plan.kind}>
-              <summary>
+              <summary {...trackAttrs("door_pick", { where, door: plan.kind })}>
                 <svg class="doorway__glyph" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   {ICONS.door.map((d) => <path d={d} />)}
                 </svg>
@@ -97,7 +108,7 @@ const ICONS = {
                   </svg>
                   <div class="doorway__cell">
                     <p>{plan.slack.line}</p>
-                    <a href={plan.slack.join.href} aria-describedby={plan.slack.join.describedBy} data-join>
+                    <a href={plan.slack.join.href} aria-describedby={plan.slack.join.describedBy} data-join {...joinAttrs(where)}>
                       {plan.slack.join.text}
                     </a>
                   </div>
@@ -156,11 +167,11 @@ const ICONS = {
     {
       doors.map(({ route, steps }) => (
         <details class="door" name={group}>
-          <summary>{route.label}</summary>
+          <summary {...trackAttrs("door_pick", { where, door: route.id })}>{route.label}</summary>
           <ul class="steps">
             {steps.map((step) => (
               <li>
-                <a class="community" href={step.href}>
+                <a class="community" href={step.href} {...stepAttrs(step.kind)}>
                   {step.label}
                 </a>
                 <span class="note">{step.note}</span>

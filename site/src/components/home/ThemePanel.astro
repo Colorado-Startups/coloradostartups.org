@@ -4,7 +4,8 @@
 //
 // The header is the real map of the region (ColoradoMap's thumbnail): its
 // line along its roads, its cities, and where it sits in the state. It links
-// to the region's page, where the region's painting is the full art.
+// to the region's page, where the region's painting is the full art. With
+// `where`, a click on it counts as map_region_open (step M1c).
 import { REGION_COLORS } from "../../lib/regions/map";
 import ColoradoMap from "../map/ColoradoMap.astro";
 import type { Theme } from "./home-data";
@@ -12,13 +13,15 @@ import StatTile from "./StatTile.astro";
 
 interface Props {
   theme: Theme;
+  /** The band, as map_region_open's `where`. */
+  where?: string;
 }
-const { theme } = Astro.props;
+const { theme, where } = Astro.props;
 const id = `theme-${theme.region}`;
 ---
 
 <article class="theme panel" aria-labelledby={id} style={`--theme-color: ${REGION_COLORS[theme.region]}`}>
-  <ColoradoMap id={`theme-map-${theme.region}`} zone={theme.region} variant="thumb" label={`Map of ${theme.regionName}: open its page`} />
+  <ColoradoMap id={`theme-map-${theme.region}`} zone={theme.region} variant="thumb" label={`Map of ${theme.regionName}: open its page`} where={where} />
   <div class="theme__body">
     <h3 id={id}>{theme.title}</h3>
     <div class="theme__tiles">

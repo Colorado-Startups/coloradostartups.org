@@ -6,7 +6,13 @@
 // <body>. The search is a plain GET to /ask/?q=, the page that runs Pagefind.
 // Resourcus is named with "an AI agent" wherever it appears
 // (.claude/rules/ai-disclosure.md).
+// Each way to ask counts as ask_used, where "ask-dialog" (step M1c): the
+// Search button (pressing Enter in the box clicks it too) with kind "search",
+// the Resourcus link with "resourcus", and Copy prompt with "copy".
+import { trackAttrs } from "../../lib/track-attrs";
 import AskAi from "../ai/AskAi.astro";
+
+const where = "ask-dialog";
 ---
 
 <template data-ask-template>
@@ -21,7 +27,7 @@ import AskAi from "../ai/AskAi.astro";
       <label for="ask-dialog-q">Search the site</label>
       <div class="ask-dialog__row">
         <input id="ask-dialog-q" type="search" name="q" required autocomplete="off" enterkeyhint="search" />
-        <button type="submit" class="btn btn--gold">Search</button>
+        <button type="submit" class="btn btn--gold" {...trackAttrs("ask_used", { where, kind: "search" })}>Search</button>
       </div>
     </form>
     {/* WCAG 2.1.4: a one-key shortcut must be possible to turn off. Saved on this device. */}
@@ -30,10 +36,10 @@ import AskAi from "../ai/AskAi.astro";
       <label for="ask-dialog-key">Open search with the / key</label>
     </p>
     <p class="ask-dialog__resourcus">
-      <a href="/ask/">Ask Resourcus, an AI agent</a>, about Colorado's startup resources.
+      <a href="/ask/" {...trackAttrs("ask_used", { where, kind: "resourcus" })}>Ask Resourcus, an AI agent</a>, about Colorado's startup resources.
     </p>
     <div class="ask-dialog__ai">
-      <AskAi subject="Colorado Startups" path="/" id="ask-dialog-ai" />
+      <AskAi subject="Colorado Startups" path="/" id="ask-dialog-ai" where={where} dialog />
     </div>
   </dialog>
 </template>

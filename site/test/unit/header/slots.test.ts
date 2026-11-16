@@ -24,6 +24,8 @@ const template = (source: string) => source.split("---").slice(2).join("---");
 // nothing" check. The header's styles (after the <script>) gained K1's gaps.
 // W8 (2026-11-16) filled YourRegion the same way: only the slot comment's
 // words changed, and the check below on YourRegion replaces its own.
+// M1c (2026-11-16) marks Join the Slack for the click listener; the hash is
+// taken with that one mark removed, so the rest stays pinned.
 const MARKUP_BEFORE_S0 = "129944a847f68aa6ad4daee22e2dbf58b793b0a3052821997bd4225e81b81d4e";
 
 const SLOTS = [
@@ -78,7 +80,12 @@ describe("header slots", () => {
       .slice(0, markup.indexOf("<script>"))
       .replace(/^ *\{\/\* Slots for K1 .*\*\/\}\n/m, "")
       .replace(/^ *<AskButton \/>\n/m, "")
-      .replace(/^ *<YourRegion \/>\n/m, "");
+      .replace(/^ *<YourRegion \/>\n/m, "")
+      .replace(' {...joinAttrs("header")}', "");
     expect(createHash("sha256").update(withoutSlots).digest("hex")).toBe(MARKUP_BEFORE_S0);
+  });
+
+  it("marks Join the Slack as join_click from the header (M1c)", () => {
+    expect(header).toContain('<a class="btn btn--gold cta" href={WAYS_IN.slack} aria-describedby="header-slack-note" {...joinAttrs("header")}>');
   });
 });

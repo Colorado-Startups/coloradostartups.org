@@ -13,6 +13,7 @@ import { regionLede, WAYS_IN } from "@cs/shared";
 
 import StatTile from "../../home/StatTile.astro";
 import { REGION_COLORS } from "../../../lib/regions/map";
+import { joinAttrs } from "../../../lib/track-attrs";
 import { regionTiles } from "../region-tiles";
 
 interface Props {
@@ -38,7 +39,7 @@ const { region } = Astro.props;
             it goes (#128). */}
         <div class="first-actions">
           <div class="btn-row">
-            <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note-top">Join the Slack</a>
+            <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note-top" {...joinAttrs(`regions-${region.id}-hero`)}>Join the Slack</a>
             <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
           </div>
           <p class="meta" id="slack-note-top">Join the Slack opens a Google Form.</p>

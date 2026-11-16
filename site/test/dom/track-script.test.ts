@@ -7,9 +7,9 @@ import { describe, expect, it } from "vitest";
 import { contentPages, DIST_DIR } from "./pages";
 
 // M1b: every built page loads the click-event helper (src/lib/track.ts)
-// through an external module script, and no page marks anything with
-// data-track yet (step M1c adds the marks). With no mark and no automatic
-// event, the site makes no request to /api/e. Run `npm run build` first.
+// through an external module script, once. It sends no event on its own
+// (no page view). Step M1c marks the controls; track-attrs.test.ts checks
+// the marks. Run `npm run build` first.
 //
 // Astro may put the helper in the page's own entry file or in a chunk that
 // entry imports, so the test follows each entry's static imports.
@@ -51,11 +51,10 @@ const trackFiles = (html: string) => loadedModules(html).all.filter((src) => TRA
 
 describe("the track helper on every built page", () => {
   for (const page of pages) {
-    it(`${page.route} loads it once, through an external module script, with no data-track mark`, () => {
+    it(`${page.route} loads it once, through an external module script`, () => {
       const { entries } = loadedModules(page.html);
       expect(entries.length, `${page.route} module scripts`).toBeGreaterThan(0);
       expect(trackFiles(page.html), `${page.route} loads ${entries.join(", ")}`).toHaveLength(1);
-      expect(page.html).not.toMatch(/\sdata-track[\s=>-]/);
     });
   }
 

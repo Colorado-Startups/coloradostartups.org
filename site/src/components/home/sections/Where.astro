@@ -8,6 +8,8 @@
 // The counts are frozen at build time, so the table says the build's date in
 // Denver time, and the events column says its seven days. Counts come from zone-counts.ts,
 // in the regions' fixed data order: regions are equals, never ranked.
+// A click on a zone or on a region's row counts as map_region_open (step
+// M1c): "home-map" on the map, "home-map-list" in the table.
 //
 // Since 2026-11-16 this band comes right after the hero, so the map is in the
 // first screen (Paul: "The homepage should lead with the Colorado map too").
@@ -21,6 +23,7 @@ import { regionCrestKey } from "../../art/keepers";
 import ColoradoMap from "../../map/ColoradoMap.astro";
 import { COUNT_LABELS, zoneCounts } from "../../map/zone-counts";
 import { REGION_COLORS } from "../../../lib/regions/map";
+import { trackAttrs } from "../../../lib/track-attrs";
 import { CALENDAR_TIMEZONE } from "../../info/links";
 
 // The map's column: up to 960 px, the whole .wrap (100vw less two 24 px
@@ -47,7 +50,7 @@ const rows = zones.map((z) => {
   <div class="wrap where">
     <h2 class="where__title" id="where">Three regions along the Front Range</h2>
     <div class="where__map">
-      <ColoradoMap id="home-map" live={false} caption="" zones={zones} sizes={MAP_SIZES} priority />
+      <ColoradoMap id="home-map" live={false} caption="" zones={zones} sizes={MAP_SIZES} priority where="home-map" />
     </div>
     <div class="where__list">
       <table class="zones" data-zone-counts data-as-of={now.toISOString()}>
@@ -63,7 +66,7 @@ const rows = zones.map((z) => {
             rows.map((r) => (
               <tr data-zone-row={r.id} style={`--region-color: ${REGION_COLORS[r.id]}`}>
                 <th scope="row">
-                  <a class="region-link" href={`/regions/${r.id}/`}>
+                  <a class="region-link" href={`/regions/${r.id}/`} {...trackAttrs("map_region_open", { where: "home-map-list", region: r.id })}>
                     <img class="zones__crest" src={r.crest.src} srcset={r.crest.srcset} sizes="40px" width="40" height="40" alt="" loading="lazy" decoding="async" />
                     <span class="region-link__name">{r.name}</span>
                   </a>

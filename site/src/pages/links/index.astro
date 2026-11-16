@@ -6,7 +6,8 @@
 // /slack/ short link that ops/redirects/map.csv sends to the Google Form. So
 // the Slack backend can change in that one row without touching any copy
 // (LinkedIn project decisions 30 and 35, #128). The page collects no data
-// itself.
+// itself. The Slack and LinkedIn Group links count as join_click, and the
+// Startup Community Project's event page as event_out (step M1c).
 import { WAYS_IN } from "@cs/shared";
 
 import { STARTUP_COMMUNITY_PROJECT_URL } from "../../components/hall/channels";
@@ -15,6 +16,7 @@ import Button from "../../components/ui/Button.astro";
 import Panel from "../../components/ui/Panel.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { GUIDES_INDEX } from "../../lib/guides/guides";
+import { eventSource, joinAttrs, trackAttrs } from "../../lib/track-attrs";
 
 interface LinkRow {
   label: string;
@@ -65,6 +67,14 @@ const GROUPS: { id: string; heading: string; links: LinkRow[] }[] = [
     ],
   },
 ];
+
+/** A row's click mark: the LinkedIn Group join and the outside event page count. */
+const rowAttrs = (href: string) =>
+  href === LINKEDIN_GROUP_URL
+    ? joinAttrs("links", "linkedin-group")
+    : href === STARTUP_COMMUNITY_PROJECT_URL
+      ? trackAttrs("event_out", { where: "links", source: eventSource(href) })
+      : {};
 ---
 
 <BaseLayout
@@ -80,7 +90,7 @@ const GROUPS: { id: string; heading: string; links: LinkRow[] }[] = [
         <Panel raised size="lg" class="slack" data-slack-entry>
           <h2 id="slack">Join the Slack</h2>
           <p>Founders across Colorado ask questions, trade advice and share wins here. Joining starts with a short Google Form.</p>
-          <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
+          <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note" {...joinAttrs("links")}>Join the Slack</Button>
           <p class="meta" id="slack-form-note">Opens a Google Form.</p>
         </Panel>
       </div>
@@ -97,7 +107,7 @@ const GROUPS: { id: string; heading: string; links: LinkRow[] }[] = [
               <ul class="rows" role="list">
                 {group.links.map((link) => (
                   <li>
-                    <a class="row" href={link.href}>
+                    <a class="row" href={link.href} {...rowAttrs(link.href)}>
                       <span class="label">{link.label}</span>
                       <span class="what">{link.what}</span>
                     </a>

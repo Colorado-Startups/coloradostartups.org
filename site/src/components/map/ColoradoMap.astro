@@ -39,6 +39,10 @@
 // (home/sections/Where.astro). Home's statewide map is also its first-screen
 // image, so it passes `priority` too (Paul, 2026-11-16: "The homepage should
 // lead with the Colorado map too").
+//
+// `where` marks each region link (a zone, or the thumbnail) for the click
+// listener (step M1c): a click sends map_region_open with that `where` and
+// the region's id.
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
 
@@ -49,6 +53,7 @@ import { coloradoMapSvg, viewOf } from "../../lib/regions/colorado-map";
 import { inFrame } from "../../lib/regions/colorado-views";
 import { REGION_COLORS } from "../../lib/regions/map";
 import { andList } from "../../lib/text";
+import { trackAttrs } from "../../lib/track-attrs";
 import { brandArt } from "../art/art-assets";
 import { regionCrestKey } from "../art/keepers";
 import { COUNT_LABELS, type ZoneCounts } from "./zone-counts";
@@ -72,9 +77,13 @@ interface Props {
   zones?: readonly ZoneCounts[];
   /** The first-screen image: load the relief eagerly, at high fetch priority. */
   priority?: boolean;
+  /** The band, as map_region_open's `where`. Omit for an unmarked map. */
+  where?: string;
 }
 
-const { id, zone, variant = "full", sizes, zones, priority = false } = Astro.props;
+const { id, zone, variant = "full", sizes, zones, priority = false, where } = Astro.props;
+/** A region link's click mark, or none. */
+const opens = (region: string) => (where ? trackAttrs("map_region_open", { where, region }) : {});
 const thumb = variant === "thumb" && Boolean(zone);
 const live = !thumb && (Astro.props.live ?? true);
 const focus = zone ? zoneById(zone).properties : undefined;
@@ -119,7 +128,7 @@ const hits = zone
 
 {
   thumb ? (
-    <a class="colorado-map colorado-map--thumb" id={id} href={`/regions/${zone}/`} data-zone={zone} style={ratio}>
+    <a class="colorado-map colorado-map--thumb" id={id} href={`/regions/${zone}/`} data-zone={zone} style={ratio} {...opens(zone!)}>
       <span class="colorado-map__box">
         <Image
           class="colorado-map__relief"
@@ -152,7 +161,7 @@ const hits = zone
         {hits.map((h) =>
           h.counts && h.crest ? (
             <>
-              <a class="colorado-map__hit colorado-map__hit--zone" href={`/regions/${h.id}/`} style={h.style} data-zone={h.id} aria-label={`${h.name} on the map`} />
+              <a class="colorado-map__hit colorado-map__hit--zone" href={`/regions/${h.id}/`} style={h.style} data-zone={h.id} aria-label={`${h.name} on the map`} {...opens(h.id)} />
               <div class="colorado-map__card" data-zone={h.id} style={`--region-color: ${REGION_COLORS[h.id]}`} aria-hidden="true">
                 <img class="colorado-map__crest" src={h.crest.src} srcset={h.crest.srcset} sizes="56px" width="56" height="56" alt="" loading="lazy" decoding="async" />
                 <p class="colorado-map__card-name">{h.name}</p>
@@ -167,7 +176,7 @@ const hits = zone
               </div>
             </>
           ) : (
-            <a class="colorado-map__hit" href={`/regions/${h.id}/`} style={h.style} tabindex="-1" aria-hidden="true" title={h.name} />
+            <a class="colorado-map__hit" href={`/regions/${h.id}/`} style={h.style} tabindex="-1" aria-hidden="true" title={h.name} {...opens(h.id)} />
           ),
         )}
         {live && <div class="colorado-map__live" data-map-canvas data-label={label} />}

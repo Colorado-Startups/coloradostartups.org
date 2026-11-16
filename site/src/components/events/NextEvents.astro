@@ -4,6 +4,9 @@
 // in Mountain Time. Every event that had not ended at build time is in the
 // HTML; the first NEXT_COUNT show and the rest wait hidden, and a small script
 // (prune.ts) moves the six along as events end. Owner: L24.
+// An event's own link counts as event_out, where "event-calendar-next", with
+// its host as `source` (step M1c).
+import { eventSource, trackAttrs } from "../../lib/track-attrs";
 import { cardPlace, type CalendarEvent, dateParts, endsAt, NEXT_COUNT, whenText } from "./events";
 
 interface Props {
@@ -31,7 +34,7 @@ const { events } = Astro.props;
               <div class="ev-card__body">
                 <h3 class="ev-card__title">
                   {event.url ? (
-                    <a href={event.url} rel="nofollow noopener">
+                    <a href={event.url} rel="nofollow noopener" {...trackAttrs("event_out", { where: "event-calendar-next", source: eventSource(event.url) })}>
                       {event.title}
                     </a>
                   ) : (

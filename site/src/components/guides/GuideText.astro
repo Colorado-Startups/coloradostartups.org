@@ -1,17 +1,22 @@
 ---
 // Inline text built by lib/guides: plain words, links and dates. The parts
 // carry their own spaces, so nothing here adds whitespace. Owner: L23.
+// A link to the Slack counts as join_click (step M1c).
+import { WAYS_IN } from "@cs/shared";
+
 import type { Part } from "../../lib/guides/guides";
+import { joinAttrs } from "../../lib/track-attrs";
 
 interface Props {
   parts: readonly Part[];
 }
 
 const { parts } = Astro.props;
+const linkAttrs = (href: string) => (href === WAYS_IN.slack ? joinAttrs("guides") : {});
 ---
 
 {
   parts.map((p) =>
-    typeof p === "string" ? p : "href" in p ? <a href={p.href}>{p.text}</a> : <time datetime={p.datetime}>{p.text}</time>,
+    typeof p === "string" ? p : "href" in p ? <a href={p.href} {...linkAttrs(p.href)}>{p.text}</a> : <time datetime={p.datetime}>{p.text}</time>,
   )
 }

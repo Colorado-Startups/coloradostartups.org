@@ -8,6 +8,7 @@
 // current-page test live in nav.ts.
 import { WAYS_IN } from "@cs/shared";
 
+import { joinAttrs } from "../../lib/track-attrs";
 import { brandArt } from "../art/art-assets";
 import AskButton from "./header/AskButton.astro";
 import YourRegion from "./header/YourRegion.astro";
@@ -45,7 +46,7 @@ const here = Astro.url.pathname;
       {/* Slots for K1 (Ask anywhere: the Search button) and W8 (your region: its crest, or Pick your region). */}
       <AskButton />
       <YourRegion />
-      <a class="btn btn--gold cta" href={WAYS_IN.slack} aria-describedby="header-slack-note">Join the Slack</a>
+      <a class="btn btn--gold cta" href={WAYS_IN.slack} aria-describedby="header-slack-note" {...joinAttrs("header")}>Join the Slack</a>
       <span class="cta-note" id="header-slack-note">Opens a Google Form.</span>
     </nav>
   </div>

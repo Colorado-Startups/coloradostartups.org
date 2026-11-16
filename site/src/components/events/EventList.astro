@@ -11,9 +11,13 @@
 // Owner: L2a. Step L2b adds an "Add to calendar" file on each row (ics.ts),
 // the subscribe link at the top, and honest format tags (format.ts): a hybrid
 // event is in person and online, and an event with no place says so.
+// Each way out counts as event_out, where "event-calendar-list" (step M1c):
+// an event's own link with its host as `source` (eventSource), Add to
+// calendar as "ics" and the subscribe link as "calendar-feed".
 import { calendarFeedSubscribeUrl } from "../info/links";
 import { regionForCity, REGIONS } from "../../lib/regions/match";
 import { REGION_COLORS } from "../../lib/regions/map";
+import { eventSource, trackAttrs } from "../../lib/track-attrs";
 import { cardPlace, type CalendarEvent, dateParts, endsAt, startsAt, whenText } from "./events";
 import { formatLabel, formatOf, formatTokens } from "./format";
 import { icsPath } from "./ics";
@@ -24,6 +28,9 @@ interface Props {
 }
 
 const { events } = Astro.props;
+
+/** A way out's click mark. */
+const out = (source: string) => trackAttrs("event_out", { where: "event-calendar-list", source });
 
 const STATE = /^[A-Z]{2}(?:\s+\d{5}(?:-\d{4})?)?$/;
 
@@ -87,7 +94,7 @@ const placeText = (location: string | null, tag: string | null) => {
 <div class="evlist" data-event-list>
   <h2 id="all-events">Every upcoming event</h2>
   <p class="evlist__subscribe">
-    <a class="btn btn--stone" href={calendarFeedSubscribeUrl()} data-subscribe-feed>Subscribe to all events</a>
+    <a class="btn btn--stone" href={calendarFeedSubscribeUrl()} data-subscribe-feed {...out("calendar-feed")}>Subscribe to all events</a>
     <span class="meta">Opens in your calendar app. The feed comes from Google Calendar.</span>
   </p>
   {
@@ -196,7 +203,7 @@ const placeText = (location: string | null, tag: string | null) => {
                     <div class="ev__body">
                       <h4 class="ev__title">
                         {event.url ? (
-                          <a href={event.url} rel="nofollow noopener">
+                          <a href={event.url} rel="nofollow noopener" {...out(eventSource(event.url))}>
                             {event.title}
                           </a>
                         ) : (
@@ -226,7 +233,7 @@ const placeText = (location: string | null, tag: string | null) => {
                         )}
                       </p>
                       <p class="ev__add">
-                        <a href={icsPath(event)} download data-add-ics>
+                        <a href={icsPath(event)} download data-add-ics {...out("ics")}>
                           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
                             <rect x="1.5" y="2.5" width="13" height="12" rx="1.5" fill="none" stroke="currentColor" />
                             <path d="M1.5 6h13M5 1v3M11 1v3M8 8v5M5.5 10.5h5" fill="none" stroke="currentColor" />

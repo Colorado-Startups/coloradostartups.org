@@ -17,6 +17,8 @@
 //               a <Frame> portrait
 //   element     the outer element: "article" (default), "li" or "div"
 //   class       extra classes, appended
+//   linkAttrs   attributes for the title link, such as a click mark
+//               (lib/track-attrs.ts); needs href
 //   ...rest     any other attribute, on the outer element
 //
 // Slots
@@ -34,6 +36,7 @@ interface Props {
   mediaInset?: boolean;
   element?: "article" | "li" | "div";
   class?: string;
+  linkAttrs?: Record<string, string>;
   [attr: string]: unknown;
 }
 
@@ -46,6 +49,7 @@ const {
   mediaInset = false,
   element: Tag = "article",
   class: extra,
+  linkAttrs,
   ...rest
 } = Astro.props;
 
@@ -62,7 +66,7 @@ const hasFoot = Astro.slots.has("meta") || Astro.slots.has("actions");
     )
   }
   <div class="hall-card__body">
-    <Heading class="hall-card__title">{href ? <a href={href}>{title}</a> : title}</Heading>
+    <Heading class="hall-card__title">{href ? <a href={href} {...linkAttrs}>{title}</a> : title}</Heading>
     {
       Astro.slots.has("badges") && (
         <div class="hall-card__badges">
