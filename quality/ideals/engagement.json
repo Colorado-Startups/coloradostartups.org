@@ -1,0 +1,22 @@
+{
+  "ideal": "A visitor meets real companies, events and founders on the first screens, joins in one step, and every goal is measured, not guessed.",
+  "sources": [
+    {
+      "title": "web.dev: Web Vitals",
+      "url": "https://web.dev/articles/vitals",
+      "date": "2026-11-16"
+    },
+    {
+      "title": "Cloudflare Docs: Web Analytics",
+      "url": "https://developers.cloudflare.com/web-analytics/",
+      "date": "2026-11-16"
+    },
+    {
+      "title": "Model Context Protocol: About the MCP Registry",
+      "url": "https://modelcontextprotocol.io/registry/about",
+      "date": "2026-11-16"
+    }
+  ],
+  "quality": "Home names real companies and live items, every named event is wired, and each AI client has an install path.",
+  "speed": "Joining takes no step on another site, a first choice needs few rows, and pages paint and answer fast on a phone."
+}

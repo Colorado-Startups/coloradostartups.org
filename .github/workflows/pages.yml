@@ -55,6 +55,12 @@ jobs:
       - name: Install the repo's packages for knip
         run: npm ci --ignore-scripts --no-audit --no-fund --loglevel=error
 
+      # The repo's own Engagement collector (quality/collectors/engagement/) is tested where it runs, before the
+      # collect step uses it. Its test fakes the site and the repo, so it makes no network call. It reads data
+      # files with the yaml package the step above installs.
+      - name: Test the repo's own quality collector
+        run: node --test quality/collectors/engagement/engagement.test.mjs
+
       # The read-only "Colorado Startups quality reader" App's token: main only, one hour, this repo only (the
       # action's default scope), so a pull request's code never sees it. It reads the settings, alerts and board
       # metrics marked needs github-admin or project-scope. The key went from GitHub's manifest exchange straight

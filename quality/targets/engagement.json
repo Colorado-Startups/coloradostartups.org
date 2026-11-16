@@ -1,0 +1,419 @@
+[
+  {
+    "id": "engagement.home_companies",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Home",
+    "label": "Companies on home",
+    "means": "Leaderboard companies the home page names; more shows who builds here.",
+    "unit": "companies",
+    "goal": 12,
+    "near": 9,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step P1, the Builders band); near band: this repo's choice",
+    "source": "state: the live home page, elements carrying data-builder, each value once",
+    "needs": "none",
+    "chart": "number",
+    "params": {
+      "comment": "The Engagement tab's collector is quality/collectors/engagement/engagement.mjs. origin is the live site it reads; sitemap and max_pages bound the pages a names read fetches. Each entry's params.measure says what to read: the read kinds are listed at the top of the collector. Goals come from the engagement plan's metrics table (approved 2026-11-15); its now column was read 2026-11-15.",
+      "origin": "https://coloradostartups.org",
+      "sitemap": "/sitemap-index.xml",
+      "max_pages": 200,
+      "measure": { "read": "marks", "page": "/", "marks": ["data-builder"], "distinct": true }
+    }
+  },
+  {
+    "id": "engagement.home_live_items",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Home",
+    "label": "Live items on home",
+    "means": "Events and weekly threads home shows before any click; more gives a reason to come back.",
+    "unit": "items",
+    "goal": 7,
+    "near": 5,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step P2a: events, threads and resources); near band: this repo's choice",
+    "source": "state: the live home page, elements carrying data-starts (an event) or data-day (a weekly thread), outside any hidden element or template",
+    "needs": "none",
+    "chart": "bar",
+    "params": {
+      "measure": {
+        "read": "marks",
+        "page": "/",
+        "marks": ["data-starts", "data-day"],
+        "visible": true,
+        "labels": { "data-starts": "events", "data-day": "weekly threads" }
+      }
+    }
+  },
+  {
+    "id": "engagement.spotlights",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Home",
+    "label": "Founder spotlights",
+    "means": "Founder spotlight files the home page draws its cards from; more puts founders in front.",
+    "unit": "spotlights",
+    "goal": 6,
+    "near": 3,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step P3b); near band: this repo's choice",
+    "source": "state: YAML files in data/spotlights/; the folder is not in the repo until the first spotlight",
+    "needs": "none",
+    "chart": "number",
+    "params": {
+      "measure": { "read": "files", "dir": "data/spotlights", "ext": [".yaml", ".yml"], "absent_is_zero": true }
+    }
+  },
+  {
+    "id": "engagement.events_wired",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Measured",
+    "label": "Named events wired",
+    "means": "Events on the site's event list that a page marks or a site script sends; an unwired event counts nothing.",
+    "unit": "events",
+    "goal": 12,
+    "near": 11,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step M1c: every named event); 11 is near, since step_done waits for First steps",
+    "source": "state: the names in packages/shared/src/events.ts, each wired when a page in the live sitemap marks it or a file under site/src sends it with track()",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": {
+        "read": "names",
+        "list": { "file": "packages/shared/src/events.ts", "pattern": "^  ([a-z_]+): \\[" },
+        "pages": "sitemap",
+        "marks": ["data-track", "data-submit-event"],
+        "calls": { "paths": ["site/src"], "pattern": "\\btrack\\(\\s*[\"']([a-z_]+)[\"']" }
+      }
+    }
+  },
+  {
+    "id": "engagement.join_clicks_per_100",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Measured",
+    "label": "Join clicks per 100 home visits",
+    "means": "Join clicks on home for every hundred home visits; more means the first screen leads people in.",
+    "unit": "clicks",
+    "goal": 0,
+    "near": 0,
+    "direction": "higher",
+    "goal_source": "no goal yet: the engagement plan (approved 2026-11-15) sets it from the first 100 home visits after step M1c; 0 only holds its place",
+    "source": "window: join_click events with a home where, from PostHog, over home visits from Cloudflare Web Analytics, the last 7 days",
+    "needs": "posthog",
+    "chart": "number",
+    "params": {
+      "measure": {
+        "read": "outside",
+        "reason": "not measured yet: it needs the Actions secret POSTHOG_QUERY_KEY (a PostHog personal API key with Query Read on the site's one project) for the clicks and CF_WEB_ANALYTICS_TOKEN for the visits; neither exists (gh secret list, 2026-11-16). Its goal waits for the first 100 visits"
+      }
+    }
+  },
+  {
+    "id": "engagement.ai_clients_install",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "AI and MCP",
+    "label": "AI clients with an install path",
+    "means": "Share of the AI clients the Connect page lists that come with a command, steps, a plugin or a skill.",
+    "unit": "%",
+    "goal": 100,
+    "near": 80,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step A1a), as the AI allow list stands since 2026-11-16: every client data/ai-clients.yaml lists; near band: this repo's choice",
+    "source": "state: the records of data/ai-clients.yaml: the share with a command, steps, config, plugin or skill",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": { "read": "records", "file": "data/ai-clients.yaml", "has_any": ["command", "steps", "config", "plugin", "skill"], "share": true }
+    }
+  },
+  {
+    "id": "engagement.mcp_registries",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "AI and MCP",
+    "label": "Registries listing /mcp",
+    "means": "Directories where an AI app can find the site's MCP server; more means more people find it.",
+    "unit": "registries",
+    "goal": 2,
+    "near": 1,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (steps A2b and A7); near band: this repo's choice",
+    "source": "state: server.json in the repo, which the mcp-registry workflow publishes, plus a manual flag for each directory with no file to read",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": {
+        "read": "listings",
+        "items": [
+          { "label": "MCP Registry", "file": "server.json" },
+          { "label": "Anthropic Connectors Directory", "listed": false, "set": "2026-11-16" }
+        ]
+      }
+    }
+  },
+  {
+    "id": "engagement.mcp_tools",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "AI and MCP",
+    "label": "MCP tools",
+    "means": "Tools the site's MCP server offers an AI app; more lets it answer more.",
+    "unit": "tools",
+    "goal": 7,
+    "near": 5,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step A4b); near band: this repo's choice",
+    "source": "state: distinct tool names registered with registerTool in site/worker/mcp/",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": { "read": "source", "paths": ["site/worker/mcp"], "ext": [".ts"], "pattern": "registerTool\\(\\s*[\"']([a-z_]+)[\"']" }
+    }
+  },
+  {
+    "id": "engagement.agents",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "AI and MCP",
+    "label": "AI agents on /agents/",
+    "means": "AI agents the agents page shows, each with what it does and where it runs.",
+    "unit": "agents",
+    "goal": 6,
+    "near": 5,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step A6a); 5 is near: the page shows 5 while one agent's repo is private",
+    "source": "state: the live /agents/ page, elements carrying data-agent, each value once",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": { "read": "marks", "page": "/agents/", "marks": ["data-agent"], "distinct": true }
+    }
+  },
+  {
+    "id": "engagement.region_clips",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Art and motion",
+    "label": "Region clips",
+    "means": "Region pages whose painting plays its brand clip; more brings each region to life.",
+    "unit": "regions",
+    "goal": 3,
+    "near": 2,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step W0: 3 of 3); near band: this repo's choice",
+    "source": "state: the three live region pages, each carrying data-region-clip",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": {
+        "read": "pages",
+        "pages": ["/regions/fusion-canyon/", "/regions/photon-mountain/", "/regions/space-peak/"],
+        "marks": ["data-region-clip"]
+      }
+    }
+  },
+  {
+    "id": "engagement.painting_hotspots",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Art and motion",
+    "label": "Paintings that open companies and events",
+    "means": "Region paintings with hotspots that open the region's companies and its next event.",
+    "unit": "paintings",
+    "goal": 3,
+    "near": 2,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step W3b: 3 of 3); near band: this repo's choice",
+    "source": "state: the three live region pages, each carrying a companies hotspot and an event hotspot",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": {
+        "read": "pages",
+        "pages": ["/regions/fusion-canyon/", "/regions/photon-mountain/", "/regions/space-peak/"],
+        "marks": ["data-hotspot=companies", "data-hotspot=event"]
+      }
+    }
+  },
+  {
+    "id": "engagement.builder_paintings",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Art and motion",
+    "label": "Paintings that show builders at work",
+    "means": "Place paintings in the pulled brand release marked as showing builders at their region's craft.",
+    "unit": "paintings",
+    "goal": 5,
+    "near": 3,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step B4: 5 place paintings v2); near band: this repo's choice",
+    "source": "state: the places in data/brand/brand.json, the release brand.lock.json pins, whose builders field is true",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": { "read": "records", "file": "data/brand/brand.json", "path": "places", "where": "builders" }
+    }
+  },
+  {
+    "id": "engagement.rive_animations",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Art and motion",
+    "label": "Rive animations",
+    "means": "Rive files the site's code and brand pin name; each is a keeper or the hero that moves.",
+    "unit": "files",
+    "goal": 4,
+    "near": 3,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (steps W4a and W7: 3 keepers and the hero); near band: this repo's choice",
+    "source": "state: distinct .riv file names in the text files under site/src, site/public and brand.lock.json",
+    "needs": "none",
+    "chart": "table",
+    "params": {
+      "measure": {
+        "read": "source",
+        "paths": ["site/src", "site/public", "brand.lock.json"],
+        "ext": [".astro", ".ts", ".mjs", ".js", ".json", ".css", ".html"],
+        "pattern": "([\\w./-]+\\.riv)\\b"
+      }
+    }
+  },
+  {
+    "id": "engagement.visits_7d",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Traffic",
+    "label": "Visits in the last 7 days",
+    "means": "Visits real people made to the live site; more means the community finds it.",
+    "unit": "visits",
+    "goal": 1000,
+    "near": 500,
+    "direction": "higher",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (every step moves it); near band: this repo's choice",
+    "source": "window: Cloudflare Web Analytics, rumPageloadEventsAdaptiveGroups sum of visits, host coloradostartups.org, bots out, the last 7 days",
+    "needs": "cloudflare",
+    "chart": "number",
+    "params": {
+      "measure": {
+        "read": "outside",
+        "reason": "not measured yet: it needs the Actions secret CF_WEB_ANALYTICS_TOKEN, a Cloudflare API token with Account Analytics Read on the site's account; none exists (gh secret list, 2026-11-16)"
+      }
+    }
+  },
+  {
+    "id": "engagement.cls_p75",
+    "tab": "engagement",
+    "kind": "quality",
+    "group": "Vitals",
+    "label": "CLS at p75, real visits",
+    "means": "How much the page jumps while it loads, for three in four real visits; lower is better.",
+    "unit": "",
+    "goal": 0.1,
+    "near": 0.25,
+    "direction": "lower",
+    "goal_source": "engagement plan goal, approved 2026-11-15: hold under 0.1, web.dev's good line; near band: its poor line, 0.25 (web.dev/articles/cls, read 2026-11-16)",
+    "source": "window: Cloudflare Web Analytics, rumWebVitalsEventsAdaptiveGroups cumulativeLayoutShiftP75, host coloradostartups.org, the last 7 days",
+    "needs": "cloudflare",
+    "chart": "number",
+    "params": {
+      "measure": {
+        "read": "outside",
+        "reason": "not measured yet: it needs the Actions secret CF_WEB_ANALYTICS_TOKEN, a Cloudflare API token with Account Analytics Read on the site's account; none exists (gh secret list, 2026-11-16)"
+      }
+    }
+  },
+  {
+    "id": "engagement.resources_rows",
+    "tab": "engagement",
+    "kind": "speed",
+    "group": "Choices",
+    "label": "Rows before a choice on Startup Resources",
+    "means": "Resource rows Startup Resources shows before a visitor picks a stage or searches; fewer is quicker to scan.",
+    "unit": "rows",
+    "goal": 12,
+    "near": 16,
+    "direction": "lower",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step L1b: 12 picks, down from 24 rows); near band: this repo's choice",
+    "source": "state: the live /ecosystem-canvas/ page, elements carrying data-pick or data-resource, outside any hidden element or template",
+    "needs": "none",
+    "chart": "bar",
+    "params": {
+      "measure": {
+        "read": "marks",
+        "page": "/ecosystem-canvas/",
+        "marks": ["data-pick", "data-resource"],
+        "visible": true,
+        "labels": { "data-pick": "picks", "data-resource": "rows of the full list" }
+      }
+    }
+  },
+  {
+    "id": "engagement.slack_offsite_steps",
+    "tab": "engagement",
+    "kind": "speed",
+    "group": "Join",
+    "label": "Off-site steps to join the Slack",
+    "means": "Pages on another site a visitor passes between /slack/ and Slack itself; fewer is a faster join.",
+    "unit": "steps",
+    "goal": 0,
+    "near": 0,
+    "direction": "lower",
+    "goal_source": "engagement plan goal, approved 2026-11-15 (step P5b: /slack/ opens the on-site form)",
+    "source": "state: GET /slack/ on the live site, following its redirects; a page on a host that is neither the site nor Slack is one step",
+    "needs": "none",
+    "chart": "number",
+    "params": {
+      "measure": { "read": "redirect", "path": "/slack/", "done_hosts": ["slack.com"] }
+    }
+  },
+  {
+    "id": "engagement.lcp_p75",
+    "tab": "engagement",
+    "kind": "speed",
+    "group": "Vitals",
+    "label": "LCP at p75, real visits",
+    "means": "How long the main content takes to paint for three in four real visits; lower is better.",
+    "unit": "s",
+    "goal": 1,
+    "near": 2.5,
+    "direction": "lower",
+    "goal_source": "engagement plan goal, approved 2026-11-15: hold under 1.0 s; near band: web.dev's good line, 2.5 s (web.dev/articles/vitals, read 2026-11-16)",
+    "source": "window: Cloudflare Web Analytics, rumWebVitalsEventsAdaptiveGroups largestContentfulPaintP75, host coloradostartups.org, the last 7 days",
+    "needs": "cloudflare",
+    "chart": "number",
+    "params": {
+      "measure": {
+        "read": "outside",
+        "reason": "not measured yet: it needs the Actions secret CF_WEB_ANALYTICS_TOKEN, a Cloudflare API token with Account Analytics Read on the site's account; none exists (gh secret list, 2026-11-16)"
+      }
+    }
+  },
+  {
+    "id": "engagement.inp_p75",
+    "tab": "engagement",
+    "kind": "speed",
+    "group": "Vitals",
+    "label": "INP at p75, real visits",
+    "means": "How long the page takes to answer a tap or a key for three in four real visits; lower is better.",
+    "unit": "ms",
+    "goal": 200,
+    "near": 500,
+    "direction": "lower",
+    "goal_source": "engagement plan goal, approved 2026-11-15: hold under 200 ms, web.dev's good line; near band: its needs-improvement line, 500 ms (web.dev/articles/inp, read 2026-11-16)",
+    "source": "window: Cloudflare Web Analytics, rumWebVitalsEventsAdaptiveGroups interactionToNextPaintP75, host coloradostartups.org, the last 7 days",
+    "needs": "cloudflare",
+    "chart": "number",
+    "params": {
+      "measure": {
+        "read": "outside",
+        "reason": "not measured yet: it needs the Actions secret CF_WEB_ANALYTICS_TOKEN, a Cloudflare API token with Account Analytics Read on the site's account; none exists (gh secret list, 2026-11-16)"
+      }
+    }
+  }
+]
