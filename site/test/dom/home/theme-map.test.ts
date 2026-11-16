@@ -2,6 +2,8 @@ import { REGION_IDS } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
 import { type CalendarEvent, startsAt } from "../../../src/components/events/events";
+import { CALENDAR_TIMEZONE } from "../../../src/components/info/links";
+import { cssRules, pageCss } from "../page-polish/css";
 import { readDist } from "../pages";
 
 // The home page's maps (ColoradoMap.astro): the statewide map as a drawing over
@@ -87,9 +89,34 @@ describe("living home map", () => {
     expect([...table.querySelectorAll("thead th[scope='col']")].map((th) => text(th))).toEqual([
       "Region",
       "Leaderboard companies",
-      "Events this week",
+      "Events, next 7 days",
       "Startup Resources",
     ]);
+  });
+
+  it("shows the build's date in Denver time, the date the counts are as of", () => {
+    const asOf = new Date(table.getAttribute("data-as-of")!);
+    const note = home.querySelector(".zones__as-of")!;
+    expect(note.closest("section"), "in the Where band").toBe(table.closest("section"));
+    expect(note.closest("[hidden], [aria-hidden='true'], .visually-hidden"), "visible").toBeNull();
+    const day = new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR_TIMEZONE }).format(asOf);
+    expect(note.querySelector("time")?.getAttribute("datetime")).toBe(day);
+    expect(text(note)).toMatch(/^As of \w{3} \d{1,2}, \d{4}, Denver time\.$/);
+  });
+
+  it("opens a zone's card on keyboard focus only, never on hover or tap (WCAG 1.4.13)", () => {
+    const rules = cssRules(pageCss(readDist("index.html")));
+    const opens = rules.filter((r) => r.decls["visibility"] === "visible" && r.selectors.some((s) => s.endsWith(".colorado-map__card")));
+    expect(opens.length, "a rule that shows the card").toBeGreaterThan(0);
+    for (const r of opens) {
+      for (const s of r.selectors) {
+        expect(s, "opened by focus").toMatch(/:focus-visible \+ \.colorado-map__card$/);
+        expect(s, "not by hover or tap").not.toMatch(/:hover|:active/);
+      }
+    }
+    for (const r of rules.filter((r) => r.selectors.includes(".colorado-map__card"))) {
+      expect(r.decls["pointer-events"], "the card takes the pointer").not.toBe("none");
+    }
   });
 
   it("uses no ranking words", () => {

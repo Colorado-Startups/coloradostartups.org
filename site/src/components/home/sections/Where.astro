@@ -2,18 +2,23 @@
 // Where: the statewide map as its drawing over shaded relief (ColoradoMap,
 // live={false}: no MapLibre here, for the 75 KB JavaScript goal), each zone
 // the entrance to its region (step W2). Hover, focus or tap on a zone lifts
-// it and shows a card with the region's crest, name and three counts. The
-// table beside the map holds the same crest, name and counts, so a phone or a
-// screen reader gets all of it without hover. Counts come from zone-counts.ts,
+// it and makes it glow; keyboard focus also shows a card with the region's
+// crest, name and three counts. The table beside the map holds the same crest,
+// name and counts, so a phone, a pointer or a screen reader gets all of it.
+// The counts are frozen at build time, so the table says the build's date in
+// Denver time, and the events column says its seven days. Counts come from zone-counts.ts,
 // in the regions' fixed data order: regions are equals, never ranked.
 import { brandArt } from "../../art/art-assets";
 import { regionCrestKey } from "../../art/keepers";
 import ColoradoMap from "../../map/ColoradoMap.astro";
 import { COUNT_LABELS, zoneCounts } from "../../map/zone-counts";
 import { REGION_COLORS } from "../../../lib/regions/map";
+import { CALENDAR_TIMEZONE } from "../../info/links";
 
 const now = new Date();
 const zones = await zoneCounts(now);
+const asOf = new Intl.DateTimeFormat("en-US", { timeZone: CALENDAR_TIMEZONE, month: "short", day: "numeric", year: "numeric" }).format(now);
+const asOfDay = new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR_TIMEZONE }).format(now);
 const rows = zones.map((z) => {
   const crest = brandArt(regionCrestKey(z.id));
   if (!crest) throw new Error(`no crest for region "${z.id}"; add it to brand.lock.json`);
@@ -49,6 +54,7 @@ const rows = zones.map((z) => {
           }
         </tbody>
       </table>
+      <p class="zones__as-of meta">As of <time datetime={asOfDay}>{asOf}</time>, Denver time.</p>
     </div>
     <ColoradoMap id="home-map" live={false} caption="" zones={zones} />
   </div>
@@ -74,6 +80,9 @@ const rows = zones.map((z) => {
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
     gap: var(--s-6);
     align-items: center;
+  }
+  .zones__as-of {
+    margin: var(--s-1) 0 0;
   }
   .zones {
     width: 100%;

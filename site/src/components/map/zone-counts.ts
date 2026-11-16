@@ -1,5 +1,5 @@
 // Each region's three counts for the home map's zones (step W2), read at build
-// time: its Leaderboard companies, its events this week and its Startup
+// time: its Leaderboard companies, its events in the next 7 days and its Startup
 // Resources. Nothing is counted by hand here. Each count is the site's own
 // counter, called the way the page that shows it calls it:
 //   companies  honoreesIn() over buildBoard(), as /regions/<id>/ tallies them
@@ -21,7 +21,7 @@ import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
 import { REGIONS } from "../../lib/regions/match";
 import { honoreesIn, inRegion } from "../../lib/regions/page";
 
-/** "This week": events that have not ended and start within seven days of the build. */
+/** "Next 7 days": events that have not ended and start within seven days of the build. */
 export const WEEK_MS = 7 * 86_400_000;
 
 export interface ZoneCounts {
@@ -35,7 +35,7 @@ export interface ZoneCounts {
 /** Each count's label, in the order the map's cards and the list beside it show them. */
 export const COUNT_LABELS = [
   ["companies", "Leaderboard companies"],
-  ["events", "Events this week"],
+  ["events", "Events, next 7 days"],
   ["resources", "Startup Resources"],
 ] as const satisfies readonly (readonly [keyof Omit<ZoneCounts, "id" | "name">, string])[];
 
