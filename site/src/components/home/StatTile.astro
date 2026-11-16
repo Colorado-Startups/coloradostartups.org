@@ -3,14 +3,17 @@
 // from. The source line is the fact's own `short` (data/positions/facts.yaml),
 // so a figure never shows without its source. One row per figure: the number
 // on the left, its words on the right.
+import { countUp, countUpAttrs } from "./count-up";
 import type { StatTileData } from "./home-data";
 
 type Props = StatTileData;
 const { value, label, source } = Astro.props;
+// The figure stays as text; global.css may count up over it as it scrolls in.
+const counting = countUp(value);
 ---
 
-<div class="stat">
-  <p class="stat__value">{value}</p>
+<div class="stat" data-reveal>
+  <p class="stat__value" {...(counting ? countUpAttrs(counting) : {})}><span class="count__text">{value}</span></p>
   <div class="stat__text">
     <p class="stat__label">{label}</p>
     <p class="stat__source">{source}</p>
