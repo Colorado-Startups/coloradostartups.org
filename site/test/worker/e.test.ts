@@ -1,10 +1,10 @@
 import { SELF } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { anonId } from "../../worker/lib/anon-id";
-import { cleanProps, handle, POSTHOG_CAPTURE_URL } from "../../worker/routes/e";
+import { cleanProps, EVENT_NAMES, EVENT_PROPS, handle, POSTHOG_CAPTURE_URL } from "../../worker/routes/e";
 import { server } from "./server";
 
 const ORIGIN = "https://coloradostartups.org";
@@ -50,6 +50,15 @@ function capture(): { headers: Headers; body: Record<string, unknown> }[] {
   return seen;
 }
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+// Silences console.error for one test and hands back the spy to assert on.
+function errors() {
+  return vi.spyOn(console, "error").mockImplementation(() => {});
+}
+
 describe("POST /api/e", () => {
   it("is wired in the route table and refuses GET", async () => {
     const res = await SELF.fetch(URL_, { method: "GET" });
@@ -82,17 +91,41 @@ describe("POST /api/e", () => {
     expect(seen).toHaveLength(0);
   });
 
-  it("answers 503 and forwards nothing when the secrets are not set", async () => {
+  it("answers 503, names the missing secret and forwards nothing when a secret is not set", async () => {
     const seen = capture();
+    const log = errors();
     const res = await handle(post({ name: "join_click" }), env as unknown as Env, undefined, DAY1);
     expect(res.status).toBe(503);
+    expect(log).toHaveBeenCalledTimes(1);
+    expect(log.mock.calls[0][0]).toContain("POSTHOG_PROJECT_TOKEN");
+    expect(log.mock.calls[0][0]).toContain("ANON_ID_SALT");
+
+    log.mockClear();
+    const noSalt = { ...configured, ANON_ID_SALT: undefined } as unknown as Env;
+    expect((await handle(post({ name: "join_click" }), noSalt, undefined, DAY1)).status).toBe(503);
+    expect(log.mock.calls[0][0]).toContain("ANON_ID_SALT");
+    expect(log.mock.calls[0][0]).not.toContain("POSTHOG_PROJECT_TOKEN");
+    expect(log.mock.calls[0][0]).not.toContain("test-salt");
+    expect(log.mock.calls[0][0]).not.toContain("phc_test_token");
     expect(seen).toHaveLength(0);
+  });
+
+  it("logs and drops the event when CF-Connecting-IP is missing, so visitors never merge into one id", async () => {
+    const seen = capture();
+    const log = errors();
+    const req = post({ name: "join_click" });
+    req.headers.delete("CF-Connecting-IP");
+    const res = await handle(req, configured, undefined, DAY1);
+    expect(res.status).toBe(204);
+    expect(seen).toHaveLength(0);
+    expect(log).toHaveBeenCalledTimes(1);
+    expect(log.mock.calls[0][0]).toContain("CF-Connecting-IP");
   });
 
   it("forwards one anonymous event with no IP, cookie or visitor header", async () => {
     const seen = capture();
     const res = await handle(
-      post({ name: "door_pick", props: { door: "founder", $ip: IP, $set: { email: "a@b.example" }, n: 2 } }),
+      post({ name: "door_pick", props: { door: "founder", where: "home", $ip: IP, $set: { email: "a@b.example" }, n: 2 } }),
       configured,
       undefined,
       DAY1,
@@ -112,17 +145,53 @@ describe("POST /api/e", () => {
     expect(body.event).toBe("door_pick");
     expect(body.api_key).toBe("phc_test_token");
     expect(body.distinct_id).toBe(await anonId("test-salt", IP, UA, DAY1));
-    expect(body.properties).toEqual({ door: "founder", n: 2, $process_person_profile: false, $geoip_disable: true });
+    expect(body.properties).toEqual({ where: "home", door: "founder", $process_person_profile: false, $geoip_disable: true });
     expect(body).not.toHaveProperty("$ip");
     expect(JSON.stringify(body)).not.toContain(IP);
     expect(JSON.stringify(body)).not.toContain("session=abc");
     expect(JSON.stringify(body)).not.toContain(UA);
   });
 
-  it("still answers 204 when PostHog fails", async () => {
-    server.use(http.post(POSTHOG_CAPTURE_URL, () => new HttpResponse(null, { status: 500 })));
+  it("still answers 204 and logs the status when PostHog answers 5xx or 4xx", async () => {
+    for (const status of [500, 400, 401]) {
+      server.use(http.post(POSTHOG_CAPTURE_URL, () => new HttpResponse(null, { status })));
+      const log = errors();
+      const res = await handle(post({ name: "step_done" }), configured, undefined, DAY1);
+      expect(res.status).toBe(204);
+      expect(log).toHaveBeenCalledTimes(1);
+      expect(log.mock.calls[0][0]).toContain(`PostHog answered ${status}`);
+      log.mockRestore();
+    }
+  });
+
+  it("still answers 204 and logs when the fetch to PostHog is rejected", async () => {
+    server.use(http.post(POSTHOG_CAPTURE_URL, () => HttpResponse.error()));
+    const log = errors();
     const res = await handle(post({ name: "step_done" }), configured, undefined, DAY1);
     expect(res.status).toBe(204);
+    expect(log).toHaveBeenCalledTimes(1);
+    expect(log.mock.calls[0][0]).toContain("forward failed");
+  });
+
+  it("gives up on a PostHog that never answers, then answers 204 and logs", async () => {
+    // The route asks for a 3 s timeout; the test shortens it to 5 ms and hands
+    // back a fetch that settles only when that signal aborts.
+    const timeout = AbortSignal.timeout.bind(AbortSignal);
+    const asked = vi.spyOn(AbortSignal, "timeout").mockImplementation(() => timeout(5));
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      (_input, init) =>
+        new Promise((_resolve, reject) => {
+          const signal = init?.signal;
+          if (!signal) return reject(new Error("no signal"));
+          signal.addEventListener("abort", () => reject(signal.reason));
+        }),
+    );
+    const log = errors();
+    const res = await handle(post({ name: "step_done" }), configured, undefined, DAY1);
+    expect(res.status).toBe(204);
+    expect(asked).toHaveBeenCalledWith(3000);
+    expect(log).toHaveBeenCalledTimes(1);
+    expect(log.mock.calls[0][0]).toContain("forward failed");
   });
 });
 
@@ -154,11 +223,47 @@ describe("anonId", () => {
 });
 
 describe("cleanProps", () => {
-  it("drops reserved, nested and oversized props", () => {
-    const many = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`k${i}`, i]));
-    expect(Object.keys(cleanProps(many))).toHaveLength(8);
-    expect(cleanProps({ $ip: "1.2.3.4", nested: { a: 1 }, list: [1], ok: "x".repeat(500) })).toEqual({ ok: "x".repeat(200) });
-    expect(cleanProps(null)).toEqual({});
-    expect(cleanProps(["a"])).toEqual({});
+  it("lists keys for exactly the 12 event names", () => {
+    expect(EVENT_NAMES).toHaveLength(12);
+    for (const name of EVENT_NAMES) expect(EVENT_PROPS[name].length).toBeGreaterThan(0);
+  });
+
+  it("keeps only the keys the event lists", () => {
+    expect(cleanProps("door_pick", { door: "founder", where: "home", region: "front-range", other: "x" })).toEqual({
+      door: "founder",
+      where: "home",
+    });
+    expect(cleanProps("join_click", { door: "founder" })).toEqual({});
+    expect(cleanProps("search_used", { where: "nav", results: 3, query: "my-co" })).toEqual({ where: "nav", results: 3 });
+  });
+
+  it("keeps short slugs, finite numbers and booleans, and drops every other value", () => {
+    expect(cleanProps("join_submit", { where: "join-form_2", ok: true })).toEqual({ where: "join-form_2", ok: true });
+    expect(cleanProps("search_used", { results: 0 })).toEqual({ results: 0 });
+    for (const bad of [
+      "a@b.example",
+      "Founder",
+      "two words",
+      "https://x.example/",
+      "x".repeat(41),
+      "",
+      "dot.ted",
+      null,
+      { a: 1 },
+      ["a"],
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+    ]) {
+      expect(cleanProps("join_click", { where: bad })).toEqual({});
+    }
+    expect(cleanProps("join_click", { where: "x".repeat(40) })).toEqual({ where: "x".repeat(40) });
+  });
+
+  it("drops reserved and inherited keys, and non-object props", () => {
+    expect(cleanProps("join_click", { $ip: "1.2.3.4", $set: { email: "a@b.example" } })).toEqual({});
+    expect(cleanProps("join_click", Object.create({ where: "home" }))).toEqual({});
+    expect(cleanProps("join_click", null)).toEqual({});
+    expect(cleanProps("join_click", ["home"])).toEqual({});
+    expect(cleanProps("join_click", "home")).toEqual({});
   });
 });
