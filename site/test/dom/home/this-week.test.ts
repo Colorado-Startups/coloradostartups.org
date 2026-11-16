@@ -82,12 +82,15 @@ describe("This week on home", () => {
     )!;
   });
 
-  it("is a band headed This week, above Where", () => {
+  // Since 2026-11-16 Where, the map, leads the page right under the hero, and
+  // This week follows it (Paul: "The homepage should lead with the Colorado
+  // map too").
+  it("is a band headed This week, below Where", () => {
     expect(band).not.toBeNull();
     expect(text(band.querySelector("h2#this-week"))).toBe("This week");
     const where = home.querySelector('section[aria-labelledby="where"]')!;
     expect(
-      band.compareDocumentPosition(where) & Node.DOCUMENT_POSITION_FOLLOWING,
+      band.compareDocumentPosition(where) & Node.DOCUMENT_POSITION_PRECEDING,
     ).toBeTruthy();
   });
 

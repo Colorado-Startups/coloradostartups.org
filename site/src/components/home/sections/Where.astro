@@ -8,12 +8,29 @@
 // The counts are frozen at build time, so the table says the build's date in
 // Denver time, and the events column says its seven days. Counts come from zone-counts.ts,
 // in the regions' fixed data order: regions are equals, never ranked.
+//
+// Since 2026-11-16 this band comes right after the hero, so the map is in the
+// first screen (Paul: "The homepage should lead with the Colorado map too").
+// The map is the page's first image and its LCP: `priority` loads its relief
+// eagerly, at high fetch priority, and the map comes before the table in the
+// HTML, so no crest is fetched ahead of it. On a laptop the map takes the
+// left column, and the heading and the table the right; on a phone or a
+// tablet the heading comes first, then the map, then the table.
 import { brandArt } from "../../art/art-assets";
 import { regionCrestKey } from "../../art/keepers";
 import ColoradoMap from "../../map/ColoradoMap.astro";
 import { COUNT_LABELS, zoneCounts } from "../../map/zone-counts";
 import { REGION_COLORS } from "../../../lib/regions/map";
 import { CALENDAR_TIMEZONE } from "../../info/links";
+
+// The map's column: up to 960 px, the whole .wrap (100vw less two 24 px
+// gutters); past it, 13 of 23 parts of .wrap (at most 1180 px) less the 48 px
+// gap, so 640 px at the widest, the relief's 640w file on a 1x laptop. Between
+// 960 and 1228 px, (100vw - 96px) * 13 / 23 is rounded up to
+// calc(57vw - 3.5rem), 2 to 4 px over, so a browser never picks a file
+// narrower than the map draws (test/dom/home/map-first.test.ts). `sizes`
+// cannot read CSS variables, so it uses rem (16 px).
+const MAP_SIZES = "(max-width: 60rem) calc(100vw - 3rem), (max-width: 76.75rem) calc(57vw - 3.5rem), 40rem";
 
 const now = new Date();
 const zones = await zoneCounts(now);
@@ -26,10 +43,13 @@ const rows = zones.map((z) => {
 });
 ---
 
-<section class="section section--lit" aria-labelledby="where">
+<section class="section section--lit where-band" aria-labelledby="where">
   <div class="wrap where">
-    <div class="where__copy">
-      <h2 id="where">Three regions along the Front Range</h2>
+    <h2 class="where__title" id="where">Three regions along the Front Range</h2>
+    <div class="where__map">
+      <ColoradoMap id="home-map" live={false} caption="" zones={zones} sizes={MAP_SIZES} priority />
+    </div>
+    <div class="where__list">
       <table class="zones" data-zone-counts data-as-of={now.toISOString()}>
         <caption class="visually-hidden">Each region's counts</caption>
         <thead>
@@ -56,7 +76,6 @@ const rows = zones.map((z) => {
       </table>
       <p class="zones__as-of meta">As of <time datetime={asOfDay}>{asOf}</time>, Denver time.</p>
     </div>
-    <ColoradoMap id="home-map" live={false} caption="" zones={zones} />
   </div>
 </section>
 
@@ -75,18 +94,65 @@ const rows = zones.map((z) => {
 </script>
 
 <style>
+  /* Close under the hero, on the same ground, so the two read as one first
+     screen. */
+  .where-band {
+    padding-block: var(--s-4) var(--s-8);
+  }
+  /* A phone or a tablet: the heading, the map right under it, then the
+     table. */
   .where {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: var(--s-6);
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "title"
+      "map"
+      "list";
+    gap: 0 var(--s-7);
+    align-items: start;
+  }
+  .where__title {
+    grid-area: title;
+    margin-bottom: var(--s-3);
+  }
+  .where__map {
+    grid-area: map;
+  }
+  .where__list {
+    grid-area: list;
+    margin-top: var(--s-4);
+  }
+  /* A laptop: map left, heading and table right. The map's column is 13 of
+     23 parts, the width MAP_SIZES assumes. The table needs about 400 px with
+     each crest beside its name and 344 px with it above (dev check,
+     2026-11-16), so two columns start past 960 px, where the table's column
+     is 376 px, and the crest sits above the name up to 1152 px. A media query
+     cannot read CSS variables: 60rem is 960 px. */
+  @media (min-width: 60.0625rem) {
+    .where {
+      grid-template-columns: minmax(0, 13fr) minmax(0, 10fr);
+      grid-template-areas:
+        "map title"
+        "map list";
+      grid-template-rows: auto 1fr;
+    }
+    .where__list {
+      margin-top: 0;
+    }
+  }
+  @media (min-width: 60.0625rem) and (max-width: 72rem) {
+    .region-link {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--s-1);
+    }
   }
   .zones__as-of {
     margin: var(--s-1) 0 0;
   }
   .zones {
     width: 100%;
-    margin: var(--s-4) 0 0;
+    margin: 0;
     border-collapse: separate;
     border-spacing: 0 var(--s-2);
     font-variant-numeric: tabular-nums;
@@ -146,17 +212,22 @@ const rows = zones.map((z) => {
     text-decoration-thickness: var(--line-edge);
   }
 
-  @media (max-width: 760px) {
-    .where {
-      grid-template-columns: 1fr;
-    }
-  }
-  /* At phone width the crest sits above the name, so four columns fit 375 px. */
+  /* At phone width the crest sits above the name and the cells pad 4 px a
+     side, not 8, so four columns fit inside 375 px's 327 px .wrap (352 px at
+     8 px, which ran into the right gutter; dev check, 2026-11-16). */
   @media (max-width: 420px) {
     .region-link {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--s-1);
+      padding-inline-start: var(--s-1);
+    }
+    .zones thead th,
+    .zones tbody > tr > * {
+      padding-inline: var(--s-1);
+    }
+    .zones tbody th {
+      padding-inline-start: 0;
     }
   }
 </style>

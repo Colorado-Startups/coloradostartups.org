@@ -1,4 +1,4 @@
-// Step P1: the Builders band on home, right under the hero, read from the
+// Step P1: the Builders band on home, right after the hero and the map, read from the
 // built site (run `npm run build` first; test:content does). The pick and its
 // weekly turn are test/unit/home/builders-pick.test.ts. The band's 60 words
 // are counted here and in home-budget.test.ts.
@@ -84,9 +84,22 @@ describe("the Builders band on home", () => {
 
   const items = () => [...band.querySelectorAll<HTMLElement>("li.builder")];
 
-  it("sits right under the hero, headed Builders", () => {
+  // Since 2026-11-16 the first screen is the hero and the map's band under
+  // it (Paul: "The homepage should lead with the Colorado map too"); Builders
+  // comes right after both.
+  // The band before, skipping the <script> a band may render after itself
+  // (Where.astro's Escape handler).
+  const sectionBefore = (el: Element | null | undefined) => {
+    let prev = el?.previousElementSibling;
+    while (prev && !prev.matches("section")) prev = prev.previousElementSibling;
+    return prev;
+  };
+
+  it("sits right after the first screen, the hero and the map, headed Builders", () => {
     expect(band).not.toBeNull();
-    expect(band.previousElementSibling?.matches("section.hero")).toBe(true);
+    const where = sectionBefore(band);
+    expect(where?.matches('section[aria-labelledby="where"]'), "the map's band before it").toBe(true);
+    expect(sectionBefore(where)?.matches("section.hero"), "the hero before that").toBe(true);
     expect(text(band.querySelector("h2#builders"))).toBe("Builders");
   });
 
