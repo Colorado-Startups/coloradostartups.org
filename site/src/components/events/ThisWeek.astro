@@ -1,0 +1,179 @@
+---
+// This week on home (engagement plan step P2a): the next three events with a
+// countdown, and the weekly thread rhythm in the Slack and the LinkedIn Group.
+//
+// Events. Every event that had not ended at build time is in the HTML, up to
+// KEEP; the first COUNT show. On the visitor's clock the script hides what
+// ended (prune.ts, as NextEvents does) and rewrites each countdown
+// (countdown.ts), so a page built days ago still counts from today. Without
+// JavaScript the build-time list stands. Titles link the event calendar, which
+// carries the host's own link: home links only a few known outside hosts
+// (site/test/dom/l1/hall.test.ts). A long title is cut on screen; the link's
+// aria-label carries it in full, with the date.
+//
+// Region. An event whose city belongs to a region carries data-region with
+// the region's id, for the region filter a later step adds (W8). Online and
+// unlisted places carry none.
+//
+// Newest Startup Resources are left out: only two records carry an `added`
+// date, and both are commercial, which home never features (PR for P2a).
+import { WAYS_IN } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { clampWords } from "../../lib/communitas/doors";
+import { SLACK_JOIN } from "../../lib/communitas/join";
+import { ELSEWHERE, regionForCity } from "../../lib/regions/match";
+import { countdown } from "./countdown";
+import { cardPlace, dateParts, endsAt, SNAPSHOT, startsAt, upcomingEvents } from "./events";
+
+/** Events that show, and how many wait hidden behind them for prune.ts. */
+const COUNT = 3;
+const KEEP = 9;
+/** Words of an event title on screen, so the strip stays inside its word cap. */
+const TITLE_WORDS = 5;
+
+const now = Date.now();
+const events = upcomingEvents(SNAPSHOT, new Date(now)).slice(0, KEEP);
+
+/** The event's region id, from the city in its location, or undefined. */
+function regionOf(location: string | null): string | undefined {
+  if (!location) return undefined;
+  const city = cardPlace(location).split(",").pop()!.trim();
+  const region = regionForCity(city);
+  return region === ELSEWHERE ? undefined : region;
+}
+
+const DAYS = [
+  { day: "mon", label: "Mon" },
+  { day: "wed", label: "Wed" },
+  { day: "fri", label: "Fri" },
+] as const;
+const openers = (await getCollection("threads")).map((entry) => entry.data);
+const rhythm = DAYS.flatMap(({ day, label }) => {
+  const opener = openers.find((t) => t.day === day);
+  return opener ? [{ day, label, title: opener.title }] : [];
+});
+---
+
+<section class="section this-week" aria-labelledby="this-week">
+  <div class="wrap">
+    <h2 id="this-week">This week</h2>
+    <div class="this-week__grid">
+      <div class="this-week__events" data-this-week data-count={COUNT}>
+        {
+          events.length > 0 && (
+            <ol class="this-week__list" role="list">
+              {events.map((event, i) => {
+                const date = dateParts(event);
+                const start = startsAt(event);
+                return (
+                  <li
+                    data-ends={new Date(endsAt(event)).toISOString()}
+                    data-starts={new Date(start).toISOString()}
+                    data-region={regionOf(event.location)}
+                    hidden={i >= COUNT}
+                  >
+                    <time class="this-week__when" datetime={event.start} data-countdown>
+                      {countdown(start, now)}
+                    </time>
+                    <a href={WAYS_IN.events} aria-label={`${event.title}, ${date.weekday} ${date.month} ${date.day}`}>
+                      {clampWords(event.title, TITLE_WORDS)}
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          )
+        }
+        <p class="this-week__empty" data-events-empty hidden={events.length > 0}>
+          <a href={WAYS_IN.events}>See the event calendar</a>
+        </p>
+      </div>
+      <div class="this-week__threads" data-threads>
+        <ul class="this-week__list" role="list">
+          {
+            rhythm.map((t) => (
+              <li data-day={t.day}>
+                <span class="this-week__when">{t.label}</span>
+                <span>{t.title}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="this-week__ways">
+          Weekly in the <a href={SLACK_JOIN.href} aria-describedby={SLACK_JOIN.noteId} data-way="slack">Slack</a> and the{" "}
+          <a href={WAYS_IN["linkedin-group"]} rel="noopener" data-way="linkedin-group">LinkedIn Group</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { countdown } from "./countdown";
+  import { showNext } from "./prune";
+
+  const now = Date.now();
+  for (const root of document.querySelectorAll<HTMLElement>("[data-this-week]")) {
+    showNext(root, now, Number(root.dataset.count));
+    for (const li of root.querySelectorAll<HTMLElement>("li[data-starts]")) {
+      const start = Date.parse(li.dataset.starts ?? "");
+      const when = li.querySelector("[data-countdown]");
+      if (when && !Number.isNaN(start)) when.textContent = countdown(start, now);
+    }
+  }
+</script>
+
+<style>
+  .this-week h2 {
+    margin-bottom: var(--s-5);
+  }
+  .this-week__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--s-4);
+  }
+  .this-week__events,
+  .this-week__threads {
+    padding: var(--s-3) var(--s-4);
+    border-top: var(--line-bold) solid var(--c-accent);
+    border-radius: var(--r-chisel);
+    background: var(--c-ground);
+  }
+  .this-week__list,
+  .this-week__empty {
+    list-style: none;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  .this-week__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-1) var(--s-3);
+    min-height: var(--size-tap);
+  }
+  /* display: flex would beat the hidden attribute's own rule. */
+  .this-week__list li[hidden],
+  .this-week__empty[hidden] {
+    display: none;
+  }
+  .this-week__when {
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r-chisel);
+    background: var(--c-surface-2);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .this-week a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    overflow-wrap: anywhere;
+    font-weight: 700;
+  }
+  .this-week__ways {
+    margin: var(--s-2) 0 0;
+  }
+</style>
