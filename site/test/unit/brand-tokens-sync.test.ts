@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import YAML from "yaml";
 
 import { SOURCE, TARGET, renderTokens } from "../../scripts/sync-brand.mjs";
-import { PENDING_BRAND_ROLES, pendingAndAbsent } from "../brand-pending";
+import { adoptedButPending, PENDING_BRAND_ROLES, pendingAndAbsent } from "../brand-pending";
 
 // tokens.css is generated from 01_doctrine/brand_tokens.yaml. A hand edit to the
 // CSS, or a YAML change without a rebuild, fails here.
@@ -43,6 +43,25 @@ describe("brand tokens", () => {
     expect(pendingAndAbsent("ground", {})).toBe(false);
     expect(pendingAndAbsent("region-space-peak", {})).toBe(true);
     expect(pendingAndAbsent("region-space-peak", { "region-space-peak": "#C67273" })).toBe(false);
+  });
+
+  // A role leaves the list when the site takes it in (step W0b deletes the
+  // file), so the list can never hold a role brand_tokens.yaml declares.
+  it("keeps no role on the pending list once brand_tokens.yaml declares it", () => {
+    const tokens = YAML.parse(readFileSync(SOURCE, "utf8")) as { color: Record<string, string>; night: Record<string, string> };
+    expect(Object.keys(tokens.color).length).toBeGreaterThan(0);
+    expect(adoptedButPending(tokens)).toEqual([]);
+  });
+
+  it("flags a pending role the site declares, in color or night (known bad), and passes a site that lacks them (known clean)", () => {
+    const fix = "remove it from PENDING_BRAND_ROLES in site/test/brand-pending.ts";
+    expect(adoptedButPending({ color: { ground: "#FFFFFF", "region-space-peak": "#C67273" } })).toEqual([
+      `region-space-peak is declared in 01_doctrine/brand_tokens.yaml: ${fix}`,
+    ]);
+    expect(adoptedButPending({ color: { ground: "#FFFFFF" }, night: { "on-region-fusion-canyon": "#000A33" } })).toEqual([
+      `on-region-fusion-canyon is declared in 01_doctrine/brand_tokens.yaml: ${fix}`,
+    ]);
+    expect(adoptedButPending({ color: { ground: "#FFFFFF" }, night: { ground: "#000A33" } })).toEqual([]);
   });
 
   // The night block copies each role's night value from the same tokens.json
