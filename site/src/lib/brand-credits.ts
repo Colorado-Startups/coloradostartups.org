@@ -21,7 +21,8 @@ export const PLACE_CREDITS: Record<"boulder" | "golden" | "denver" | "springs" |
 
 /**
  * The brand's website art, also on the site (brand dist/website/ and dist/logo/
- * README, at the tag in brand.lock.json, read 2026-11-15). None starts from a
+ * README, at the tag in brand.lock.json, read 2026-11-15; crests/ and social/
+ * added at v4.3.0). None starts from a
  * photo, so none owes a photo credit. Each keeper row says it is an AI agent
  * (.claude/rules/ai-disclosure.md). `names` are the pulled file names.
  */
@@ -33,6 +34,7 @@ export interface WebsiteArtCredit {
 
 const TEXT_TO_IMAGE = "AI-made with FIBO 2.0, text to image. No source photo.";
 const SHIELD_EDIT = "AI-made with FIBO 2.0, an edit of the 2014 Colorado Startups shield.";
+const CREST_EDIT = "AI-made with FIBO 2.0, an edit of the master crest, itself an edit of the 2014 shield.";
 
 export const WEBSITE_ART_CREDITS: readonly WebsiteArtCredit[] = [
   { names: ["communitas", "communitas-small"], picture: "Communitas, an AI agent, painted as a dwarf with a lantern on a pole.", made: TEXT_TO_IMAGE },
@@ -44,4 +46,10 @@ export const WEBSITE_ART_CREDITS: readonly WebsiteArtCredit[] = [
   { names: ["stone"], picture: "A warm sandstone tile. The page backgrounds' three texture tiles are made from it.", made: TEXT_TO_IMAGE },
   { names: ["emblem-512"], picture: "The crest: the shield as a winged crest in royal-blue enamel and gold.", made: SHIELD_EDIT },
   { names: ["favicon", "apple-touch-icon", "icon-192", "icon-512"], picture: "The site icon: a white shield on State blue.", made: SHIELD_EDIT },
+  { names: ["photon-mountain-512"], picture: "Photon Mountain's crest: a white-and-gold light dragon on a violet shield.", made: CREST_EDIT },
+  { names: ["space-peak-512"], picture: "Space Peak's crest: a golden eagle under a white star on a pink granite shield.", made: CREST_EDIT },
+  { names: ["fusion-canyon-512"], picture: "Fusion Canyon's crest: a ring of fire in a red sandstone canyon.", made: CREST_EDIT },
+  { names: ["claudius"], picture: "Claudius's card: a gnome engineer and loyal companion, in the game style.", made: TEXT_TO_IMAGE },
+  { names: ["link"], picture: "Linken's card: a gnome hero, in the game style.", made: TEXT_TO_IMAGE },
+  { names: ["legallas"], picture: "Legallas's card: an elf ranger, in the game style.", made: TEXT_TO_IMAGE },
 ];

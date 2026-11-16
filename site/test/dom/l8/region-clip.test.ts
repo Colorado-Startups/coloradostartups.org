@@ -33,10 +33,9 @@ describe("Photon Mountain's hero clip", () => {
     for (const src of sources) expect(existsSync(path.join(DIST_DIR, src)), src).toBe(true);
   });
 
-  it("offers a Pause button, and no other page has a clip yet", () => {
+  it("offers a Pause button, and the home page has no clip", () => {
     expect(media.querySelector("button[data-clip-toggle]")?.textContent?.trim()).toBe("Pause");
-    for (const other of ["index.html", "regions/space-peak/index.html", "regions/fusion-canyon/index.html"]) {
-      expect(readDist(other), other).not.toContain("data-region-clip");
-    }
+    // Space Peak and Fusion Canyon got their clips in brand v4.3.0 (brand-v43.test.ts).
+    expect(readDist("index.html")).not.toContain("data-region-clip");
   });
 });

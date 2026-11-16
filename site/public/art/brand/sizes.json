@@ -140,5 +140,56 @@
       96,
       144
     ]
+  },
+  "photon-mountain-512": {
+    "file": "photon-mountain-512.png",
+    "width": 512,
+    "height": 512,
+    "widths": [
+      512
+    ]
+  },
+  "space-peak-512": {
+    "file": "space-peak-512.png",
+    "width": 512,
+    "height": 512,
+    "widths": [
+      512
+    ]
+  },
+  "fusion-canyon-512": {
+    "file": "fusion-canyon-512.png",
+    "width": 512,
+    "height": 512,
+    "widths": [
+      512
+    ]
+  },
+  "claudius": {
+    "file": "claudius.jpg",
+    "width": 1280,
+    "height": 640,
+    "widths": [
+      720,
+      1280
+    ]
+  },
+  "link": {
+    "file": "link.jpg",
+    "width": 1280,
+    "height": 640,
+    "widths": [
+      720,
+      1280
+    ]
+  },
+  "legallas": {
+    "file": "legallas.jpg",
+    "width": 1280,
+    "height": 640,
+    "widths": [
+      720,
+      1280
+    ]
   }
 }

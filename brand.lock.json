@@ -1,7 +1,7 @@
 {
-  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.2.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
+  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.3.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
   "repo": "Colorado-Startups/brand",
-  "tag": "v4.2.0",
+  "tag": "v4.3.0",
   "files": {
     "dist/places/boulder.jpg": "2816f12e39305c407c7e400702f734c79440429f52ef3724a5971d066bf9072c",
     "dist/places/golden.jpg": "10737f40c1cdff6ec90255fe2c25e68f8ef8a72e2724e9b15dc908bf9092b3c9",
@@ -27,6 +27,16 @@
     "dist/logo/icon-192.png": "d38bb081b7cb827dd37c281646c0d78e78b0abc643737fd6a617747bc0b90674",
     "dist/logo/icon-512.png": "cbdbe869187b8eb86e3a0da7ecc71d8a43bd35e46f10fe663764537ad0b33485",
     "dist/clips/photonics.webm": "494c8b69c52433dd6977debd54d47b2632f302b527c7226b87cff55f0d651425",
-    "dist/clips/photonics.mp4": "9923f4ace75554f8a64d48c7799978c89e0af795ae563f834c222370353bdeb7"
+    "dist/clips/photonics.mp4": "9923f4ace75554f8a64d48c7799978c89e0af795ae563f834c222370353bdeb7",
+    "dist/crests/photon-mountain-512.png": "1e226de5209a9ff15098180b4b4e7b1cf88d0e306ed9118c295d684432dcc9c1",
+    "dist/crests/space-peak-512.png": "b6bc7267ca47af76efb7f5dfb67ffb01d7a28b84f33540f68a359ec7dfa9623d",
+    "dist/crests/fusion-canyon-512.png": "c072573d4977ac8d03a0c012aa18d4c2f0936384e924075581f0ec6bc2dc84ad",
+    "dist/clips/fusion.webm": "0c22d62106325a274f6146bf8bd21d388f840b78229f3292c43a8425bea06d67",
+    "dist/clips/fusion.mp4": "ac80614b9d5ded4faeb96dbc10b8cdf6eadcb220070773dfb72d74235d19f4db",
+    "dist/clips/space.webm": "14f15e8eef47da9f31356f284e3b13ae768b08797f9e6986e1af5efadb9e8c5b",
+    "dist/clips/space.mp4": "9801857698ae986930ba2da7f8b4c6a530ab6249f57fd649d3de68096f9fb615",
+    "dist/social/claudius.jpg": "d38b196831b5375e57f4123692ecb1fec376e173c99cbdff9b50495898df252a",
+    "dist/social/link.jpg": "1693346786b3bb69625c8892fc89bb3979ef2e5d50cde975b0da4c324eafdf13",
+    "dist/social/legallas.jpg": "d1ee9b2beb722474b50cc8aa0c1eaa6b331b2ff9932fc5ff68f68af8c1a90834"
   }
 }
