@@ -18,7 +18,8 @@ type PropKey<N extends EventName> = (typeof EVENT_PROPS)[N][number];
 export function trackAttrs<N extends EventName>(name: N, props: { [K in PropKey<N>]?: string }): Record<string, string> {
   const listed: readonly string[] = EVENT_PROPS[name];
   const attrs: Record<string, string> = { "data-track": name };
-  for (const [key, value] of Object.entries(props)) {
+  // A generic mapped type loses its value type in Object.entries, so name it.
+  for (const [key, value] of Object.entries(props) as [string, string | undefined][]) {
     if (value === undefined) continue;
     if (!listed.includes(key)) throw new Error(`track-attrs: ${name} lists no prop "${key}"`);
     if (!PROP_TOKEN.test(value)) throw new Error(`track-attrs: ${name} ${key}="${value}" is not a short slug`);
