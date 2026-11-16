@@ -1,315 +1,54 @@
 ---
 // Home. A first-time visitor's Colorado, in the order Paul set on 2026-11-15
-// and signed off as a mockup: join, where, why Colorado, explore, ask, and the
-// keepers last. About 200 visible words; pictures, maps and numbers carry it.
+// and signed off as a mockup. Each band is one file in
+// components/home/sections/; the five marked "slot" render nothing yet, and
+// the engagement plan step named in each file fills it.
 //
-// - Join: one gold action, Join the Slack, with the LinkedIn Group beside it.
-//   Join the Slack opens a Google Form, and the note under it says so (#128).
-// - Where: the statewide map as its drawing over shaded relief (ColoradoMap,
-//   live={false}: no MapLibre here, for the 75 KB JavaScript goal), each zone
-//   a link to its region, and a chip per region.
-// - Why Colorado: three panels, each headed by its region's real map, with
-//   three figures from facts.yaml and their source lines (home-data.ts). No
-//   figure without a source. The paintings are each region page's full art.
-// - Explore: live counts from the same data the pages use.
-// - Ask: a search box that opens /ask/ with the words, and the /mcp address.
-// - Keepers: the AI agents, disclosed (KeeperStrip, an ai-disclosure surface).
+// | Band | File | Filled by |
+// | --- | --- | --- |
+// | Join | Hero | today |
+// | Builders | Builders (slot) | P1 |
+// | Founder spotlights | Spotlights (slot) | P3b |
+// | This week | ThisWeek (slot) | P2a |
+// | Where | Where | today |
+// | Why Colorado | Why | today |
+// | Pick your door | PickDoor (slot) | P4 |
+// | Explore | Explore | today |
+// | Ask | Ask | today |
+// | First steps | FirstSteps (slot) | W5 |
+// | Keepers | Keepers | today |
 //
-// The Leaderboard is never tied to investing (decision 17), and no line here
-// states a member count.
-import { WAYS_IN } from "@cs/shared";
-
-import { brandArt } from "../components/art/art-assets";
-import { HALL_ART_ALT } from "../components/art/keepers";
+// At most 300 visible words, a source under every figure, no member count,
+// and 75 KB of gzipped JavaScript up front: site/test/dom/home/home-budget.test.ts.
+// The Leaderboard is never tied to investing (decision 17).
 import { DESCRIPTOR, homeJsonLd } from "../components/hall/org";
-import ExploreTile from "../components/home/ExploreTile.astro";
-import { homeCounts, themes } from "../components/home/home-data";
-import KeeperStrip from "../components/home/KeeperStrip.astro";
-import ThemePanel from "../components/home/ThemePanel.astro";
-import ColoradoMap from "../components/map/ColoradoMap.astro";
-import Button from "../components/ui/Button.astro";
+import Ask from "../components/home/sections/Ask.astro";
+import Builders from "../components/home/sections/Builders.astro";
+import Explore from "../components/home/sections/Explore.astro";
+import FirstSteps from "../components/home/sections/FirstSteps.astro";
+import Hero from "../components/home/sections/Hero.astro";
+import Keepers from "../components/home/sections/Keepers.astro";
+import PickDoor from "../components/home/sections/PickDoor.astro";
+import Spotlights from "../components/home/sections/Spotlights.astro";
+import ThisWeek from "../components/home/sections/ThisWeek.astro";
+import Where from "../components/home/sections/Where.astro";
+import Why from "../components/home/sections/Why.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { REGION_COLORS } from "../lib/regions/map";
-import { REGIONS } from "../lib/regions/match";
 
 const site = Astro.site!;
 const description = `${DESCRIPTOR} Join the Slack and the LinkedIn Group, see Colorado's three startup regions, and find resources.`;
-const hero = brandArt("brand/golden")!;
-const counts = await homeCounts();
-const mcpUrl = new URL("/mcp", site).toString();
 ---
 
 <BaseLayout title="Colorado Startups" description={description} ogImage="home" jsonLd={homeJsonLd(site)}>
-  <section class="hero" aria-labelledby="home-title">
-    {/* sizes caps phones at the 720 px file up to 2.6x screens (270 x 2.625 =
-         709 device px): the painting sits under a night veil, so the 1440 px
-         file (267 KB) would cost the LCP and show nothing more. */}
-    <div class="hero__art" data-art="brand/golden">
-      <img
-      src={hero.src}
-      srcset={hero.srcset}
-      sizes="(max-width: 760px) 270px, 100vw"
-      width={hero.width}
-      height={hero.height}
-      alt={HALL_ART_ALT}
-      loading="eager"
-      fetchpriority="high"
-      decoding="async"
-      />
-    </div>
-    <div class="wrap hero__copy">
-      <h1 id="home-title">Colorado Startups</h1>
-      <p class="lede">Meet the founders building companies in Colorado.</p>
-      <div class="btn-row">
-        <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
-        <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
-      </div>
-      <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
-    </div>
-  </section>
-
-  <section class="section section--lit" aria-labelledby="where">
-    <div class="wrap where">
-      <div class="where__copy">
-        <h2 id="where">Three regions along the Front Range</h2>
-        <ul class="region-links" role="list">
-          {
-            REGIONS.map((r) => (
-              <li>
-                <a class="region-link" href={`/regions/${r.id}/`} style={`--region-color: ${REGION_COLORS[r.id]}`}>
-                  <span class="region-link__swatch" aria-hidden="true" />
-                  <span class="region-link__name">{r.name}</span>
-                  <span class="region-link__cities">{r.cities.slice(0, 2).join(" · ")}</span>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-      <ColoradoMap id="home-map" live={false} caption="" />
-    </div>
-  </section>
-
-  <section class="section section--band" aria-labelledby="why">
-    <div class="wrap">
-      <h2 id="why">Why Colorado</h2>
-      <div class="themes">
-        {themes().map((theme) => <ThemePanel theme={theme} />)}
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--lit" aria-labelledby="explore">
-    <div class="wrap">
-      <h2 id="explore">Explore</h2>
-      <ul class="explore-grid" role="list">
-        <li><ExploreTile href={WAYS_IN.canvas} count={counts.resources} label="Startup Resources" icon="book" /></li>
-        <li><ExploreTile href={WAYS_IN.leaderboard} count={counts.companies} label="Leaderboard companies" icon="trophy" /></li>
-        <li><ExploreTile href={WAYS_IN.events} count={counts.events} label="Upcoming events" icon="calendar" /></li>
-        <li><ExploreTile href="/guides/" count={counts.guides} label="Founder guides" icon="compass" /></li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="section section--night" aria-labelledby="ask">
-    <div class="wrap ask">
-      <div class="stack">
-        <h2 id="ask">Ask</h2>
-        <form class="ask__form" action="/ask/" method="get" role="search">
-          <label for="home-q">Search resources, companies, guides and events</label>
-          <div class="ask__row">
-            <input id="home-q" name="q" type="search" autocomplete="off" />
-            <Button type="submit">Search</Button>
-          </div>
-        </form>
-        <p class="meta">Or <a href="/ask/">ask Resourcus</a>, an AI agent.</p>
-      </div>
-      <div class="stack connect">
-        <h3>Connect your AI</h3>
-        <p>Claude and OpenCode, free, no key.</p>
-        <code>{mcpUrl}</code>
-        <a class="tap-target" href="/ask/#connect">How to connect</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--band keepers" aria-label="The keepers">
-    <div class="wrap">
-      <KeeperStrip />
-    </div>
-  </section>
+  <Hero />
+  <Builders />
+  <Spotlights />
+  <ThisWeek />
+  <Where />
+  <Why />
+  <PickDoor />
+  <Explore />
+  <Ask />
+  <FirstSteps />
+  <Keepers />
 </BaseLayout>
-
-<style>
-  /* The hero: Golden's painting under a night veil, so white text holds 4.5:1
-     on its lightest pixel at every width. */
-  .hero {
-    position: relative;
-    display: grid;
-    align-items: end;
-    min-height: min(36rem, 80vh);
-    padding-block: var(--s-8) var(--s-7);
-    background: var(--c-night);
-    color: var(--c-on-night);
-    isolation: isolate;
-    --ink-link: var(--c-gold-on-night);
-    --focus-ring: var(--c-focus-on-night);
-  }
-  .hero__art {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-  }
-  .hero__art img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(to top, var(--c-night) 0%, color-mix(in oklab, var(--c-night) 70%, transparent) 45%, transparent 85%),
-      linear-gradient(to right, color-mix(in oklab, var(--c-night) 75%, transparent), transparent 70%);
-  }
-  .hero h1 {
-    margin: 0 0 var(--s-3);
-    color: var(--c-on-night);
-  }
-  .hero .lede {
-    margin-bottom: var(--s-5);
-    color: var(--c-on-night);
-  }
-  .hero .meta {
-    margin: var(--s-3) 0 0;
-    color: var(--c-on-night-dim);
-  }
-
-  .where {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: var(--s-6);
-    align-items: center;
-  }
-  .region-links {
-    display: grid;
-    gap: var(--s-2);
-    margin: var(--s-4) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .region-link {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s-1) var(--s-3);
-    min-height: var(--size-tap);
-    padding: var(--s-2) var(--s-3);
-    border-radius: var(--r-card);
-    background: var(--c-surface);
-    color: var(--c-text);
-    text-decoration: none;
-  }
-  .region-link__swatch {
-    width: 14px;
-    height: 14px;
-    border-radius: var(--r-chisel);
-    background: var(--region-color);
-  }
-  .region-link__name {
-    font-weight: 700;
-  }
-  .region-link__cities {
-    margin-left: auto;
-    color: var(--c-text-dim);
-    font-size: var(--t-step--1);
-  }
-  .region-link:hover .region-link__name,
-  .region-link:focus-visible .region-link__name {
-    text-decoration: underline;
-  }
-
-  .themes {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--s-5);
-    margin-top: var(--s-5);
-  }
-
-  /* A list gets the reading measure by default (global.css); this one is a grid. */
-  .region-links,
-  .explore-grid {
-    max-width: none;
-  }
-  .explore-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--s-4);
-    margin: var(--s-5) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .ask {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-7);
-    align-items: start;
-  }
-  .ask h2,
-  .ask h3 {
-    color: var(--c-on-night);
-  }
-  .ask__form label {
-    display: block;
-    margin-bottom: var(--s-2);
-    color: var(--c-on-night-dim);
-  }
-  .ask__row {
-    display: flex;
-    gap: var(--s-2);
-  }
-  .ask__row input {
-    flex: 1;
-    min-width: 0;
-    min-height: var(--size-control);
-    padding-inline: var(--s-3);
-    border: var(--line-edge) solid var(--c-border);
-    border-radius: var(--r-chisel);
-    background: var(--c-night-ceiling);
-    color: var(--c-on-night);
-    font: inherit;
-  }
-  .ask .meta {
-    color: var(--c-on-night-dim);
-  }
-  .connect code {
-    display: block;
-    overflow-wrap: anywhere;
-    padding: var(--s-2) var(--s-3);
-    border-radius: var(--r-chisel);
-    background: var(--c-night-ceiling);
-    color: var(--c-gold-on-night);
-  }
-
-  .keepers {
-    padding-block: var(--s-6);
-  }
-
-  @media (max-width: 960px) {
-    .themes {
-      grid-template-columns: 1fr;
-    }
-    .explore-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (max-width: 760px) {
-    .where,
-    .ask {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

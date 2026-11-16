@@ -1,0 +1,88 @@
+---
+// Home's first section: Golden's painting, the name, and one gold action,
+// Join the Slack, with the LinkedIn Group beside it. Join the Slack opens a
+// Google Form, and the note under it says so (#128).
+import { WAYS_IN } from "@cs/shared";
+
+import { brandArt } from "../../art/art-assets";
+import { HALL_ART_ALT } from "../../art/keepers";
+import Button from "../../ui/Button.astro";
+
+const hero = brandArt("brand/golden")!;
+---
+
+<section class="hero" aria-labelledby="home-title">
+  {/* sizes caps phones at the 720 px file up to 2.6x screens (270 x 2.625 =
+       709 device px): the painting sits under a night veil, so the 1440 px
+       file (267 KB) would cost the LCP and show nothing more. */}
+  <div class="hero__art" data-art="brand/golden">
+    <img
+    src={hero.src}
+    srcset={hero.srcset}
+    sizes="(max-width: 760px) 270px, 100vw"
+    width={hero.width}
+    height={hero.height}
+    alt={HALL_ART_ALT}
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
+    />
+  </div>
+  <div class="wrap hero__copy">
+    <h1 id="home-title">Colorado Startups</h1>
+    <p class="lede">Meet the founders building companies in Colorado.</p>
+    <div class="btn-row">
+      <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
+      <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
+    </div>
+    <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
+  </div>
+</section>
+
+<style>
+  /* The hero: Golden's painting under a night veil, so white text holds 4.5:1
+     on its lightest pixel at every width. */
+  .hero {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: min(36rem, 80vh);
+    padding-block: var(--s-8) var(--s-7);
+    background: var(--c-night);
+    color: var(--c-on-night);
+    isolation: isolate;
+    --ink-link: var(--c-gold-on-night);
+    --focus-ring: var(--c-focus-on-night);
+  }
+  .hero__art {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .hero__art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to top, var(--c-night) 0%, color-mix(in oklab, var(--c-night) 70%, transparent) 45%, transparent 85%),
+      linear-gradient(to right, color-mix(in oklab, var(--c-night) 75%, transparent), transparent 70%);
+  }
+  .hero h1 {
+    margin: 0 0 var(--s-3);
+    color: var(--c-on-night);
+  }
+  .hero .lede {
+    margin-bottom: var(--s-5);
+    color: var(--c-on-night);
+  }
+  .hero .meta {
+    margin: var(--s-3) 0 0;
+    color: var(--c-on-night-dim);
+  }
+</style>
