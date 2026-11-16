@@ -1,0 +1,290 @@
+---
+// The startup credits calculator (step L4, 2026-11-15). A founder ticks their
+// stage and what they build with, and sees the programs that may fit and an
+// "up to" total. The full tables stay below it on the page as the complete
+// list.
+//
+// With JavaScript off the whole tool stays hidden (the `hidden` attribute,
+// which the script removes), so the page reads exactly as it did: the tables
+// still list every program. The logic is in calc.ts; this file renders one
+// list item per program at build time, largest stated amount first, and the
+// script only hides the ones that do not fit. No inline script: Astro bundles
+// the <script> below into /_astro/*.js (the CSP is script-src 'self').
+//
+// Only fields already public on the page feed it (issue #11). Each item's
+// amount is the provider's own figure beside its source page, the same
+// sentence the tables show. The total is Colorado Startups' arithmetic, and
+// the live sentence says so.
+import { amountLine, COVER_LABELS, shortProvider, sourceLabel, type Cover, type Program } from "../../lib/guides/credits";
+import { statedMax } from "../../lib/guides/credits-chart";
+import { calculate, COVER_MEANS, creditOf, type CalcProgram } from "./calc";
+
+interface Props {
+  programs: readonly Program[];
+  /** The snapshot date as a reader sees it ("November 15, 2026"). */
+  checked: string;
+}
+
+const { programs, checked } = Astro.props;
+const byId = new Map(programs.map((p) => [p.id, p]));
+const calcPrograms: CalcProgram[] = programs.map((p) => ({
+  id: p.id,
+  provider: shortProvider(p.provider),
+  creditOf: creditOf(p.id, shortProvider(p.provider)),
+  bucket: p.bucket,
+  covers: p.covers,
+  amount: statedMax(p),
+}));
+const COVERS = Object.keys(COVER_LABELS) as Cover[];
+// Every program, in the order the result shows them.
+const ordered = calculate(calcPrograms, { company: true, funded: true, covers: COVERS }).programs;
+const START = "Tick at least one kind of tool to see the programs that may fit.";
+---
+
+<section class="calc panel" aria-labelledby="calc-title" data-credits-calc data-checked={checked} hidden>
+  <div class="calc__intro stack">
+    <h2 id="calc-title">Find the credits that may fit you</h2>
+    <p>
+      Tick where your company is and what you build with to see the programs that may fit. The list and the total change
+      as you tick.
+    </p>
+  </div>
+  <form class="calc__form" data-calc-form aria-label="Your company and tools">
+    <fieldset>
+      <legend>Where your company is</legend>
+      <label class="check">
+        <input type="checkbox" name="company" />
+        <span><strong>We formed a company</strong><span class="meta calc__hint">An LLC or a corporation.</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="funded" />
+        <span
+          ><strong>We raised a round or have a partner code</strong><span class="meta calc__hint"
+            >From an equity round, an accelerator or an investor.</span
+          ></span
+        >
+      </label>
+      <p class="meta">Leave both clear if you have an idea and an account.</p>
+    </fieldset>
+    <fieldset>
+      <legend>What you build with</legend>
+      {
+        COVERS.map((c) => (
+          <label class="check">
+            <input type="checkbox" name="cover" value={c} />
+            <span>
+              <strong>{COVER_LABELS[c]}</strong>
+              <span class="meta calc__hint">{COVER_MEANS[c]}</span>
+            </span>
+          </label>
+        ))
+      }
+    </fieldset>
+    <p><button class="btn btn--stone" type="reset">Clear my choices</button></p>
+  </form>
+  <div class="calc__result">
+    {/* The big number is for the eye; the status sentence under it says the
+        same figure, with its source, for a screen reader. */}
+    <p class="calc__total" aria-hidden="true" data-calc-total hidden>
+      <span class="calc__upto">Up to</span>
+      <span class="calc__amount" data-calc-amount></span>
+    </p>
+    <p class="calc__status" role="status" aria-live="polite" data-calc-status>{START}</p>
+    <ul class="calc__list" aria-label="Programs that may fit" data-calc-list>
+      {
+        ordered.map((cp) => {
+          const p = byId.get(cp.id)!;
+          return (
+            <li
+              data-calc-program={cp.id}
+              data-bucket={cp.bucket}
+              data-covers={cp.covers.join(" ")}
+              data-provider={cp.provider}
+              data-credit-of={cp.creditOf}
+              data-amount={cp.amount ?? ""}
+              hidden
+            >
+              <a href={`#p-${p.id}`}>{p.program}</a>
+              <span class="meta">{p.provider}</span>
+              <span class="calc__line">
+                {`${amountLine(p).stated}, per `}
+                <a href={p.source} rel="noopener nofollow">
+                  {sourceLabel(p.source)}
+                </a>
+              </span>
+            </li>
+          );
+        })
+      }
+    </ul>
+    <p class="meta">
+      Each name opens its row in the tables below, with what it needs and its terms. An "up to" total is not a promise
+      of money: each provider decides who gets what.
+    </p>
+  </div>
+</section>
+
+<script>
+  import type { Cover } from "../../lib/guides/credits";
+  import { calculate, summary, type Bucket, type CalcProgram, type Selection } from "./calc";
+
+  const root = document.querySelector<HTMLElement>("[data-credits-calc]");
+  const form = root?.querySelector<HTMLFormElement>("[data-calc-form]");
+  if (root && form) {
+    const items = [...root.querySelectorAll<HTMLLIElement>("[data-calc-program]")];
+    const programs: CalcProgram[] = items.map((li) => ({
+      id: li.dataset.calcProgram!,
+      provider: li.dataset.provider!,
+      creditOf: li.dataset.creditOf!,
+      bucket: li.dataset.bucket as Bucket,
+      covers: (li.dataset.covers ?? "").split(" ").filter(Boolean) as Cover[],
+      amount: li.dataset.amount ? Number(li.dataset.amount) : null,
+    }));
+    const total = root.querySelector<HTMLElement>("[data-calc-total]")!;
+    const amount = root.querySelector<HTMLElement>("[data-calc-amount]")!;
+    const status = root.querySelector<HTMLElement>("[data-calc-status]")!;
+    const checked = root.dataset.checked ?? "";
+
+    const update = () => {
+      const data = new FormData(form);
+      const sel: Selection = {
+        company: data.has("company"),
+        funded: data.has("funded"),
+        covers: data.getAll("cover") as Cover[],
+      };
+      const r = calculate(programs, sel);
+      const fit = new Set(r.programs.map((p) => p.id));
+      for (const li of items) li.hidden = !fit.has(li.dataset.calcProgram!);
+      total.hidden = r.sources === 0;
+      amount.textContent = `$${r.upTo.toLocaleString("en-US")}`;
+      status.textContent = summary(r, sel, checked);
+    };
+
+    form.addEventListener("change", update);
+    form.addEventListener("submit", (e) => e.preventDefault());
+    // A reset clears the boxes after its event, so read them on the next frame.
+    form.addEventListener("reset", () => requestAnimationFrame(update));
+    root.hidden = false;
+    update();
+  }
+</script>
+
+<style>
+  .calc {
+    display: grid;
+    gap: var(--s-5) var(--s-7);
+    grid-template-areas: "intro" "form" "result";
+  }
+  @media (min-width: 56rem) {
+    .calc {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      grid-template-areas: "intro intro" "form result";
+      align-items: start;
+    }
+    /* The boxes stay in view while a long list scrolls past. */
+    .calc__form {
+      position: sticky;
+      top: var(--s-5);
+    }
+  }
+  .calc__intro {
+    grid-area: intro;
+  }
+  .calc__form {
+    grid-area: form;
+    display: grid;
+    gap: var(--s-4);
+  }
+  .calc__result {
+    grid-area: result;
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    min-width: 0;
+  }
+  fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  legend {
+    padding: 0;
+    margin-bottom: var(--s-3);
+    font-weight: 700;
+  }
+  .calc .check {
+    min-height: var(--size-tap);
+    margin-bottom: var(--s-2);
+    cursor: pointer;
+  }
+  .calc__hint {
+    display: block;
+  }
+  /* The one loud thing: the running total, set in the display face on a gold
+     ledge. Gold is a fill here, never text. */
+  .calc__total {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s-3);
+    margin: 0;
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-chisel);
+    background: var(--c-surface-2);
+    box-shadow: var(--sh-ledge-gold);
+  }
+  .calc__upto {
+    font-weight: 700;
+    font-size: var(--t-step-1);
+  }
+  .calc__amount {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-5);
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  .calc__status {
+    margin: 0;
+    font-weight: 700;
+  }
+  .calc__list {
+    display: grid;
+    gap: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--line-hair) solid var(--c-rule);
+  }
+  .calc__list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 var(--s-3);
+    padding: var(--s-2) 0;
+    border-bottom: var(--line-hair) solid var(--c-rule);
+    font-size: var(--t-step--1);
+  }
+  .calc__list li > a:first-child {
+    font-weight: 700;
+  }
+  .calc__line {
+    grid-column: 1 / -1;
+  }
+  .calc__line a {
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 30rem) {
+    .calc__list li {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* A display rule above would beat the browser's own [hidden]; these win back. */
+  .calc[hidden],
+  .calc__total[hidden],
+  .calc__list li[hidden] {
+    display: none;
+  }
+</style>
