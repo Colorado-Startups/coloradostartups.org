@@ -19,7 +19,8 @@ art: brand/fortcollins
 # Hotspots on brand/fortcollins (step W3a; W3b draws them). x and y are
 # percent of the painting from its top left. Each sits on a painted feature:
 # the glowing workshop, the stone bridge where gnomes gather, the round
-# green door on the left, and the hill house on the right. No place hotspot
+# green door on the left, and the hill house on the right. W3b checked each
+# by eye on the 1440 px painting, and all four sit on their features. No place hotspot
 # until a source shows the landmark is not a place that matters to the Ute
 # or other tribes.
 hotspots:
