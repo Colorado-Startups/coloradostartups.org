@@ -1,7 +1,7 @@
 import type { Company, Edition } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
-import { buildBoard, countBy, foundingYears, latestEdition } from "../../../src/lib/leaderboard/board";
+import { buildBoard, companiesByCity, countBy, foundingYears, latestEdition } from "../../../src/lib/leaderboard/board";
 import { compareCells, nextDirection, sortedOrder } from "../../../src/lib/leaderboard/sort";
 
 const company = (id: string, name: string, extra: Partial<Company> = {}): Company => ({
@@ -87,6 +87,40 @@ describe("countBy and foundingYears", () => {
     const newer = { ...edition([{ company: "a", group: "Overall" }], "2026-10-08"), id: "new" };
     expect(latestEdition([older, newer])?.id).toBe("new");
     expect(latestEdition([])).toBeUndefined();
+  });
+});
+
+// L3a: the map's city panel lists each mapped city's companies, linked by id.
+describe("companiesByCity", () => {
+  const rows = [
+    company("zed", "Zed", { hq_city: "Denver" }),
+    company("bolt", "bolt works", { hq_city: "Boulder" }),
+    company("acme", "Acme", { hq_city: "Denver" }),
+    company("far", "Far Co", { hq_city: "Austin, TX" }),
+    company("aspen", "Aspen", { hq_city: "Boulder" }),
+    company("gold", "Gold", { hq_city: "Golden" }),
+  ].map((c) => ({ company: c, groups: ["Overall"] }));
+
+  it("groups companies by HQ city, largest city first, ties A to Z, names A to Z", () => {
+    expect(companiesByCity(rows)).toEqual([
+      { city: "Boulder", companies: [{ id: "aspen", name: "Aspen" }, { id: "bolt", name: "bolt works" }] },
+      { city: "Denver", companies: [{ id: "acme", name: "Acme" }, { id: "zed", name: "Zed" }] },
+      { city: "Austin, TX", companies: [{ id: "far", name: "Far Co" }] },
+      { city: "Golden", companies: [{ id: "gold", name: "Gold" }] },
+    ]);
+  });
+
+  it("keeps only the cities the filter keeps, in the same order as countBy", () => {
+    const kept = companiesByCity(rows, (city) => !city.includes(","));
+    expect(kept.map((c) => c.city)).toEqual(["Boulder", "Denver", "Golden"]);
+    const counts = countBy(rows, (r) => r.company.hq_city).filter((c) => !c.key.includes(","));
+    expect(kept.map((c) => c.companies.length)).toEqual(counts.map((c) => c.count));
+  });
+
+  it("lists every kept company exactly once", () => {
+    const ids = companiesByCity(rows).flatMap((c) => c.companies.map((x) => x.id));
+    expect(ids.sort()).toEqual(rows.map((r) => r.company.id).sort());
+    expect(companiesByCity([])).toEqual([]);
   });
 });
 

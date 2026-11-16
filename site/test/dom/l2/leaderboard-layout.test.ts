@@ -84,3 +84,59 @@ describe("/leaderboard/ room order", () => {
     expect(skippedLevels([1, 3, 2])).toEqual(["h1 > h3"]);
   });
 });
+
+// L3a: the "Where they are" map's dots open a city panel (city-map.ts). The
+// built page carries what the script needs, and stays complete without it.
+describe("/leaderboard/ city map", () => {
+  const figure = page.getElementById("chart-map-title")!.closest("figure")!;
+  const panel = figure.querySelector<HTMLElement>("[data-city-panel]")!;
+  const circles = [...figure.querySelectorAll("circle")];
+  const templates = [...panel.querySelectorAll("template")];
+
+  it("tags every dot with its city and count, and keeps a title on each", () => {
+    expect(circles.length).toBeGreaterThan(0);
+    for (const c of circles) {
+      expect(c.getAttribute("data-city"), c.outerHTML).toBeTruthy();
+      expect(Number(c.getAttribute("data-count"))).toBeGreaterThan(0);
+      expect(c.querySelector("title")?.textContent).toContain(c.getAttribute("data-city")!);
+    }
+  });
+
+  it("has a panel with a polite live status, apart from the aria-hidden copy hover writes", () => {
+    expect(panel.id).toBe("chart-map-panel");
+    expect(panel.querySelector("[data-city-status]")?.getAttribute("aria-live")).toBe("polite");
+    const visual = panel.querySelector("[data-city-visual]")!;
+    expect(visual.getAttribute("aria-hidden")).toBe("true");
+    expect(visual.hasAttribute("aria-live")).toBe(false);
+  });
+
+  // Review of #84: the phone row has one button per dot, in the panel's order.
+  it("draws one phone-row button per mapped city, each pointing at the panel", () => {
+    const chips = [...figure.querySelectorAll<HTMLButtonElement>("[data-city-chips] button")];
+    const narrow = [...figure.querySelectorAll(".plot--narrow circle")].map((c) => c.getAttribute("data-city"));
+    expect(chips.map((b) => b.dataset.city).sort()).toEqual(narrow.sort());
+    expect(chips.map((b) => b.dataset.city)).toEqual(templates.map((t) => t.getAttribute("data-city")));
+    for (const b of chips) {
+      expect(b.getAttribute("aria-controls")).toBe(panel.id);
+      expect(b.textContent?.trim()).toMatch(/^.+ \(\d+\)$/);
+    }
+  });
+
+  it("lists each dot's companies, as many as the dot counts, each linking to a table row", () => {
+    const byCity = new Map(templates.map((t) => [t.getAttribute("data-city"), t]));
+    for (const c of circles) {
+      const t = byCity.get(c.getAttribute("data-city"));
+      expect(t, c.getAttribute("data-city")!).toBeDefined();
+      const links = [...t!.content.querySelectorAll("a")];
+      expect(links.length).toBe(Number(c.getAttribute("data-count")));
+      for (const a of links) {
+        const row = page.getElementById(a.getAttribute("href")!.slice(1));
+        expect(row?.tagName, a.getAttribute("href")!).toBe("TR");
+      }
+    }
+  });
+
+  it("puts no button over the dots before the script runs", () => {
+    expect(figure.querySelector(".plot button")).toBeNull();
+  });
+});

@@ -26,6 +26,34 @@ const hqPoints = (cities: readonly Count[]) =>
     .filter((c) => Object.hasOwn(COLORADO_PLACES, c.key))
     .map((c) => ({ city: c.key, count: c.count, ...COLORADO_PLACES[c.key]! }));
 
+type HqPoint = ReturnType<typeof hqPoints>[number];
+
+/**
+ * The city dots. Each circle carries a <title> (a hover label that needs no
+ * script) and data-city and data-count, which leaderboard/city-map.ts reads to
+ * lay its buttons over the dots. Plot draws the largest dot first, so the
+ * index maps each circle back to its point.
+ */
+const cityDots = (points: readonly HqPoint[]) =>
+  Plot.dot(points, {
+    x: "lon",
+    y: "lat",
+    r: "count",
+    fill: MARK,
+    fillOpacity: 0.75,
+    stroke: DOT_EDGE,
+    title: (d: HqPoint) => `${d.city}: ${d.count} ${d.count === 1 ? "company" : "companies"}`,
+    render(index, scales, values, dimensions, context, next) {
+      const g = next!(index, scales, values, dimensions, context);
+      g?.querySelectorAll("circle").forEach((circle, i) => {
+        const point = points[index[i]!]!;
+        circle.setAttribute("data-city", point.city);
+        circle.setAttribute("data-count", String(point.count));
+      });
+      return g ?? null;
+    },
+  });
+
 /** HQ cities in Colorado as dots on the state outline, sized by company count. */
 export function hqMap(cities: readonly Count[], text: ChartText, labelTop = 3): string {
   const points = hqPoints(cities);
@@ -39,7 +67,7 @@ export function hqMap(cities: readonly Count[], text: ChartText, labelTop = 3): 
     r: { range: [3, 22] },
     marks: [
       Plot.geo(COLORADO_OUTLINE, { stroke: OUTLINE, strokeWidth: 1.5 }),
-      Plot.dot(points, { x: "lon", y: "lat", r: "count", fill: MARK, fillOpacity: 0.75, stroke: DOT_EDGE }),
+      cityDots(points),
       Plot.text(labelled, {
         x: "lon",
         y: "lat",
@@ -147,7 +175,7 @@ export function hqMapNarrow(cities: readonly Count[], text: ChartText, labelTop 
     r: { range: [2, 11] },
     marks: [
       Plot.geo(COLORADO_OUTLINE, { stroke: OUTLINE, strokeWidth: 1.5 }),
-      Plot.dot(points, { x: "lon", y: "lat", r: "count", fill: MARK, fillOpacity: 0.75, stroke: DOT_EDGE }),
+      cityDots(points),
       label("east"),
       label("west"),
       label("south"),
