@@ -9,6 +9,8 @@
 import { WAYS_IN } from "@cs/shared";
 
 import { brandArt } from "../art/art-assets";
+import AskButton from "./header/AskButton.astro";
+import YourRegion from "./header/YourRegion.astro";
 import { isCurrent, NAV } from "./nav";
 
 // Brand v3 logo tiers (brand decision 50): the emblem at 40 to 48 px beside the
@@ -40,6 +42,9 @@ const here = Astro.url.pathname;
           ))
         }
       </ul>
+      {/* Slots for K1 (Ask anywhere) and W8 (your region). Both render nothing yet. */}
+      <AskButton />
+      <YourRegion />
       <a class="btn btn--gold cta" href={WAYS_IN.slack} aria-describedby="header-slack-note">Join the Slack</a>
       <span class="cta-note" id="header-slack-note">Opens a Google Form.</span>
     </nav>
