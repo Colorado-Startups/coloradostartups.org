@@ -1,0 +1,16 @@
+{
+  "name": "colorado-startups",
+  "description": "Colorado Startups for Claude Code: Colorado startup resources, events, regions and Leaderboard companies.",
+  "owner": {
+    "name": "Colorado Startups",
+    "email": "info@coloradostartups.org",
+    "url": "https://coloradostartups.org"
+  },
+  "plugins": [
+    {
+      "name": "colorado-startups",
+      "source": "./plugins/colorado-startups",
+      "description": "The read-only Colorado Startups MCP server, which needs no key, and a skill that tells Claude when and how to use it."
+    }
+  ]
+}

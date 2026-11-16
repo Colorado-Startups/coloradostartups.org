@@ -1,0 +1,292 @@
+// L1a: topPicks(), the 12 picks Startup Resources opens on (L1b renders them).
+// Determinism, the count, the spread rules, the region bias, short stages and
+// an empty list. The fixture mirrors the real mix: Denver and Boulder heavy,
+// a statewide share in every stage, the types each stage actually holds.
+import { STAGES, type ResourceCard, type Stage } from "@cs/shared";
+import { describe, expect, it } from "vitest";
+
+import { COMMERCIAL, FIRST_NEED, isCommercial, substageCounts, topPicks } from "../../../src/components/canvas/top-picks";
+
+type Type = ResourceCard["type"];
+
+const SUBSTAGE: Record<Stage, string> = {
+  idea: "educate",
+  launch: "develop",
+  growth: "investors",
+  support: "organizations",
+};
+
+function card(stage: Stage, name: string, type: Type, city: string): ResourceCard {
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  return { id, name, url: `https://example.org/${id}`, stage, substage: SUBSTAGE[stage], city, type, description: "One line." };
+}
+
+const FIXTURE: ResourceCard[] = [
+  card("idea", "Denver Founders Meetup", "community", "Denver"),
+  card("idea", "Boulder Startup Circle", "community", "Boulder"),
+  card("idea", "Colorado Founder Network", "community", "statewide"),
+  card("idea", "Startup Basics Course", "education", "statewide"),
+  card("idea", "Springs Idea Lab", "education", "Colorado Springs"),
+  card("idea", "Pitch Night Denver", "event", "Denver"),
+  card("idea", "Statewide Startup Week", "event", "statewide"),
+  card("idea", "Founder Stories Podcast", "media", "online"),
+  card("idea", "Fort Collins Makers", "community", "Fort Collins"),
+  card("launch", "Front Range Accelerator", "accelerator", "Boulder"),
+  card("launch", "Denver Venture Lab", "accelerator", "Denver"),
+  card("launch", "Colorado Seed Fund", "investor", "statewide"),
+  card("launch", "Peak Angels", "investor", "Denver"),
+  card("launch", "Startup Law Group", "service-provider", "statewide"),
+  card("launch", "Boulder Desk Co", "coworking", "Boulder"),
+  card("launch", "Springs Incubator", "incubator", "Colorado Springs"),
+  card("launch", "Loveland Launchpad", "incubator", "Loveland"),
+  card("launch", "Fort Collins Coworking", "coworking", "Fort Collins"),
+  card("growth", "Growth Capital Partners", "investor", "statewide"),
+  card("growth", "Denver Growth Fund", "investor", "Denver"),
+  card("growth", "Scale Accounting", "service-provider", "statewide"),
+  card("growth", "Boulder Recruiting", "service-provider", "Boulder"),
+  card("growth", "Colorado Business News", "media", "statewide"),
+  card("growth", "Springs Scale Program", "accelerator", "Colorado Springs"),
+  card("support", "State Office of Economic Development", "government", "statewide"),
+  card("support", "City of Denver Business Office", "government", "Denver"),
+  card("support", "University Venture Office", "university", "Boulder"),
+  card("support", "Founders Nonprofit", "nonprofit", "statewide"),
+  card("support", "Springs Chamber", "other", "Colorado Springs"),
+  card("support", "Fort Collins Innovation Hub", "university", "Fort Collins"),
+];
+
+const FUSION_CANYON = { cities: ["Fort Collins", "Loveland", "Windsor"], nearby: ["Greeley", "Estes Park"] };
+
+const names = (result: ReturnType<typeof topPicks>) => result.map((s) => s.picks.map((p) => p.card.name));
+const LOCAL = new Set(["statewide", "online"]);
+
+describe("topPicks", () => {
+  it("gives the same output for the same input, whatever the input order", () => {
+    const first = topPicks(FIXTURE);
+    expect(topPicks(FIXTURE)).toEqual(first);
+    expect(topPicks([...FIXTURE].reverse())).toEqual(first);
+    const shuffled = [...FIXTURE].sort((a, b) => (a.url.length % 7) - (b.url.length % 7) || b.id.localeCompare(a.id));
+    expect(topPicks(shuffled)).toEqual(first);
+  });
+
+  it("returns up to 3 picks for each of the 4 stages, in journey order", () => {
+    const result = topPicks(FIXTURE);
+    expect(result.map((s) => s.stage)).toEqual([...STAGES]);
+    for (const s of result) for (const p of s.picks) expect(p.card.stage).toBe(s.stage);
+    // Growth holds two non-commercial cards, so it stops at two.
+    expect(result.map((s) => s.picks.length)).toEqual([3, 3, 2, 3]);
+  });
+
+  it("puts statewide reach first, then the stage's first-need types", () => {
+    const [idea, launch, growth, support] = topPicks(FIXTURE);
+    expect(idea.picks.map((p) => p.card.name)).toEqual([
+      "Startup Basics Course",
+      "Colorado Founder Network",
+      "Statewide Startup Week",
+    ]);
+    expect(idea.picks.every((p) => p.reason === "statewide")).toBe(true);
+    // Launch's statewide cards are commercial, and it has four non-commercial
+    // programs, so all three picks are programs and no firm appears.
+    expect(launch.picks.map((p) => p.card.name)).toEqual([
+      "Denver Venture Lab",
+      "Loveland Launchpad",
+      "Front Range Accelerator",
+    ]);
+    expect(launch.picks.map((p) => p.reason)).toEqual(["first-need", "first-need", "first-need"]);
+    // Growth has two non-commercial cards, and no commercial card fills the last slot.
+    expect(growth.picks.map((p) => p.card.name)).toEqual(["Colorado Business News", "Springs Scale Program"]);
+    expect(support.picks[0].card.name).toBe("State Office of Economic Development");
+  });
+
+  it("never repeats a type in a stage while another non-commercial type is left", () => {
+    for (const s of topPicks(FIXTURE)) {
+      const available = new Set(FIXTURE.filter((c) => c.stage === s.stage && !COMMERCIAL.has(c.type)).map((c) => c.type));
+      const programs = s.picks.filter((p) => !COMMERCIAL.has(p.card.type));
+      expect(new Set(programs.map((p) => p.card.type)).size).toBe(Math.min(programs.length, available.size));
+    }
+  });
+
+  it("repeats a type only when the stage has too few types", () => {
+    const cards = [
+      card("idea", "Alpha Community", "community", "Denver"),
+      card("idea", "Beta Community", "community", "Boulder"),
+      card("idea", "Gamma Course", "education", "Denver"),
+    ];
+    const [idea] = topPicks(cards);
+    expect(idea.picks).toHaveLength(3);
+    expect(idea.picks.map((p) => p.card.type).sort()).toEqual(["community", "community", "education"]);
+  });
+
+  it("spreads local picks across cities, within a stage and across stages", () => {
+    const local = (stage: Stage, n: number, city: string) =>
+      Array.from({ length: n }, (_, i) => card(stage, `${city} ${stage} ${i}`, FIRST_NEED[stage][i % FIRST_NEED[stage].length], city));
+    const cards = [
+      ...local("idea", 4, "Denver"),
+      ...local("idea", 4, "Boulder"),
+      ...local("idea", 4, "Colorado Springs"),
+      ...local("launch", 5, "Denver"),
+      ...local("launch", 5, "Fort Collins"),
+      ...local("launch", 5, "Boulder"),
+      ...local("launch", 5, "Loveland"),
+    ];
+    const [idea, launch] = topPicks(cards);
+    const cityOf = (s: typeof idea) => s.picks.map((p) => p.card.city);
+    expect(new Set(cityOf(idea)).size).toBe(3);
+    expect(new Set(cityOf(launch)).size).toBe(3);
+    // Fort Collins and Loveland were not used by Idea, so Launch reaches them first.
+    expect(cityOf(launch)).toEqual(expect.arrayContaining(["Fort Collins", "Loveland"]));
+    // Spread never costs a type: each stage still shows three types.
+    expect(new Set(idea.picks.map((p) => p.card.type)).size).toBe(3);
+  });
+
+  it("does not count statewide or online as a city for spread", () => {
+    const cards = [
+      card("idea", "A Course", "education", "statewide"),
+      card("idea", "B Network", "community", "statewide"),
+      card("idea", "C Podcast", "media", "online"),
+      card("idea", "D Meetup", "event", "online"),
+    ];
+    const [idea] = topPicks(cards);
+    expect(idea.picks.map((p) => p.card.city)).toEqual(["statewide", "statewide", "online"]);
+  });
+
+  it("prefers the region's cities and nearby towns, keeping the spread rules", () => {
+    const [idea, launch, growth, support] = topPicks(FIXTURE, { region: FUSION_CANYON });
+    expect(idea.picks[0].card.name).toBe("Fort Collins Makers");
+    expect(idea.picks[0].reason).toBe("your-region");
+    const launchRegion = launch.picks.filter((p) => p.reason === "your-region").map((p) => p.card.name);
+    // Fort Collins Coworking is in the region but commercial, so programs take every slot.
+    expect(launchRegion).toEqual(["Loveland Launchpad"]);
+    expect(launch.picks.some((p) => COMMERCIAL.has(p.card.type))).toBe(false);
+    // A stage with nothing in the region falls back to the statewide order.
+    expect(growth.picks.map((p) => p.reason)).not.toContain("your-region");
+    expect(growth.picks[0].reason).toBe("statewide");
+    expect(support.picks[0].card.name).toBe("Fort Collins Innovation Hub");
+    // A nearby town counts as the region.
+    const nearby = topPicks([card("idea", "Greeley Founder School", "education", "Greeley, CO"), ...FIXTURE], { region: FUSION_CANYON });
+    expect(nearby[0].picks.slice(0, 2).map((p) => [p.card.name, p.reason])).toEqual([
+      ["Greeley Founder School", "your-region"],
+      ["Fort Collins Makers", "your-region"],
+    ]);
+  });
+
+  it("returns what a stage has when it has fewer than 3", () => {
+    const cards = [
+      card("idea", "Only Idea", "community", "Denver"),
+      card("growth", "First Growth", "investor", "Boulder"),
+      card("growth", "Second Growth", "media", "Denver"),
+    ];
+    const result = topPicks(cards);
+    expect(result.map((s) => s.picks.length)).toEqual([1, 0, 1, 0]);
+    expect(names(result)).toEqual([["Only Idea"], [], ["Second Growth"], []]);
+  });
+
+  it("returns four empty stages for an empty list", () => {
+    expect(topPicks([])).toEqual(STAGES.map((stage) => ({ stage, picks: [] })));
+  });
+
+  it("ranks by stage, type, city and name only, so no url, description or extra field moves a card", () => {
+    const before = names(topPicks(FIXTURE));
+    const picked = "Startup Basics Course";
+    const notPicked = "Peak Angels";
+    expect(before.flat()).toContain(picked);
+    expect(before.flat()).not.toContain(notPicked);
+    const promote = (c: ResourceCard) =>
+      ({
+        ...c,
+        url: "https://example.org/sponsored",
+        description: "Sponsored. Featured partner. Top rated.",
+        sponsored: true,
+        featured: true,
+        paid: 1000,
+      }) as ResourceCard;
+    const demote = (c: ResourceCard) => ({ ...c, url: "https://example.org/x", description: "x" });
+    const changed = FIXTURE.map((c) => (c.name === notPicked ? promote(c) : c.name === picked ? demote(c) : c));
+    expect(names(topPicks(changed))).toEqual(before);
+    const swapped = FIXTURE.map((c) => (c.name === picked ? promote(c) : c.name === notPicked ? demote(c) : c));
+    expect(names(topPicks(swapped))).toEqual(before);
+  });
+
+  it("keeps commercial types out of every first-need list", () => {
+    for (const stage of STAGES) for (const t of FIRST_NEED[stage]) expect(COMMERCIAL.has(t)).toBe(false);
+  });
+
+  it("never picks a commercial card, even to fill a slot", () => {
+    for (const s of topPicks(FIXTURE)) expect(s.picks.filter((p) => isCommercial(p.card))).toEqual([]);
+    const cards = [
+      card("launch", "Aardvark Law", "service-provider", "statewide"),
+      card("launch", "Acme Capital", "investor", "statewide"),
+      card("launch", "Able Desks", "coworking", "statewide"),
+      card("launch", "Zed Accelerator", "accelerator", "Denver"),
+    ];
+    const launch = topPicks(cards)[1];
+    // The statewide firms never appear, though a slot stays empty.
+    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator"]);
+    // A region does not let a firm in either.
+    const regional = topPicks([...cards, card("launch", "Fort Collins Law", "service-provider", "Fort Collins")], { region: FUSION_CANYON })[1];
+    expect(regional.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator"]);
+  });
+
+  // PR #89 review: a stage whose cards are all commercial gets no picks; the
+  // page shows a browse row for it instead.
+  it("gives a stage whose cards are all commercial zero picks", () => {
+    const cards = [
+      card("growth", "Acme Capital", "investor", "statewide"),
+      card("growth", "Able Desks", "coworking", "Denver"),
+      { ...card("growth", "Score Co", "accelerator", "statewide"), substage: "service-providers" },
+      { ...card("growth", "Pitch Platform", "event", "online"), substage: "service-providers" },
+    ];
+    expect(topPicks(cards)[2].picks).toEqual([]);
+    expect(topPicks(cards, { region: FUSION_CANYON })[2].picks).toEqual([]);
+    expect(substageCounts(cards, "growth")).toEqual([
+      { substage: "investors", count: 2 },
+      { substage: "service-providers", count: 2 },
+    ]);
+  });
+
+  it("picks no commercial card even when spread and reach would favor it", () => {
+    // Idea uses Denver, so the spread rule alone would take the statewide
+    // investor first. The pick order is asserted as returned, with no reorder.
+    const cards = [
+      card("idea", "Denver Founders Meetup", "community", "Denver"),
+      card("launch", "Acme Capital", "investor", "statewide"),
+      card("launch", "Zed Accelerator", "accelerator", "Denver"),
+    ];
+    const launch = topPicks(cards)[1];
+    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator"]);
+  });
+
+  it("picks no commercial card when a stage has 3 or more non-commercial cards", () => {
+    // Same type and same city on purpose: no spread rule may let a firm in.
+    const cards = [
+      card("launch", "Acme Capital", "investor", "statewide"),
+      card("launch", "Aardvark Law", "service-provider", "statewide"),
+      card("launch", "Able Desks", "coworking", "Fort Collins"),
+      card("launch", "Xeno Accelerator", "accelerator", "Denver"),
+      card("launch", "Yolo Accelerator", "accelerator", "Denver"),
+      card("launch", "Zed Accelerator", "accelerator", "Denver"),
+    ];
+    for (const options of [{}, { region: FUSION_CANYON }]) {
+      const launch = topPicks(cards, options)[1];
+      expect(launch.picks.map((p) => p.card.name)).toEqual(["Xeno Accelerator", "Yolo Accelerator", "Zed Accelerator"]);
+    }
+  });
+
+  it("breaks ties by name", () => {
+    const cards = [
+      card("support", "Zeta Office", "government", "statewide"),
+      card("support", "alpha Office", "government", "statewide"),
+      card("support", "Beta Office", "government", "statewide"),
+    ];
+    expect(topPicks(cards)[3].picks.map((p) => p.card.name)).toEqual(["alpha Office", "Beta Office", "Zeta Office"]);
+  });
+
+  it("labels every pick with a known reason", () => {
+    const reasons = new Set(["your-region", "statewide", "first-need", "spread"]);
+    for (const s of topPicks(FIXTURE, { region: FUSION_CANYON })) {
+      for (const p of s.picks) expect(reasons.has(p.reason)).toBe(true);
+    }
+    const spread = topPicks([card("support", "Some Group", "other", "Denver")])[3].picks[0];
+    expect(spread.reason).toBe("spread");
+    expect(LOCAL.has(spread.card.city)).toBe(false);
+  });
+});

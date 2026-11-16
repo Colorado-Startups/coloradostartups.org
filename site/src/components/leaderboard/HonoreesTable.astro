@@ -8,12 +8,17 @@
 // Below 600 px each row draws as a card: the company, then each fact with its
 // label, and the sort buttons wrap above the cards (#145). The explicit roles
 // keep the table's semantics where a browser drops them for display: block.
+// L3b: a Table and Cards switch above the list sets data-view on .board, and
+// honorees-cards.css lays the same rows out as a grid of cards (board-view.ts).
+// The switch waits hidden until its script runs, so without JavaScript the
+// table shows as it always has.
 // There is no Founded column: 84 of 115 rows said "Not stated" (2026-11-02),
 // so the year shows under the description only when a source states it.
 import type { BoardRow } from "../../lib/leaderboard/board";
-import { themeCounts, themeOf } from "../../lib/leaderboard/themes";
+import { THEMES, themeCounts, themeOf } from "../../lib/leaderboard/themes";
 import { optionsFrom } from "./honorees-filter";
 import ThemeChips from "./ThemeChips.astro";
+import "./honorees-cards.css";
 
 interface Props {
   rows: BoardRow[];
@@ -34,9 +39,11 @@ const columns = [
 const sectors = optionsFrom(rows.map((r) => r.company.sector));
 const cities = optionsFrom(rows.map((r) => r.company.hq_city));
 const themes = themeCounts(rows.map((r) => r.company.sector));
+// A card's top edge takes its theme's color, the same as its chip's swatch.
+const themeColor = (sector: string) => THEMES.find((t) => t.id === themeOf(sector))?.color ?? null;
 ---
 
-<div class="board" data-sortable-table>
+<div class="board" data-sortable-table data-view="table">
   <form class="honoree-filters panel" role="search" aria-label="Filter the honorees" data-honoree-filters hidden>
     <ThemeChips total={rows.length} themes={themes} />
     <div class="honoree-filters__grid">
@@ -63,6 +70,11 @@ const themes = themeCounts(rows.map((r) => r.company.sector));
       <button class="btn btn--stone" type="reset">Clear filters</button>
     </div>
   </form>
+  <div class="board-view" role="group" aria-label="Show the companies as" data-board-view hidden>
+    <button type="button" class="board-view__option" data-view-option="table" aria-pressed="true">Table</button>
+    <button type="button" class="board-view__option" data-view-option="cards" aria-pressed="false">Cards</button>
+    <p class="visually-hidden" aria-live="polite" data-view-status></p>
+  </div>
   <div class="scroll" role="region" aria-label={caption} tabindex="0">
     <table role="table">
       <caption>{caption}</caption>
@@ -90,6 +102,7 @@ const themes = themeCounts(rows.map((r) => r.company.sector));
               data-sector={company.sector}
               data-city={company.hq_city}
               data-theme={themeOf(company.sector)}
+              style={themeColor(company.sector) ? `--theme-color: ${themeColor(company.sector)}` : undefined}
             >
               <th scope="row" role="rowheader" data-sort={company.name}>
                 <a href={company.website} rel="noopener">
@@ -134,9 +147,11 @@ const themes = themeCounts(rows.map((r) => r.company.sector));
 </div>
 
 <script>
+  import { initBoardView } from "./board-view";
   import { initHonoreesTables } from "./honorees-table-client";
 
   initHonoreesTables(document);
+  for (const board of document.querySelectorAll<HTMLElement>("[data-sortable-table]")) initBoardView(board);
 </script>
 
 <style>

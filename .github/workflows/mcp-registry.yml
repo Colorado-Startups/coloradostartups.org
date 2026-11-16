@@ -1,0 +1,87 @@
+name: mcp-registry
+
+# ADVISORY. No ruleset requires this check, so it reports and never blocks a merge.
+#
+# Lists the public /mcp server in the official MCP Registry (registry.modelcontextprotocol.io)
+# from server.json at the repo root. It follows the registry's GitHub Actions guide
+# (modelcontextprotocol.io/registry/github-actions, read 2026-11-15):
+#   - GitHub OIDC login, so no secret: the job's id-token proves the repo owner, and the
+#     registry grants io.github.<repository_owner>/*. That match is case sensitive, so the
+#     name keeps the org login's case, io.github.Colorado-Startups/.
+#   - mcp-publisher pinned to one release and checked against its Sigstore bundle with
+#     cosign before it runs. Bump MCP_PUBLISHER_VERSION on purpose; never use releases/latest.
+#
+# Fires on a push to main that changes server.json, and on dispatch. It publishes only from
+# main, so a dispatch from a branch validates and stops. The registry keeps each version once:
+# bump "version" in server.json, with the server's own version in site/worker/mcp/server.ts,
+# before a change merges. site/test/unit/mcp-discovery.test.ts checks the two agree.
+#
+# Check the listing after a run:
+#   curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.Colorado-Startups/coloradostartups"
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "server.json"
+
+permissions: {}
+
+# One publish at a time; a running publish always finishes.
+concurrency:
+  group: mcp-registry
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: mcp-registry
+    # ubuntu-latest, not ubuntu-slim: the cosign installer calls envsubst, which the
+    # slim image lacks (the first run, 43819398716, failed on it). The repo is public,
+    # so the standard runner is free.
+    runs-on: ubuntu-latest
+    # Publishing writes under the org's name, so only main may run it: the
+    # mcp-registry environment's branch policy allows main alone (review of #82).
+    environment: mcp-registry
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      # Newest release at least 14 days old on 2026-11-15 (published 2026-10-23), the repo's
+      # dependency age rule. The guide's example pins v1.8.1.
+      MCP_PUBLISHER_VERSION: v1.8.4
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      - name: Download and verify mcp-publisher
+        run: |
+          set -euo pipefail
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+          archive="mcp-publisher_${os}_${arch}.tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob \
+            --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+
+      - name: Validate server.json
+        run: ./mcp-publisher validate
+
+      - name: Log in with GitHub OIDC
+        if: github.ref == 'refs/heads/main'
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish to the MCP Registry
+        if: github.ref == 'refs/heads/main'
+        run: ./mcp-publisher publish

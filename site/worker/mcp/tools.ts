@@ -1,5 +1,5 @@
-// The five /mcp tools as pure functions over the open data: search, events,
-// region, path and company. No SDK imports, so test/unit/mcp/tools.test.ts
+// The seven /mcp tools as pure functions over the open data: search, events,
+// region, path, company, guide and this_week. No SDK imports, so test/unit/mcp/tools.test.ts
 // runs them in plain Node. Every list holds at most MAX_RESULTS items, and
 // every link is absolute on the origin the request came to.
 import { SUBSTAGES, type OpenEvent, type OpenRegion, type RegionId, type ResourceCard, type Stage } from "@cs/shared";
@@ -278,7 +278,9 @@ export function path(data: OpenData, input: PathInput, origin: string) {
 
   let note: string | undefined;
   if (steps.length === 0) note = `No Startup Resources listed for the ${input.stage} stage${input.region ? " in that region" : ""} yet.`;
-  else if (!needMatched) note = `No listing at this stage mentions "${input.need}", so this path covers the stage as a whole.`;
+  // The note never repeats the caller's own words: a tool result that echoes
+  // its input is a path for text aimed at the model.
+  else if (!needMatched) note = "No listing at this stage mentions that need, so this path covers the stage as a whole.";
 
   return {
     stage: input.stage,
@@ -306,5 +308,63 @@ export function company(data: OpenData, id: string, origin: string) {
     website: c.website,
     sources: c.sources,
     url: new URL(`/leaderboard/#company-${c.id}`, origin).toString(),
+  };
+}
+
+// A guide's answer is plain text from the page; this caps what one call returns.
+export const GUIDE_ANSWER_CHARS = 8000;
+
+/** One founder guide's public content, or null for a slug the site does not have. */
+export function guide(data: OpenData, slug: string, origin: string) {
+  const g = data.guides.find((x) => x.id === slug);
+  if (!g) return null;
+  const cut = g.answer.length > GUIDE_ANSWER_CHARS;
+  return {
+    id: g.id,
+    title: g.title,
+    description: g.description,
+    region: g.region,
+    answer: cut ? `${g.answer.slice(0, GUIDE_ANSWER_CHARS).trimEnd()}...` : g.answer,
+    ...(cut ? { truncated: true } : {}),
+    url: new URL(g.url, origin).toString(),
+  };
+}
+
+/** The guide slugs, sorted, at most MAX_RESULTS, for an error that names valid ones. */
+export function guideSlugs(data: OpenData): { slugs: string[]; more: number } {
+  const all = data.guides.map((g) => g.id).sort();
+  return { slugs: all.slice(0, MAX_RESULTS), more: Math.max(0, all.length - MAX_RESULTS) };
+}
+
+export const WEEK_DAYS = 7;
+export const WEEK_EVENTS = 10;
+
+/** A YYYY-MM-DD day plus n days. */
+function addDays(day: string, n: number): string {
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * The events in the next seven days in Mountain Time, today included: at most
+ * ten, soonest first. The weekly Slack threads are not in the open data the
+ * Worker reads, so this answers with events only.
+ */
+export function thisWeek(data: OpenData, input: { region?: RegionId }, origin: string, now: Date) {
+  const from = denverToday(now);
+  const to = addDays(from, WEEK_DAYS - 1);
+  const list = data.events
+    .filter((e) => localDay(e.end) >= from && localDay(e.start) <= to)
+    .filter((e) => !input.region || e.region === input.region)
+    .sort((a, b) => a.start.localeCompare(b.start) || a.title.localeCompare(b.title, "en"));
+  return {
+    from,
+    to,
+    timeZone: TIME_ZONE,
+    region: input.region ?? null,
+    events: list.slice(0, WEEK_EVENTS),
+    ...(list.length > WEEK_EVENTS ? { moreEvents: list.length - WEEK_EVENTS } : {}),
+    calendar: new URL("/event-calendar/", origin).toString(),
   };
 }

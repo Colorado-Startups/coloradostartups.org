@@ -1,9 +1,22 @@
 // Step H0 over the built site (run `npm run build` first; test:content does):
 // the home page's budget. Home is split into sections (components/home/
 // sections/), five of them empty slots that later steps fill; these checks
-// hold the page to its limits while they do. At most 300 visible words, no
-// member count, a source line under every figure, and 75 KB of gzipped
-// JavaScript or less up front (PLAN.md, Gates).
+// hold the page to its limits while they do. At most 60 visible words in each
+// band and 450 on the page, no member count, a source line under every figure,
+// and 75 KB of gzipped JavaScript or less up front (PLAN.md, Gates).
+//
+// The cap was 300 words for the page. Step W2 (the living map) adds the map's
+// counts, and two other open steps each add up to 50 words, so one page cap
+// would make each band's change fail for words another band spent. A cap per
+// band keeps every band short on its own; 450 leaves room for all of them.
+// A band's sourced figures (.stat: value, label and source line) are left out
+// of its cap, though not the page's: Why Colorado holds nine of them by design,
+// each kept honest by the source-line check below, and they are data, not copy.
+//
+// Words behind a closed door (a <details> body, everything but its <summary>)
+// are not on screen until the visitor opens it, so they count toward neither
+// a band's 60 nor the page's 450. Each door's body has its own cap instead: at
+// most 30 words. The cap per band is unchanged (orchestrator, 2026-11-16).
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
@@ -18,21 +31,81 @@ const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace
 // Words a reader sees in <main>. Not counted: scripts, styles, hidden and
 // visually hidden text, and the maps' SVG labels (city and road names on a
 // drawing, not copy).
+//
+// The build strips the whitespace between elements, so the text of two
+// elements can touch ("doorIdea"). The count walks the text nodes and joins
+// them with a space, so words from different elements never merge.
 const UNSEEN = "script, style, template, noscript, svg, [hidden], [aria-hidden='true'], .visually-hidden";
-function visibleWords(root: Element): string[] {
-  const copy = root.cloneNode(true) as Element;
-  for (const el of copy.querySelectorAll(UNSEEN)) el.remove();
-  return text(copy).match(/[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu) ?? [];
+const CLOSED_DOOR = "details:not([open]) > :not(summary)";
+const WORD = /[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu;
+function wordsOf(root: Element, unseen: string): string[] {
+  const parts: string[] = [];
+  const walk = (node: Node) => {
+    for (const child of node.childNodes) {
+      if (child.nodeType === child.TEXT_NODE) parts.push(child.textContent ?? "");
+      else if (child.nodeType === child.ELEMENT_NODE && !(child as Element).matches(unseen)) walk(child);
+    }
+  };
+  walk(root);
+  return parts.join(" ").match(WORD) ?? [];
 }
+/** Words on screen in `root`; closed doors' bodies are left out. */
+const visibleWords = (root: Element, skip = "") => wordsOf(root, [UNSEEN, CLOSED_DOOR, skip].filter(Boolean).join(", "));
+/** Words in a door's body: every child of the <details> but its <summary>. */
+const doorBodyWords = (door: Element) =>
+  [...door.children].filter((c) => !c.matches(`summary, ${UNSEEN}`)).flatMap((c) => wordsOf(c, UNSEEN));
+
+describe("the word counter", () => {
+  it("counts the words of adjacent elements separately, even with no whitespace between them", () => {
+    const fixture = new DOMParser().parseFromString(
+      '<main><h2>Pick your door</h2><ul><li><span>Idea</span><b>Slack,</b><a href="/">Monday</a></li></ul><p hidden>Gone</p></main>',
+      "text/html",
+    );
+    expect(visibleWords(fixture.querySelector("main")!)).toEqual(["Pick", "your", "door", "Idea", "Slack,", "Monday"]);
+  });
+
+  it("leaves a closed door's body out of the visible words, and counts it as the door's body", () => {
+    const fixture = new DOMParser().parseFromString(
+      "<main><details><summary>Idea</summary><ul><li>Join<b>the</b>Slack</li></ul></details><details open><summary>Hiring</summary><p>Open text</p></details></main>",
+      "text/html",
+    );
+    const main = fixture.querySelector("main")!;
+    expect(visibleWords(main)).toEqual(["Idea", "Hiring", "Open", "text"]);
+    expect([...main.querySelectorAll("details")].map(doorBodyWords)).toEqual([["Join", "the", "Slack"], ["Open", "text"]]);
+  });
+});
 
 describe("home budget", () => {
   const main = home.querySelector("main")!;
 
-  it("has at most 300 visible words", () => {
+  it("has at most 450 visible words", () => {
     const words = visibleWords(main);
     console.info(`index.html: ${words.length} visible words in <main>`);
     expect(words.length).toBeGreaterThan(0);
-    expect(words.length).toBeLessThanOrEqual(300);
+    expect(words.length).toBeLessThanOrEqual(450);
+  });
+
+  it("has at most 60 visible words in each band, its sourced figures aside", () => {
+    const bands = [...main.children].filter((el) => el.matches("section"));
+    expect(bands.length).toBeGreaterThan(1);
+    for (const band of bands) {
+      const words = visibleWords(band, ".stat").length;
+      const name = band.getAttribute("aria-labelledby") ?? band.getAttribute("aria-label") ?? band.className;
+      console.info(`index.html: ${words} visible words in the ${name} band`);
+      expect(words, name).toBeLessThanOrEqual(60);
+    }
+  });
+
+  it("has at most 30 words behind each door", () => {
+    const doors = [...main.querySelectorAll("details")];
+    expect(doors.length, "the Pick your door doors").toBeGreaterThan(0);
+    for (const door of doors) {
+      const label = text(door.querySelector("summary"));
+      const words = doorBodyWords(door).length;
+      console.info(`index.html: ${words} words behind the ${label} door`);
+      expect(words, label).toBeGreaterThan(0);
+      expect(words, label).toBeLessThanOrEqual(30);
+    }
   });
 
   it("states no member count", () => {
@@ -49,7 +122,7 @@ describe("home budget", () => {
 
   it("keeps the bands in the order they had before the split into sections", () => {
     const outline = [...main.querySelectorAll("h1, h2")].map((h) => `${h.tagName} ${text(h)}`);
-    expect(outline).toEqual(["H1 Colorado Startups", "H2 Three regions along the Front Range", "H2 Why Colorado", "H2 Explore", "H2 Ask"]);
+    expect(outline).toEqual(["H1 Colorado Startups", "H2 Three regions along the Front Range", "H2 Why Colorado", "H2 Pick your door", "H2 Explore", "H2 Ask"]);
     expect(main.lastElementChild?.matches("section.keepers"), "the keepers last").toBe(true);
   });
 });

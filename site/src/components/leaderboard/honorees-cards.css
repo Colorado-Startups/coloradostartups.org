@@ -1,0 +1,127 @@
+/* L3b: the honorees board's Table and Cards switch, and the cards view.
+   HonoreesTable.astro imports this file. The cards are the table's own rows
+   laid out as a grid when .board has data-view="cards" (board-view.ts), so
+   sort, search, filters and the city map's #company- links keep working.
+   The table, rows and cells carry explicit ARIA roles, so a screen reader
+   still hears a table with a row header per company in either view.
+   Every selector starts at .board[data-view="cards"], which outranks the
+   component's scoped rules (one class and one attribute each). Brand tokens
+   only. */
+
+/* The switch: two buttons in a row, drawn like the theme chips, so a
+   pressed button reads the same way a checked chip does. */
+.board-view {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-bottom: var(--s-4);
+}
+/* display: flex above would beat the hidden attribute's own rule. */
+.board-view[hidden] {
+  display: none;
+}
+.board-view__option {
+  min-height: var(--size-tap);
+  padding: var(--s-1) var(--s-4);
+  font: inherit;
+  font-weight: 700;
+  color: var(--c-text);
+  background: var(--c-surface);
+  border: var(--line-hair) solid var(--c-border);
+  border-radius: var(--r-card);
+  cursor: pointer;
+}
+.board-view__option:hover {
+  text-decoration: underline;
+}
+.board-view__option[aria-pressed="true"] {
+  border-color: var(--c-text);
+  box-shadow: inset 0 0 0 var(--line-edge) var(--c-text);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+/* The cards view. The box around the table goes; each card draws its own. */
+.board[data-view="cards"] .scroll {
+  overflow-x: visible;
+  border: 0;
+}
+.board[data-view="cards"] table,
+.board[data-view="cards"] thead,
+.board[data-view="cards"] tbody,
+.board[data-view="cards"] tr,
+.board[data-view="cards"] th,
+.board[data-view="cards"] td,
+.board[data-view="cards"] caption {
+  display: block;
+}
+.board[data-view="cards"] caption {
+  padding: 0 0 var(--s-3);
+}
+/* The sort buttons stay, as a row above the cards. Sources does not sort. */
+.board[data-view="cards"] thead tr {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  padding: 0 0 var(--s-4);
+}
+.board[data-view="cards"] thead th {
+  border: var(--line-hair) solid var(--c-rule);
+  border-radius: var(--r-chisel);
+}
+.board[data-view="cards"] thead th:not([data-kind]) {
+  display: none;
+}
+/* min() keeps a card no wider than the screen at 375 px. */
+.board[data-view="cards"] tbody {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--s-4);
+}
+/* Each card's top edge takes its theme's color, like the chip's swatch;
+   Everything else keeps the plain rule. */
+.board[data-view="cards"] tbody tr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+  padding: var(--s-4);
+  background: var(--c-surface);
+  border: var(--line-hair) solid var(--c-border);
+  border-top: var(--s-1) solid var(--theme-color, var(--c-rule));
+  border-radius: var(--r-card);
+}
+/* display: flex above would beat the hidden attribute's own rule. */
+.board[data-view="cards"] tbody tr[hidden] {
+  display: none;
+}
+.board[data-view="cards"] tbody th,
+.board[data-view="cards"] tbody td {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+/* The company name leads the card, a step larger than the facts. */
+.board[data-view="cards"] tbody th a {
+  font-size: var(--t-step-1);
+}
+.board[data-view="cards"] tbody th .desc {
+  margin-top: var(--s-1);
+}
+/* Sources sit at the foot of the card, under a hairline. */
+.board[data-view="cards"] tbody td:last-child {
+  margin-top: auto;
+  padding-top: var(--s-2);
+  border-top: var(--line-hair) solid var(--c-rule);
+}
+.board[data-view="cards"] .cell-label {
+  display: inline;
+  font-weight: 700;
+}
+.board[data-view="cards"] .sources {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-3);
+  white-space: normal;
+}

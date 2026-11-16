@@ -10,7 +10,7 @@ import type { Region, ResourceCard } from "@cs/shared";
 
 import { cityLabel, TYPE_LABELS } from "../canvas/labels";
 import { countBy } from "../../lib/leaderboard/board";
-import { canvasCityHref, regionFilterHref, spread } from "../../lib/regions/page";
+import { canvasCityHref, firstStops, regionFilterHref } from "../../lib/regions/page";
 
 interface Props {
   region: Region;
@@ -22,32 +22,9 @@ interface Props {
 
 /** Six fill whole rows at one, two and three columns. */
 const SHOWN = 6;
-/** Where a founder new to the region starts: people first, then programs and places, then services. */
-const FIRST_STOPS: readonly ResourceCard["type"][] = [
-  "community",
-  "accelerator",
-  "coworking",
-  "incubator",
-  "university",
-  "government",
-  "nonprofit",
-  "event",
-  "education",
-  "investor",
-  "service-provider",
-  "media",
-  "tool",
-  "other",
-];
 
 const { region, cards, statewide } = Astro.props;
-const core = (c: ResourceCard) => (region.cities.includes(c.city) ? 0 : 1);
-const shown = spread(
-  [...cards].sort((a, b) => core(a) - core(b)),
-  (c) => c.type,
-  SHOWN,
-  FIRST_STOPS,
-);
+const shown = firstStops(region, cards, SHOWN);
 const cities = countBy(cards, (c) => c.city);
 ---
 

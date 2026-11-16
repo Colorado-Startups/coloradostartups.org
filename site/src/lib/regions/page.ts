@@ -3,7 +3,15 @@
 // test/unit/l8/page.test.ts covers the open and filled organizer cases and
 // the six-item spread the region pages show.
 
-import { type Company, type Person, type Position, type Region, type RegionId, regionLede } from "@cs/shared";
+import {
+  type Company,
+  type Person,
+  type Position,
+  type Region,
+  type RegionId,
+  type ResourceCard,
+  regionLede,
+} from "@cs/shared";
 
 import { holderOf } from "../../components/positions/positions";
 import { regionForCity } from "./match";
@@ -79,6 +87,44 @@ export function spread<T>(items: readonly T[], groupOf: (item: T) => string, n: 
     for (const q of queues) if (q[round] !== undefined && out.length < n) out.push(q[round]!);
   }
   return out;
+}
+
+/** Where a founder new to a region starts: people first, then programs and places, then services. */
+export const FIRST_STOPS: readonly ResourceCard["type"][] = [
+  "community",
+  "accelerator",
+  "coworking",
+  "incubator",
+  "university",
+  "government",
+  "nonprofit",
+  "event",
+  "education",
+  "investor",
+  "service-provider",
+  "media",
+  "tool",
+  "other",
+];
+
+/**
+ * A newcomer's first `n` stops among a region's Startup Resources: one per
+ * type in turn, in FIRST_STOPS order, a core city's ahead of a nearby
+ * town's. The directory has no ranking, so this order is the choice. The
+ * region page's resource list and its painting's hotspot card both use it.
+ */
+export function firstStops<T extends Pick<ResourceCard, "type" | "city">>(
+  region: Pick<Region, "cities">,
+  cards: readonly T[],
+  n: number,
+): T[] {
+  const core = (c: T) => (region.cities.includes(c.city) ? 0 : 1);
+  return spread(
+    [...cards].sort((a, b) => core(a) - core(b)),
+    (c) => c.type,
+    n,
+    FIRST_STOPS,
+  );
 }
 
 /** The directory or the Leaderboard filtered to one region: each reads ?region=<id>. */

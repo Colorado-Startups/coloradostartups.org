@@ -1,0 +1,242 @@
+---
+// The Slack join request form (step P5a). A plain HTML form that POSTs to
+// /api/join; field names and choices come from ./fields.ts, which the Worker
+// parses with, so the two cannot drift. The script stamps the load time into
+// `ts` (the Worker's speed check), requires the city only for someone based
+// in Colorado, shows the message for ?error=, names the fields the Worker
+// rejected (?field=), and keeps a draft of the answers in this tab so a
+// rejection does not clear them (the apply form's helpers, apply/client.ts).
+import Turnstile from "../forms/Turnstile.astro";
+import Button from "../ui/Button.astro";
+import {
+  BASED_CHOICES,
+  DESCRIBES_CHOICES,
+  HEARD_CHOICES,
+  JOIN_DRAFT,
+  JOIN_ENDPOINT,
+  JOIN_FIELDS as F,
+  JOIN_LIMITS,
+  LINKEDIN_PATTERN,
+} from "./fields";
+
+const ERRORS = {
+  invalid:
+    "Some answers need a fix. Check the required fields. The LinkedIn link must be a profile on linkedin.com. Then send the form again.",
+  verification: "We could not confirm the form came from a person. Wait a few seconds, finish the check, then send it again.",
+  ratelimit: "Too many tries from your connection. Wait a minute, then send the form again.",
+  delivery:
+    "We could not save your request, so nothing was sent. Try again later, or write to info@coloradostartups.org.",
+  unavailable:
+    "Requests are closed for a moment on our side. Nothing was sent. Try again later, or write to info@coloradostartups.org.",
+} as const;
+// Replaces the invalid message when the Worker names the fields to fix.
+const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then send the form again.";
+---
+
+<div class="join">
+  {
+    Object.entries(ERRORS).map(([code, text]) => (
+      <p
+        class="form-error"
+        role="alert"
+        data-error={code}
+        data-fields-text={code === "invalid" ? INVALID_FIELDS : undefined}
+        hidden
+      >
+        {text}
+      </p>
+    ))
+  }
+
+  <noscript>
+    <p class="noscript-note">
+      This form needs JavaScript to check that you are a person. Without it, write to info@coloradostartups.org with
+      your name, your LinkedIn profile and where you are based.
+    </p>
+  </noscript>
+
+  <form
+    method="post"
+    action={JOIN_ENDPOINT}
+    data-join-form
+    data-draft-key={JOIN_DRAFT.key}
+    data-draft-skip={[...JOIN_DRAFT.skip].join(" ")}
+  >
+    <input type="hidden" name="ts" value="" data-load-stamp />
+    <div class="hp" aria-hidden="true">
+      <label for="js-website-hp">Leave this empty</label>
+      <input id="js-website-hp" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <fieldset>
+      <legend>About you</legend>
+      <div class="field">
+        <label for="js-first-name">First name</label>
+        <input
+          id="js-first-name"
+          name={F.firstName}
+          required
+          maxlength={JOIN_LIMITS.name}
+          autocomplete="given-name"
+        />
+      </div>
+      <div class="field">
+        <label for="js-last-name">Last name</label>
+        <input id="js-last-name" name={F.lastName} required maxlength={JOIN_LIMITS.name} autocomplete="family-name" />
+      </div>
+      <div class="field">
+        <label for="js-email">Email</label>
+        <input
+          id="js-email"
+          name={F.email}
+          type="email"
+          required
+          maxlength={JOIN_LIMITS.email}
+          autocomplete="email"
+          aria-describedby="js-email-hint"
+        />
+        <span class="hint" id="js-email-hint">Your Slack invite goes to this address.</span>
+      </div>
+      <div class="field">
+        <label for="js-linkedin">LinkedIn profile</label>
+        <input
+          id="js-linkedin"
+          name={F.linkedin}
+          type="text"
+          inputmode="url"
+          autocomplete="url"
+          required
+          maxlength={JOIN_LIMITS.link}
+          pattern={LINKEDIN_PATTERN}
+          placeholder="linkedin.com/in/"
+          title="Use your profile link on linkedin.com"
+          aria-describedby="js-linkedin-hint"
+        />
+        <span class="hint" id="js-linkedin-hint">
+          It helps us check you are a real person in the ecosystem. The site never opens it.
+        </span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Where you are</legend>
+      <div class="field">
+        <label for="js-based">Where are you based?</label>
+        <select id="js-based" name={F.based} required data-based>
+          <option value="">Choose one</option>
+          {BASED_CHOICES.map(([id, label]) => <option value={id}>{label}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="js-city">City or region</label>
+        <input
+          id="js-city"
+          name={F.city}
+          maxlength={JOIN_LIMITS.city}
+          autocomplete="address-level2"
+          aria-describedby="js-city-hint"
+          data-city
+        />
+        <span class="hint" id="js-city-hint">
+          Needed if you are based in Colorado. For example: Summit County, Southwest Colorado, Fort Collins.
+        </span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your part in the ecosystem</legend>
+      <div class="field">
+        <label for="js-describes">What best describes you?</label>
+        <select id="js-describes" name={F.describes} required>
+          <option value="">Choose one</option>
+          {DESCRIBES_CHOICES.map(([id, label]) => <option value={id}>{label}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="js-heard">How did you hear about Colorado Startups? (optional)</label>
+        <select id="js-heard" name={F.heard}>
+          <option value="">Choose one</option>
+          {HEARD_CHOICES.map(([id, label]) => <option value={id}>{label}</option>)}
+        </select>
+      </div>
+      <div class="check">
+        <input id="js-newsletter" name={F.newsletter} type="checkbox" />
+        <label for="js-newsletter">Send me the Colorado Startups newsletter. Unsubscribe anytime.</label>
+      </div>
+    </fieldset>
+
+    <Turnstile />
+    <Button type="submit">Request an invite</Button>
+  </form>
+</div>
+
+<script>
+  import { clearDraft, draftFrom, markInvalidFields, readDraft, saveDraft } from "../apply/client";
+  import { showErrorMessage, stampLoadTime } from "../forms/form-status";
+
+  stampLoadTime(document);
+
+  const search = window.location.search;
+  const code = new URLSearchParams(search).get("error");
+  const form = document.querySelector<HTMLFormElement>("[data-join-form]");
+  let labels: string[] = [];
+  if (form) {
+    // The draft's key and skipped fields come from JOIN_DRAFT, rendered into
+    // the form, so this script never bundles the parser or zod.
+    const store = { key: form.dataset.draftKey ?? "", skip: new Set((form.dataset.draftSkip ?? "").split(" ")) };
+    // After a rejected request (?error=), bring back this tab's draft. Any
+    // other visit starts clean and drops an old draft.
+    const draft = code ? readDraft(store) : null;
+    if (!draft) clearDraft(store);
+    for (const [name, value] of Object.entries(draft ?? {})) {
+      const el = form.elements.namedItem(name);
+      if ((el instanceof HTMLInputElement && el.type !== "checkbox") || el instanceof HTMLSelectElement) {
+        el.value = value;
+      }
+    }
+
+    // The city is required only for someone based in Colorado; the Worker
+    // checks the same rule.
+    const based = form.querySelector("[data-based]");
+    const city = form.querySelector<HTMLInputElement>("[data-city]");
+    if (based instanceof HTMLSelectElement && city) {
+      const sync = () => {
+        city.required = based.value === "colorado";
+      };
+      based.addEventListener("change", sync);
+      sync();
+    }
+
+    if (code === "invalid") labels = markInvalidFields(form, search);
+    form.addEventListener("submit", () => saveDraft(draftFrom(new FormData(form), store), store));
+  }
+
+  // An invalid request names the fields the Worker flagged.
+  showErrorMessage(document, code, (message) => {
+    if (labels.length > 0 && message.dataset.fieldsText) {
+      message.textContent = message.dataset.fieldsText.replace("{fields}", labels.join(", "));
+    }
+  });
+</script>
+
+<style>
+  /* Fieldsets, hints, checks and hidden fields: the Forms section of
+     global.css (#195). */
+  .noscript-note {
+    max-width: 42rem;
+    font-weight: 700;
+  }
+  /* The newsletter box and its label make one 44 px target on a phone. */
+  .check {
+    min-height: var(--size-tap);
+    align-items: center;
+  }
+  .check label {
+    padding-block: var(--s-2);
+    cursor: pointer;
+  }
+  /* A field the Worker named after a rejection (?field=). */
+  :is(input, select)[aria-invalid="true"] {
+    border-color: var(--c-danger);
+  }
+</style>

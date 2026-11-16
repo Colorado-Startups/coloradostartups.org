@@ -21,6 +21,18 @@
 // is <LiveMaps /> (LiveMaps.astro), which a page adds once: MapLibre is far
 // past a page's 75 KB JavaScript goal, so a page that shows only the drawing,
 // such as the home page, ships none of it. There, each zone is a link.
+//
+// `zones` (the statewide drawing only) makes each zone the entrance to its
+// region (step W2): a focusable link that lifts and glows on hover, keyboard
+// focus and tap. Keyboard focus also opens a card in the map's top left
+// corner with the region's crest, name and three counts (zone-counts.ts).
+// Hover does not open it: the corner is away from the zone, so a pointer could
+// not move onto the card without it closing (WCAG 1.4.13), and a card beside
+// each zone could cover a neighbouring zone's link. The card is aria-hidden:
+// the page lists the same counts beside the map, so it adds nothing a phone,
+// a pointer or a screen reader would miss. A page that passes `zones` sets
+// data-dismissed on the figure to close the card with Escape
+// (home/sections/Where.astro).
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
 
@@ -29,7 +41,11 @@ import type { RegionId } from "@cs/shared";
 import { ZONES, zoneById, type LonLat } from "../../lib/regions/colorado-geo";
 import { coloradoMapSvg, viewOf } from "../../lib/regions/colorado-map";
 import { inFrame } from "../../lib/regions/colorado-views";
+import { REGION_COLORS } from "../../lib/regions/map";
 import { andList } from "../../lib/text";
+import { brandArt } from "../art/art-assets";
+import { regionCrestKey } from "../art/keepers";
+import { COUNT_LABELS, type ZoneCounts } from "./zone-counts";
 
 interface Props {
   /** Unique on the page. */
@@ -46,9 +62,11 @@ interface Props {
   live?: boolean;
   /** How wide the map draws, for the relief image's `sizes`. */
   sizes?: string;
+  /** Each zone's counts: makes the statewide zones focusable, with a card each. */
+  zones?: readonly ZoneCounts[];
 }
 
-const { id, zone, variant = "full", sizes } = Astro.props;
+const { id, zone, variant = "full", sizes, zones } = Astro.props;
 const thumb = variant === "thumb" && Boolean(zone);
 const live = !thumb && (Astro.props.live ?? true);
 const focus = zone ? zoneById(zone).properties : undefined;
@@ -78,7 +96,16 @@ const hits = zone
       const ring = z.geometry.coordinates[0]!;
       const centre: LonLat = [ring.reduce((s, p) => s + p[0], 0) / ring.length, ring.reduce((s, p) => s + p[1], 0) / ring.length];
       const [x, y] = inFrame(view.frame, centre);
-      return { id: z.id, name: z.properties.name, style: `left: ${(x * 100).toFixed(2)}%; top: ${(y * 100).toFixed(2)}%` };
+      const counts = zones?.find((c) => c.id === z.id);
+      const crest = counts ? brandArt(regionCrestKey(z.id)) : undefined;
+      if (counts && !crest) throw new Error(`no crest for region "${z.id}"; add it to brand.lock.json`);
+      return {
+        id: z.id,
+        name: z.properties.name,
+        style: `left: ${(x * 100).toFixed(2)}%; top: ${(y * 100).toFixed(2)}%; --region-color: ${REGION_COLORS[z.id]}`,
+        counts,
+        crest,
+      };
     });
 ---
 
@@ -113,9 +140,27 @@ const hits = zone
           loading="lazy"
         />
         <div class="colorado-map__drawing" set:html={svg} />
-        {hits.map((h) => (
-          <a class="colorado-map__hit" href={`/regions/${h.id}/`} style={h.style} tabindex="-1" aria-hidden="true" title={h.name} />
-        ))}
+        {hits.map((h) =>
+          h.counts && h.crest ? (
+            <>
+              <a class="colorado-map__hit colorado-map__hit--zone" href={`/regions/${h.id}/`} style={h.style} data-zone={h.id} aria-label={`${h.name} on the map`} />
+              <div class="colorado-map__card" data-zone={h.id} style={`--region-color: ${REGION_COLORS[h.id]}`} aria-hidden="true">
+                <img class="colorado-map__crest" src={h.crest.src} srcset={h.crest.srcset} sizes="56px" width="56" height="56" alt="" loading="lazy" decoding="async" />
+                <p class="colorado-map__card-name">{h.name}</p>
+                <dl class="colorado-map__counts">
+                  {COUNT_LABELS.map(([key, label]) => (
+                    <div data-count={key}>
+                      <dt>{label}</dt>
+                      <dd>{h.counts![key]}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </>
+          ) : (
+            <a class="colorado-map__hit" href={`/regions/${h.id}/`} style={h.style} tabindex="-1" aria-hidden="true" title={h.name} />
+          ),
+        )}
         {live && <div class="colorado-map__live" data-map-canvas data-label={label} />}
       </div>
       {/* Under the drawing, never over it: in a corner the button covered the names beneath it on a phone.
@@ -225,13 +270,120 @@ const hits = zone
   .colorado-map__hit:hover {
     box-shadow: 0 0 0 2px var(--c-text);
   }
+
+  /* A zone as the entrance to its region: a ring in its color marks it, and
+     interest lifts it and makes it glow. Tap counts too (:active). */
+  .colorado-map__hit--zone {
+    z-index: 1;
+    box-shadow:
+      0 0 0 var(--line-edge) color-mix(in oklab, var(--region-color) 70%, transparent),
+      inset 0 0 0 var(--line-edge) color-mix(in oklab, var(--c-ground) 60%, transparent);
+  }
+  .colorado-map__hit--zone:is(:hover, :focus-visible, :active) {
+    z-index: 2;
+    scale: 1.18;
+    background: color-mix(in oklab, var(--region-color) 24%, transparent);
+    box-shadow:
+      0 0 0 var(--line-bold) var(--region-color),
+      0 0 22px 8px color-mix(in oklab, var(--region-color) 55%, transparent);
+  }
+  .colorado-map__card {
+    position: absolute;
+    top: var(--s-3);
+    left: var(--s-3);
+    z-index: 3;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+    width: min(16rem, calc(100% - 2 * var(--s-3)));
+    padding: var(--s-3);
+    border-left: var(--line-bold) solid var(--region-color);
+    border-radius: var(--r-card);
+    background: var(--c-ground);
+    box-shadow:
+      0 0 0 var(--line-hair) var(--c-border),
+      var(--sh-glow);
+    color: var(--c-text);
+    pointer-events: auto;
+    visibility: hidden;
+    opacity: 0;
+  }
+  /* Keyboard focus only; see the note at the top of this file. */
+  .colorado-map__hit--zone:focus-visible + .colorado-map__card {
+    visibility: visible;
+    opacity: 1;
+  }
+  /* Escape closes the card until the pointer or focus moves on (Where.astro). */
+  .colorado-map[data-dismissed] .colorado-map__card {
+    visibility: hidden;
+    opacity: 0;
+  }
+  .colorado-map__crest {
+    width: 56px;
+    height: 56px;
+  }
+  .colorado-map__card-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--t-step-1);
+    line-height: 1.15;
+  }
+  .colorado-map__counts {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-2);
+    margin: 0;
+  }
+  .colorado-map__counts div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+  }
+  .colorado-map__counts dt {
+    color: var(--c-text-dim);
+    font-size: var(--t-step--1);
+    line-height: 1.2;
+  }
+  .colorado-map__counts dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-2);
+    line-height: 1.1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .colorado-map__hit--zone {
+      transition:
+        scale 180ms ease-out,
+        box-shadow 180ms ease-out,
+        background-color 180ms ease-out;
+    }
+    .colorado-map__card {
+      translate: 0 -6px;
+      transition:
+        opacity 160ms ease-out,
+        translate 200ms ease-out,
+        visibility 0s linear 200ms;
+    }
+    .colorado-map__hit--zone:focus-visible + .colorado-map__card {
+      translate: 0 0;
+      transition:
+        opacity 160ms ease-out,
+        translate 200ms ease-out,
+        visibility 0s;
+    }
+  }
   .colorado-map--thumb:hover .colorado-map__drawing,
   .colorado-map--thumb:focus-visible .colorado-map__drawing {
     filter: brightness(1.06) saturate(1.2);
   }
   .colorado-map.is-live .colorado-map__drawing,
   .colorado-map.is-live .colorado-map__relief,
-  .colorado-map.is-live .colorado-map__hit {
+  .colorado-map.is-live .colorado-map__hit,
+  .colorado-map.is-live .colorado-map__card {
     visibility: hidden;
   }
   /* The drawing carries the description until the live map hides it; then this does. */

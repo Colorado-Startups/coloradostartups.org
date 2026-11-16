@@ -1,0 +1,17 @@
+{
+  "name": "colorado-startups",
+  "displayName": "Colorado Startups",
+  "version": "1.0.0",
+  "description": "The read-only Colorado Startups MCP server, which needs no key, and a skill for questions about starting or growing a company in Colorado.",
+  "author": {
+    "name": "Colorado Startups",
+    "email": "info@coloradostartups.org",
+    "url": "https://coloradostartups.org"
+  },
+  "homepage": "https://coloradostartups.org",
+  "repository": "https://github.com/Colorado-Startups/coloradostartups.org",
+  "license": "CC0-1.0",
+  "privacyPolicyUrl": "https://coloradostartups.org/privacy/",
+  "supportUrl": "https://coloradostartups.org/contact/",
+  "keywords": ["colorado", "startups", "founders", "events", "mcp"]
+}

@@ -11,6 +11,9 @@ const FORMS = {
   "ecosystem-canvas/suggest/index.html": "/api/suggest-resource",
   "get-involved/apply/index.html": "/api/apply",
   "leaderboard/nominate/index.html": "/api/nominate",
+  "join/slack/index.html": "/api/join",
+  "founders/index.html": "/api/waitlist",
+  "get-featured/index.html": "/api/spotlight",
 };
 
 // CI builds without PUBLIC_TURNSTILE_SITE_KEY. Then SuggestForm shows a note

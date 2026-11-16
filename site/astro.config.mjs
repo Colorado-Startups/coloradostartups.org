@@ -12,8 +12,10 @@ import { dataDates, lastmodSerializer } from "./src/lib/seo/lastmod.mjs";
 const assetsInlineLimit = (/** @type {string} */ filePath) =>
   filePath.endsWith(".js") ? false : undefined;
 
-// Review-only and thank-you pages stay out of the sitemap.
-const SITEMAP_EXCLUDE = /\/(styleguide|thanks)\//;
+// Review-only and thank-you pages stay out of the sitemap. /join/slack/ stays
+// out until step P5b links it, and /get-featured/ until step P3b links it
+// (each is noindex until then too).
+const SITEMAP_EXCLUDE = /\/(styleguide|thanks|join\/slack|get-featured)\//;
 
 export default defineConfig({
   site: "https://coloradostartups.org",

@@ -1,9 +1,11 @@
 ---
 // Home's first section: Golden's painting, the name, and one gold action,
 // Join the Slack, with the LinkedIn Group beside it. Join the Slack opens a
-// Google Form, and the note under it says so (#128).
+// Google Form, and the note under it says so (#128). Both come from
+// lib/communitas/join.ts, which the doors in Pick your door reuse.
 import { WAYS_IN } from "@cs/shared";
 
+import { SLACK_JOIN } from "../../../lib/communitas/join";
 import { brandArt } from "../../art/art-assets";
 import { HALL_ART_ALT } from "../../art/keepers";
 import Button from "../../ui/Button.astro";
@@ -32,10 +34,10 @@ const hero = brandArt("brand/golden")!;
     <h1 id="home-title">Colorado Startups</h1>
     <p class="lede">Meet the founders building companies in Colorado.</p>
     <div class="btn-row">
-      <Button size="lg" href={WAYS_IN.slack} aria-describedby="slack-form-note">Join the Slack</Button>
+      <Button size="lg" href={SLACK_JOIN.href} aria-describedby={SLACK_JOIN.noteId}>{SLACK_JOIN.label}</Button>
       <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
     </div>
-    <p class="meta" id="slack-form-note">Join the Slack opens a Google Form.</p>
+    <p class="meta" id={SLACK_JOIN.noteId}>{SLACK_JOIN.note}</p>
   </div>
 </section>
 

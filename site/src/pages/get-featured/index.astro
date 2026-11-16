@@ -1,0 +1,146 @@
+---
+// /get-featured/: a founder asks to be shown in a founder spotlight (step
+// P3a). Paul decided on 2026-11-15: companies on the home page first,
+// founders by opt-in through this form, which he shares by hand. A person
+// reads every request; nothing here publishes anything. Step P3b fills the
+// home page's Spotlights slot from data/spotlights/ and links this page.
+//
+// Not linked yet: until P3b the page is noindex and out of the sitemap
+// (astro.config.mjs SITEMAP_EXCLUDE). P3b drops both.
+//
+// The card below is an example built from SPOTLIGHT_EXAMPLE, the same values
+// the form's hints give: a made-up founder and company, marked "Example" in
+// words. It is plain HTML on brand tokens, and it links nowhere.
+//
+// Copy: spotlights are not a ranking and show no counts; no promise of a
+// spot; no member counts; no keeper on this page.
+import SpotlightForm from "../../components/spotlight/SpotlightForm.astro";
+import { SPOTLIGHT_EXAMPLE as EX } from "../../components/spotlight/fields";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const initials = EX.name
+  .split(" ")
+  .map((part) => part[0])
+  .join("");
+---
+
+<BaseLayout
+  title="Get featured"
+  description="Colorado founders can ask to be shown in a founder spotlight on the Colorado Startups website."
+  ogImage="community"
+  noindex
+>
+  <section class="section section--lit" aria-labelledby="featured-title">
+    <div class="wrap stack">
+      <div class="intro">
+        <div class="stack">
+          <h1 id="featured-title">Get featured</h1>
+          <p class="lede">
+            A spotlight is a short card on our website about a Colorado founder and what they are building.
+          </p>
+          <p>Send the form below and a person reads your request. The example card shows what yours would say.</p>
+        </div>
+
+        <figure class="example" aria-labelledby="example-caption">
+          <div class="panel card" data-example-card>
+            <p class="stamp">Example</p>
+            <div class="who">
+              <span class="monogram" aria-hidden="true">{initials}</span>
+              <div>
+                <p class="name">{EX.name}</p>
+                <p class="role">{EX.role}, {EX.company}</p>
+              </div>
+            </div>
+            <p class="line">{EX.building}</p>
+            <p class="where meta">
+              {EX.city}, Colorado <span aria-hidden="true">|</span> LinkedIn
+            </p>
+          </div>
+          <figcaption id="example-caption" class="meta">
+            Example card. The founder and the company are made up.
+          </figcaption>
+        </figure>
+      </div>
+
+      <section class="stack" aria-labelledby="ask-title">
+        <h2 id="ask-title">Ask to be featured</h2>
+        <p>
+          We use your answers only to decide on your spotlight, and your email only to reply. Paul Foley, Founder and
+          President of Colorado Startups, reads every request. We never sell or share it.{" "}
+          <a href="/privacy/">Read the privacy policy</a>.
+        </p>
+        <SpotlightForm />
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Text, then the example card; side by side from 56rem. */
+  .intro {
+    display: grid;
+    gap: var(--s-6);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+      gap: var(--s-7);
+    }
+  }
+  .example {
+    margin: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .card {
+    position: relative;
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-5);
+    border: var(--line-edge) dashed var(--c-border);
+    border-radius: var(--r-card);
+  }
+  .card p {
+    margin: 0;
+  }
+  /* The word that says this card is not a real founder. */
+  .stamp {
+    justify-self: start;
+    padding: var(--s-1) var(--s-3);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    font-size: var(--t-step--1);
+    font-weight: 700;
+  }
+  .who {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .monogram {
+    display: grid;
+    place-items: center;
+    width: var(--size-control-lg);
+    height: var(--size-control-lg);
+    border-radius: 50%;
+    background: var(--c-bronze);
+    color: var(--c-on-bronze);
+    font-family: var(--font-display);
+    font-weight: 800;
+  }
+  .name {
+    font-family: var(--font-display);
+    font-size: var(--t-step-2);
+    font-weight: 800;
+    line-height: 1.15;
+  }
+  .role {
+    color: var(--ink-dim, var(--c-text-dim));
+  }
+  .line {
+    font-size: var(--t-step-1);
+    line-height: 1.4;
+  }
+</style>

@@ -36,7 +36,7 @@ const form = (stages = ["idea", "launch", "growth", "support"], types = ["event"
     <select name="city"><option value=""></option><option value="Denver"></option><option value="Boulder"></option></select>
   </form>
   <span data-stage-count="idea"></span><span data-stage-count="launch"></span><span data-stage-count="support"></span><span data-stage-count=""></span>
-  <p data-canvas-count></p>`;
+  <p data-canvas-count tabindex="-1"></p>`;
 const tail = `
   <div data-canvas-more-row hidden><p data-canvas-shown></p><button type="button" data-canvas-more></button></div>
   <p data-canvas-back hidden><a href="#find-title">Back to filters</a></p>`;
@@ -88,6 +88,27 @@ describe("filter logic", () => {
     expect(readState("?stage=idea&type=bogus&city=Denver&q=x", allowed)).toEqual({ stage: "idea", type: "", city: "Denver", q: "x" });
     expect(writeState({ stage: "idea", type: "", city: "", q: "law firm" })).toBe("?stage=idea&q=law+firm");
     expect(writeState({ stage: "", type: "", city: "", q: "" })).toBe("");
+  });
+
+  // PR #89 review: substage was not tested directly.
+  it("reads a substage only when it is allowed, and writes it after the stage", () => {
+    const withKinds = { ...allowed, substage: new Set(["investors"]) };
+    expect(readState("?stage=idea&substage=investors", withKinds)).toEqual({ stage: "idea", substage: "investors", type: "", city: "", q: "" });
+    expect(readState("?stage=idea&substage=bogus", withKinds)).toEqual({ stage: "idea", type: "", city: "", q: "" });
+    // No allowed set means no substage is read.
+    expect(readState("?substage=investors", allowed).substage).toBeUndefined();
+    expect(writeState({ stage: "growth", substage: "investors", type: "", city: "", q: "" })).toBe("?stage=growth&substage=investors");
+    expect(writeState({ stage: "growth", substage: undefined, type: "", city: "", q: "" })).toBe("?stage=growth");
+  });
+
+  it("matches only the chosen substage, so Support drops out under a kind", () => {
+    const at = (stage: string, substage: string) => ({ id: substage, stage, substage, type: "investor", city: "Denver", text: "" });
+    const state = { stage: "growth", substage: "investors", type: "", city: "", q: "" };
+    expect(matches(at("growth", "investors"), state, null)).toBe(true);
+    expect(matches(at("growth", "service-providers"), state, null)).toBe(false);
+    expect(matches(at("support", "organizations"), state, null)).toBe(false);
+    // Without a substage, Support still shows under the stage.
+    expect(matches(at("support", "organizations"), { ...state, substage: undefined }, null)).toBe(true);
   });
 
   it("matches every word of a query when Pagefind is not there", () => {
@@ -307,6 +328,88 @@ describe("initCanvasFilters, one page at a time", () => {
     expect(shown()).toContain("l3");
     // l3 is the 33rd match, so the second page shows, and 40 rows are all there are.
     expect(shown()).toHaveLength(40);
+  });
+});
+
+// A browse row's link (?stage=growth&substage=investors) sets a kind with no
+// control in the form; the chip beside the count line names and removes it.
+const kindCard = (id: string, stage: string, substage: string, type: string, city: string) =>
+  `<li data-resource data-id="${id}" data-stage="${stage}" data-substage="${substage}" data-type="${type}" data-city="${city}"><h3 id="r-${id}"><a href="https://x.example/${id}">${id}</a></h3></li>`;
+const KINDS = `
+<div data-canvas-root>
+  ${form(["idea", "launch", "growth", "support"], ["investor", "service-provider", "government"])}
+  <p data-canvas-kind hidden><span>Kind: <span data-canvas-kind-name></span></span><button type="button" aria-label="Remove the kind filter" data-canvas-kind-remove></button></p>
+  <section id="growth" data-canvas-group><ul>
+    ${kindCard("fund-a", "growth", "investors", "investor", "Denver")}
+    ${kindCard("fund-b", "growth", "investors", "investor", "Boulder")}
+    ${kindCard("law", "growth", "service-providers", "service-provider", "Denver")}
+  </ul></section>
+  <section id="support" data-canvas-group><ul>
+    ${kindCard("sbdc", "support", "organizations", "government", "Denver")}
+  </ul></section>
+  ${tail}
+</div>`;
+
+describe("initCanvasFilters, the kind chip", () => {
+  beforeEach(() => {
+    document.body.innerHTML = KINDS;
+    window.history.replaceState(null, "", "/ecosystem-canvas/?stage=growth&substage=investors");
+  });
+  const kind = () => document.querySelector<HTMLElement>("[data-canvas-kind]")!;
+  const remove = () => document.querySelector<HTMLButtonElement>("[data-canvas-kind-remove]")!;
+
+  it("names the kind from the URL with its display label", async () => {
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    expect(kind().hidden).toBe(false);
+    expect(document.querySelector("[data-canvas-kind-name]")!.textContent).toBe("Investors");
+    expect(shown()).toEqual(["fund-a", "fund-b"]);
+    expect(status()).toBe("2 of 4 resources match.");
+  });
+
+  it("stays hidden with no kind in the URL", async () => {
+    window.history.replaceState(null, "", "/ecosystem-canvas/?stage=growth");
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    expect(kind().hidden).toBe(true);
+  });
+
+  it("removes only the kind, keeps the stage, updates the URL and moves focus to the count line", async () => {
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    remove().click();
+    await settle();
+    expect(kind().hidden).toBe(true);
+    expect(window.location.search).toBe("?stage=growth");
+    expect(shown()).toEqual(["fund-a", "fund-b", "law", "sbdc"]);
+    expect(status()).toBe("All 4 resources.");
+    expect(document.activeElement).toBe(document.querySelector("[data-canvas-count]"));
+  });
+
+  it("keeps the kind through a city change and drops it with a new stage", async () => {
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    const city = document.querySelector<HTMLSelectElement>("select[name=city]")!;
+    city.value = "Denver";
+    city.dispatchEvent(new Event("change", { bubbles: true }));
+    await settle();
+    expect(window.location.search).toBe("?stage=growth&substage=investors&city=Denver");
+    expect(shown()).toEqual(["fund-a"]);
+    expect(kind().hidden).toBe(false);
+    choose("stage", "support");
+    await settle();
+    expect(window.location.search).toBe("?stage=support&city=Denver");
+    expect(kind().hidden).toBe(true);
+  });
+
+  it("drops the kind on Clear", async () => {
+    const { apply } = initCanvasFilters(root(), async () => null);
+    await apply();
+    document.querySelector<HTMLFormElement>("form")!.reset();
+    await settle();
+    await settle();
+    expect(window.location.search).toBe("");
+    expect(kind().hidden).toBe(true);
   });
 });
 
