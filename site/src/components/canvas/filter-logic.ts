@@ -35,6 +35,20 @@ export function readState(search: string, allowed: { stage: Set<string>; type: S
   return { stage: pick("stage"), type: pick("type"), city: pick("city"), q: (params.get("q") ?? "").slice(0, 100) };
 }
 
+// Every parameter that narrows the list. "region" comes from a region page's
+// "See all" link; the island does not filter on it yet, but the visitor came
+// for the list, so it opens on the list too.
+const LIST_PARAMS = [...KEYS, "region"] as const;
+
+/**
+ * True when the URL carries any filter or search parameter, so the page
+ * opens on the full list (step L1b) instead of the picks alone.
+ */
+export function opensOnList(search: string): boolean {
+  const params = new URLSearchParams(search);
+  return LIST_PARAMS.some((key) => (params.get(key) ?? "").trim() !== "");
+}
+
 /** The query string for a state, with empty values left out. */
 export function writeState(state: FilterState): string {
   const params = new URLSearchParams();

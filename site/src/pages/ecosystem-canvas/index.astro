@@ -3,15 +3,18 @@
 // Canvas. Owner: L3. Decision 46 retitled the page; the URL, the anchors and
 // the dataset's name (the Ecosystem Canvas) stay.
 //
-// One job: find a resource. The first screen is the title, the search box
-// and the chips (step F of the redesign, 2026-11-15: 40 words or fewer). The
-// stage chips are the journey, Idea to Launch to Growth with Support
-// alongside, each with its count. Resourcus waits behind an "Ask a question
-// instead" disclosure under the count. Then the rows, by stage, A to Z within
-// each substage: the island shows the first 24 matches and a "Show more"
-// button, and every row stays in the HTML for crawlers and for a visitor
-// without JavaScript. The credit to Founder Institute and the links to the
-// guides close the page.
+// One job: find a resource. The page opens on 12 picks, not 501 rows (step
+// L1b, 2026-11-16): the title, one line and Resourcus's "Ask a question
+// instead" disclosure (40 words or fewer), then "Start here", up to 3 picks
+// a stage from topPicks() (StartHere.astro). Under it, "Show all N
+// resources" opens the full list with its search and chips. The stage chips
+// are the journey, Idea to Launch to Growth with Support alongside, each with
+// its count. The rows go by stage, A to Z within each substage: the island
+// shows the first 24 matches and a "Show more" button, and every row stays in
+// the HTML for crawlers. Without JavaScript the full list simply shows below
+// the picks. A URL with a filter, a search or an anchor into the list opens
+// on the list. The credit to Founder Institute, the links to the guides and
+// the "Ask your AI" row close the page.
 //
 // Anchors other lanes rely on: each stage section is id="idea", "launch",
 // "growth" or "support" (decision 33; Communitas's welcome desk links there,
@@ -19,11 +22,13 @@
 // id="r-<resource id>", which Pagefind indexes as a sub-result and Resourcus
 // and the guides link to; the island shows that row even past the first
 // page. The "r-" prefix keeps a resource id from colliding with a stage anchor.
+import AskAi from "../../components/ai/AskAi.astro";
 import CanvasFilters from "../../components/canvas/CanvasFilters.astro";
 import { activeCards, groupByStage } from "../../components/canvas/canvas-data";
 import { groupCountText, moreText, PAGE_SIZE, shownText } from "../../components/canvas/filter-logic";
-import { STAGE_LABELS, STAGE_SUMMARIES } from "../../components/canvas/labels";
+import { showAllText, STAGE_LABELS, STAGE_SUMMARIES } from "../../components/canvas/labels";
 import ResourceRow from "../../components/canvas/ResourceRow.astro";
+import StartHere from "../../components/canvas/StartHere.astro";
 import ResourcusPanel from "../../components/resourcus/ResourcusPanel.astro";
 import Badge from "../../components/ui/Badge.astro";
 import Button from "../../components/ui/Button.astro";
@@ -44,48 +49,72 @@ const groups = groupByStage(cards);
     <section class="section section--band canvas-top" aria-labelledby="canvas-title">
       <div class="wrap stack">
         <h1 id="canvas-title">Startup Resources</h1>
-        <div class="stack" data-pagefind-ignore>
-          <h2 id="find-title" class="visually-hidden">Find a resource</h2>
-          <CanvasFilters cards={cards} />
-          <details class="canvas-ask" data-canvas-ask>
-            <summary>Ask a question instead</summary>
-            <ResourcusPanel heading="Ask Resourcus" />
-          </details>
-        </div>
+        <p class="canvas-intro">Programs, events, investors and support for Colorado founders, from a first idea to growth.</p>
+        <details class="canvas-ask" data-canvas-ask data-pagefind-ignore>
+          <summary>Ask a question instead</summary>
+          {/* The panel's own heading is an h3; this keeps the outline whole. */}
+          <h2 class="visually-hidden">Ask a question</h2>
+          <ResourcusPanel heading="Ask Resourcus" />
+        </details>
       </div>
     </section>
 
+    <StartHere cards={cards} />
+
     <div class="section section--lit canvas-results">
       <div class="wrap">
-        {
-          groups.map((g) => (
-            <section class="canvas-stage" id={g.stage} aria-labelledby={`${g.stage}-title`} data-canvas-group>
-              <div class="canvas-stage__head">
-                <h2 id={`${g.stage}-title`}>{STAGE_LABELS[g.stage]}</h2>
-                <Badge data-group-count data-pagefind-ignore>
-                  {groupCountText(g.total)}
-                </Badge>
-              </div>
-              <p class="meta">{STAGE_SUMMARIES[g.stage]}</p>
-              <ul class="canvas-rows">
-                {g.substages
-                  .flatMap((s) => s.cards)
-                  .map((card) => (
-                    <ResourceRow card={card} />
-                  ))}
-              </ul>
-            </section>
-          ))
-        }
-        <div class="canvas-more" data-canvas-more-row data-pagefind-ignore hidden>
-          <p class="meta" data-canvas-shown>{shownText(Math.min(PAGE_SIZE, cards.length), cards.length)}</p>
-          <button class="btn btn--gold" type="button" data-canvas-more>{moreText(cards.length - PAGE_SIZE)}</button>
-        </div>
-        <p class="canvas-back" data-canvas-back data-pagefind-ignore hidden>
-          <Button variant="quiet" href="#find-title">Back to filters</Button>
+        <p class="canvas-show" data-canvas-show-row data-pagefind-ignore>
+          <Button aria-expanded="false" aria-controls="all-resources" data-canvas-show-all>
+            {showAllText(cards.length)}
+          </Button>
         </p>
+        <div class="canvas-full" id="all-resources" data-canvas-full hidden>
+          <div class="stack canvas-find" data-pagefind-ignore>
+            <h2 id="find-title">Find a resource</h2>
+            <CanvasFilters cards={cards} />
+          </div>
+          {
+            groups.map((g) => (
+              <section class="canvas-stage" id={g.stage} aria-labelledby={`${g.stage}-title`} data-canvas-group>
+                <div class="canvas-stage__head">
+                  <h2 id={`${g.stage}-title`}>{STAGE_LABELS[g.stage]}</h2>
+                  <Badge data-group-count data-pagefind-ignore>
+                    {groupCountText(g.total)}
+                  </Badge>
+                </div>
+                <p class="meta">{STAGE_SUMMARIES[g.stage]}</p>
+                <ul class="canvas-rows">
+                  {g.substages
+                    .flatMap((s) => s.cards)
+                    .map((card) => (
+                      <ResourceRow card={card} />
+                    ))}
+                </ul>
+              </section>
+            ))
+          }
+          <div class="canvas-more" data-canvas-more-row data-pagefind-ignore hidden>
+            <p class="meta" data-canvas-shown>{shownText(Math.min(PAGE_SIZE, cards.length), cards.length)}</p>
+            <button class="btn btn--gold" type="button" data-canvas-more>{moreText(cards.length - PAGE_SIZE)}</button>
+          </div>
+          <p class="canvas-back" data-canvas-back data-pagefind-ignore hidden>
+            <Button variant="quiet" href="#find-title">Back to filters</Button>
+          </p>
+        </div>
       </div>
     </div>
+    {/* Without JavaScript the "Show all" button could do nothing, so it goes
+        and the full list simply shows below the picks. */}
+    <noscript>
+      <style is:inline>
+        .canvas-full[hidden] {
+          display: block !important;
+        }
+        .canvas-show {
+          display: none !important;
+        }
+      </style>
+    </noscript>
 
     <section class="section section--band" aria-labelledby="missing-title">
       <div class="wrap stack">
@@ -104,6 +133,16 @@ const groups = groupByStage(cards);
         </p>
       </div>
     </section>
+
+    <section class="section section--band" aria-labelledby="ask-ai" data-pagefind-ignore>
+      <div class="wrap">
+        <AskAi
+          subject="Startup Resources"
+          path="/ecosystem-canvas/"
+          question="Which Colorado programs, events and organizations fit a founder at my stage, and where should I start?"
+        />
+      </div>
+    </section>
   </div>
 </BaseLayout>
 
@@ -113,8 +152,20 @@ const groups = groupByStage(cards);
   .canvas-top {
     padding-block: var(--s-6) var(--s-5);
   }
+  .canvas-intro {
+    max-width: var(--t-measure);
+  }
   .canvas-results {
     padding-block: var(--s-5) var(--s-7);
+  }
+  .canvas-show {
+    margin: 0;
+  }
+  .canvas-find {
+    margin-bottom: var(--s-6);
+  }
+  .canvas-find h2 {
+    margin: 0;
   }
   .canvas-stage + .canvas-stage {
     margin-top: var(--s-7);

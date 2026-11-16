@@ -1,0 +1,96 @@
+---
+// "Start here" on Startup Resources (step L1b): up to 3 picks for each of the
+// four stages, from topPicks() at build time (top-picks.ts, step L1a). Each
+// card names the resource, its type and city, and in plain words the rule
+// that placed it. A stage shows however many picks the logic returns, even
+// none. Owner: L3.
+//
+// Never a vendor directory (voice.md): no ranking words, and the cards keep
+// the order the logic gives. The band is left out of the search index, so a
+// search lands on the resource's row in the full list, not on its pick.
+import type { ResourceCard } from "@cs/shared";
+
+import Badge from "../ui/Badge.astro";
+import Card from "../ui/Card.astro";
+import { cityLabel, PICK_REASON_LABELS, STAGE_LABELS, TYPE_LABELS } from "./labels";
+import { topPicks } from "./top-picks";
+
+interface Props {
+  cards: readonly ResourceCard[];
+}
+
+const { cards } = Astro.props;
+const stages = topPicks(cards).filter((s) => s.picks.length > 0);
+---
+
+<section class="section start-here" aria-labelledby="start-title" data-canvas-picks data-pagefind-ignore>
+  <div class="wrap">
+    <h2 id="start-title">Start here</h2>
+    <p class="meta start-here__how" data-picks-how>
+      Chosen by simple rules: statewide reach, what a founder needs first at each stage, and a spread of types and cities.
+      No one pays to be here, and every resource is in the full list below.
+    </p>
+    <div class="start-here__stages">
+      {
+        stages.map((s) => (
+          <div class="start-here__stage">
+            <h3 id={`start-${s.stage}`}>{STAGE_LABELS[s.stage]}</h3>
+            <ul class="start-here__cards">
+              {s.picks.map(({ card, reason }) => (
+                <Card element="li" as="h4" title={card.name} href={card.url} data-pick data-id={card.id}>
+                  <Fragment slot="badges">
+                    <Badge>{TYPE_LABELS[card.type]}</Badge>
+                    <Badge>{cityLabel(card.city)}</Badge>
+                  </Fragment>
+                  <Fragment slot="meta">{PICK_REASON_LABELS[reason]}</Fragment>
+                </Card>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .start-here {
+    padding-block: var(--s-6);
+  }
+  .start-here h2 {
+    margin: 0;
+  }
+  .start-here__how {
+    max-width: var(--t-measure);
+    margin: var(--s-2) 0 var(--s-5);
+  }
+  /* Four stage columns on a wide screen, two on a tablet, one on a phone.
+     Each column keeps the logic's order top to bottom. */
+  .start-here__stages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--s-6) var(--s-5);
+  }
+  .start-here__stage h3 {
+    margin: 0 0 var(--s-3);
+    padding-bottom: var(--s-2);
+    border-bottom: var(--line-bold) solid var(--c-accent);
+  }
+  .start-here__cards {
+    display: grid;
+    gap: var(--s-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* A pick is a short card: the site's card, with less padding and a
+     smaller title, so 12 fit without a long scroll. */
+  .start-here__cards :global(.hall-card__body) {
+    gap: var(--s-2);
+    padding: var(--s-4);
+  }
+  .start-here__cards :global(.hall-card__title) {
+    font-size: var(--t-step-0);
+    overflow-wrap: anywhere;
+  }
+</style>
