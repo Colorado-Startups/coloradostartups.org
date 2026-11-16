@@ -7,12 +7,14 @@
 // Full (/community/): the heading, the keeper's portrait and intro, each
 // door's steps with their notes, the Resourcus handoff and the disclosure.
 // Compact (home, step P4): the same doors in the same order and one group,
-// each opening to two short rows from doorPlan() in
-// src/lib/communitas/doors.ts: the Slack thread to start in and the Startup
-// Resources picks for that visitor. No keeper portrait and no keeper name, so
-// no disclosure line either; the host band (PickDoor.astro) gives the heading
-// and the next event. The home page's 60-word band cap counts closed doors
-// too, which is why the compact rows are this short.
+// each opening to two rows from doorPlan() in src/lib/communitas/doors.ts:
+// the weekly Slack thread to start in with a Join the Slack link, and up to
+// three Startup Resources picks with a link to the rest. No keeper portrait
+// and no keeper name, so no disclosure line either; the host band
+// (PickDoor.astro) gives the heading and the next event. A door's body holds
+// at most 30 words (site/test/dom/home/home-budget.test.ts). The Join the
+// Slack links point at the hero's Google Form note (lib/communitas/join.ts),
+// so the compact desk belongs on home only.
 //
 // Static HTML compiled at build time from data/communitas/routes.yaml through
 // deskSteps() in src/lib/communitas/route.ts. No API, no model call and no
@@ -67,8 +69,7 @@ if (compact) {
     .map((route) => doorPlan(route, threads, picks));
 }
 
-// Line icons in the link colour. Each row also names its kind in words for
-// screen readers.
+// Line icons in the link colour; each row also says in words what it is.
 const ICONS = {
   door: ["M6 21V9a6 6 0 0 1 12 0v12", "M4 21h16", "M14.5 14.5h.01"],
   slack: ["M4 5h16v11H9l-5 4z", "M9 9h6M9 12h4"],
@@ -94,18 +95,33 @@ const ICONS = {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     {ICONS.slack.map((d) => <path d={d} />)}
                   </svg>
-                  <span>
-                    <span class="visually-hidden">Start in the </span>Slack, {plan.slack.dayName}
-                    <span class="visually-hidden"> thread</span>
-                  </span>
+                  <div class="doorway__cell">
+                    <p>{plan.slack.line}</p>
+                    <a href={plan.slack.join.href} aria-describedby={plan.slack.join.describedBy} data-join>
+                      {plan.slack.join.text}
+                    </a>
+                  </div>
                 </li>
                 <li class="doorway__row" data-row="resources">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     {ICONS.book.map((d) => <path d={d} />)}
                   </svg>
-                  <a href={plan.resources.href} data-stage={plan.resources.stage ?? undefined}>
-                    {plan.resources.text}
-                  </a>
+                  <div class="doorway__cell">
+                    {plan.resources.picks.length > 0 && (
+                      <ul class="doorway__picks" role="list">
+                        {plan.resources.picks.map((pick) => (
+                          <li>
+                            <a href={pick.href} data-pick={pick.id}>
+                              {pick.text}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <a href={plan.resources.all.href} data-stage={plan.resources.stage ?? undefined} data-all>
+                      {plan.resources.all.text}
+                    </a>
+                  </div>
                 </li>
               </ul>
             </details>
@@ -165,17 +181,69 @@ const ICONS = {
 <style>
   /* ---------- Compact: a row of arched doors (home, step P4) ----------
      Each door is a tall arch with a gold keystone. Opening one fills it with
-     gold and drops its two rows beneath it, so the open door reads as lit.
-     One column of two on a phone, all eight in a row on a wide screen. */
+     gold and opens a panel under its row, as wide as the whole row, edged in
+     the same gold. Two doors a row on a phone, four on a tablet, all eight
+     wider.
+
+     The panel stays inside its own <details>, so one door opens at a time
+     with no JavaScript, and no door moves: the open door keeps its cell and
+     its row grows to hold the panel. The panel is as wide as the door set
+     (100cqi) and is shifted left by its door's column (--col), so it starts
+     at the row's left edge. The doors beside it are only as tall as their
+     arches, so the panel covers nothing. */
+  .door-set {
+    container-type: inline-size;
+  }
   .door-set__doors {
+    --cols: 2;
     max-width: none;
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     gap: var(--s-3);
     align-items: start;
+  }
+  .door-set__doors > li {
+    --col: 0;
+  }
+  .door-set__doors > li:nth-child(2n) {
+    --col: 1;
+  }
+  @container (min-width: 36rem) {
+    .door-set__doors {
+      --cols: 4;
+    }
+    .door-set__doors > li:nth-child(4n + 1) {
+      --col: 0;
+    }
+    .door-set__doors > li:nth-child(4n + 2) {
+      --col: 1;
+    }
+    .door-set__doors > li:nth-child(4n + 3) {
+      --col: 2;
+    }
+    .door-set__doors > li:nth-child(4n + 4) {
+      --col: 3;
+    }
+  }
+  @container (min-width: 60rem) {
+    .door-set__doors {
+      --cols: 8;
+    }
+    .door-set__doors > li:nth-child(8n + 5) {
+      --col: 4;
+    }
+    .door-set__doors > li:nth-child(8n + 6) {
+      --col: 5;
+    }
+    .door-set__doors > li:nth-child(8n + 7) {
+      --col: 6;
+    }
+    .door-set__doors > li:nth-child(8n + 8) {
+      --col: 7;
+    }
   }
   .doorway summary {
     position: relative;
@@ -196,8 +264,7 @@ const ICONS = {
     text-align: center;
     cursor: pointer;
   }
-  /* All eight in a row: taller, so each still reads as a door. */
-  @media (min-width: 60rem) {
+  @container (min-width: 60rem) {
     .doorway summary {
       min-height: 8.5rem;
     }
@@ -239,30 +306,54 @@ const ICONS = {
     background: var(--c-accent-ledge);
   }
   .doorway__rows {
+    box-sizing: border-box;
+    width: 100cqi;
+    max-width: none;
     list-style: none;
-    margin: 0;
-    padding: var(--s-2) var(--s-3);
+    margin: calc(-1 * var(--line-edge)) 0 0
+      calc(-1 * var(--col) * ((100cqi - (var(--cols) - 1) * var(--s-3)) / var(--cols) + var(--s-3)));
+    padding: var(--s-4);
     border: var(--line-edge) solid var(--c-accent-ledge);
-    border-top: 0;
-    border-radius: 0 0 var(--r-chisel) var(--r-chisel);
+    border-top-width: var(--line-bold);
+    border-radius: var(--r-chisel);
     background: var(--c-ground);
     display: grid;
+    gap: var(--s-4);
+  }
+  /* Side by side when the row is wide enough; stacked on a phone. */
+  @container (min-width: 36rem) {
+    .doorway__rows {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
   .doorway__row {
     display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    min-height: var(--size-tap);
-    font-size: var(--t-step--1);
+    align-items: start;
+    gap: var(--s-3);
   }
   .doorway__row svg {
     flex: none;
+    margin-top: var(--s-1);
     color: var(--ink-community, var(--c-community));
+  }
+  .doorway__cell {
+    display: grid;
+    min-width: 0;
+  }
+  .doorway__cell p {
+    margin: 0 0 var(--s-1);
+  }
+  .doorway__picks {
+    list-style: none;
+    max-width: none;
+    margin: 0;
+    padding: 0;
   }
   .doorway__row a {
     display: inline-flex;
     align-items: center;
     min-height: var(--size-tap);
+    overflow-wrap: anywhere;
     font-weight: 700;
   }
 
