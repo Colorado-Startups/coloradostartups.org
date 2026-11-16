@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
 import { SOURCE, TARGET } from "../../../scripts/sync-brand.mjs";
-import { pendingAndAbsent } from "../../brand-pending";
 
 // The contrast block in 01_doctrine/brand_tokens.yaml is the record of every
 // text and UI pairing the Hall uses. This test recomputes each WCAG 2.2 ratio
@@ -70,6 +69,18 @@ describe("brand_tokens.yaml contrast block", () => {
     for (const ink of inks) expect(covered, `no contrast entry for ${ink}`).toContain(ink);
   });
 
+  // A region fill is a swatch, a card's edge or a map line on ground or
+  // surface (lib/regions/map.ts), and its on-region ink is for text on it.
+  it("covers every region fill on the grounds it sits on, and its ink on it", () => {
+    const regions = Object.keys(doc.color).filter((role) => role.startsWith("region-"));
+    expect(regions).toHaveLength(3);
+    const pairs = new Set(doc.contrast.map((p) => `${p.fg}|${p.bg}|${p.min}`));
+    for (const fill of regions) {
+      for (const bg of ["ground", "surface"]) expect(pairs, `no contrast entry for ${fill} on ${bg}`).toContain(`${fill}|${bg}|3`);
+      expect(pairs, `no contrast entry for on-${fill} on ${fill}`).toContain(`on-${fill}|${fill}|4.5`);
+    }
+  });
+
   it("covers every ink role that sits on night", () => {
     const inks = ["on-night", "on-night-dim", "gold-on-night", "focus-on-night", "danger-on-night"];
     const onNight = new Set(doc.contrast.filter((p) => p.bg === "night").map((p) => p.fg));
@@ -104,10 +115,7 @@ describe("brand_tokens.yaml night contrast block", () => {
       $extensions: { "org.coloradostartups.brand": { contrast: { night: Pairing[] } } };
     };
     const night = new Set(doc.contrast_night.map((p) => `${p.fg}|${p.bg}`));
-    // A pairing that names a role the site has not taken in yet waits with it (test/brand-pending.ts).
-    const pairs = brand.$extensions["org.coloradostartups.brand"].contrast.night.filter(
-      (p) => !pendingAndAbsent(p.fg, doc.color) && !pendingAndAbsent(p.bg, doc.color),
-    );
+    const pairs = brand.$extensions["org.coloradostartups.brand"].contrast.night;
     expect(pairs.length).toBeGreaterThan(0);
     for (const p of pairs) {
       expect(night, `brand pairs ${p.fg} on ${p.bg} at night`).toContain(`${p.fg}|${p.bg}`);

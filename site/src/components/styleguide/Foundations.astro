@@ -46,6 +46,10 @@ const GROUPS: [string, string[]][] = [
   ["Forge metals", ["accent", "accent-deep", "accent-ledge", "molten", "brass", "bronze", "bronze-deep", "fire"]],
   ["Night", ["night", "on-night", "on-night-dim", "gold-on-night", "focus-on-night", "danger-on-night"]],
   ["Tag washes", ["sky-wash", "copper-wash", "pine", "pine-wash"]],
+  [
+    "Regions, each a fill with its ink",
+    ["region-photon-mountain", "on-region-photon-mountain", "region-space-peak", "on-region-space-peak", "region-fusion-canyon", "on-region-fusion-canyon"],
+  ],
   ["Brand marks, logo only", ["brand-teal", "brand-purple"]],
 ];
 const grouped = new Set(GROUPS.flatMap(([, names]) => names));

@@ -214,7 +214,7 @@ describe("renderRegion", () => {
     const html = renderRegion(toolData(asResult(REGION)), NAMES, MAPS);
     expect(html).toContain("<h1>Space Peak</h1>");
     expect(html).toContain('<p class="sub">Colorado Springs &#183; Fountain</p>');
-    expect(html).toContain('<figure class="map"><svg>map</svg><figcaption>Space Peak in yellow; the corner map shows where it sits in Colorado.</figcaption></figure>');
+    expect(html).toContain('<figure class="map"><svg>map</svg><figcaption>Space Peak is filled in its region color; the corner map shows where it sits in Colorado.</figcaption></figure>');
     expect(html).toContain("Space Pitch Night");
     expect(html).toContain('data-link="https://coloradostartups.org/leaderboard/#company-peak-robotics"');
     expect(html).toContain('data-link="https://coloradostartups.org/regions/space-peak/"');

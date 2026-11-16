@@ -172,7 +172,7 @@ export function renderRegion(data, names, maps, input) {
   // The caption names the region in words, since a narrow card hides the map's city labels.
   const map = own(maps, data.id);
   if (map) {
-    parts.push(`<figure class="map">${map}<figcaption>${esc(data.name)} in yellow; the corner map shows where it sits in Colorado.</figcaption></figure>`);
+    parts.push(`<figure class="map">${map}<figcaption>${esc(data.name)} is filled in its region color; the corner map shows where it sits in Colorado.</figcaption></figure>`);
   }
   if (text(data.summary)) parts.push(`<p class="summary">${esc(data.summary)}</p>`);
   parts.push(`<h2>Next events</h2>`);

@@ -14,6 +14,11 @@
 # Hall materials keep their role names (stone, bronze, brass, molten), so
 # components still name what a surface is made of, not its hex.
 #
+# Region colors (brand v4.4.0, decision 64): one fill per region, from its
+# crest, with an on-region ink for text set on that fill. Each is a fill, never
+# text, and the region's name rides beside it. lib/regions/map.ts
+# (REGION_COLORS) is the one place a component takes a region's color from.
+#
 # Contrast: every text and UI pairing is listed in the contrast block at the end,
 # with its WCAG 2.2 ratio. test/unit/l12/contrast.test.ts recomputes each ratio
 # from the hex values here and fails if one drifts or drops below its minimum.
@@ -60,6 +65,12 @@ color:
   copper-wash: "#FAEBEE"      # badge ground for link ink
   pine: "#245D38"             # ink for nature and green status
   pine-wash: "#E9EFEB"        # badge ground for pine ink
+  region-photon-mountain: "#4A2C84"     # Photon Mountain's fill: fluorite violet, never text
+  on-region-photon-mountain: "#FFFFFF"  # text on Photon Mountain's fill
+  region-space-peak: "#C67273"          # Space Peak's fill: granite pink, never text
+  on-region-space-peak: "#000A33"       # text on Space Peak's fill
+  region-fusion-canyon: "#7A2A1E"       # Fusion Canyon's fill: Stout red, never text
+  on-region-fusion-canyon: "#FFFFFF"    # text on Fusion Canyon's fill
 # Night: the dark theme (brand v3, Colorado-Startups/brand dist/tokens.css).
 # Each role's night value from the brand's tokens.json, where the brand gives
 # one under $extensions; a role not listed keeps its light value. The page
@@ -85,6 +96,11 @@ night:
   copper-wash: "#37000D"
   pine: "#87A692"
   pine-wash: "#0B1C11"
+  region-photon-mountain: "#A58FE6"
+  on-region-photon-mountain: "#000A33"
+  region-space-peak: "#E8A3B4"
+  region-fusion-canyon: "#D9703F"
+  on-region-fusion-canyon: "#000A33"
 # Old names from the dark v1 palette, kept so lane code written against them
 # still renders. New code uses the names above; these go away after Wave 2.
 alias:
@@ -195,6 +211,10 @@ contrast:
   - { fg: community, bg: sky-wash, ratio: 5.58, min: 4.5 }
   - { fg: link, bg: copper-wash, ratio: 5.41, min: 4.5 }
   - { fg: pine, bg: pine-wash, ratio: 6.68, min: 4.5 }
+  # Text on a region fill takes that region's on-region ink (the brand's pairs, 2026-11-16).
+  - { fg: on-region-photon-mountain, bg: region-photon-mountain, ratio: 10.58, min: 4.5 }
+  - { fg: on-region-space-peak, bg: region-space-peak, ratio: 5.55, min: 4.5 }
+  - { fg: on-region-fusion-canyon, bg: region-fusion-canyon, ratio: 9.64, min: 4.5 }
   - { fg: border, bg: ground, ratio: 4.48, min: 3 }
   - { fg: border, bg: surface, ratio: 4.07, min: 3 }
   - { fg: border, bg: stone, ratio: 3.66, min: 3 }
@@ -202,6 +222,14 @@ contrast:
   - { fg: focus, bg: surface, ratio: 13.89, min: 3 }
   - { fg: focus, bg: stone, ratio: 12.49, min: 3 }
   - { fg: focus-on-night, bg: night, ratio: 13.17, min: 3 }
+  # A region fill is a shape that carries meaning (a swatch, a card's edge, a
+  # map line), so it meets 3:1 on the grounds it sits on: ground and surface.
+  - { fg: region-photon-mountain, bg: ground, ratio: 10.58, min: 3 }
+  - { fg: region-space-peak, bg: ground, ratio: 3.47, min: 3 }
+  - { fg: region-fusion-canyon, bg: ground, ratio: 9.64, min: 3 }
+  - { fg: region-photon-mountain, bg: surface, ratio: 9.61, min: 3 }
+  - { fg: region-space-peak, bg: surface, ratio: 3.15, min: 3 }
+  - { fg: region-fusion-canyon, bg: surface, ratio: 8.76, min: 3 }
 
 # The same pairings under the night colors, plus the night-only pairs the
 # brand records (fire as large text, and night text on the night ceiling).
@@ -240,6 +268,9 @@ contrast_night:
   - { fg: community, bg: sky-wash, ratio: 6.33, min: 4.5 }
   - { fg: link, bg: copper-wash, ratio: 12.30, min: 4.5 }
   - { fg: pine, bg: pine-wash, ratio: 6.65, min: 4.5 }
+  - { fg: on-region-photon-mountain, bg: region-photon-mountain, ratio: 7.03, min: 4.5 }
+  - { fg: on-region-space-peak, bg: region-space-peak, ratio: 9.47, min: 4.5 }
+  - { fg: on-region-fusion-canyon, bg: region-fusion-canyon, ratio: 5.81, min: 4.5 }
   - { fg: border, bg: ground, ratio: 5.24, min: 3 }
   - { fg: border, bg: surface, ratio: 4.67, min: 3 }
   - { fg: border, bg: stone, ratio: 4.35, min: 3 }
@@ -247,6 +278,12 @@ contrast_night:
   - { fg: focus, bg: surface, ratio: 11.75, min: 3 }
   - { fg: focus, bg: stone, ratio: 10.93, min: 3 }
   - { fg: focus-on-night, bg: night, ratio: 13.74, min: 3 }
+  - { fg: region-photon-mountain, bg: ground, ratio: 7.03, min: 3 }
+  - { fg: region-space-peak, bg: ground, ratio: 9.47, min: 3 }
+  - { fg: region-fusion-canyon, bg: ground, ratio: 5.81, min: 3 }
+  - { fg: region-photon-mountain, bg: surface, ratio: 6.27, min: 3 }
+  - { fg: region-space-peak, bg: surface, ratio: 8.44, min: 3 }
+  - { fg: region-fusion-canyon, bg: surface, ratio: 5.18, min: 3 }
   - { fg: fire, bg: ground, ratio: 6.36, min: 3 }
   - { fg: fire, bg: surface, ratio: 5.67, min: 3 }
   - { fg: on-night, bg: night-ceiling, ratio: 15.29, min: 4.5 }
