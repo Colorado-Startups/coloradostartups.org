@@ -198,8 +198,16 @@ describe("coloradoMapSvg", () => {
     expect(root.querySelectorAll("circle").length).toBe(cities);
   });
 
-  it("is a real map: interstates and peaks by name, and a mile bar", () => {
-    for (const name of ["I-25", "I-70", "I-76", "Longs Peak", "Pikes Peak", "100 mi"]) expect(text, name).toContain(name);
+  it("is a real map: peaks by name and a mile bar", () => {
+    for (const name of ["Longs Peak", "Pikes Peak", "100 mi"]) expect(text, name).toContain(name);
+  });
+
+  it("signs each interstate with a shield: its number on the sign, its full name in the title", () => {
+    const shields = [...root.querySelectorAll("path > title")].map((t) => t.textContent);
+    for (const name of ["I-25", "I-70", "I-76"]) {
+      expect(shields, name).toContain(name);
+      expect(text, name).toContain(name.replace("I-", ""));
+    }
   });
 
   // d3-geo needs clockwise exterior rings; a counterclockwise one fills the globe.

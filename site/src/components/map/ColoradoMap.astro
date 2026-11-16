@@ -6,8 +6,8 @@
 //   2. a drawing made at build time (lib/regions/colorado-map.ts): the roads,
 //      zones, cities and names, with no JavaScript;
 //   3. the live map (colorado-map.client.ts): MapLibre over OpenFreeMap,
-//      loaded when a visitor presses "Explore the live map". It hides the
-//      first two once it has drawn.
+//      loaded when a visitor presses "Explore the live map", the button under
+//      the box. It hides the first two once it has drawn.
 // Zones come from data/geo/regions.geojson: each is the loop its named roads
 // close, traced along US Census road lines. The region chips or links beside
 // the map are its list alternative.
@@ -117,13 +117,16 @@ const hits = zone
           <a class="colorado-map__hit" href={`/regions/${h.id}/`} style={h.style} tabindex="-1" aria-hidden="true" title={h.name} />
         ))}
         {live && <div class="colorado-map__live" data-map-canvas data-label={label} />}
-        {/* Shown by the loader, and only where the browser can draw the live map. */}
-        {live && (
+      </div>
+      {/* Under the drawing, never over it: in a corner the button covered the names beneath it on a phone.
+          The loader shows it, and only where the browser can draw the live map. The row keeps its height either way, so nothing below moves. */}
+      {live && (
+        <p class="colorado-map__actions">
           <button type="button" class="colorado-map__open" data-map-open hidden>
             Explore the live map
           </button>
-        )}
-      </div>
+        </p>
+      )}
       <p class="colorado-map__desc visually-hidden">{description}</p>
       <figcaption>
         {caption && <span>{caption}</span>}
@@ -192,10 +195,13 @@ const hits = zone
   .colorado-map:not(.is-live) .colorado-map__live {
     pointer-events: none;
   }
+  .colorado-map__actions {
+    display: flex;
+    justify-content: flex-end;
+    min-height: var(--size-tap);
+    margin: var(--s-2) 0 0;
+  }
   .colorado-map__open {
-    position: absolute;
-    top: var(--s-2);
-    right: var(--s-2);
     min-height: var(--size-tap);
     padding-inline: var(--s-3);
     border: var(--line-hair) solid var(--c-border);

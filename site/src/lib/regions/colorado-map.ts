@@ -3,8 +3,9 @@
 // visitor sees before the live map (MapLibre) loads over it.
 //
 // Three kinds of view, each a frame in data/geo/views.json:
-//   state        Colorado: the highways, the three zones in their region colors,
-//                the cities on their corners, the zone names, two peaks.
+//   state        Colorado: the highways, three interstates by shield, the three
+//                zones in their region colors, the cities on their corners,
+//                the zone names, two peaks.
 //   zone-<id>    one zone: its highways, the roads its line follows by name,
 //                its cities by name, its nearby towns as dots.
 //   thumb-<id>   the same zone at 16:9 with a state locator, for a card header.
@@ -74,6 +75,28 @@ const INTERSTATE_LABELS: [string, LonLat][] = [
   ["I-70", [-107.75, 39.55]],
   ["I-76", [-102.65, 40.85]],
 ];
+/** A shield's half-width in px: room for two digits at SMALL_PX. */
+const SHIELD_R = 14;
+/** The path calls a symbol draws with. */
+interface PathContext {
+  moveTo(x: number, y: number): void;
+  lineTo(x: number, y: number): void;
+  quadraticCurveTo(cx: number, cy: number, x: number, y: number): void;
+  bezierCurveTo(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void;
+  closePath(): void;
+}
+/** An interstate's sign: a crowned top and a pointed foot. Plot sizes a symbol by its area, so `s` is half the width. */
+const SHIELD = {
+  draw(context: PathContext, size: number) {
+    const s = Math.sqrt(size / Math.PI);
+    context.moveTo(-s, -0.85 * s);
+    context.quadraticCurveTo(0, -1.1 * s, s, -0.85 * s);
+    context.lineTo(s, 0.1 * s);
+    context.bezierCurveTo(s, 0.6 * s, 0.45 * s, 0.9 * s, 0, 1.1 * s);
+    context.bezierCurveTo(-0.45 * s, 0.9 * s, -s, 0.6 * s, -s, 0.1 * s);
+    context.closePath();
+  },
+};
 // A loop's road is named on its line when it runs at least this far: a two-mile link is too short to carry a name.
 const NAMED_ROAD_MI = 3;
 const SCALE_BAR_MI = { state: 100, zone: 5 };
@@ -322,10 +345,14 @@ export function coloradoMapSvg(text: ChartText, view: MapView = {}): string {
       const road = roads.find((h) => h.name === name);
       if (!road) return [];
       const [lon, lat] = nearest(road.lines, near);
-      return claim(layout, textBox(toPx(frame, [lon, lat]), name, SMALL_PX, "middle")) ? [{ lon, lat, name }] : [];
+      const [x, y] = toPx(frame, [lon, lat]);
+      const box = { left: x - SHIELD_R, right: x + SHIELD_R, top: y - 1.1 * SHIELD_R, bottom: y + 1.1 * SHIELD_R };
+      return claim(layout, box) ? [{ lon, lat, name, number: name.replace("I-", "") }] : [];
     });
     marks.push(
-      Plot.text(interstates, { x: "lon", y: "lat", text: "name", fontWeight: 700, fill: DIM, ...halo }),
+      // The shield carries the number; its title carries the full name, such as "I-25".
+      Plot.dot(interstates, { x: "lon", y: "lat", r: SHIELD_R, symbol: SHIELD, fill: TEXT, stroke: GROUND, strokeWidth: 1.5, title: "name" }),
+      Plot.text(interstates, { x: "lon", y: "lat", text: "number", dy: -1, fontWeight: 700, fill: GROUND }),
       Plot.dot(peaks, { x: "lon", y: "lat", r: 4, symbol: "triangle", fill: DIM, stroke: GROUND, strokeWidth: 1 }),
       Plot.text(peaks, { x: "lon", y: "lat", text: "name", textAnchor: "end", dx: -8, fill: DIM, ...halo }),
       Plot.dot(cities, { x: "lon", y: "lat", r: 3, fill: TEXT, stroke: GROUND, strokeWidth: 1.5 }),
