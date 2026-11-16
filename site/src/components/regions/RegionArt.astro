@@ -44,9 +44,11 @@ const clip = hero ? REGION_CLIP[region.id as RegionArtId] : undefined;
 // (58 KB) instead of the 800w (86 KB), and the hero the 640w instead of the
 // 960w. The three cards load at once on a phone: the lazy two sit inside
 // Chrome's lazy-load distance, so they share the bandwidth with the first.
+// The sizes attribute cannot read CSS variables, so it uses rem (16 px each):
+// 73.75rem is the 1180 px wrap, 3rem the two 24 px gutters, 23.75rem a 380 px card.
 const SIZES = {
-  hero: "(max-width: 1227px) calc(100vw - 48px), 1180px",
-  card: "(max-width: 615px) calc(100vw - 52px), (max-width: 911px) calc(50vw - 40px), 380px",
+  hero: "(max-width: 76.6875rem) calc(100vw - 3rem), 73.75rem",
+  card: "(max-width: 38.4375rem) calc(100vw - 3.25rem), (max-width: 56.9375rem) calc(50vw - 2.5rem), 23.75rem",
 };
 const art = {
   src: region.art,
@@ -153,8 +155,9 @@ const art = {
     visibility: visible;
   }
   /* 21:9 shows the scene 327 by 140 px on a phone, a strip that loses its
-     detail. 16:9 keeps it readable (#251). */
-  @media (max-width: 760px) {
+     detail. 16:9 keeps it readable (#251). A media query cannot read CSS
+     variables either, so 47.5rem is the 760 px breakpoint. */
+  @media (max-width: 47.5rem) {
     :global(figure.art-image.region-art--hero) {
       aspect-ratio: 16 / 9;
     }
