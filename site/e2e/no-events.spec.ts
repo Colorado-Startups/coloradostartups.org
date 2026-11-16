@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 // A test run is not a visitor (#66, M1b). The e2e server serves the
-// production build on 127.0.0.1, and src/lib/track.ts sends nothing on a local
-// host. This spec proves it in a real browser: it marks a button the way M1c
+// production build on 127.0.0.1, and src/lib/track.ts sends only from
+// coloradostartups.org and www.coloradostartups.org. This spec proves it in a real browser: it marks a button the way M1c
 // will, clicks it, and expects no request to /api/e.
 
 for (const path of ["/", "/get-involved/apply/", "/ask/"]) {

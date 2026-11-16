@@ -15,7 +15,7 @@ import {
   canSend,
   eventFor,
   install,
-  isLocalHost,
+  isLiveHost,
   onClick,
   track,
   TRACK_CONTENT_TYPE,
@@ -115,12 +115,38 @@ describe("track", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("sends nothing on a local or test host", () => {
-    for (const host of ["localhost", "127.0.0.1", "127.0.1.1", "[::1]", "::1", "0.0.0.0", "site.localhost", "cs.test"]) {
-      expect(isLocalHost(host), host).toBe(true);
+  it("sends only from the two production hosts", () => {
+    const silent = [
+      "localhost",
+      "127.0.0.1",
+      "[::1]",
+      "site.localhost",
+      "cs.test",
+      "coloradostartups-site.paul.workers.dev",
+      "coloradostartups.pages.dev",
+      "abc123.coloradostartups.pages.dev",
+      "staging.coloradostartups.org",
+      "coloradostartups.org.example",
+    ];
+    for (const host of silent) expect(isLiveHost(host), host).toBe(false);
+    for (const host of ["coloradostartups.org", "www.coloradostartups.org", "WWW.ColoradoStartups.org"]) {
+      expect(isLiveHost(host), host).toBe(true);
     }
-    for (const host of ["coloradostartups.org", "www.coloradostartups.org", "test.example", "localhost.example"]) {
-      expect(isLocalHost(host), host).toBe(false);
+  });
+
+  it("is silent on a preview or staging deploy and sends on production, end to end", () => {
+    for (const [host, sends] of [
+      ["coloradostartups-site.paul.workers.dev", false],
+      ["coloradostartups.pages.dev", false],
+      ["staging.coloradostartups.org", false],
+      ["coloradostartups.org", true],
+      ["www.coloradostartups.org", true],
+    ] as const) {
+      setProp(window, "location", { hostname: host });
+      beacon.mockClear();
+      expect(track("join_click", { where: "home" }), host).toBe(sends);
+      expect(beacon.mock.calls.length, host).toBe(sends ? 1 : 0);
+      restores.pop()!();
     }
   });
 
@@ -241,6 +267,10 @@ describe("one event list for the site and the Worker", () => {
     const route = read("worker/routes/e.ts");
     const helper = read("src/lib/track.ts");
     expect(policy).toContain("If your browser sends Global Privacy Control or Do Not Track, the site sends no click events at all.");
+    // Nothing is marked data-track yet, so the policy says buttons can record a click, not that they do.
+    expect(policy).toContain("Some buttons, such as a join button, can record a click as an anonymous event. When they do,");
+    expect(policy).toContain("The policy now also describes click events, which some buttons can record");
+    expect(policy).not.toMatch(/the site records the click|We also added click events/);
     expect(helper).toContain("globalPrivacyControl");
     expect(helper).toContain("doNotTrack");
     expect(policy).toContain("up to two short labels");

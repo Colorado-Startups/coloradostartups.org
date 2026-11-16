@@ -5,7 +5,8 @@
 // It sets and reads no cookie and no storage, builds no id, and sends no event
 // on its own (no page view). It sends nothing when the browser sends Global
 // Privacy Control or Do Not Track, nothing outside a production build, and
-// nothing on a local or test host, so the e2e suite on 127.0.0.1 never posts.
+// nothing on any host but the live site, so the e2e suite on 127.0.0.1 and
+// preview or staging deploys never post.
 // It never throws into the page.
 //
 // Event names and prop keys come from the one list the Worker checks
@@ -19,18 +20,13 @@ export const TRACK_PATH = "/api/e";
 // the body as JSON whatever the type says.
 export const TRACK_CONTENT_TYPE = "text/plain;charset=UTF-8";
 
-// Hosts that are never the live site: a dev server, the e2e test server, and
-// names reserved for testing (RFC 6761).
-export function isLocalHost(hostname: string): boolean {
-  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  return (
-    host === "localhost" ||
-    host === "::1" ||
-    host === "0.0.0.0" ||
-    /^127\./.test(host) ||
-    host.endsWith(".localhost") ||
-    host.endsWith(".test")
-  );
+// The only hosts that send. Every other host stays silent: a dev server, the
+// e2e test server, a preview or staging deploy (*.workers.dev, *.pages.dev,
+// staging.coloradostartups.org), so none of them posts into the live project.
+export const LIVE_HOSTS: readonly string[] = ["coloradostartups.org", "www.coloradostartups.org"];
+
+export function isLiveHost(hostname: string): boolean {
+  return LIVE_HOSTS.includes(hostname.toLowerCase());
 }
 
 // True when the visitor's browser asks not to be tracked, by Global Privacy
@@ -43,7 +39,7 @@ export function optedOut(): boolean {
 
 /** Whether this page may send events at all. */
 export function canSend(): boolean {
-  return import.meta.env.PROD === true && !isLocalHost(location.hostname) && !optedOut();
+  return import.meta.env.PROD === true && isLiveHost(location.hostname) && !optedOut();
 }
 
 /**
