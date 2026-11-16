@@ -1,7 +1,7 @@
 ---
 // Home. A first-time visitor's Colorado, in the order Paul set on 2026-11-15
 // and signed off as a mockup. Each band is one file in
-// components/home/sections/; the five marked "slot" render nothing yet, and
+// components/home/sections/; the ones marked "slot" render nothing yet, and
 // the engagement plan step named in each file fills it.
 //
 // | Band | File | Filled by |
@@ -9,7 +9,7 @@
 // | Join | Hero | today |
 // | Builders | Builders | P1 |
 // | Founder spotlights | Spotlights (slot) | P3b |
-// | This week | ThisWeek (slot) | P2a |
+// | This week | ThisWeek (components/events/ThisWeek.astro) | P2a |
 // | Where | Where | today |
 // | Why Colorado | Why | today |
 // | Pick your door | PickDoor | P4 |
@@ -18,8 +18,9 @@
 // | First steps | FirstSteps (slot) | W5 |
 // | Keepers | Keepers | today |
 //
-// At most 300 visible words, a source under every figure, no member count,
-// and 75 KB of gzipped JavaScript up front: site/test/dom/home/home-budget.test.ts.
+// At most 60 visible words a band and 450 a page, a source under every figure,
+// no member count, and 75 KB of gzipped JavaScript up front:
+// site/test/dom/home/home-budget.test.ts.
 // The Leaderboard is never tied to investing (decision 17).
 import { DESCRIPTOR, homeJsonLd } from "../components/hall/org";
 import Ask from "../components/home/sections/Ask.astro";
