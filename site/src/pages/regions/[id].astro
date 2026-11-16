@@ -1,29 +1,33 @@
 ---
-// /regions/<id>/: one zone's hub (step H of the 2026-11-15 redesign). In order:
-// the place painting and four sourced figures (region-tiles.ts); the map
-// zoomed to the zone, the other two dimmed, beside its core cities and nearby
-// towns; the Connector seat, a person's; six Startup Resources and six
-// Leaderboard honorees, each with a link to see all of them; the Slack and
-// events; and the other two regions. Every city goes through regionForCity(),
-// so a city added to the YAML shows up in both lists (decision 45). Owner: L8.
+// /regions/<id>/: one zone's hub (step H of the 2026-11-15 redesign), built
+// from sections in components/regions/sections/. In order: Hero, with Art's
+// place painting and four sourced figures; the This week slot; the map zoomed
+// to the zone, the other two dimmed, beside its core cities and nearby towns;
+// the Connector seat, a person's; six Startup Resources and six Leaderboard
+// honorees, each with a link to see all of them; the Spotlights slot; the Slack
+// and events; the Ask your AI slot; and the other two regions. The three slots
+// render nothing until steps P2b, P3b and A3a fill them. Every city goes
+// through regionForCity(), so a city added to the YAML shows up in both lists
+// (decision 45). The title is the region name alone, no hub word (#67). Owner: L8.
 import { regionLede, WAYS_IN } from "@cs/shared";
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
 
 import { activeCards } from "../../components/canvas/canvas-data";
-import StatTile from "../../components/home/StatTile.astro";
 import ColoradoMap from "../../components/map/ColoradoMap.astro";
 import LiveMaps from "../../components/map/LiveMaps.astro";
 import OrganizerCard from "../../components/regions/OrganizerCard.astro";
-import RegionArt from "../../components/regions/RegionArt.astro";
 import RegionChip from "../../components/regions/RegionChip.astro";
 import RegionHonorees from "../../components/regions/RegionHonorees.astro";
 import RegionResources from "../../components/regions/RegionResources.astro";
 import RegionSize from "../../components/regions/RegionSize.astro";
-import { regionTiles } from "../../components/regions/region-tiles";
+import Art from "../../components/regions/sections/Art.astro";
+import AskAi from "../../components/regions/sections/AskAi.astro";
+import Hero from "../../components/regions/sections/Hero.astro";
+import Spotlights from "../../components/regions/sections/Spotlights.astro";
+import ThisWeek from "../../components/regions/sections/ThisWeek.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
-import { REGION_COLORS } from "../../lib/regions/map";
 import { REGIONS } from "../../lib/regions/match";
 import { andList, honoreesIn, inRegion, organizerFor, summaryAfterLede } from "../../lib/regions/page";
 
@@ -54,34 +58,11 @@ const honorees = honoreesIn(
 const others = regions.filter((r) => r.id !== region.id);
 ---
 
-<BaseLayout title={`${region.name} Outpost`} description={`${regionLede(region)} Core cities: ${andList(region.cities)}.`} ogImage={region.id}>
-  <section class="section section--lit" aria-labelledby="region-title" style={`--region-color: ${REGION_COLORS[region.id]}`}>
-    <div class="wrap">
-      <nav aria-label="Breadcrumb" class="crumbs">
-        <ol>
-          <li><a href="/regions/">Regions</a></li>
-          <li aria-current="page">{region.name}</li>
-        </ol>
-      </nav>
-      <h1 id="region-title">{region.name}</h1>
-      <p class="lede">{regionLede(region)}</p>
-      {/* The page's main action, in the first screen at 375 and 1280 px (#218).
-          "Meet founders here" below repeats it. Each Slack button says where
-          it goes (#128). */}
-      <div class="first-actions">
-        <div class="btn-row">
-          <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note-top">Join the Slack</a>
-          <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
-        </div>
-        <p class="meta" id="slack-note-top">Join the Slack opens a Google Form.</p>
-      </div>
-      <RegionArt region={region} size="hero" />
-      <h2 class="visually-hidden">{region.name} in numbers</h2>
-      <div class="tiles" data-region-tiles>
-        {regionTiles(region.id).map((t) => <StatTile {...t} />)}
-      </div>
-    </div>
-  </section>
+<BaseLayout title={region.name} description={`${regionLede(region)} Core cities: ${andList(region.cities)}.`} ogImage={region.id}>
+  <Hero region={region}>
+    <Art region={region} />
+  </Hero>
+  <ThisWeek region={region} />
 
   <section class="section section--band" aria-labelledby="where">
     <div class="wrap where">
@@ -128,6 +109,8 @@ const others = regions.filter((r) => r.id !== region.id);
     </div>
   </section>
 
+  <Spotlights region={region} />
+
   <section class="section section--band" aria-labelledby="meet">
     <div class="wrap">
       <h2 id="meet">Meet founders here</h2>
@@ -143,6 +126,8 @@ const others = regions.filter((r) => r.id !== region.id);
     </div>
   </section>
 
+  <AskAi region={region} />
+
   <section class="section section--lit" aria-labelledby="other-regions">
     <div class="wrap">
       <h2 id="other-regions">The other regions</h2>
@@ -157,28 +142,8 @@ const others = regions.filter((r) => r.id !== region.id);
 </BaseLayout>
 
 <style>
-  /* The breadcrumb's look, and its 44 px phone targets, are global.css's
-     .crumbs (#682); only the space above the title is this page's. */
-  .crumbs ol {
-    margin: 0 0 var(--s-3);
-  }
-  h1 {
-    border-bottom: 4px solid var(--region-color);
-    display: inline-block;
-    padding-bottom: var(--s-1);
-  }
-  .first-actions {
-    margin: var(--s-4) 0 var(--s-6);
-  }
-  .first-actions .meta,
   #slack-note {
     margin: var(--s-3) 0 0;
-  }
-  .tiles {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-5) var(--s-7);
-    margin-top: var(--s-6);
   }
   .where {
     display: grid;
@@ -218,7 +183,6 @@ const others = regions.filter((r) => r.id !== region.id);
     margin: 0 0 var(--s-5);
   }
   @media (max-width: 760px) {
-    .tiles,
     .where,
     .region-chips {
       grid-template-columns: minmax(0, 1fr);
