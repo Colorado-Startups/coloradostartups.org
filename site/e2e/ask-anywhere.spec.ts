@@ -55,6 +55,10 @@ test("the dialog names Resourcus as an AI agent and holds the Ask-your-AI row", 
   await page.keyboard.press("/");
   await expect(dialog(page).getByRole("link", { name: "Ask Resourcus, an AI agent" })).toHaveAttribute("href", "/ask/");
   await expect(dialog(page).getByRole("button", { name: "Copy prompt" })).toBeVisible();
+  // Claude only, per 01_doctrine/ai_recommend.yaml (Paul, 2026-11-16).
+  await expect(dialog(page).getByRole("link", { name: "Open in Claude" })).toHaveAttribute("href", /^https:\/\/claude\.ai\/new\?q=/u);
+  await expect(dialog(page).getByRole("link", { name: /ChatGPT/iu })).toHaveCount(0);
+  await expect(dialog(page).locator('a[href*="chatgpt.com"]')).toHaveCount(0);
 });
 
 test("a / with Ctrl held, or typed in a page's own field, leaves the dialog shut", async ({ page }) => {

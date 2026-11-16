@@ -1,8 +1,8 @@
 // A3a: the "Ask your AI" prompt names the page's subject and the MCP server,
-// and each encoded link stays under 2,000 characters.
+// and its one encoded link, to Claude, stays under 2,000 characters.
 import { describe, expect, it } from "vitest";
 
-import { askAiLinks, buildPrompt, chatgptLink, claudeLink, MAX_LINK, MCP_URL } from "../../../src/components/ai/prompt";
+import { askAiLinks, buildPrompt, claudeLink, MAX_LINK, MCP_URL } from "../../../src/components/ai/prompt";
 
 describe("ask-AI prompt", () => {
   it("names the subject, the page and the MCP server", () => {
@@ -17,25 +17,23 @@ describe("ask-AI prompt", () => {
     expect(prompt).toContain("Who invests here?");
   });
 
-  it("encodes the prompt into both links", () => {
-    const { prompt, claude, chatgpt } = askAiLinks({ subject: 'Fort Collins & "Loveland"?', path: "/regions/x/" });
+  it("encodes the prompt into the Claude link, the only link it makes", () => {
+    const links = askAiLinks({ subject: 'Fort Collins & "Loveland"?', path: "/regions/x/" });
+    const { prompt, claude } = links;
+    expect(Object.keys(links).sort()).toEqual(["claude", "prompt"]);
     expect(claude.startsWith("https://claude.ai/new?q=")).toBe(true);
-    expect(chatgpt.startsWith("https://chatgpt.com/?q=")).toBe(true);
-    for (const link of [claude, chatgpt]) {
-      expect(new URL(link).searchParams.get("q")).toBe(prompt);
-      // Only the one ?q= separator; the prompt's own & ? # " and spaces are encoded.
-      expect(link.slice(link.indexOf("?q=") + 3)).not.toMatch(/[ "&?#]/u);
-    }
+    expect(new URL(claude).searchParams.get("q")).toBe(prompt);
+    // Only the one ?q= separator; the prompt's own & ? # " and spaces are encoded.
+    expect(claude.slice(claude.indexOf("?q=") + 3)).not.toMatch(/[ "&?#]/u);
     expect(claudeLink("a b")).toBe("https://claude.ai/new?q=a%20b");
-    expect(chatgptLink("a&b")).toBe("https://chatgpt.com/?q=a%26b");
+    expect(claudeLink("a&b")).toBe("https://claude.ai/new?q=a%26b");
   });
 
-  it("keeps each link under the cap, and still names the subject, for a long subject and question", () => {
+  it("keeps the link under the cap, and still names the subject, for a long subject and question", () => {
     const subject = `Startup resources ${"for founders in every corner of Colorado ".repeat(40)}`;
     const question = `What ${"should I really know ".repeat(80)}?`;
-    const { prompt, claude, chatgpt } = askAiLinks({ subject, path: "/guides/long/", question });
+    const { prompt, claude } = askAiLinks({ subject, path: "/guides/long/", question });
     expect(claude.length).toBeLessThan(MAX_LINK);
-    expect(chatgpt.length).toBeLessThan(MAX_LINK);
     expect(prompt).toContain('"Startup resources');
     expect(prompt).toContain(MCP_URL);
   });
