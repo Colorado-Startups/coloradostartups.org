@@ -13,6 +13,10 @@
 // image's metadata (sharp keepMetadata): its AI-made label and photo credit
 // live there (brand decision 46, Bria's terms), and Astro's image pipeline
 // would strip them, so these files are served as-is.
+// The brand guide's data (dist/brand.json) goes to data/brand/ instead: the
+// build reads it, and the site never serves it. The guide is its public copy,
+// and its style list quotes words the built lint refuses on a page ("the
+// Silicon Valley of"), so a served copy would fail lint:built (step A6a).
 // Exit codes (04_tools/README.md): 0 clean, 1 a mismatch or missing file,
 // 2 usage error, 3 could not check.
 import { createHash } from "node:crypto";
@@ -23,8 +27,13 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 export const OUT = "site/public/art/brand";
+export const DATA_OUT = "data/brand";
 export const WIDTHS = [720, 1440];
 export const SIZES = "sizes.json";
+// Locked files the build reads but the site never serves.
+const DATA_ONLY = new Set(["dist/brand.json"]);
+/** The folder a locked file is written to: DATA_OUT for build-only data, OUT for the rest. */
+export const outDir = (path) => (DATA_ONLY.has(path) ? DATA_OUT : OUT);
 
 export const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 export const stem = (path) => basename(path).replace(/\.[a-z]+$/i, "");
@@ -65,7 +74,7 @@ export function checkFiles(lock, root = ROOT) {
   const sizesFile = join(root, OUT, SIZES);
   const sizes = existsSync(sizesFile) ? JSON.parse(readFileSync(sizesFile, "utf8")) : {};
   for (const [path, want] of Object.entries(lock.files)) {
-    const file = join(root, OUT, basename(path));
+    const file = join(root, outDir(path), basename(path));
     if (!existsSync(file)) { problems.push(`${basename(path)}: missing; run npm run brand:pull`); continue; }
     const got = sha256(readFileSync(file));
     if (got !== want) problems.push(`${basename(path)}: sha256 ${got.slice(0, 12)} is not the lock's ${want.slice(0, 12)}`);
@@ -82,6 +91,7 @@ export function checkFiles(lock, root = ROOT) {
 async function pull(lock) {
   const { default: sharp } = await import("sharp");
   mkdirSync(join(ROOT, OUT), { recursive: true });
+  mkdirSync(join(ROOT, DATA_OUT), { recursive: true });
   const sizes = {};
   for (const [path, want] of Object.entries(lock.files)) {
     const url = `https://raw.githubusercontent.com/${lock.repo}/${lock.tag}/${path}`;
@@ -93,7 +103,7 @@ async function pull(lock) {
       console.error(`brand: ${path}: sha256 ${got} is not the lock's ${want}`);
       process.exit(1);
     }
-    writeFileSync(join(ROOT, OUT, basename(path)), buf);
+    writeFileSync(join(ROOT, outDir(path), basename(path)), buf);
     if (asIs(path)) { console.log(`brand: ${basename(path)} ok (${lock.tag})`); continue; }
     const { width, height } = await sharp(buf).metadata();
     const widths = sizesFor(path, width);
@@ -122,12 +132,23 @@ function selfTest() {
       sizesFor("dist/logo/emblem-512.png", 512) === LOGO_WIDTHS &&
       sizesFor("dist/logo/favicon.ico", 48) === null &&
       sizesFor("dist/logo/icon-192.png", 192) === null;
+    // Guide data is checked in data/brand/, never in the served folder.
+    const guide = Buffer.from('{"characters":[]}');
+    const guideLock = { ...lock, files: { ...lock.files, "dist/brand.json": sha256(guide) } };
+    writeFileSync(join(dir, OUT, "brand.json"), guide);
+    const servedOnly = checkFiles(guideLock, dir).some((p) => p.startsWith("brand.json: missing"));
+    mkdirSync(join(dir, DATA_OUT), { recursive: true });
+    writeFileSync(join(dir, DATA_OUT, "brand.json"), guide);
+    const routed = outDir("dist/brand.json") === DATA_OUT && outDir("dist/tokens.json") === OUT && checkFiles(guideLock, dir).length === 0;
     rmSync(join(dir, OUT, sizeName("a.jpg", 960)));
     const missing = checkFiles(lock, dir).some((p) => p.includes("a-960.webp"));
     writeFileSync(join(dir, OUT, "a.jpg"), "tampered");
     const bad = checkFiles(lock, dir).some((p) => p.includes("sha256"));
-    if (!ok || !bad || !missing || !widthsOk) {
-      console.error(`brand self-test: FAIL (clean ${ok}, bad caught ${bad}, missing size caught ${missing}, widths ${widthsOk})`);
+    if (!ok || !bad || !missing || !widthsOk || !servedOnly || !routed) {
+      console.error(
+        `brand self-test: FAIL (clean ${ok}, bad caught ${bad}, missing size caught ${missing}, widths ${widthsOk}, ` +
+          `served-only guide caught ${servedOnly}, guide routed to ${DATA_OUT} ${routed})`,
+      );
       return 1;
     }
     console.log("brand self-test: PASS");

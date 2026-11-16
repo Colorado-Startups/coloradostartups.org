@@ -110,6 +110,7 @@ export function buildLlmsTxt(
     `- [Event calendar](${link("/event-calendar/")}): Startup events across Colorado in one Google Calendar, plus Colorado Startups events on Luma.`,
     `- [Get involved](${link("/get-involved/")}): Open moderator, organizer and project roles for people in the community.`,
     `- [Team](${link("/team/")}): The people who run Colorado Startups, and the AI agents that help them.`,
+    `- [AI agents](${link("/agents/")}): The AI agents on this site and the open-source AI agent projects for your own AI tool, each with its disclosure line.`,
     `- [Code of Conduct](${link("/code-of-conduct/")}): How we post and treat each other in the Slack and the LinkedIn Group.`,
     `- [Contact](${link("/contact/")}): Email ${CONTACT_EMAIL}, or write to the mailing address in Denver.`,
     `- [Sponsors](${link("/sponsors/")}): The people and companies who sponsor Colorado Startups through GitHub Sponsors.`,

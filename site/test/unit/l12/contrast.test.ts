@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
 import { SOURCE, TARGET } from "../../../scripts/sync-brand.mjs";
+import { pendingAndAbsent } from "../../brand-pending";
 
 // The contrast block in 01_doctrine/brand_tokens.yaml is the record of every
 // text and UI pairing the Hall uses. This test recomputes each WCAG 2.2 ratio
@@ -103,7 +104,12 @@ describe("brand_tokens.yaml night contrast block", () => {
       $extensions: { "org.coloradostartups.brand": { contrast: { night: Pairing[] } } };
     };
     const night = new Set(doc.contrast_night.map((p) => `${p.fg}|${p.bg}`));
-    for (const p of brand.$extensions["org.coloradostartups.brand"].contrast.night) {
+    // A pairing that names a role the site has not taken in yet waits with it (test/brand-pending.ts).
+    const pairs = brand.$extensions["org.coloradostartups.brand"].contrast.night.filter(
+      (p) => !pendingAndAbsent(p.fg, doc.color) && !pendingAndAbsent(p.bg, doc.color),
+    );
+    expect(pairs.length).toBeGreaterThan(0);
+    for (const p of pairs) {
       expect(night, `brand pairs ${p.fg} on ${p.bg} at night`).toContain(`${p.fg}|${p.bg}`);
     }
   });

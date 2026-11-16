@@ -1,7 +1,7 @@
 {
-  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.3.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
+  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.4.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
   "repo": "Colorado-Startups/brand",
-  "tag": "v4.3.0",
+  "tag": "v4.4.0",
   "files": {
     "dist/places/boulder.jpg": "2816f12e39305c407c7e400702f734c79440429f52ef3724a5971d066bf9072c",
     "dist/places/golden.jpg": "10737f40c1cdff6ec90255fe2c25e68f8ef8a72e2724e9b15dc908bf9092b3c9",
@@ -18,7 +18,7 @@
     "dist/website/founders.jpg": "139f695a3e1494d5050ee5cabd8356e2c911d3da85d7285fe8dcad45df9c485a",
     "dist/website/guides.jpg": "fc0f64ea8e92e5369e0f9a64d6ce90ac05ffddc9a7f2191f10074137f5bc7457",
     "dist/website/stone.png": "7cd3171af6b20b0392822977ec708fefe32df081ed0af374e8c16e041eb8392a",
-    "dist/tokens.json": "6bd9992df4db70d7501c795243637c0e7f2877b82ac0af2f292682dd3c76006d",
+    "dist/tokens.json": "6983d271cb97c11b4f53ccb1ece9a76f2d0e09d6263fa9e7c224717c702a9e50",
     "dist/logo/emblem-512.png": "4132211999706338e841a13666856d92293b6461a0d1635a0e9eb0d418b60880",
     "dist/logo/banner-960x1200.png": "1ee3abd83cbe52d2bf26740d770f19d2312aecbcf9e47ed590cc1d5f9de35699",
     "dist/logo/banner-480x600.png": "70440036f7e02fe897f612051534cc8a983fdcebfcb1327f6eb43d10e63a0ef4",
@@ -37,6 +37,7 @@
     "dist/clips/space.mp4": "9801857698ae986930ba2da7f8b4c6a530ab6249f57fd649d3de68096f9fb615",
     "dist/social/claudius.jpg": "d38b196831b5375e57f4123692ecb1fec376e173c99cbdff9b50495898df252a",
     "dist/social/link.jpg": "1693346786b3bb69625c8892fc89bb3979ef2e5d50cde975b0da4c324eafdf13",
-    "dist/social/legallas.jpg": "d1ee9b2beb722474b50cc8aa0c1eaa6b331b2ff9932fc5ff68f68af8c1a90834"
+    "dist/social/legallas.jpg": "d1ee9b2beb722474b50cc8aa0c1eaa6b331b2ff9932fc5ff68f68af8c1a90834",
+    "dist/brand.json": "64397a0cec579720910396e60fa869407e25f3da1f06f9fc4f5753392b5bdb8d"
   }
 }

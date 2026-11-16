@@ -5,6 +5,8 @@ import { expect, test } from "@playwright/test";
 // a sentence stay inline; WCAG 2.2 SC 2.5.8 exempts them.
 
 const STANDALONE = [
+  // Five card buttons and the two projects' install steps links (step A6a).
+  { route: "/agents/", selector: "main a", count: 7 },
   { route: "/code-of-conduct/", selector: "nav.toc a", count: 4 },
   { route: "/contact/", selector: ".doors a", count: 6 },
   { route: "/get-involved/", selector: "ul.jump a", count: 3 },

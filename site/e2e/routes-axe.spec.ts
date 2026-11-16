@@ -8,6 +8,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const PAGES = [
+  "/agents/",
   "/data/",
   "/dispatches/2026-10-06-a-new-chapter/",
   "/ecosystem-canvas/suggest/thanks/",

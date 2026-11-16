@@ -35,6 +35,10 @@ id: team
 title: Team
 art: brand/golden
 
+id: agents
+title: AI agents
+art: brand/communitas
+
 id: get-involved
 title: Get involved
 art: brand/golden
