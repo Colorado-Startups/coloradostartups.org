@@ -313,6 +313,13 @@ describe.each([undefined, ...REGION_IDS])("mapFileSvg(%s)", (zone) => {
     expect(root.querySelector("image")?.getAttribute("href")).toMatch(/^data:image\/jpeg;base64,/);
   });
 
+  it("paints in real colors: the wash's stops and every fill and stroke a token gave", () => {
+    const stops = [...root.querySelectorAll("stop")].map((s) => s.getAttribute("stop-color"));
+    expect(stops).toHaveLength(3);
+    for (const color of stops) expect(color).toMatch(/^#[0-9a-f]{6}$/i);
+    expect(svg).not.toMatch(/NaN|undefined|\[object/);
+  });
+
   it("names itself, and credits its sources", () => {
     expect(root.getAttribute("aria-label")).toMatch(/^Map of /);
     expect(root.querySelector("title")?.textContent).toBe(root.getAttribute("aria-label"));

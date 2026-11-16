@@ -16,10 +16,18 @@ const COLORS = (parse(Object.values(tokenFile)[0] ?? "") as { color?: Record<str
 // The two type steps the drawing uses (styles/tokens.css), as the px the drawing's own layout assumes.
 const TYPE: Readonly<Record<string, string>> = { "--t-step-0": `${NAME_PX}px`, "--t-step--1": `${SMALL_PX}px` };
 
-/** A CSS custom property's light-theme value: `--c-text` is `color.text` in brand_tokens.yaml. */
+/**
+ * A CSS custom property's light-theme value: a type step in px, or a color,
+ * where `--c-text` is `color.text` in brand_tokens.yaml. A color must be a
+ * six-digit hex: `mix` reads nothing else, and anything else would reach the
+ * file as a broken color with no error.
+ */
 function token(name: string): string {
-  const value = TYPE[name] ?? COLORS[name.replace(/^--c-/, "")];
-  if (!value) throw new Error(`01_doctrine/brand_tokens.yaml has no light-theme value for ${name}`);
+  if (TYPE[name]) return TYPE[name];
+  const value: unknown = COLORS[name.replace(/^--c-/, "")];
+  if (typeof value !== "string" || !/^#[0-9a-f]{6}$/i.test(value)) {
+    throw new Error(`01_doctrine/brand_tokens.yaml has no six-digit hex for ${name} in its light theme (found ${JSON.stringify(value)})`);
+  }
   return value;
 }
 
