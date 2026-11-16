@@ -1,19 +1,18 @@
 ---
 // /agents/ (step A6a): Colorado Startups' AI agents in two groups. "On this
 // site" holds the keepers, which run here; "In your own AI tool" holds the
-// open-source AI agent projects the brand flags for this page. Visual first,
-// few words: a picture, the name, one line, where it lives, and its
-// disclosure, word for word from its source, beside it
-// (.claude/rules/ai-disclosure.md). lib/agents/agents.ts builds both lists
-// from data/team/dwarves.yaml and the pulled brand.json; nothing here types a
-// name or a disclosure. Install paths name only Claude and OpenCode
-// (01_doctrine/ai_recommend.yaml).
-import ArtImage from "../components/art/ArtImage.astro";
-import Portrait from "../components/art/Portrait.astro";
-import Badge from "../components/ui/Badge.astro";
+// open-source AI agent projects the brand flags for this page. Few words, and
+// the words lead (Paul, 2026-11-16: "they're supposed to be getting info").
+// Each card shows a small picture beside the name, then what the agent does,
+// how to use it, and its disclosure, word for word from its source, as the
+// card's last line (.claude/rules/ai-disclosure.md). At 1280 by 800 the first
+// screen shows the title, the intro and every keeper's name, job and link; at
+// 375 by 812, the first keeper's name and job. lib/agents/agents.ts builds
+// both lists from data/team/dwarves.yaml and the pulled brand.json; nothing
+// here types a name or a disclosure. Install paths name only Claude and
+// OpenCode (01_doctrine/ai_recommend.yaml).
+import AgentCard from "../components/agents/AgentCard.astro";
 import Button from "../components/ui/Button.astro";
-import Card from "../components/ui/Card.astro";
-import Frame from "../components/ui/Frame.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { PROJECT_AGENTS, SITE_AGENTS } from "../lib/agents/agents";
 ---
@@ -23,7 +22,7 @@ import { PROJECT_AGENTS, SITE_AGENTS } from "../lib/agents/agents";
   description="Colorado Startups' AI agents: the keepers that run on this site, and the open-source AI agent projects you run in your own AI tool, each with its disclosure."
   ogImage="agents"
 >
-  <section class="section section--band" aria-labelledby="agents-title">
+  <section class="section section--band agents-head" aria-labelledby="agents-title">
     <div class="wrap stack">
       <h1 id="agents-title">AI agents</h1>
       <p class="lede">
@@ -33,27 +32,21 @@ import { PROJECT_AGENTS, SITE_AGENTS } from "../lib/agents/agents";
     </div>
   </section>
 
-  <section class="section section--lit" id="on-this-site" aria-labelledby="on-this-site-title">
+  <section class="section section--lit agents-first" id="on-this-site" aria-labelledby="on-this-site-title">
     <div class="wrap stack">
       <h2 id="on-this-site-title">On this site</h2>
       <ul class="hall-grid agents-grid" aria-label="On this site" data-group="site">
         {
-          SITE_AGENTS.map((agent, i) => (
-            <Card title={agent.name} tone="gilded" mediaInset element="li" data-agent={agent.id}>
-              <Frame slot="media" shape="arch" ratio="4 / 5">
-                <Portrait
-                  id={agent.id}
-                  framed
-                  alt={agent.alt}
-                  sizes="(max-width: 40rem) 80vw, 20rem"
-                  loading={i === 0 ? "eager" : "lazy"}
-                />
-              </Frame>
-              <Badge slot="badges">AI agent</Badge>
-              <p>{agent.what}</p>
+          SITE_AGENTS.map((agent) => (
+            <AgentCard agent={agent}>
+              <p data-what>{agent.what}</p>
+              <p class="btn-row">
+                <Button variant="secondary" href={agent.where.href} data-where>
+                  {agent.where.label}
+                </Button>
+              </p>
               <p class="ai-note" data-disclosure>{agent.disclosure}</p>
-              <Button slot="actions" variant="secondary" href={agent.where.href} data-where>{agent.where.label}</Button>
-            </Card>
+            </AgentCard>
           ))
         }
       </ul>
@@ -66,18 +59,8 @@ import { PROJECT_AGENTS, SITE_AGENTS } from "../lib/agents/agents";
       <ul class="hall-grid agents-grid agents-grid--projects" aria-label="In your own AI tool" data-group="project">
         {
           PROJECT_AGENTS.map((agent) => (
-            <Card title={agent.name} element="li" data-agent={agent.id}>
-              <ArtImage
-                slot="media"
-                src={agent.card}
-                alt={agent.cardAlt}
-                aspect="2 / 1"
-                sizes="(max-width: 40rem) 92vw, 36rem"
-                motion="none"
-              />
-              <Badge slot="badges">AI agent</Badge>
-              <Badge slot="badges">Open source</Badge>
-              <p>{agent.what}</p>
+            <AgentCard agent={agent}>
+              <p data-what>{agent.what}</p>
               <p class="meta">{agent.note}</p>
               {agent.install.map((path) => (
                 <div class="agent-install" data-install={path.app}>
@@ -90,11 +73,13 @@ import { PROJECT_AGENTS, SITE_AGENTS } from "../lib/agents/agents";
                   </p>
                 </div>
               ))}
+              <p class="btn-row">
+                <Button variant="secondary" href={agent.repoUrl} data-repo>
+                  See {agent.name} on GitHub
+                </Button>
+              </p>
               <p class="ai-note" data-disclosure>{agent.disclosure}</p>
-              <Button slot="actions" variant="secondary" href={agent.repoUrl} data-repo>
-                See {agent.name} on GitHub
-              </Button>
-            </Card>
+            </AgentCard>
           ))
         }
       </ul>
@@ -103,14 +88,20 @@ import { PROJECT_AGENTS, SITE_AGENTS } from "../lib/agents/agents";
 </BaseLayout>
 
 <style>
+  /* A shorter title band and a shorter gap above the first group, so every
+     keeper's name, job and link fit in the first screen at 1280 by 800. */
+  .agents-head {
+    padding-block: var(--s-7) var(--s-6);
+  }
+  .agents-first {
+    padding-top: var(--s-6);
+  }
   /* Three keepers side by side on a wide screen, one column on a phone. */
   .agents-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   }
-  /* The projects' cards are 2:1 social cards; Card crops its media to
-     --card-ratio, so it takes the card's own ratio and keeps the name whole. */
+  /* The projects' cards hold install commands, so they take wider columns. */
   .agents-grid--projects {
-    --card-ratio: 2 / 1;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
   }
   .agent-install {

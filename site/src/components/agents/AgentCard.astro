@@ -1,0 +1,112 @@
+---
+// One AI agent on /agents/: a small picture beside its name and badges, then
+// the card's own lines in the default slot. Paul, 2026-11-16: the page is for
+// the startup community, not to display art. So the picture is a thumbnail
+// that identifies the agent, never a hero, and the words lead the first
+// screen. test/dom/agents.test.ts pins the size, and
+// test/dom/first-picture.test.ts holds /agents/ to it.
+//
+// A keeper shows its small portrait (brand/<id>-small, head and shoulders,
+// 1:1). A project shows the brand's social card, cropped to its right half,
+// where the card paints the character; the left half paints the name, which
+// the card already writes beside it. The width and height attributes are the
+// drawn size, so the box is reserved and nothing shifts, while srcset still
+// serves a sharp file on a 2x or 3x screen. Every picture loads lazily, and
+// its alt text says "AI agent" (.claude/rules/ai-disclosure.md).
+//
+// The card uses hall.css's card classes, not Card.astro: Card sets its media
+// above or beside the whole body, and this thumbnail sits beside the name only.
+//
+// The picture carries data-agent-pic, not Portrait's data-portrait or
+// ArtImage's data-art. Those markers promise a width attribute equal to the
+// file's own width (test/dom/page-polish/art-srcset.test.ts reads it so), and
+// this one is the drawn size. The first-picture test still reads it as art,
+// by its /art/brand/ file.
+import { brandArt } from "../art/art-assets";
+import { portraitKeys } from "../art/keepers";
+import Badge from "../ui/Badge.astro";
+import type { ProjectAgent, SiteAgent } from "../../lib/agents/agents";
+
+interface Props {
+  agent: SiteAgent | ProjectAgent;
+}
+
+const { agent } = Astro.props;
+
+// The thumbnail's drawn size in CSS px: 7rem, as .agent__pic draws it.
+const THUMB = 112;
+
+const keeper = agent.group === "site";
+const key = keeper ? portraitKeys(agent.id).small : agent.card;
+const picture = brandArt(key);
+if (!picture) throw new Error(`/agents/: ${agent.name}'s picture ${key} is not pulled (brand.lock.json)`);
+const alt = keeper ? agent.alt : agent.cardAlt;
+const badges = keeper ? ["AI agent"] : ["AI agent", "Open source"];
+---
+
+<li class:list={["hall-card", keeper && "hall-card--gilded", "agent"]} data-agent={agent.id}>
+  <div class="agent__head" data-agent-head>
+    <figure class:list={["agent__pic", !keeper && "agent__pic--card"]} data-agent-pic={key}>
+      <img
+        src={picture.src}
+        srcset={picture.srcset}
+        sizes="7rem"
+        width={THUMB}
+        height={THUMB}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+      />
+    </figure>
+    <div class="agent__name">
+      <h3 class="hall-card__title">{agent.name}</h3>
+      <div class="hall-card__badges">{badges.map((badge) => <Badge>{badge}</Badge>)}</div>
+    </div>
+  </div>
+  <slot />
+</li>
+
+<style>
+  .agent {
+    gap: var(--s-3);
+    padding: var(--s-5);
+  }
+  /* The slotted lines carry the page's scope, so this reaches them as global. */
+  .agent > :global(*) {
+    margin: 0;
+  }
+  .agent__head {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+  }
+  .agent__pic {
+    flex: none;
+    inline-size: 7rem;
+    aspect-ratio: 1;
+    margin: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--c-surface-2);
+    box-shadow: 0 0 0 var(--line-bold) var(--c-accent);
+  }
+  .agent__pic img {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  /* The brand's social cards paint the name on the left half and the
+     character on the right half. */
+  .agent__pic--card img {
+    object-position: right center;
+  }
+  .agent__name {
+    display: grid;
+    gap: var(--s-2);
+    min-inline-size: 0;
+  }
+  .agent__name > * {
+    margin: 0;
+  }
+</style>

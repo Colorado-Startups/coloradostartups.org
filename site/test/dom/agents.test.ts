@@ -5,6 +5,11 @@
 // reads the sources off disk), every picture's alt says "AI agent", Legallas
 // stays off, and every link in a project card goes to its own repo or to
 // Claude or OpenCode (01_doctrine/ai_recommend.yaml).
+//
+// The words lead (Paul, 2026-11-16: "they're supposed to be getting info"):
+// each picture is a thumbnail of at most THUMB_MAX px beside the agent's name,
+// and the page's first picture sits in the first keeper's card, with that
+// keeper's name, job and link.
 import { existsSync } from "node:fs";
 import path from "node:path";
 
@@ -19,6 +24,8 @@ const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace
 // Hosts an install link may name besides the project's own repo: Claude's and OpenCode's.
 const AI_HOSTS = new Set(["claude.ai", "claude.com", "www.claude.com", "code.claude.com", "opencode.ai"]);
 const APPS = new Set(["Claude Code", "Claude Desktop", "claude.ai", "OpenCode"]);
+// The widest an agent's thumbnail may be, in CSS px: a small picture that identifies it, never a hero.
+const THUMB_MAX = 128;
 
 const page = doc("agents/index.html");
 const main = page.querySelector("main")!;
@@ -71,9 +78,41 @@ describe("/agents/", () => {
         for (const attr of ["width", "height", "sizes", "srcset"]) expect(img.getAttribute(attr), `${card.dataset.agent} ${attr}`).toBeTruthy();
       }
     }
-    // Only the first keeper's portrait can sit in the first screen; every other picture waits.
-    const lazy = cards.flatMap((c) => [...c.querySelectorAll("img")]).map((img) => img.getAttribute("loading"));
-    expect(lazy.slice(1).every((l) => l === "lazy")).toBe(true);
+    // Every picture but the first waits, and none holds up the page while it decodes.
+    const rest = cards.flatMap((c) => [...c.querySelectorAll("img")]).slice(1);
+    expect(rest.map((img) => img.getAttribute("loading")).every((l) => l === "lazy")).toBe(true);
+    expect(rest.map((img) => img.getAttribute("decoding")).every((d) => d === "async")).toBe(true);
+  });
+
+  it("draws each agent's one picture as a thumbnail beside its name, 128 px or less", () => {
+    for (const card of cards) {
+      const imgs = [...card.querySelectorAll("img")];
+      expect(imgs, card.dataset.agent).toHaveLength(1);
+      const img = imgs[0]!;
+      for (const attr of ["width", "height"]) {
+        const px = Number(img.getAttribute(attr));
+        expect(px, `${card.dataset.agent} ${attr}`).toBeGreaterThan(0);
+        expect(px, `${card.dataset.agent} ${attr}`).toBeLessThanOrEqual(THUMB_MAX);
+      }
+      // Beside its name: the picture and the name share the card's head.
+      const head = img.closest("[data-agent-head]");
+      expect(head?.parentElement, card.dataset.agent).toBe(card);
+      expect(text(head?.querySelector(".hall-card__title")), card.dataset.agent).toBe(text(card.querySelector(".hall-card__title")));
+    }
+  });
+
+  it("leads with the first keeper's name, job and link, in the card that holds the page's first picture", () => {
+    const first = main.querySelector("img, video, canvas, svg[role='img'], [role='img']");
+    const card = first?.closest<HTMLElement>("[data-agent]");
+    expect(card).toBe(cards[0]);
+    const keeper = SOURCE_KEEPERS[0] as (typeof SOURCE_KEEPERS)[number] & { role: string };
+    expect(text(card!.querySelector(".hall-card__title"))).toBe(keeper.name);
+    expect(text(card!.querySelector("[data-what]"))).toBe(keeper.role);
+    expect(card!.querySelector("a[data-where]")).not.toBeNull();
+    // Before that card, main holds only the title, its intro and the group's heading.
+    const before = [...main.querySelectorAll("*")].filter((el) => el.compareDocumentPosition(card!) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(before.filter((el) => /^H\d$/.test(el.tagName)).map((h) => text(h))).toEqual(["AI agents", "On this site"]);
+    expect(before.filter((el) => el.tagName === "P").map((p) => p.classList.contains("lede"))).toEqual([true]);
   });
 
   it("leaves Legallas off while the brand's agents_page flag is false", () => {
