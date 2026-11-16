@@ -155,6 +155,16 @@ const NEEDS: Need[] = [
     want: { event: "event_out", where: "event-calendar-list", source: "calendar-feed" },
   },
   { route: "/links/", selector: `[data-slack-entry] a[href="${WAYS_IN.slack}"]`, want: { event: "join_click", where: "links" } },
+  {
+    route: "/founders/",
+    selector: `a.btn[aria-describedby="slack-form-note-top"]`,
+    want: { event: "join_click", where: "founders" },
+  },
+  {
+    route: "/event-calendar/",
+    selector: `.hero-actions a[href^="https://luma.com/"]`,
+    want: { event: "event_out", where: "event-calendar-top", source: "luma" },
+  },
   { route: "/contact/", selector: `.doors a[href="${WAYS_IN.slack}"]`, want: { event: "join_click", where: "contact" } },
   { route: "/community/", selector: `[data-channel="slack"] a.btn`, want: { event: "join_click", where: "community" } },
   {
@@ -210,16 +220,23 @@ describe("the required controls", () => {
     }
   });
 
-  // One follow-up: /founders/ is open in another PR (#121), so its own Slack
-  // button waits for it. Its header and footer joins are marked.
-  const FOLLOW_UPS = [{ route: "/founders/", describedBy: "slack-form-note-top" }];
-
   it("marks every link to the Slack or the LinkedIn Group as join_click", () => {
     for (const { route, doc } of pages) {
-      const joins = all(doc, `a[href="${WAYS_IN.slack}"], a[href="${WAYS_IN["linkedin-group"]}"]`).filter(
-        (el) => !FOLLOW_UPS.some((f) => f.route === route && el.getAttribute("aria-describedby") === f.describedBy),
-      );
-      for (const el of joins) expect(mark(el)?.event, `${route}: ${describe1(el)}`).toBe("join_click");
+      for (const el of all(doc, `a[href="${WAYS_IN.slack}"], a[href="${WAYS_IN["linkedin-group"]}"]`)) {
+        expect(mark(el)?.event, `${route}: ${describe1(el)}`).toBe("join_click");
+      }
+    }
+  });
+
+  it("marks every way out to Luma or Google Calendar on /event-calendar/", () => {
+    const doc = page("/event-calendar/");
+    const outs = all(doc, `.hero-actions a, [aria-labelledby="more-ways"] .cards a.btn`);
+    expect(outs.length).toBeGreaterThanOrEqual(5);
+    for (const a of outs) {
+      const m = mark(a);
+      expect(m?.event, describe1(a)).toBe("event_out");
+      expect(["event-calendar-top", "event-calendar-more"]).toContain(m?.where);
+      expect(["luma", "google-calendar"]).toContain(m?.source);
     }
   });
 
