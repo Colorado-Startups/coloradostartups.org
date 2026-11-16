@@ -166,6 +166,13 @@
           ]
         },
         {
+          "doc": "plugins/colorado-startups/skills/colorado-startups/SKILL.md",
+          "area": [
+            "site/worker/mcp/",
+            "plugins/colorado-startups/.mcp.json"
+          ]
+        },
+        {
           "doc": "**",
           "area": [
             "{dir}/"

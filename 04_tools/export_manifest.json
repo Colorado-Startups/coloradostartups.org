@@ -54,6 +54,8 @@
     {"glob": "THREAT-MODEL.md", "public": true, "reason": "The Workers threat model, written in this repo (2026-11-13)"},
     {"glob": "brand.lock.json", "public": true, "reason": "The brand release the site pins, read by scripts/brand/pull.mjs"},
     {"glob": "server.json", "public": true, "reason": "The MCP Registry listing for /mcp, published by .github/workflows/mcp-registry.yml"},
+    {"glob": ".claude-plugin/**", "public": true, "reason": "The Claude Code plugin marketplace that lists plugins/colorado-startups (A6b)"},
+    {"glob": "plugins/**", "public": true, "reason": "The colorado-startups Claude Code plugin: the /mcp server config and its skill (A6b)"},
     {"glob": "SUPPORT.md", "public": true, "reason": "A public root doc, written in this repo (2026-11-13)"},
     {"glob": "ROADMAP.md", "public": true, "reason": "A public root doc; in the archive it lives only in the overlay, so this rule matches in the public repo"},
     {"glob": "LICENSES/**", "public": true, "reason": "License texts beside the root LICENSE; in the archive they live only in the overlay, so this rule matches in the public repo"},
