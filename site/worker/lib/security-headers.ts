@@ -21,11 +21,13 @@
 //   - data: (img): Vite inlines small images as data: URIs (astro.config.mjs
 //     keeps its default for every asset but scripts), and the footer's ridge
 //     mask is an inline SVG.
-//   - blob: (img) and https://tiles.openfreemap.org (connect): the statewide
-//     map (components/map/ColoradoMap.astro) fetches OpenFreeMap tiles, glyphs
-//     and sprites, and MapLibre decodes images through blob: URLs (MapLibre's
-//     CSP docs). Its worker is a same-origin file, which script-src 'self'
-//     already allows, so no worker-src is needed.
+//   - blob: (img), https://tiles.openfreemap.org and
+//     https://tiles.mapterhorn.com (connect): the live map
+//     (components/map/ColoradoMap.astro) fetches OpenFreeMap tiles, glyphs and
+//     sprites and Mapterhorn's terrain tiles for its shaded relief, and
+//     MapLibre decodes images through blob: URLs (MapLibre's CSP docs). Its
+//     worker is a same-origin file, which script-src 'self' already allows,
+//     so no worker-src is needed.
 // script-src stays free of 'unsafe-inline': astro.config.mjs keeps every script
 // external, and test/dom/no-inline-scripts.test.ts guards that.
 
@@ -35,7 +37,7 @@ export const CSP_DIRECTIVES: readonly string[] = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://challenges.cloudflare.com",
   "font-src 'self'",
-  "connect-src 'self' https://cloudflareinsights.com https://challenges.cloudflare.com https://tiles.openfreemap.org",
+  "connect-src 'self' https://cloudflareinsights.com https://challenges.cloudflare.com https://tiles.openfreemap.org https://tiles.mapterhorn.com",
   "frame-src https://challenges.cloudflare.com https://calendar.google.com",
   "form-action 'self'",
   "base-uri 'self'",

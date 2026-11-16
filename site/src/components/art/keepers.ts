@@ -58,6 +58,12 @@ export const REGION_ART_ALT = {
 
 export type RegionArtId = keyof typeof REGION_ART_ALT;
 
+/**
+ * A region's brand clip (brand/<clip>.webm and .mp4, brand v4.2.0), when the
+ * brand has one. It plays over the region's painting on its page (RegionArt).
+ */
+export const REGION_CLIP: Partial<Record<RegionArtId, string>> = { "photon-mountain": "photonics" };
+
 /** A region scene's alt. Throws for a region with no entry, so no scene ships an undisclosed alt. */
 export function regionArtAlt(id: string): string {
   const alt = (REGION_ART_ALT as Readonly<Record<string, string>>)[id];

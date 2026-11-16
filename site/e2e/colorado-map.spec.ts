@@ -1,8 +1,9 @@
 // The statewide map (components/map/ColoradoMap.astro) in a real browser, on
 // /styleguide/: the build-time drawing is there with or without JavaScript,
-// and where the browser has WebGL2 the live MapLibre map loads over it with
-// its three zone names and no console error. CI's headless Chromium may lack
-// WebGL2; then the live part is skipped and the drawing is what ships.
+// and where the browser has WebGL2 its "Explore the live map" button loads the
+// live MapLibre map over it, with its three zone names and no console error.
+// CI's headless Chromium may lack WebGL2; then the button never shows, the
+// live part is skipped and the drawing is what ships.
 import { expect, test } from "@playwright/test";
 
 const MAP = "#sg-colorado-map";
@@ -23,7 +24,10 @@ for (const width of [1280, 375]) {
     for (const name of ["Photon Mountain", "Fusion Canyon", "Space Peak"]) await expect(map.locator(".colorado-map__drawing")).toContainText(name);
     const webgl2 = await page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")));
     test.skip(!webgl2, "no WebGL2 in this browser: the drawing is the map");
+    // The drawing is the map until a visitor asks for the live one.
     await map.scrollIntoViewIfNeeded();
+    await expect(map).not.toHaveClass(/is-live/);
+    await map.getByRole("button", { name: "Explore the live map" }).click();
     await expect(map).toHaveClass(/is-live/, { timeout: 30_000 });
     await expect(map.locator("canvas")).toBeVisible();
     await expect(map.locator(".colorado-map__label")).toHaveCount(3);
@@ -47,9 +51,9 @@ test("/styleguide/ map with no JavaScript is the whole drawing", async ({ browse
 });
 
 // A region page's map (ColoradoMap with `zone`): the drawing zoomed to the
-// zone with its core cities named, then, where WebGL2 exists, the live map
-// fitted to the same zone, with no zone names over it (the basemap names the
-// towns) and no console error.
+// zone with its cities named, then, where WebGL2 exists and the visitor asks,
+// the live map fitted to the same zone, with no zone names over it (the
+// basemap names the towns) and no console error.
 test("/regions/fusion-canyon/ map: zoomed to the zone, drawing then live map", async ({ page }) => {
   await page.route("https://static.cloudflareinsights.com/**", (r) => r.fulfill({ contentType: "text/javascript", body: "" }));
   const errors: string[] = [];
@@ -64,6 +68,7 @@ test("/regions/fusion-canyon/ map: zoomed to the zone, drawing then live map", a
   const webgl2 = await page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")));
   test.skip(!webgl2, "no WebGL2 in this browser: the drawing is the map");
   await map.scrollIntoViewIfNeeded();
+  await map.getByRole("button", { name: "Explore the live map" }).click();
   await expect(map).toHaveClass(/is-live/, { timeout: 30_000 });
   await expect(map.locator("canvas")).toBeVisible();
   await expect(map.locator(".colorado-map__label")).toHaveCount(0);

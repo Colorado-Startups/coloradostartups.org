@@ -1,42 +1,56 @@
 ---
-// The statewide map: Colorado with Photon Mountain, Fusion Canyon and Space
-// Peak outlined. Two layers in one fixed-ratio box, so nothing shifts:
-//   1. a drawing made at build time (lib/regions/colorado-map.ts): the whole
-//      map with no JavaScript, and what shows before the live map loads;
-//   2. the live map (colorado-map.client.ts): MapLibre over OpenFreeMap,
-//      loaded when the figure nears the screen. It hides the drawing once it
-//      has drawn.
+// The map: Colorado with Photon Mountain, Fusion Canyon and Space Peak drawn
+// along their roads. Three layers in one fixed-ratio box, so nothing shifts:
+//   1. a shaded-relief image of the frame (USGS 3DEP; scripts/geo/views.mjs),
+//      lazy-loaded, tinted by the box's own colors;
+//   2. a drawing made at build time (lib/regions/colorado-map.ts): the roads,
+//      zones, cities and names, with no JavaScript;
+//   3. the live map (colorado-map.client.ts): MapLibre over OpenFreeMap,
+//      loaded when a visitor presses "Explore the live map". It hides the
+//      first two once it has drawn.
 // Zones come from data/geo/regions.geojson: each is the loop its named roads
 // close, traced along US Census road lines. The region chips or links beside
 // the map are its list alternative.
 //
-// `zone` zooms both layers to one region and dims the other two: the drawing
-// at build time, the live map when it fits to the zone's bounds.
+// `zone` zooms every layer to one region.
+//
+// `variant="thumb"` is a card header: the zone at 16:9 with a state locator,
+// as one link to the region's page. It has no caption and no live map.
 //
 // `live` (default true) marks the figure for the live map. The loader itself
 // is <LiveMaps /> (LiveMaps.astro), which a page adds once: MapLibre is far
 // past a page's 75 KB JavaScript goal, so a page that shows only the drawing,
-// such as the home page, ships none of it.
+// such as the home page, ships none of it. There, each zone is a link.
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
 import type { RegionId } from "@cs/shared";
 
-import { ZONES, zoneById } from "../../lib/regions/colorado-geo";
-import { coloradoMapSvg, MAP_HEIGHT, MAP_WIDTH } from "../../lib/regions/colorado-map";
+import { ZONES, zoneById, type LonLat } from "../../lib/regions/colorado-geo";
+import { coloradoMapSvg, viewOf } from "../../lib/regions/colorado-map";
+import { inFrame } from "../../lib/regions/colorado-views";
 import { andList } from "../../lib/text";
 
 interface Props {
   /** Unique on the page. */
   id: string;
-  /** Zoom to one region and dim the other two. Omit for the whole state. */
+  /** Zoom to one region. Omit for the whole state. */
   zone?: RegionId;
+  /** "thumb": a 16:9 card header that links to the region's page. Needs `zone`. */
+  variant?: "full" | "thumb";
   /** Accessible name for the map. */
   label?: string;
   /** One short line under the map; empty for none. */
   caption?: string;
   /** Load the live map over the drawing (the page must also render <LiveMaps />). */
   live?: boolean;
+  /** How wide the map draws, for the relief image's `sizes`. */
+  sizes?: string;
 }
 
-const { id, zone, live = true } = Astro.props;
+const { id, zone, variant = "full", sizes } = Astro.props;
+const thumb = variant === "thumb" && Boolean(zone);
+const live = !thumb && (Astro.props.live ?? true);
 const focus = zone ? zoneById(zone).properties : undefined;
 const {
   label = focus
@@ -45,54 +59,168 @@ const {
   caption = focus ? `${focus.name} on the Front Range.` : "Photon Mountain, Fusion Canyon and Space Peak along the Front Range.",
 } = Astro.props;
 const description = focus
-  ? `${focus.name} covers ${andList(focus.cities)}. The other two regions are dimmed.`
+  ? `${focus.name} covers ${andList(focus.cities)}. Its line follows ${andList(focus.roads)}.`
   : ZONES.features.map((z) => `${z.properties.name} covers ${andList(z.properties.cities)}.`).join(" ");
-const svg = coloradoMapSvg({ label, description }, { zone });
+const view = viewOf({ zone, variant });
+const svg = coloradoMapSvg({ label, description }, { zone, variant });
+
+const reliefs = import.meta.glob<{ default: ImageMetadata }>("../../assets/maps/relief-*.jpg", { eager: true });
+const relief = reliefs[`../../assets/maps/relief-${view.id}.jpg`]?.default;
+if (!relief) throw new Error(`site/src/assets/maps/relief-${view.id}.jpg is missing; run node scripts/geo/views.mjs`);
+const ratio = `--map-ratio: ${view.frame.width} / ${view.frame.height}`;
+
+// On the statewide drawing each zone is small, so a 56 px link sits over it.
+// The region links beside the map say the same, so these stay out of the tab
+// order and the accessibility tree.
+const hits = zone
+  ? []
+  : ZONES.features.map((z) => {
+      const ring = z.geometry.coordinates[0]!;
+      const centre: LonLat = [ring.reduce((s, p) => s + p[0], 0) / ring.length, ring.reduce((s, p) => s + p[1], 0) / ring.length];
+      const [x, y] = inFrame(view.frame, centre);
+      return { id: z.id, name: z.properties.name, style: `left: ${(x * 100).toFixed(2)}%; top: ${(y * 100).toFixed(2)}%` };
+    });
 ---
 
-<figure
-  class="colorado-map"
-  id={id}
-  data-colorado-map={live ? "" : undefined}
-  data-zone={zone}
-  style={`--map-ratio: ${MAP_WIDTH} / ${MAP_HEIGHT}`}
->
-  <div class="colorado-map__box">
-    <div class="colorado-map__drawing" set:html={svg} />
-    {live && <div class="colorado-map__live" data-map-canvas data-label={label} />}
-  </div>
-  <p class="colorado-map__desc visually-hidden">{description}</p>
-  <figcaption>
-    {caption && <span>{caption}</span>}
-    <small>
-      Each line follows named roads, from US Census road data. A proposal, not a legal line.{live && " Basemap © OpenMapTiles, data © OpenStreetMap contributors."}
-    </small>
-  </figcaption>
-</figure>
+{
+  thumb ? (
+    <a class="colorado-map colorado-map--thumb" id={id} href={`/regions/${zone}/`} data-zone={zone} style={ratio}>
+      <span class="colorado-map__box">
+        <Image
+          class="colorado-map__relief"
+          src={relief}
+          widths={[384, 768]}
+          sizes={sizes ?? "(max-width: 760px) calc(100vw - 48px), 380px"}
+          format="webp"
+          quality={55}
+          alt=""
+          loading="lazy"
+        />
+        <span class="colorado-map__drawing" set:html={svg} />
+      </span>
+    </a>
+  ) : (
+    <figure class="colorado-map" id={id} data-colorado-map={live ? "" : undefined} data-zone={zone} style={ratio}>
+      <div class="colorado-map__box">
+        <Image
+          class="colorado-map__relief"
+          src={relief}
+          widths={[640, 960, 1280]}
+          sizes={sizes ?? "(max-width: 760px) calc(100vw - 48px), 640px"}
+          format="webp"
+          quality={55}
+          alt=""
+          loading="lazy"
+        />
+        <div class="colorado-map__drawing" set:html={svg} />
+        {hits.map((h) => (
+          <a class="colorado-map__hit" href={`/regions/${h.id}/`} style={h.style} tabindex="-1" aria-hidden="true" title={h.name} />
+        ))}
+        {live && <div class="colorado-map__live" data-map-canvas data-label={label} />}
+        {/* Shown by the loader, and only where the browser can draw the live map. */}
+        {live && (
+          <button type="button" class="colorado-map__open" data-map-open hidden>
+            Explore the live map
+          </button>
+        )}
+      </div>
+      <p class="colorado-map__desc visually-hidden">{description}</p>
+      <figcaption>
+        {caption && <span>{caption}</span>}
+        <small>
+          Each line follows named roads. A proposal, not a legal line. Roads: US Census Bureau. Relief: USGS.{live && " Basemap © OpenMapTiles, data © OpenStreetMap contributors."}
+        </small>
+      </figcaption>
+    </figure>
+  )
+}
 
 <style>
   .colorado-map {
+    display: block;
     margin: 0;
   }
   .colorado-map__box {
+    display: block;
     position: relative;
     aspect-ratio: var(--map-ratio);
     border-radius: var(--r-card);
     overflow: hidden;
-    background: var(--c-surface);
+    /* Mountains west, plains east: a cool-to-warm wash that the relief shades. */
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--c-community) 46%, var(--c-surface)) 0%,
+      color-mix(in oklab, var(--c-community) 14%, var(--c-surface)) 46%,
+      color-mix(in oklab, var(--c-accent) 34%, var(--c-surface)) 100%
+    );
     box-shadow: 0 0 0 var(--line-hair) var(--c-border);
+    isolation: isolate;
   }
+  .colorado-map--thumb .colorado-map__box {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .colorado-map__relief,
   .colorado-map__drawing,
   .colorado-map__live {
     position: absolute;
     inset: 0;
+  }
+  /* The relief is mid grey with lit and shaded slopes: overlaid on the wash, it
+     lightens one side of a ridge and darkens the other, in either theme. */
+  .colorado-map__relief {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: overlay;
+    filter: contrast(1.35) brightness(0.86);
+  }
+  .colorado-map__drawing {
+    display: block;
   }
   .colorado-map__drawing :global(svg) {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .colorado-map.is-live .colorado-map__drawing {
+  /* Until the live map loads, its empty layer must not take the drawing's clicks. */
+  .colorado-map:not(.is-live) .colorado-map__live {
+    pointer-events: none;
+  }
+  .colorado-map__open {
+    position: absolute;
+    top: var(--s-2);
+    right: var(--s-2);
+    min-height: var(--size-tap);
+    padding-inline: var(--s-3);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    background: var(--c-ground);
+    color: var(--c-text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .colorado-map__open:hover {
+    background: var(--c-surface);
+  }
+  .colorado-map__hit {
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    margin: -28px 0 0 -28px;
+    border-radius: 50%;
+  }
+  .colorado-map__hit:hover {
+    box-shadow: 0 0 0 2px var(--c-text);
+  }
+  .colorado-map--thumb:hover .colorado-map__drawing,
+  .colorado-map--thumb:focus-visible .colorado-map__drawing {
+    filter: brightness(1.06) saturate(1.2);
+  }
+  .colorado-map.is-live .colorado-map__drawing,
+  .colorado-map.is-live .colorado-map__relief,
+  .colorado-map.is-live .colorado-map__hit {
     visibility: hidden;
   }
   /* The drawing carries the description until the live map hides it; then this does. */

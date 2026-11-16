@@ -4,11 +4,18 @@
 // optimize it, and shows a placeholder tinted with the region's color until the
 // file lands, so layout does not shift. The region page's hero gets a lantern
 // glow; list cards stay still. Owner: L8; wired by L7 (lane/L7-wiring).
+//
+// A region with a brand clip (keepers.ts REGION_CLIP; brand v4.2.0: Photon
+// Mountain) plays it over its hero painting: muted, looped, loaded only when
+// the painting nears the screen, with a Pause button, and never under
+// prefers-reduced-motion. The painting stays underneath as the image, its alt
+// text and the no-JavaScript view; the clip is aria-hidden, since it is the
+// same picture moving.
 import type { Region } from "@cs/shared";
 
 import { REGION_COLORS } from "../../lib/regions/map";
 import ArtImage from "../art/ArtImage.astro";
-import { regionArtAlt } from "../art/keepers";
+import { REGION_CLIP, regionArtAlt, type RegionArtId } from "../art/keepers";
 
 interface Props {
   region: Region;
@@ -26,6 +33,7 @@ const { region, size = "card", loading, sizes } = Astro.props;
 // an empty one.
 const alt = regionArtAlt(region.id);
 const hero = size === "hero";
+const clip = hero ? REGION_CLIP[region.id as RegionArtId] : undefined;
 
 // `sizes` is the width the art really draws, so a phone picks the smallest
 // file that still covers it. Both sit in .wrap (100vw less two 24 px
@@ -40,20 +48,66 @@ const SIZES = {
   hero: "(max-width: 1227px) calc(100vw - 48px), 1180px",
   card: "(max-width: 615px) calc(100vw - 52px), (max-width: 911px) calc(50vw - 40px), 380px",
 };
+const art = {
+  src: region.art,
+  alt,
+  aspect: hero ? "21 / 9" : "16 / 9",
+  widths: hero ? [640, 960, 1280, 1920] : [400, 640, 800],
+  sizes: sizes ?? SIZES[size],
+  loading: loading ?? (hero ? ("eager" as const) : ("lazy" as const)),
+  motion: hero ? ("glow" as const) : ("none" as const),
+  label: "Illustration in progress",
+  tint: REGION_COLORS[region.id],
+  class: `region-art region-art--${size}`,
+};
 ---
 
-<ArtImage
-  src={region.art}
-  alt={alt}
-  aspect={hero ? "21 / 9" : "16 / 9"}
-  widths={hero ? [640, 960, 1280, 1920] : [400, 640, 800]}
-  sizes={sizes ?? SIZES[size]}
-  loading={loading ?? (hero ? "eager" : "lazy")}
-  motion={hero ? "glow" : "none"}
-  label="Illustration in progress"
-  tint={REGION_COLORS[region.id]}
-  class={`region-art region-art--${size}`}
-/>
+{
+  clip ? (
+    <div class="region-art__media">
+      <ArtImage {...art} />
+      <video class="region-art__clip" data-region-clip muted loop playsinline preload="none" aria-hidden="true">
+        <source src={`/art/brand/${clip}.webm`} type="video/webm" />
+        <source src={`/art/brand/${clip}.mp4`} type="video/mp4" />
+      </video>
+      <button type="button" class="region-art__toggle" data-clip-toggle>
+        Pause
+      </button>
+    </div>
+  ) : (
+    <ArtImage {...art} />
+  )
+}
+
+<script>
+  // Play each clip while its painting is on screen; the button pauses it for good.
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    for (const video of document.querySelectorAll<HTMLVideoElement>("[data-region-clip]")) {
+      const media = video.parentElement!;
+      const toggle = media.querySelector<HTMLButtonElement>("[data-clip-toggle]");
+      let held = false;
+      const play = () =>
+        video
+          .play()
+          .then(() => (media.dataset.playing = "true"))
+          .catch(() => undefined);
+      new IntersectionObserver(
+        ([entry]) => {
+          if (held) return;
+          if (entry?.isIntersecting) void play();
+          else video.pause();
+        },
+        { threshold: 0.25 },
+      ).observe(media);
+      toggle?.addEventListener("click", () => {
+        held = !video.paused;
+        if (held) video.pause();
+        else void play();
+        toggle.textContent = held ? "Play" : "Pause";
+      });
+    }
+  }
+</script>
 
 <style>
   /* ArtImage renders the <figure>. On the region page it gets the card radius
@@ -61,6 +115,42 @@ const SIZES = {
   :global(.art-image.region-art--hero) {
     border-radius: var(--r-card);
     box-shadow: var(--sh-glow);
+  }
+  .region-art__media {
+    position: relative;
+    border-radius: var(--r-card);
+    overflow: hidden;
+  }
+  .region-art__clip {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .region-art__toggle {
+    position: absolute;
+    right: var(--s-2);
+    bottom: var(--s-2);
+    min-height: var(--size-tap);
+    padding-inline: var(--s-3);
+    border: 0;
+    border-radius: var(--r-chisel);
+    background: color-mix(in oklab, var(--c-night) 75%, transparent);
+    color: var(--c-on-night);
+    font: inherit;
+    font-weight: 700;
+    /* Not just see-through: hidden, so Tab never lands on it before the clip shows. */
+    visibility: hidden;
+  }
+  .region-art__media[data-playing] .region-art__clip {
+    opacity: 1;
+  }
+  .region-art__media[data-playing] .region-art__toggle {
+    visibility: visible;
   }
   /* 21:9 shows the scene 327 by 140 px on a phone, a strip that loses its
      detail. 16:9 keeps it readable (#251). */

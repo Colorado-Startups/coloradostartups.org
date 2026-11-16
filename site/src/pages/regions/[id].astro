@@ -19,6 +19,7 @@ import RegionArt from "../../components/regions/RegionArt.astro";
 import RegionChip from "../../components/regions/RegionChip.astro";
 import RegionHonorees from "../../components/regions/RegionHonorees.astro";
 import RegionResources from "../../components/regions/RegionResources.astro";
+import RegionSize from "../../components/regions/RegionSize.astro";
 import { regionTiles } from "../../components/regions/region-tiles";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
@@ -100,6 +101,8 @@ const others = regions.filter((r) => r.id !== region.id);
             </>
           )
         }
+        <h3>Size</h3>
+        <RegionSize region={region.id} />
       </div>
     </div>
   </section>
