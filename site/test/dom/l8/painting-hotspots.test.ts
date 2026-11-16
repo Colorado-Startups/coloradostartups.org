@@ -65,6 +65,17 @@ describe.each(REGION_IDS)("%s painting hotspots", (id) => {
       .join("\n");
     expect(js).toContain("cardOpen");
     expect(js).toContain(":popover-open");
+    // Without Popover that selector throws, so the script asks first
+    // (e2e/region-clip-hold.spec.ts runs a page with Popover removed).
+    expect(js).toContain("selector(:popover-open)");
+    // While a card holds the clip, Pause keeps its label but rests,
+    // described by a hidden note (e2e/region-clip-hold.spec.ts runs it).
+    expect(js).toContain("aria-disabled");
+    const note = media.querySelector<HTMLElement>("[data-clip-note]");
+    expect(note?.id).toBe(`${id}-clip-note`);
+    expect(note?.hasAttribute("hidden")).toBe(true);
+    expect(text(note)).toBe("The clip is paused while a card is open.");
+    expect(media.querySelector("button[data-clip-toggle]")?.hasAttribute("aria-disabled")).toBe(false);
     const css = pageCss(html);
     expect(declFor(css, ".region-art__media[data-card-open] .region-art__clip", "opacity")).toBe("0");
     // The minifier writes ::after as :after.

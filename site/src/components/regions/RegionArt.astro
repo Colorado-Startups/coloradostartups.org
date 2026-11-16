@@ -123,6 +123,11 @@ const art = {
             Pause
           </button>
         )}
+        {clip && spots.length > 0 && (
+          <span id={`${region.id}-clip-note`} hidden data-clip-note>
+            The clip is paused while a card is open.
+          </span>
+        )}
       </div>
       {spots.map((h) => (
         <div id={h.id} popover class="hotspot-card" data-hotspot-card={h.kind}>
@@ -184,8 +189,12 @@ const art = {
 
 <script>
   // Without the Popover API the hotspots are hidden (CSS below), so open the
-  // list of the same links under each painting instead.
-  if (!Object.hasOwn(HTMLElement.prototype, "popover")) {
+  // list of the same links under each painting instead. Without it the
+  // :popover-open selector throws a SyntaxError, so the clip code below
+  // reads it only when popoverOk, and treats every card as closed otherwise.
+  const popoverOk =
+    Object.hasOwn(HTMLElement.prototype, "popover") && typeof CSS !== "undefined" && CSS.supports("selector(:popover-open)");
+  if (!popoverOk) {
     for (const list of document.querySelectorAll<HTMLDetailsElement>("[data-painting-links]")) list.open = true;
   }
 
@@ -195,6 +204,15 @@ const art = {
   // carries data-card-open, the clip pauses, and the CSS shows the still
   // under it, so the card points at the exact feature it names. When the last
   // card closes the clip plays again, unless the visitor paused it.
+  //
+  // The Pause button names only the visitor's own choice: "Pause" until they
+  // press it, "Play" after. A card's hold is not their choice, so the label
+  // stays, but while it lasts the button is aria-disabled, described by the
+  // note "The clip is paused while a card is open", and a press changes
+  // nothing. So no press starts the clip under an open card, and when the
+  // last card closes the button says again what the clip is doing. A mouse
+  // press on Pause closes the open card first (light dismiss), so that press
+  // ends the hold and counts as the visitor's own Pause.
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     for (const video of document.querySelectorAll<HTMLVideoElement>("[data-region-clip]")) {
       const media = video.parentElement!;
@@ -202,11 +220,25 @@ const art = {
       const cards = [...(media.parentElement?.querySelectorAll<HTMLElement>("[data-hotspot-card]") ?? [])];
       let held = false;
       let onScreen = false;
-      const open = new Set<HTMLElement>();
+      // Read from the page, not kept in a set: when one card replaces another,
+      // the new one is open before the old one's toggle event runs, so the clip
+      // never starts between them.
+      const anyOpen = () => popoverOk && cards.some((card) => card.matches(":popover-open"));
+      const note = media.querySelector<HTMLElement>("[data-clip-note]");
       const sync = () => {
-        if (open.size > 0) media.dataset.cardOpen = "";
+        const holding = anyOpen();
+        if (holding) media.dataset.cardOpen = "";
         else delete media.dataset.cardOpen;
-        if (held || !onScreen || open.size > 0) {
+        if (toggle) {
+          if (holding) {
+            toggle.setAttribute("aria-disabled", "true");
+            if (note) toggle.setAttribute("aria-describedby", note.id);
+          } else {
+            toggle.removeAttribute("aria-disabled");
+            toggle.removeAttribute("aria-describedby");
+          }
+        }
+        if (held || !onScreen || holding) {
           video.pause();
           return;
         }
@@ -222,14 +254,9 @@ const art = {
         },
         { threshold: 0.25 },
       ).observe(media);
-      for (const card of cards) {
-        card.addEventListener("toggle", () => {
-          if (card.matches(":popover-open")) open.add(card);
-          else open.delete(card);
-          sync();
-        });
-      }
+      for (const card of cards) card.addEventListener("toggle", sync);
       toggle?.addEventListener("click", () => {
+        if (anyOpen()) return;
         held = !held;
         toggle.textContent = held ? "Play" : "Pause";
         sync();
@@ -286,6 +313,11 @@ const art = {
   }
   .region-art__media[data-playing] .region-art__toggle {
     visibility: visible;
+  }
+  /* A card holds the clip: the button stays in reach but reads as resting. */
+  .region-art__toggle[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.55;
   }
   /* 21:9 shows the scene 327 by 140 px on a phone, a strip that loses its
      detail. 16:9 keeps it readable (#251). A media query cannot read CSS
