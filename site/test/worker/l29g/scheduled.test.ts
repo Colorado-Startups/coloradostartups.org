@@ -1,4 +1,4 @@
-// L29g: the Worker's weekly scheduled() handler runs all six retention jobs,
+// L29g: the Worker's weekly scheduled() handler runs all seven retention jobs,
 // each logs a count only, and one failing job never stops the others.
 // Real D1 with every migration applied; a failure is simulated by a DB wrapper
 // that refuses statements for one table. Fixtures use example.org only.
@@ -116,6 +116,19 @@ const JOBS: Job[] = [
     done: async () => (await count("SELECT COUNT(*) AS n FROM founders_waitlist WHERE first_name = 'Old'")) === 0,
     kept: async () => (await count("SELECT COUNT(*) AS n FROM founders_waitlist WHERE first_name = 'Recent'")) === 1,
   },
+  {
+    name: "spotlight_requests purge",
+    table: "spotlight_requests",
+    log: /^spotlight_requests purge: \d+ deleted$/,
+    seed: () =>
+      env.DB.prepare(
+        "INSERT INTO spotlight_requests (created_at, first_name, last_name, email, role, company, company_website, city, building, founder, consent_show, consent_at, consent_version) VALUES (?1, 'Old', 'Founder', 'sweep@example.org', 'Cofounder', 'Old Example Co', 'https://example.org/', 'Salida', 'A line', 1, 1, ?1, '2026-11-16'), (?2, 'Recent', 'Founder', 'sweep@example.org', 'Cofounder', 'Recent Example Co', 'https://example.org/', 'Salida', 'A line', 1, 1, ?2, '2026-11-16')",
+      )
+        .bind(OLD, RECENT)
+        .run(),
+    done: async () => (await count("SELECT COUNT(*) AS n FROM spotlight_requests WHERE first_name = 'Old'")) === 0,
+    kept: async () => (await count("SELECT COUNT(*) AS n FROM spotlight_requests WHERE first_name = 'Recent'")) === 1,
+  },
 ];
 
 /** env.DB, except that any statement naming `table` throws, the way a D1 outage would. */
@@ -148,6 +161,7 @@ describe("the weekly scheduled() handler", () => {
       "csp_reports",
       "slack_join_requests",
       "founders_waitlist",
+      "spotlight_requests",
     ]) {
       await env.DB.prepare(`DELETE FROM ${table}`).run();
     }
@@ -158,7 +172,7 @@ describe("the weekly scheduled() handler", () => {
     vi.restoreAllMocks();
   });
 
-  it("runs all six jobs: each clears its old rows and keeps its recent ones", async () => {
+  it("runs all seven jobs: each clears its old rows and keeps its recent ones", async () => {
     await runScheduled();
     for (const job of JOBS) {
       expect(await job.done(), `${job.name} cleared old rows`).toBe(true);

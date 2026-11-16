@@ -13,6 +13,7 @@ const FORMS = {
   "leaderboard/nominate/index.html": "/api/nominate",
   "join/slack/index.html": "/api/join",
   "founders/index.html": "/api/waitlist",
+  "get-featured/index.html": "/api/spotlight",
 };
 
 // CI builds without PUBLIC_TURNSTILE_SITE_KEY. Then SuggestForm shows a note
