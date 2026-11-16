@@ -42,6 +42,8 @@ const REQUIRED = [
   "space-peak",
   "fusion-canyon",
   "team",
+  // /agents/ (step A6a): titled "AI agents", on the Communitas portrait.
+  "agents",
   "get-involved",
   "founders",
   "dispatches",
