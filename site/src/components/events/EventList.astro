@@ -1,0 +1,415 @@
+---
+// Every upcoming event on /event-calendar/ as a native list, grouped by day
+// in Mountain Time, from the same snapshot as the next-events cards
+// (events.ts). Chips filter it by region, this week, and in person or online
+// without a page load (list-filter.ts), and the choice lives in the URL. A
+// chip group shows only when the data has more than one choice for it.
+// Without JavaScript the chips stay hidden and the whole list stands as built.
+// Owner: L2a.
+import { regionForCity, REGIONS } from "../../lib/regions/match";
+import { REGION_COLORS } from "../../lib/regions/map";
+import { cardPlace, type CalendarEvent, dateParts, endsAt, startsAt, whenText } from "./events";
+import { denverDay } from "./list-filter";
+
+interface Props {
+  events: CalendarEvent[];
+}
+
+const { events } = Astro.props;
+
+const STATE = /^[A-Z]{2}(?:\s+\d{5}(?:-\d{4})?)?$/;
+
+/** The city in a location ("ID345, 3960 High St, Denver, CO 80205, USA" is Denver), or null. */
+function cityOf(location: string): string | null {
+  const parts = location
+    .replace(/,\s*(?:USA|United States)$/i, "")
+    .split(",")
+    .map((p) => p.trim());
+  const state = parts.findIndex((p) => STATE.test(p));
+  return state >= 1 ? parts[state - 1]! : null;
+}
+
+/** The event's region id, "elsewhere" for another Colorado place, or "" when it is online or has no place. */
+function regionOf(e: CalendarEvent): string {
+  if (!e.inPerson || !e.location) return "";
+  const city = cityOf(e.location);
+  return city ? regionForCity(city) : "elsewhere";
+}
+
+const ELSEWHERE_LABEL = "Elsewhere in Colorado";
+const regionName = (id: string) => REGIONS.find((r) => r.id === id)?.name ?? ELSEWHERE_LABEL;
+
+const rows = events.map((e) => ({
+  event: e,
+  day: denverDay(startsAt(e)),
+  region: regionOf(e),
+  type: e.inPerson ? "in-person" : "online",
+}));
+
+// One group per Mountain Time start day, in the order the events come (soonest first).
+const days: { day: string; rows: typeof rows }[] = [];
+for (const row of rows) {
+  const last = days.at(-1);
+  if (last?.day === row.day) last.rows.push(row);
+  else days.push({ day: row.day, rows: [row] });
+}
+
+const present = new Set(rows.map((r) => r.region));
+const regionChoices = [
+  ...REGIONS.filter((r) => present.has(r.id)).map((r) => ({ value: r.id, label: r.name, hint: r.cities.join(", ") })),
+  ...(present.has("elsewhere") ? [{ value: "elsewhere", label: ELSEWHERE_LABEL, hint: "" }] : []),
+];
+const types = new Set(rows.map((r) => r.type));
+const showRegions = regionChoices.length > 1;
+const showTypes = types.size > 1;
+---
+
+<div class="evlist" data-event-list>
+  <h2 id="all-events">Every upcoming event</h2>
+  {
+    rows.length > 0 && (
+      <form class="evlist__filters" aria-label="Filter the events" data-list-filters>
+        {showRegions && (
+          <fieldset class="evlist__chips">
+            <legend>Region</legend>
+            <div class="evlist__row">
+              <label class="pick">
+                <input type="radio" name="region" value="" checked />
+                <span>Every region</span>
+              </label>
+              {regionChoices.map((c) => (
+                <label class="pick">
+                  <input type="radio" name="region" value={c.value} />
+                  {c.value !== "elsewhere" && (
+                    <span class="swatch" style={`--swatch: ${REGION_COLORS[c.value as keyof typeof REGION_COLORS]}`} aria-hidden="true" />
+                  )}
+                  <span>
+                    {c.label}
+                    {c.hint && <span class="pick__hint">{c.hint}</span>}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
+        <fieldset class="evlist__chips">
+          <legend>When</legend>
+          <div class="evlist__row">
+            <label class="pick">
+              <input type="radio" name="when" value="" checked />
+              <span>Any day</span>
+            </label>
+            <label class="pick">
+              <input type="radio" name="when" value="week" />
+              <span>This week</span>
+            </label>
+          </div>
+        </fieldset>
+        {showTypes && (
+          <fieldset class="evlist__chips">
+            <legend>Format</legend>
+            <div class="evlist__row">
+              <label class="pick">
+                <input type="radio" name="type" value="" checked />
+                <span>Any format</span>
+              </label>
+              <label class="pick">
+                <input type="radio" name="type" value="in-person" />
+                <span>In person</span>
+              </label>
+              <label class="pick">
+                <input type="radio" name="type" value="online" />
+                <span>Online</span>
+              </label>
+            </div>
+          </fieldset>
+        )}
+      </form>
+    )
+  }
+  <noscript>
+    <style is:inline>
+      [data-list-filters] {
+        display: none !important;
+      }
+    </style>
+  </noscript>
+  <p class="meta evlist__count" role="status" aria-live="polite" data-list-count>
+    {rows.length > 0 ? `Showing all ${rows.length} upcoming ${rows.length === 1 ? "event" : "events"}.` : ""}
+  </p>
+
+  {
+    days.length > 0 && (
+      <ol class="evlist__days" role="list">
+        {days.map(({ day, rows: dayRows }) => {
+          const date = dateParts(dayRows[0]!.event);
+          return (
+            <li class="day" data-day-group>
+              <h3 class="day__date">
+                <time datetime={day}>
+                  <span class="day__weekday">{date.weekday}</span>{" "}
+                  <span class="day__num">{date.day}</span>{" "}
+                  <span class="day__month">{date.month}</span>
+                </time>
+              </h3>
+              <ol class="day__events" role="list">
+                {dayRows.map(({ event, day: startDay, region, type }) => (
+                  <li
+                    class="ev"
+                    data-ends={new Date(endsAt(event)).toISOString()}
+                    data-day={startDay}
+                    data-region={region}
+                    data-type={type}
+                  >
+                    <p class="ev__time">{whenText(event).time}</p>
+                    <div class="ev__body">
+                      <h4 class="ev__title">
+                        {event.url ? (
+                          <a href={event.url} rel="nofollow noopener">
+                            {event.title}
+                          </a>
+                        ) : (
+                          event.title
+                        )}
+                      </h4>
+                      <p class="ev__where">
+                        {event.location && <span class="ev__place">{cardPlace(event.location)}</span>}
+                        {region ? (
+                          <span class="ev__tag">
+                            {region !== "elsewhere" && (
+                              <span
+                                class="swatch"
+                                style={`--swatch: ${REGION_COLORS[region as keyof typeof REGION_COLORS]}`}
+                                aria-hidden="true"
+                              />
+                            )}
+                            {regionName(region)}
+                          </span>
+                        ) : (
+                          type === "online" && <span class="ev__tag">Online</span>
+                        )}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </li>
+          );
+        })}
+      </ol>
+    )
+  }
+  <p data-events-empty hidden={rows.length > 0}>No events are listed right now. The full calendar below has them all.</p>
+  <p data-list-none hidden>
+    No events match these filters. <button type="button" class="btn btn--stone" data-list-clear>Show every event</button>
+  </p>
+  <p class="meta">Times are Mountain Time. Check each host's page before you go.</p>
+</div>
+
+<script>
+  import { initEventList } from "./list-filter";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-event-list]")) initEventList(root);
+</script>
+
+<style>
+  .evlist {
+    margin-block: var(--s-7);
+  }
+  .evlist__filters {
+    display: grid;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
+  }
+  .evlist__filters[hidden] {
+    display: none;
+  }
+  .evlist__chips {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .evlist__chips legend {
+    padding: 0;
+    margin-bottom: var(--s-2);
+    font-weight: 700;
+  }
+  /* The chips wrap on a wide screen and scroll sideways in one row on a phone,
+     so the list starts in the first screen. */
+  .evlist__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  @media (max-width: 40rem) {
+    .evlist__row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: var(--s-2);
+      scrollbar-width: thin;
+    }
+  }
+  /* Each chip is a label over its own radio, the CanvasFilters way: arrow keys
+     move through a group and a choice filters at once. */
+  .pick {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--size-tap);
+    padding: var(--s-1) var(--s-3);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-bevel);
+    background: var(--c-ground);
+    color: var(--c-text);
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .pick input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .pick:has(input:focus-visible) {
+    outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+    outline-offset: var(--line-edge);
+  }
+  .pick:has(input:checked) {
+    border-color: var(--c-text);
+    background: var(--c-text);
+    color: var(--c-ground);
+  }
+  .pick__hint {
+    display: block;
+    font-size: var(--t-step--1);
+    font-weight: 400;
+  }
+  .swatch {
+    flex: none;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--swatch);
+    box-shadow: 0 0 0 var(--line-hair) var(--c-ground);
+  }
+
+  .evlist__count {
+    margin-bottom: var(--s-4);
+  }
+
+  /* An agenda: each day's date sits in a left column and stays in view while
+     its events scroll past; the events are rows beside it. */
+  .evlist__days,
+  .day__events {
+    list-style: none;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  .day {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: var(--s-4);
+    padding-block: var(--s-4);
+    border-top: var(--line-hair) solid var(--c-border);
+  }
+  /* display: grid would beat the hidden attribute's own rule. */
+  .day[hidden],
+  .ev[hidden] {
+    display: none;
+  }
+  .day__date {
+    align-self: start;
+    position: sticky;
+    top: var(--s-4);
+    margin: 0;
+  }
+  .day__date time {
+    display: grid;
+    justify-items: center;
+    padding: var(--s-2) var(--s-1);
+    border-radius: var(--r-chisel);
+    background: var(--c-surface);
+    border-top: var(--line-bold) solid var(--c-accent);
+    line-height: 1.1;
+  }
+  .day__weekday,
+  .day__month {
+    font-size: var(--t-step--1);
+    font-weight: 700;
+    color: var(--c-text-dim);
+  }
+  .day__num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-step-3);
+    color: var(--c-text);
+  }
+  .ev {
+    display: grid;
+    grid-template-columns: 11.5rem minmax(0, 1fr);
+    gap: var(--s-1) var(--s-4);
+    padding-block: var(--s-2);
+  }
+  .ev + .ev {
+    border-top: var(--line-hair) dashed var(--c-border);
+  }
+  .ev p {
+    margin: 0;
+  }
+  .ev__time {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .ev__body {
+    display: grid;
+    gap: var(--s-1);
+    min-width: 0;
+  }
+  .ev__title {
+    margin: 0;
+    font-size: var(--t-step-0);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .ev__where {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-1) var(--s-3);
+    font-size: var(--t-step--1);
+    color: var(--c-text-dim);
+  }
+  .ev__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    font-weight: 700;
+  }
+  /* On a phone the time sits over the title. */
+  @media (max-width: 40rem) {
+    .day {
+      grid-template-columns: 3.75rem minmax(0, 1fr);
+      gap: var(--s-3);
+    }
+    .ev {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  [data-list-none] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+  }
+  [data-list-none][hidden] {
+    display: none;
+  }
+</style>
