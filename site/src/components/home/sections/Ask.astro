@@ -1,0 +1,78 @@
+---
+// Ask: a search box that opens /ask/ with the words, and the /mcp address.
+import Button from "../../ui/Button.astro";
+
+const mcpUrl = new URL("/mcp", Astro.site!).toString();
+---
+
+<section class="section section--night" aria-labelledby="ask">
+  <div class="wrap ask">
+    <div class="stack">
+      <h2 id="ask">Ask</h2>
+      <form class="ask__form" action="/ask/" method="get" role="search">
+        <label for="home-q">Search resources, companies, guides and events</label>
+        <div class="ask__row">
+          <input id="home-q" name="q" type="search" autocomplete="off" />
+          <Button type="submit">Search</Button>
+        </div>
+      </form>
+      <p class="meta">Or <a href="/ask/">ask Resourcus</a>, an AI agent.</p>
+    </div>
+    <div class="stack connect">
+      <h3>Connect your AI</h3>
+      <p>Claude and OpenCode, free, no key.</p>
+      <code>{mcpUrl}</code>
+      <a class="tap-target" href="/ask/#connect">How to connect</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ask {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-7);
+    align-items: start;
+  }
+  .ask h2,
+  .ask h3 {
+    color: var(--c-on-night);
+  }
+  .ask__form label {
+    display: block;
+    margin-bottom: var(--s-2);
+    color: var(--c-on-night-dim);
+  }
+  .ask__row {
+    display: flex;
+    gap: var(--s-2);
+  }
+  .ask__row input {
+    flex: 1;
+    min-width: 0;
+    min-height: var(--size-control);
+    padding-inline: var(--s-3);
+    border: var(--line-edge) solid var(--c-border);
+    border-radius: var(--r-chisel);
+    background: var(--c-night-ceiling);
+    color: var(--c-on-night);
+    font: inherit;
+  }
+  .ask .meta {
+    color: var(--c-on-night-dim);
+  }
+  .connect code {
+    display: block;
+    overflow-wrap: anywhere;
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-chisel);
+    background: var(--c-night-ceiling);
+    color: var(--c-gold-on-night);
+  }
+
+  @media (max-width: 760px) {
+    .ask {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

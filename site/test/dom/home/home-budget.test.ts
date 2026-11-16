@@ -1,0 +1,96 @@
+// Step H0 over the built site (run `npm run build` first; test:content does):
+// the home page's budget. Home is split into sections (components/home/
+// sections/), five of them empty slots that later steps fill; these checks
+// hold the page to its limits while they do. At most 300 visible words, no
+// member count, a source line under every figure, and 75 KB of gzipped
+// JavaScript or less up front (PLAN.md, Gates).
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { gzipSync } from "node:zlib";
+
+import { describe, expect, it } from "vitest";
+
+import { DIST_DIR, readDist } from "../pages";
+
+const home = new DOMParser().parseFromString(readDist("index.html"), "text/html");
+const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
+
+// Words a reader sees in <main>. Not counted: scripts, styles, hidden and
+// visually hidden text, and the maps' SVG labels (city and road names on a
+// drawing, not copy).
+const UNSEEN = "script, style, template, noscript, svg, [hidden], [aria-hidden='true'], .visually-hidden";
+function visibleWords(root: Element): string[] {
+  const copy = root.cloneNode(true) as Element;
+  for (const el of copy.querySelectorAll(UNSEEN)) el.remove();
+  return text(copy).match(/[\p{L}\p{N}][\p{L}\p{N}'’.,:/-]*/gu) ?? [];
+}
+
+describe("home budget", () => {
+  const main = home.querySelector("main")!;
+
+  it("has at most 300 visible words", () => {
+    const words = visibleWords(main);
+    console.info(`index.html: ${words.length} visible words in <main>`);
+    expect(words.length).toBeGreaterThan(0);
+    expect(words.length).toBeLessThanOrEqual(300);
+  });
+
+  it("states no member count", () => {
+    const body = text(home.body);
+    expect(body).not.toMatch(/\b\d[\d,.]*\s*[kK+]?\+?\s+(?:members|founders|people|builders|startups in (?:the|our) (?:Slack|community))\b/);
+    expect(body).not.toMatch(/\bmember count\b/i);
+  });
+
+  it("gives every figure a source line", () => {
+    const stats = [...main.querySelectorAll(".stat")];
+    expect(stats.length, "the Why Colorado figures").toBeGreaterThan(0);
+    for (const s of stats) expect(text(s.querySelector(".stat__source")).length, text(s)).toBeGreaterThan(0);
+  });
+
+  it("keeps the bands in the order they had before the split into sections", () => {
+    const outline = [...main.querySelectorAll("h1, h2")].map((h) => `${h.tagName} ${text(h)}`);
+    expect(outline).toEqual(["H1 Colorado Startups", "H2 Three regions along the Front Range", "H2 Why Colorado", "H2 Explore", "H2 Ask"]);
+    expect(main.lastElementChild?.matches("section.keepers"), "the keepers last").toBe(true);
+  });
+});
+
+// The up-front JavaScript walk, copied from site/test/dom/l8/regions.test.ts
+// (importing a test file would run its tests here too): a page's entry
+// scripts and every file they import statically. What it may load later by
+// import() is measured and logged, not budgeted.
+const local = (from: string, spec: string) =>
+  spec.startsWith("/") ? path.join(DIST_DIR, spec.replace(/^\//, "")) : path.resolve(path.dirname(from), spec);
+const STATIC_IMPORT = /\b(?:import|export)\s*(?:[^"'()]*?\bfrom\s*)?["']((?:\.{1,2}\/|\/)[^"']+\.m?js)["']/g;
+const DYNAMIC_IMPORT = /\bimport\(\s*[`"']((?:\.{1,2}\/|\/)[^`"']+\.m?js)[`"']\s*\)/g;
+
+function jsOf(page: Document): { upFront: Set<string>; lazy: Set<string> } {
+  const upFront = new Set<string>();
+  const lazy = new Set<string>();
+  const queue: string[] = [];
+  for (const s of page.querySelectorAll("script")) {
+    const src = s.getAttribute("src");
+    if (src?.startsWith("/")) queue.push(path.join(DIST_DIR, src.replace(/^\//, "")));
+    else if (!src) for (const m of (s.textContent ?? "").matchAll(STATIC_IMPORT)) queue.push(local(path.join(DIST_DIR, "x.js"), m[1]!));
+  }
+  while (queue.length) {
+    const file = queue.pop()!;
+    if (upFront.has(file) || !existsSync(file)) continue;
+    upFront.add(file);
+    const source = readFileSync(file, "utf8");
+    for (const m of source.matchAll(STATIC_IMPORT)) queue.push(local(file, m[1]!));
+    for (const m of source.matchAll(DYNAMIC_IMPORT)) lazy.add(local(file, m[1]!));
+  }
+  for (const f of upFront) lazy.delete(f);
+  return { upFront, lazy };
+}
+const gz = (files: Iterable<string>) => [...files].filter(existsSync).reduce((n, f) => n + gzipSync(readFileSync(f)).length, 0);
+
+describe("home JS budget", () => {
+  it("ships 75 KB of gzipped JavaScript or less up front, with no MapLibre", () => {
+    const { upFront, lazy } = jsOf(home);
+    const kb = (n: number) => `${(n / 1024).toFixed(1)} KB`;
+    console.info(`index.html: up front ${kb(gz(upFront))} gzipped, on demand ${kb(gz(lazy))} gzipped`);
+    expect(gz(upFront)).toBeLessThanOrEqual(75 * 1024);
+    expect([...upFront].some((f) => /maplibre/i.test(path.basename(f))), "MapLibre in the up-front JavaScript").toBe(false);
+  });
+});
