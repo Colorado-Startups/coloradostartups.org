@@ -15,7 +15,7 @@
     "needs": "none",
     "chart": "number",
     "params": {
-      "comment": "The Engagement tab's collector is quality/collectors/engagement/engagement.mjs. origin is the live site it reads; sitemap and max_pages bound the pages a names read fetches. Each entry's params.measure says what to read: the read kinds are listed at the top of the collector. Goals come from the engagement plan's metrics table (approved 2026-11-15); its now column was read 2026-11-15.",
+      "comment": "The Engagement tab's collector is quality/collectors/engagement/engagement.mjs. origin is the live site it reads. sitemap, which a names read over every page needs, and max_pages bound the pages it fetches. Each entry's params.measure says what to read: the read kinds are listed at the top of the collector. Goals come from the engagement plan's metrics table (approved 2026-11-15); its now column was read 2026-11-15.",
       "origin": "https://coloradostartups.org",
       "sitemap": "/sitemap-index.xml",
       "max_pages": 200,
@@ -78,7 +78,7 @@
     "near": 11,
     "direction": "higher",
     "goal_source": "engagement plan goal, approved 2026-11-15 (step M1c: every named event); 11 is near, since step_done waits for First steps",
-    "source": "state: the names in packages/shared/src/events.ts, each wired when a page in the live sitemap marks it or a file under site/src sends it with track()",
+    "source": "state: the names in packages/shared/src/events.ts, each wired when a page in the live sitemap marks it or a .ts or .astro file under site/src sends it with track(), comments left out",
     "needs": "none",
     "chart": "table",
     "params": {
@@ -87,7 +87,7 @@
         "list": { "file": "packages/shared/src/events.ts", "pattern": "^  ([a-z_]+): \\[" },
         "pages": "sitemap",
         "marks": ["data-track", "data-submit-event"],
-        "calls": { "paths": ["site/src"], "pattern": "\\btrack\\(\\s*[\"']([a-z_]+)[\"']" }
+        "calls": { "paths": ["site/src"], "ext": [".ts", ".astro"], "pattern": "\\btrack\\(\\s*[\"']([a-z_]+)[\"']" }
       }
     }
   },
@@ -138,7 +138,7 @@
     "kind": "quality",
     "group": "AI and MCP",
     "label": "Registries listing /mcp",
-    "means": "Directories where an AI app can find the site's MCP server; more means more people find it.",
+    "means": "Directories listing the site's MCP server: server.json in the repo plus a dated manual flag, not a confirmed listing.",
     "unit": "registries",
     "goal": 2,
     "near": 1,
@@ -253,7 +253,7 @@
     "near": 3,
     "direction": "higher",
     "goal_source": "engagement plan goal, approved 2026-11-15 (step B4: 5 place paintings v2); near band: this repo's choice",
-    "source": "state: the places in data/brand/brand.json, the release brand.lock.json pins, whose builders field is true",
+    "source": "state: the places in data/brand/brand.json, the release brand.lock.json pins, whose builders field is true; not measured while no place carries the field",
     "needs": "none",
     "chart": "table",
     "params": {
@@ -266,20 +266,20 @@
     "kind": "quality",
     "group": "Art and motion",
     "label": "Rive animations",
-    "means": "Rive files the site's code and brand pin name; each is a keeper or the hero that moves.",
+    "means": "Rive files the site's code names; each is a keeper or the hero that moves.",
     "unit": "files",
     "goal": 4,
     "near": 3,
     "direction": "higher",
     "goal_source": "engagement plan goal, approved 2026-11-15 (steps W4a and W7: 3 keepers and the hero); near band: this repo's choice",
-    "source": "state: distinct .riv file names in the text files under site/src, site/public and brand.lock.json",
+    "source": "state: distinct .riv file names in the .ts and .astro files under site/src, comments left out",
     "needs": "none",
     "chart": "table",
     "params": {
       "measure": {
         "read": "source",
-        "paths": ["site/src", "site/public", "brand.lock.json"],
-        "ext": [".astro", ".ts", ".mjs", ".js", ".json", ".css", ".html"],
+        "paths": ["site/src"],
+        "ext": [".ts", ".astro"],
         "pattern": "([\\w./-]+\\.riv)\\b"
       }
     }
@@ -340,7 +340,7 @@
     "near": 16,
     "direction": "lower",
     "goal_source": "engagement plan goal, approved 2026-11-15 (step L1b: 12 picks, down from 24 rows); near band: this repo's choice",
-    "source": "state: the live /ecosystem-canvas/ page, elements carrying data-pick or data-resource, outside any hidden element or template",
+    "source": "state: the live /ecosystem-canvas/ page, elements carrying data-pick or data-resource, outside any hidden element or template; a page with no data-pick is not measured",
     "needs": "none",
     "chart": "bar",
     "params": {
@@ -349,6 +349,7 @@
         "page": "/ecosystem-canvas/",
         "marks": ["data-pick", "data-resource"],
         "visible": true,
+        "min": { "data-pick": 1 },
         "labels": { "data-pick": "picks", "data-resource": "rows of the full list" }
       }
     }

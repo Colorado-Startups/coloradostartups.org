@@ -3,17 +3,20 @@
 // Crafter quality/collectors/README.md.
 //
 // Nothing here names a repo, a path or a page. Each metric's targets entry
-// says what to read in params.measure, and params.origin names the site:
+// says what to read in params.measure. params.origin names the site, and
+// params.sitemap its sitemap, for a names read over every page:
 //
 //   read: "marks"     one page; elements carrying any of `marks` ("data-x" or
 //                     "data-x=value"), only those a visitor sees before a click
-//                     with `visible`, each value once with `distinct`
+//                     with `visible`, each value once with `distinct`. `min`
+//                     ({ mark: least count }) reads not measured when a mark the
+//                     count leans on is missing, so a changed page is no pass
 //   read: "pages"     each of `pages`; how many carry every one of `marks`
 //   read: "names"     the names `list.pattern` finds in `list.file`; how many a
 //                     page marks (`marks`, on `pages` or every page in the
-//                     sitemap) or a source file sends (`calls.pattern` in
-//                     `calls.paths`)
-//   read: "source"    distinct matches of `pattern` in the text files under `paths`
+//                     sitemap) or a source file sends (`calls.pattern` in the
+//                     `calls.ext` files under `calls.paths`)
+//   read: "source"    distinct matches of `pattern` in the `ext` files under `paths`
 //   read: "records"   a JSON or YAML file's records (at `path`): a count, those
 //                     with a true `where` field, or with `share` the percent
 //                     that have any of `has_any`
@@ -24,6 +27,11 @@
 //   read: "redirect"  steps on other sites between `path` and a host in
 //                     `done_hosts`, following the live redirects
 //   read: "outside"   a service this run cannot read: not measured, `reason`
+//
+// Source reads leave out comments in code files, so a commented-out call or a
+// note never counts. A page is fetched with its redirects followed only while
+// they stay on the site, and once more after a short wait when the first try
+// meets a network error or a 5xx.
 //
 // Every read resolves to a value or to could_not_check with its reason. A page
 // that does not answer, a file that is missing or a pattern that finds no
@@ -44,8 +52,16 @@ const UA = "quality-collector (Engagement tab)";
 const TIMEOUT_MS = 30_000;
 const MAX_HOPS = 5;
 const AT_ONCE = 4;
+// The wait before the one retry of a page after a network error or a 5xx.
+const RETRY_MS = 500;
+// The source label of a reading that never reached its own read.
+const OWN = "engagement collector";
 const TEXT_EXT = [".astro", ".ts", ".mts", ".mjs", ".js", ".json", ".css", ".html", ".md", ".yaml", ".yml"];
+// Files whose comments a source read leaves out: // and /* */, and <!-- --> in .astro.
+const CODE_EXT = new Set([".astro", ".ts", ".mts", ".mjs", ".js"]);
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", ".astro", ".wrangler"]);
+// Sitemap paths never fetched: an /api/ route can act on a GET.
+const SITEMAP_SKIP = ["/api/"];
 
 const firstLine = (e) => String(e?.message ?? e).split("\n")[0].slice(0, 300);
 
@@ -55,8 +71,11 @@ const unread = (reason, source) => ({ could_not_check: reason, source });
 
 // ---------- the site ----------
 
+const pause = (ms) => new Promise((done) => setTimeout(done, ms));
+
 // The site params.origin names, with one fetch per page for the whole run.
-function siteFor(params, fetchImpl) {
+// Every GET sets redirect "manual", so no request ever goes to another host.
+function siteFor(params, fetchImpl, retryMs) {
   let origin = null;
   try {
     origin = new URL(params.origin).origin;
@@ -65,19 +84,41 @@ function siteFor(params, fetchImpl) {
   }
   const pages = new Map();
   const ua = params.user_agent || UA;
-  const get = (url, redirect) =>
-    fetchImpl(url, { redirect, headers: { "user-agent": ua, accept: "text/html,application/xml;q=0.9,*/*;q=0.8" }, signal: AbortSignal.timeout(TIMEOUT_MS) });
-  // A page's text, or { error }. A page that redirects off the site is an error: it is not this site's.
+  const once = (url) =>
+    fetchImpl(url, { redirect: "manual", headers: { "user-agent": ua, accept: "text/html,application/xml;q=0.9,*/*;q=0.8" }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+  // One GET, tried once more after retryMs when it meets a network error or a 5xx.
+  const get = async (url) => {
+    try {
+      const res = await once(url);
+      if (res.status < 500) return res;
+      await res.body?.cancel?.();
+    } catch {
+      // A network error: the one retry below answers for it.
+    }
+    await pause(retryMs);
+    return once(url);
+  };
+  // A page's text, or { error }, following its redirects while they stay on the site.
   const page = (path) => {
     if (!pages.has(path)) {
       pages.set(
         path,
         (async () => {
           try {
-            const res = await get(new URL(path, origin).href, "follow");
-            if (res.url && new URL(res.url).origin !== origin) return { error: `GET ${path} left the site for ${new URL(res.url).host}` };
-            if (!res.ok) return { error: `GET ${path} answered ${res.status}` };
-            return { text: await res.text() };
+            let at = new URL(path, origin);
+            for (let hop = 0; hop <= MAX_HOPS; hop++) {
+              const res = await get(at.href);
+              const location = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null;
+              if (!location) {
+                if (!res.ok) return { error: `GET ${path} answered ${res.status}` };
+                return { text: await res.text() };
+              }
+              await res.body?.cancel?.();
+              const next = new URL(location, at);
+              if (next.origin !== origin) return { error: `GET ${path} redirects off the site, to ${next.host}` };
+              at = next;
+            }
+            return { error: `GET ${path}: more than ${MAX_HOPS} redirects` };
           } catch (e) {
             return { error: `GET ${path}: ${firstLine(e)}` };
           }
@@ -103,15 +144,18 @@ async function pagesText(site, paths) {
   return out;
 }
 
-// The site's pages from its sitemap (params.sitemap, default /sitemap-index.xml),
-// one index level deep, same origin only, at most params.max_pages.
+// The site's pages from its sitemap (params.sitemap), one index level deep,
+// same origin only, none under params.sitemap_skip (default /api/), at most
+// params.max_pages.
 async function sitemapPages(site, params) {
-  const index = await site.page(params.sitemap || "/sitemap-index.xml");
+  if (typeof params.sitemap !== "string" || !params.sitemap) throw new Error("params.sitemap names no sitemap");
+  const index = await site.page(params.sitemap);
   if (index.error) throw new Error(`sitemap: ${index.error}`);
+  const skip = params.sitemap_skip ?? SITEMAP_SKIP;
   const own = (u) => {
     try {
       const url = new URL(u);
-      return url.origin === site.origin ? url.pathname : null;
+      return url.origin === site.origin && !skip.some((s) => url.pathname.startsWith(s)) ? url.pathname : null;
     } catch {
       return null;
     }
@@ -154,12 +198,48 @@ function textFiles(root, paths, ext = TEXT_EXT) {
   return files;
 }
 
-// Distinct values `pattern` finds in the files: its first group, else the match.
+// Code with its comments blanked out: // to the line's end, /* */, and with
+// `html` <!-- -->. Strings stay, so a "//" inside a URL is no comment; a ' or
+// " string ends at its line, so an apostrophe in a template's prose swallows
+// at most one line. Newlines stay, so a match keeps its line.
+export function withoutComments(text, { html = false } = {}) {
+  const blank = (s) => s.replace(/[^\n]/g, " ");
+  let out = "";
+  let i = 0;
+  while (i < text.length) {
+    const two = text.slice(i, i + 2);
+    let end = -1;
+    if (two === "//") end = text.indexOf("\n", i) < 0 ? text.length : text.indexOf("\n", i);
+    else if (two === "/*") end = text.indexOf("*/", i + 2) < 0 ? text.length : text.indexOf("*/", i + 2) + 2;
+    else if (html && text.startsWith("<!--", i)) end = text.indexOf("-->", i + 4) < 0 ? text.length : text.indexOf("-->", i + 4) + 3;
+    if (end >= 0) {
+      out += blank(text.slice(i, end));
+      i = end;
+      continue;
+    }
+    const c = text[i];
+    if (c === '"' || c === "'" || c === "`") {
+      let j = i + 1;
+      while (j < text.length && text[j] !== c && !(c !== "`" && text[j] === "\n")) j += text[j] === "\\" ? 2 : 1;
+      out += text.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    out += c;
+    i++;
+  }
+  return out;
+}
+
+// Distinct values `pattern` finds in the files: its first group, else the
+// match. Comments in code files are left out.
 function sourceMatches(root, paths, pattern, ext) {
   const re = new RegExp(pattern, "gm");
   const found = new Map();
   for (const abs of textFiles(root, paths, ext)) {
-    for (const m of readFileSync(abs, "utf8").matchAll(re)) {
+    const raw = readFileSync(abs, "utf8");
+    const text = CODE_EXT.has(extname(abs)) ? withoutComments(raw, { html: extname(abs) === ".astro" }) : raw;
+    for (const m of text.matchAll(re)) {
       const name = m[1] ?? m[0];
       if (!found.has(name)) found.set(name, relative(root, abs).split(sep).join("/"));
     }
@@ -194,6 +274,9 @@ async function readMarks(m, { site }) {
   const got = await site.page(m.page);
   if (got.error) return unread(got.error, source);
   const counts = countMarks(got.text, m.marks, m);
+  // A mark under its least count means the page no longer says what this read counts.
+  const short = Object.entries(m.min ?? {}).find(([mark, least]) => (counts.find((c) => c.mark === mark)?.count ?? 0) < least);
+  if (short) return unread(`not measured: ${m.page} carries ${counts.find((c) => c.mark === short[0])?.count ?? 0} ${short[0]}, under the ${short[1]} this read needs, so the page may have changed`, source);
   const labels = m.labels ?? {};
   return { value: counts.reduce((s, c) => s + c.count, 0), detail: counts.map((c) => ({ label: labels[c.mark] ?? c.mark, value: c.count })), source };
 }
@@ -253,6 +336,8 @@ async function readRecords(m, { root }) {
     return { value: Math.round((has.reduce((s, d) => s + d.value, 0) / list.length) * 1000) / 10, detail: has, source };
   }
   if (m.where) {
+    // No record with the field at all says the data does not mark it yet: no count, not a 0.
+    if (!list.some((r) => r && typeof r === "object" && Object.hasOwn(r, m.where))) return unread(`not measured: no record carries a ${m.where} field yet`, source);
     const rows = list.map((r, i) => ({ label: recordName(r, i), value: r?.[m.where] === true ? 1 : 0, unit: "" }));
     return { value: rows.reduce((s, d) => s + d.value, 0), detail: rows, source: `${source}; ${list.length} records` };
   }
@@ -290,7 +375,7 @@ async function readRedirect(m, { site }) {
   for (let hop = 0; hop <= MAX_HOPS; hop++) {
     let res;
     try {
-      res = await site.get(at.href, "manual");
+      res = await site.get(at.href);
     } catch (e) {
       return unread(`GET ${at.pathname}: ${firstLine(e)}`, source);
     }
@@ -326,24 +411,24 @@ const ON_SITE = new Set(["marks", "pages", "names", "redirect"]);
 // One metric's reading, from its own entry's params.measure.
 async function readOne(def, ctx) {
   const m = def.params?.measure;
-  const own = "quality/collectors/engagement/engagement.mjs";
-  if (!m || typeof m !== "object") return unread(`${def.id} has no params.measure in its targets entry`, own);
-  if (m.read === "outside") return unread(m.reason || "a service this run cannot read", m.source || def.source || own);
+  if (!m || typeof m !== "object") return unread(`${def.id} has no params.measure in its targets entry`, OWN);
+  if (m.read === "outside") return unread(m.reason || "a service this run cannot read", m.source || def.source || OWN);
   const read = READS[m.read];
-  if (!read) return unread(`params.measure.read "${m.read}" is not one of ${[...Object.keys(READS), "outside"].join(", ")}`, own);
-  if (ON_SITE.has(m.read) && !ctx.site.origin) return unread("params.origin names no site", def.source || own);
+  if (!read) return unread(`params.measure.read "${m.read}" is not one of ${[...Object.keys(READS), "outside"].join(", ")}`, OWN);
+  if (ON_SITE.has(m.read) && !ctx.site.origin) return unread("params.origin names no site", def.source || OWN);
   try {
     const got = await read(m, ctx);
     if (got.could_not_check !== undefined) return got;
     return measured(got.value, got.source, got.detail, ctx.readAt);
   } catch (e) {
-    return unread(firstLine(e), def.source || own);
+    return unread(firstLine(e), def.source || OWN);
   }
 }
 
-// Every metric of this targets file: { [id]: reading }.
-export async function collect({ root = process.cwd(), params = {}, targets = [], fetch: fetchImpl = globalThis.fetch, now = new Date() } = {}) {
-  const ctx = { root, params, site: siteFor(params, fetchImpl), readAt: now.toISOString() };
+// Every metric of this targets file: { [id]: reading }. A test passes its own
+// fetch, clock and retry wait.
+export async function collect({ root = process.cwd(), params = {}, targets = [], fetch: fetchImpl = globalThis.fetch, now = new Date(), retryMs = RETRY_MS } = {}) {
+  const ctx = { root, params, site: siteFor(params, fetchImpl, retryMs), readAt: now.toISOString() };
   const out = {};
   for (const def of targets) out[def.id] = await readOne(def, ctx);
   return out;
