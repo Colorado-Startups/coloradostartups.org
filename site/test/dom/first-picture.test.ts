@@ -24,7 +24,6 @@ import { describe, expect, it } from "vitest";
 import { contentPages } from "./pages";
 
 const EXEMPT: Readonly<Record<string, string>> = {
-  "/": "Another builder owns the home page (brief of 2026-11-16); that change decides what leads it.",
   "/ask/":
     "Resourcus's small portrait is part of its own ask box, beside its disclosure line. The site search above it has no picture.",
   "/agents/":
