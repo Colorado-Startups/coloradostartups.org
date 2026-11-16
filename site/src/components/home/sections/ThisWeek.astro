@@ -1,4 +1,8 @@
 ---
-// A slot on the home page that renders nothing yet. Step P2a of the
-// 2026-11-15 engagement plan fills it (this week: events, weekly threads, newest resources).
+// This week on home, step P2a of the 2026-11-15 engagement plan: the next
+// events with a countdown and the weekly threads. The strip itself is
+// components/events/ThisWeek.astro, so region pages can place it too (P2b).
+import ThisWeek from "../../events/ThisWeek.astro";
 ---
+
+<ThisWeek />
