@@ -5,6 +5,7 @@
 import * as apply from "./apply"; // L19 Seat applications
 import * as ask from "./ask"; // L4 Resourcus
 import * as cspReport from "./csp-report"; // orchestrator
+import * as e from "./e"; // M1a anonymous events
 import * as health from "./health"; // L4 Worker
 import * as join from "./join"; // L6 Comms, Slack join requests (P5a)
 import * as nominate from "./nominate"; // L2 Leaderboard
@@ -30,6 +31,7 @@ export const ROUTES: Readonly<Record<string, Route>> = {
   "/api/waitlist": { methods: ["POST"], handle: waitlist.handle },
   "/api/spotlight": { methods: ["POST"], handle: spotlight.handle },
   "/api/csp-report": { methods: ["POST"], handle: cspReport.handle },
+  "/api/e": { methods: ["POST"], handle: e.handle },
   "/api/health": { methods: ["GET", "HEAD"], handle: health.handle },
 };
 

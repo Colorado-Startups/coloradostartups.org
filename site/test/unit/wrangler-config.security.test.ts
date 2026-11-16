@@ -25,7 +25,12 @@ describe("wrangler.jsonc", () => {
       expect(env.ai?.binding).toBe("AI");
       expect(env.ai_search?.[0]?.binding).toBe("RESOURCUS_SEARCH");
       expect(env.d1_databases?.[0]?.binding).toBe("DB");
-      expect(env.ratelimits?.map((r: { name: string }) => r.name).sort()).toEqual(["ASK_RATE_LIMIT", "FORM_RATE_LIMIT", "MCP_RATE_LIMIT"]);
+      expect(env.ratelimits?.map((r: { name: string }) => r.name).sort()).toEqual([
+        "ASK_RATE_LIMIT",
+        "EVENT_RATE_LIMIT",
+        "FORM_RATE_LIMIT",
+        "MCP_RATE_LIMIT",
+      ]);
       expect(env.send_email?.[0]?.name).toBe("FORM_EMAIL");
     }
   });
@@ -37,7 +42,7 @@ describe("wrangler.jsonc", () => {
 
   it("never inlines a secret", () => {
     const text = JSON.stringify(cfg);
-    for (const name of ["TURNSTILE_SECRET_KEY", "KIT_API_KEY", "SLACK_BOT_TOKEN", "SLACK_SIGNING_SECRET"]) {
+    for (const name of ["TURNSTILE_SECRET_KEY", "KIT_API_KEY", "SLACK_BOT_TOKEN", "SLACK_SIGNING_SECRET", "POSTHOG_PROJECT_TOKEN", "ANON_ID_SALT"]) {
       expect(text).not.toContain(`"${name}"`);
     }
   });

@@ -5,11 +5,16 @@
 // event paths 301 here (public/_redirects). Owner: L13. The next-events cards
 // and their Event JSON-LD are L24's (components/events/), built from
 // data/events/upcoming.json so crawlers can read what the iframe hides. The
-// redesign (2026-11-15): no intro, the next six events as cards, then the
-// calendar.
+// redesign (2026-11-15): no intro, the next six events as cards. Step L2a
+// (2026-11-16) adds every upcoming event as a filterable list
+// (components/events/EventList.astro), puts the Google Calendar behind a
+// "Full calendar" disclosure so its iframe loads only when opened, and adds
+// the Ask your AI row.
+import AskAi from "../components/ai/AskAi.astro";
 import ArtImage from "../components/art/ArtImage.astro";
 import { PLACE_ART_ALT } from "../components/art/keepers";
 import { eventsJsonLd, NEXT_COUNT, SNAPSHOT, upcomingEvents } from "../components/events/events";
+import EventList from "../components/events/EventList.astro";
 import NextEvents from "../components/events/NextEvents.astro";
 import CalendarEmbed from "../components/info/CalendarEmbed.astro";
 import InfoHeader from "../components/info/InfoHeader.astro";
@@ -47,8 +52,22 @@ const events = upcomingEvents(SNAPSHOT, new Date());
         />
       </div>
       <NextEvents events={events} />
+      <EventList events={events} />
       <h2 id="full-calendar">The full calendar</h2>
-      <CalendarEmbed />
+      {/* Google's frame and its cookies load only for a visitor who opens the
+          disclosure (CalendarEmbed's deferred mode). The "Full calendar" link
+          on the cards (#full-calendar) opens it. */}
+      <details class="full-cal" data-full-calendar data-open-on="full-calendar">
+        <summary>Full calendar</summary>
+        <CalendarEmbed deferred />
+      </details>
+      <div class="ask-row">
+        <AskAi
+          subject="Startup events in Colorado"
+          path="/event-calendar/"
+          question="Which upcoming startup events in Colorado fit me, and which should I go to first?"
+        />
+      </div>
     </div>
   </section>
 
@@ -98,6 +117,45 @@ const events = upcomingEvents(SNAPSHOT, new Date());
 </BaseLayout>
 
 <style>
+  .full-cal > summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    padding: 0 var(--s-4);
+    margin-bottom: var(--s-4);
+    border: var(--line-hair) solid var(--c-border);
+    border-radius: var(--r-bevel);
+    background: var(--c-surface);
+    gap: var(--s-2);
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .full-cal > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A triangle that points down once the calendar is open. */
+  .full-cal > summary::before {
+    content: "";
+    border-block: 0.35em solid transparent;
+    border-inline-start: 0.55em solid currentColor;
+    transition: rotate 0.15s ease;
+  }
+  .full-cal[open] > summary::before {
+    rotate: 90deg;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .full-cal > summary::before {
+      transition: none;
+    }
+  }
+  .full-cal > summary:focus-visible {
+    outline: var(--line-bold) solid var(--focus-ring, var(--c-focus));
+    outline-offset: var(--line-edge);
+  }
+  .ask-row {
+    margin-top: var(--s-7);
+  }
   .hero-actions {
     margin-top: var(--s-4);
   }
