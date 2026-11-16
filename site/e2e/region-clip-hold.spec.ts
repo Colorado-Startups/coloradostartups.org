@@ -3,7 +3,9 @@
 // it, so the still shows under the card; it plays again when the last card
 // closes, unless the visitor pressed Pause. While a card holds the clip the
 // Pause button keeps its label but is aria-disabled and described by a note,
-// and a keyboard press on it changes nothing. Every wait is on state, never a
+// and a keyboard press on it changes nothing; a mouse click on it closes the
+// card and counts as the visitor's Pause. Without the Popover API the clip
+// still plays and nothing throws. Every wait is on state, never a
 // fixed sleep. The clip files are committed under public/art/brand, so the
 // built site serves them (region-clip.test.ts checks they land in dist).
 import { expect, type Page, test } from "@playwright/test";
@@ -16,6 +18,8 @@ const plays = (page: Page) => page.evaluate(() => (window as unknown as { clipPl
 const resetPlays = (page: Page) => page.evaluate(() => ((window as unknown as { clipPlays: number }).clipPlays = 0));
 
 test("an open hotspot card holds the clip, and the Pause button tells the truth", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(ROUTE);
@@ -112,6 +116,67 @@ test("an open hotspot card holds the clip, and the Pause button tells the truth"
   await expect(media).not.toHaveAttribute("data-card-open", /.*/);
   await expect(toggle).toHaveText("Pause");
   await expect.poll(() => paused(page)).toBe(false);
+
+  // A mouse click on Pause itself while a card is open: the click closes the
+  // card (light dismiss) and counts as the visitor's own Pause, so the clip
+  // stays paused and never starts in between. The card used is one that does
+  // not cover the button, so the click lands on the button.
+  const toggleBox = (await toggle.boundingBox())!;
+  const overlaps = (a: typeof toggleBox, b: typeof toggleBox) =>
+    a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+  let clear: Awaited<ReturnType<typeof cardFor>> | undefined;
+  for (let i = 0; i < (await hotspots.count()) && !clear; i++) {
+    const card = await cardFor(i);
+    await hotspots.nth(i).click();
+    await expect.poll(() => isOpen(card)).toBe(true);
+    if (!overlaps((await card.boundingBox())!, toggleBox)) clear = card;
+    else {
+      await page.keyboard.press("Escape");
+      await expect.poll(() => isOpen(card)).toBe(false);
+    }
+  }
+  expect(clear, "a card that leaves the Pause button uncovered").toBeDefined();
+  await expect.poll(() => paused(page)).toBe(true);
+  await resetPlays(page);
+  await toggle.click();
+  await expect.poll(() => isOpen(clear!)).toBe(false);
+  await expect(media).not.toHaveAttribute("data-card-open", /.*/);
+  await expect(toggle).toHaveText("Play");
+  await expect(toggle).not.toHaveAttribute("aria-disabled", /.*/);
+  expect(await paused(page)).toBe(true);
+  expect(await plays(page)).toBe(0);
+
+  expect(errors).toEqual([]);
+});
+
+test("without the Popover API the clip still plays, the list opens, and nothing throws", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  // Before any page script: take Popover away the way an older browser lacks
+  // it. The property goes, CSS.supports says no, and the selector throws.
+  await page.addInitScript(() => {
+    delete (HTMLElement.prototype as { popover?: unknown }).popover;
+    const supports = CSS.supports.bind(CSS);
+    CSS.supports = ((property: string, value?: string) => {
+      if (value === undefined) return property.includes(":popover-open") ? false : supports(property);
+      return supports(property, value);
+    }) as typeof CSS.supports;
+    const matches = Element.prototype.matches;
+    Element.prototype.matches = function (this: Element, selector: string) {
+      if (selector.includes(":popover-open")) throw new DOMException(`'${selector}' is not a valid selector`, "SyntaxError");
+      return matches.call(this, selector);
+    };
+  });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(ROUTE);
+  const media = page.locator(".region-art__media").first();
+  await media.scrollIntoViewIfNeeded();
+  await expect(media).toHaveAttribute("data-playing", "true", { timeout: 20_000 });
+  await expect.poll(() => paused(page)).toBe(false);
+  await expect(page.locator("details[data-painting-links]")).toHaveAttribute("open", "");
+  await expect(media.locator("button[data-clip-toggle]")).not.toHaveAttribute("aria-disabled", /.*/);
+  expect(errors).toEqual([]);
 });
 
 test("under reduced motion the still shows and no clip logic runs", async ({ page }) => {

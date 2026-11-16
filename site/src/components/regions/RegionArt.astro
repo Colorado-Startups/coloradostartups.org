@@ -189,8 +189,12 @@ const art = {
 
 <script>
   // Without the Popover API the hotspots are hidden (CSS below), so open the
-  // list of the same links under each painting instead.
-  if (!Object.hasOwn(HTMLElement.prototype, "popover")) {
+  // list of the same links under each painting instead. Without it the
+  // :popover-open selector throws a SyntaxError, so the clip code below
+  // reads it only when popoverOk, and treats every card as closed otherwise.
+  const popoverOk =
+    Object.hasOwn(HTMLElement.prototype, "popover") && typeof CSS !== "undefined" && CSS.supports("selector(:popover-open)");
+  if (!popoverOk) {
     for (const list of document.querySelectorAll<HTMLDetailsElement>("[data-painting-links]")) list.open = true;
   }
 
@@ -219,7 +223,7 @@ const art = {
       // Read from the page, not kept in a set: when one card replaces another,
       // the new one is open before the old one's toggle event runs, so the clip
       // never starts between them.
-      const anyOpen = () => cards.some((card) => card.matches(":popover-open"));
+      const anyOpen = () => popoverOk && cards.some((card) => card.matches(":popover-open"));
       const note = media.querySelector<HTMLElement>("[data-clip-note]");
       const sync = () => {
         const holding = anyOpen();

@@ -65,6 +65,9 @@ describe.each(REGION_IDS)("%s painting hotspots", (id) => {
       .join("\n");
     expect(js).toContain("cardOpen");
     expect(js).toContain(":popover-open");
+    // Without Popover that selector throws, so the script asks first
+    // (e2e/region-clip-hold.spec.ts runs a page with Popover removed).
+    expect(js).toContain("selector(:popover-open)");
     // While a card holds the clip, Pause keeps its label but rests,
     // described by a hidden note (e2e/region-clip-hold.spec.ts runs it).
     expect(js).toContain("aria-disabled");
