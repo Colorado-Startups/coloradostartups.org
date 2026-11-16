@@ -73,8 +73,9 @@ const welcomeRoutes = defineCollection({
   schema: WelcomeRouteSchema,
 });
 
-// Validation only: no page reads threads.yaml. The build checks it against
-// ThreadOpenerSchema here, and the Communitas Worker validates and posts it.
+// The build checks threads.yaml against ThreadOpenerSchema here, and the
+// Communitas Worker validates and posts it. The only page that reads it is
+// home, for the Slack threads behind its doors (WelcomeDesk compact, step P4).
 const threads = defineCollection({
   loader: file(`${DATA}/communitas/threads.yaml`),
   schema: ThreadOpenerSchema,
