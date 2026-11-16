@@ -1,0 +1,59 @@
+---
+// /join/slack/: the on-site request to join the Colorado Startups Slack (step
+// P5a). Paul reads every request and sends each invite himself.
+//
+// Not linked yet: /slack and /join still redirect to the Google Form until
+// step P5b switches them (public/_redirects matches /join and /join/ exactly,
+// so this path is never redirected). Until then the page is noindex and out
+// of the sitemap (astro.config.mjs SITEMAP_EXCLUDE). P5b drops both.
+//
+// Copy: no member counts, no keeper on this page, and how we use what people
+// send is stated before the first field.
+import SlackJoinForm from "../../../components/join/SlackJoinForm.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Join the Colorado Startups Slack"
+  description="Ask to join the Colorado Startups Slack, a place for Colorado founders and the people who back them."
+  ogImage="community"
+  noindex
+>
+  <section class="section section--lit" aria-labelledby="join-title">
+    <div class="wrap stack">
+      <h1 id="join-title">Join the Colorado Startups Slack</h1>
+      <p class="lede">A place for Colorado founders and the people who back them to talk.</p>
+      <p>A person reviews every request before an invite is sent. Our goal is to answer within 24 hours.</p>
+
+      <section class="panel purpose" aria-labelledby="purpose-title">
+        <h2 id="purpose-title" class="purpose-title">How we use what you send</h2>
+        <ul>
+          <li>We use your answers only to decide on your invite, and your email to send it.</li>
+          <li>Paul Foley, Founder and President of Colorado Startups, reads every request.</li>
+          <li>We never sell or share it. The site never opens your LinkedIn link.</li>
+          <li>We add you to the newsletter only if you tick the box.</li>
+        </ul>
+        <p class="meta">Read the full <a href="/privacy/">privacy policy</a>.</p>
+      </section>
+
+      <SlackJoinForm />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .purpose {
+    max-width: 42rem;
+  }
+  .purpose ul {
+    margin: 0;
+    padding-left: 1.4em;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .purpose-title {
+    font-family: var(--font-body);
+    font-size: var(--t-step-2);
+    letter-spacing: 0;
+  }
+</style>

@@ -5,6 +5,7 @@ name: visual-check
 # session or a reviewer takes screenshots here instead:
 #
 #   gh workflow run visual-check.yml -f ref=<sha or branch> -f paths=/,/team/ -f widths=375,1280 -f schemes=light,dark
+#   add -f clip_times=0.2,2,3.8 with region routes to hold each clip at those seconds
 #   gh run list --workflow visual-check.yml --limit 1
 #   gh run download <id> -n visual
 #
@@ -41,6 +42,11 @@ on:
         description: Comma-separated system color schemes, light and/or dark
         required: false
         default: "light"
+        type: string
+      clip_times:
+        description: Seconds into each region clip to hold and shoot, such as 0.2,2,3.8 (site/test/visual/clip-frames.spec.ts); empty skips
+        required: false
+        default: ""
         type: string
   pull_request:
     paths:
@@ -106,6 +112,7 @@ jobs:
           VISUAL_PATHS: ${{ inputs.paths || '/' }}
           VISUAL_WIDTHS: ${{ inputs.widths || '375' }}
           VISUAL_SCHEMES: ${{ inputs.schemes || 'light' }}
+          VISUAL_CLIP_TIMES: ${{ inputs.clip_times || '' }}
         run: npm run -w @cs/site test:visual
 
       # Uploads whatever the spec wrote, even when a page failed its check.

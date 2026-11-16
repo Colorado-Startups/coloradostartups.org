@@ -31,10 +31,12 @@
 // Binds 127.0.0.1 by default, NOT localhost, so the listening stack and the
 // address Playwright probes cannot disagree about IPv4 versus IPv6.
 
-import { createReadStream, existsSync, statSync } from "node:fs";
+import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { stripBeacon } from "./strip-beacon.mjs";
 
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distRoot = join(siteRoot, "dist");
@@ -96,6 +98,12 @@ const sendFile = (res, file, status) => {
     "content-type": contentType(file),
     "cache-control": "no-store",
   });
+  // A page goes out without the analytics beacon, so an e2e run or a local
+  // look never counts as a visit (#66). The file in dist/ keeps the tag.
+  if (file.endsWith(".html")) {
+    res.end(stripBeacon(readFileSync(file, "utf8")));
+    return;
+  }
   createReadStream(file).pipe(res);
 };
 

@@ -30,8 +30,9 @@ function skippedLevels(levels: number[]): string[] {
 }
 
 describe("/leaderboard/ room order", () => {
-  it("runs hero, charts, honorees, nominate", () => {
-    expect(rooms).toEqual(["hero", "glance", "2026-honorees", "nominate"]);
+  // L3b put the "Ask your AI" row (A3a) once on the page, before the hearth.
+  it("runs hero, charts, honorees, ask your AI, nominate", () => {
+    expect(rooms).toEqual(["hero", "glance", "2026-honorees", "ask-ai", "nominate"]);
   });
 
   it("puts the charts before the honorees table", () => {
@@ -41,7 +42,13 @@ describe("/leaderboard/ room order", () => {
   });
 
   it("alternates lit and band grounds, then closes on the hearth", () => {
-    expect(rooms.map(ground)).toEqual(["section--lit", "section--band", "section--lit", "section--hearth"]);
+    expect(rooms.map(ground)).toEqual([
+      "section--lit",
+      "section--band",
+      "section--lit",
+      "section--band",
+      "section--hearth",
+    ]);
   });
 
   // A class with no rule would draw nothing; the hearth band lives in global.css.
@@ -82,5 +89,120 @@ describe("/leaderboard/ room order", () => {
   it("self-test: the level check catches a skip and passes a clean outline", () => {
     expect(skippedLevels([1, 2, 3, 2, 3, 2])).toEqual([]);
     expect(skippedLevels([1, 3, 2])).toEqual(["h1 > h3"]);
+  });
+});
+
+// L3a: the "Where they are" map's dots open a city panel (city-map.ts). The
+// built page carries what the script needs, and stays complete without it.
+describe("/leaderboard/ city map", () => {
+  const figure = page.getElementById("chart-map-title")!.closest("figure")!;
+  const panel = figure.querySelector<HTMLElement>("[data-city-panel]")!;
+  const circles = [...figure.querySelectorAll("circle")];
+  const templates = [...panel.querySelectorAll("template")];
+
+  it("tags every dot with its city and count, and keeps a title on each", () => {
+    expect(circles.length).toBeGreaterThan(0);
+    for (const c of circles) {
+      expect(c.getAttribute("data-city"), c.outerHTML).toBeTruthy();
+      expect(Number(c.getAttribute("data-count"))).toBeGreaterThan(0);
+      expect(c.querySelector("title")?.textContent).toContain(c.getAttribute("data-city")!);
+    }
+  });
+
+  it("has a panel with a polite live status, apart from the aria-hidden copy hover writes", () => {
+    expect(panel.id).toBe("chart-map-panel");
+    expect(panel.querySelector("[data-city-status]")?.getAttribute("aria-live")).toBe("polite");
+    const visual = panel.querySelector("[data-city-visual]")!;
+    expect(visual.getAttribute("aria-hidden")).toBe("true");
+    expect(visual.hasAttribute("aria-live")).toBe(false);
+  });
+
+  // Review of #84: the phone row has one button per dot, in the panel's order.
+  it("draws one phone-row button per mapped city, each pointing at the panel", () => {
+    const chips = [...figure.querySelectorAll<HTMLButtonElement>("[data-city-chips] button")];
+    const narrow = [...figure.querySelectorAll(".plot--narrow circle")].map((c) => c.getAttribute("data-city"));
+    expect(chips.map((b) => b.dataset.city).sort()).toEqual(narrow.sort());
+    expect(chips.map((b) => b.dataset.city)).toEqual(templates.map((t) => t.getAttribute("data-city")));
+    for (const b of chips) {
+      expect(b.getAttribute("aria-controls")).toBe(panel.id);
+      expect(b.textContent?.trim()).toMatch(/^.+ \(\d+\)$/);
+    }
+  });
+
+  it("lists each dot's companies, as many as the dot counts, each linking to a table row", () => {
+    const byCity = new Map(templates.map((t) => [t.getAttribute("data-city"), t]));
+    for (const c of circles) {
+      const t = byCity.get(c.getAttribute("data-city"));
+      expect(t, c.getAttribute("data-city")!).toBeDefined();
+      const links = [...t!.content.querySelectorAll("a")];
+      expect(links.length).toBe(Number(c.getAttribute("data-count")));
+      for (const a of links) {
+        const row = page.getElementById(a.getAttribute("href")!.slice(1));
+        expect(row?.tagName, a.getAttribute("href")!).toBe("TR");
+      }
+    }
+  });
+
+  it("puts no button over the dots before the script runs", () => {
+    expect(figure.querySelector(".plot button")).toBeNull();
+  });
+});
+
+// L3b: a Table and Cards switch over the one honorees list (board-view.ts).
+// As built, before any script runs, the board is a table, the switch waits
+// hidden, and the cards view is the same rows, so there is no second list.
+describe("/leaderboard/ Table and Cards switch", () => {
+  const board = main.querySelector<HTMLElement>("[data-sortable-table]")!;
+  const group = board.querySelector<HTMLElement>("[data-board-view]")!;
+  const buttons = [...group.querySelectorAll<HTMLButtonElement>("button[data-view-option]")];
+
+  it("starts the board in the table view", () => {
+    expect(board.dataset.view).toBe("table");
+  });
+
+  it("is a labelled group of two real buttons, Table pressed and Cards not", () => {
+    expect(group.getAttribute("role")).toBe("group");
+    expect(group.getAttribute("aria-label")).toBeTruthy();
+    expect(buttons.map((b) => b.textContent?.trim())).toEqual(["Table", "Cards"]);
+    expect(buttons.map((b) => b.dataset.viewOption)).toEqual(["table", "cards"]);
+    for (const b of buttons) expect(b.getAttribute("type")).toBe("button");
+    expect(buttons.map((b) => b.getAttribute("aria-pressed"))).toEqual(["true", "false"]);
+  });
+
+  it("waits hidden until its script runs, so the table shows as before without JavaScript", () => {
+    expect(group.hidden).toBe(true);
+  });
+
+  it("sits above the list, with a polite status line of its own", () => {
+    const table = board.querySelector("table")!;
+    expect(group.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(group.querySelector("[data-view-status]")?.getAttribute("aria-live")).toBe("polite");
+  });
+
+  it("keeps one list: one table and one row per company, each with its id", () => {
+    expect(main.querySelectorAll("[data-sortable-table]")).toHaveLength(1);
+    expect(board.querySelectorAll("table")).toHaveLength(1);
+    const rows = [...board.querySelectorAll("tbody tr")];
+    expect(rows.length).toBeGreaterThan(0);
+    for (const tr of rows) expect(tr.id).toMatch(/^company-/);
+  });
+
+  // In the cards view the cells draw as blocks, so the roles keep the table.
+  it("gives the table, rows, row headers and cells explicit roles", () => {
+    expect(board.querySelector("table")?.getAttribute("role")).toBe("table");
+    for (const tr of board.querySelectorAll("tbody tr")) {
+      expect(tr.getAttribute("role")).toBe("row");
+      expect(tr.querySelector("th")?.getAttribute("role")).toBe("rowheader");
+      expect(tr.querySelector("th a")?.textContent?.trim()).toBeTruthy();
+      for (const td of tr.querySelectorAll("td")) expect(td.getAttribute("role")).toBe("cell");
+    }
+  });
+});
+
+// A3a on the Leaderboard: the "Ask your AI" row shows once.
+describe("/leaderboard/ Ask your AI", () => {
+  it("appears once, labelling its own room", () => {
+    expect(main.querySelectorAll("[data-ask-ai]")).toHaveLength(1);
+    expect(page.getElementById("ask-ai")?.closest("section")?.getAttribute("aria-labelledby")).toBe("ask-ai");
   });
 });

@@ -1,0 +1,272 @@
+---
+// The "Get featured" form (step P3a). A plain HTML form that POSTs to
+// /api/spotlight; field names, limits and the consent wording come from
+// ./fields.ts, which the Worker parses with, so the two cannot drift. The
+// script stamps the load time into `ts` (the Worker's speed check), counts
+// the one-line answer's characters, shows the message for ?error=, names the
+// fields the Worker rejected (?field=), and keeps a draft of the answers in
+// this tab so a rejection does not clear them (the apply form's helpers,
+// apply/client.ts). The two consent boxes are never kept in the draft and
+// never ticked by default. No photo upload in this step.
+import Turnstile from "../forms/Turnstile.astro";
+import Button from "../ui/Button.astro";
+import {
+  LINKEDIN_PATTERN,
+  SPOTLIGHT_CONSENT,
+  SPOTLIGHT_DRAFT,
+  SPOTLIGHT_ENDPOINT,
+  SPOTLIGHT_EXAMPLE as EX,
+  SPOTLIGHT_FIELDS as F,
+  SPOTLIGHT_LIMITS as L,
+  SPOTLIGHT_WEBSITE_PATTERN,
+} from "./fields";
+
+const ERRORS = {
+  invalid:
+    "Some answers need a fix. Check the required fields and both boxes. The website must be an https address and the LinkedIn link a profile on linkedin.com. Then send the form again.",
+  verification: "We could not confirm the form came from a person. Wait a few seconds, finish the check, then send it again.",
+  ratelimit: "Too many tries from your connection. Wait a minute, then send the form again.",
+  delivery:
+    "We could not save your request, so nothing was sent. Try again later, or write to info@coloradostartups.org.",
+  unavailable:
+    "Requests are closed for a moment on our side. Nothing was sent. Try again later, or write to info@coloradostartups.org.",
+} as const;
+// Replaces the invalid message when the Worker names the fields to fix.
+const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then send the form again.";
+---
+
+<div class="spotlight-form">
+  {
+    Object.entries(ERRORS).map(([code, text]) => (
+      <p
+        class="form-error"
+        role="alert"
+        data-error={code}
+        data-fields-text={code === "invalid" ? INVALID_FIELDS : undefined}
+        hidden
+      >
+        {text}
+      </p>
+    ))
+  }
+
+  <noscript>
+    <p class="noscript-note">
+      This form needs JavaScript to check that you are a person. Without it, write to info@coloradostartups.org with
+      your name, your company and what you are building.
+    </p>
+  </noscript>
+
+  <form
+    method="post"
+    action={SPOTLIGHT_ENDPOINT}
+    data-spotlight-form
+    data-draft-key={SPOTLIGHT_DRAFT.key}
+    data-draft-skip={[...SPOTLIGHT_DRAFT.skip].join(" ")}
+    aria-describedby="spotlight-after"
+  >
+    <input type="hidden" name="ts" value="" data-load-stamp />
+    <div class="hp" aria-hidden="true">
+      <label for="sf-website-hp">Leave this empty</label>
+      <input id="sf-website-hp" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <fieldset>
+      <legend>About you</legend>
+      <div class="field">
+        <label for="sf-first-name">First name</label>
+        <input id="sf-first-name" name={F.firstName} required maxlength={L.name} autocomplete="given-name" />
+      </div>
+      <div class="field">
+        <label for="sf-last-name">Last name</label>
+        <input id="sf-last-name" name={F.lastName} required maxlength={L.name} autocomplete="family-name" />
+      </div>
+      <div class="field">
+        <label for="sf-email">Email</label>
+        <input
+          id="sf-email"
+          name={F.email}
+          type="email"
+          required
+          maxlength={L.email}
+          autocomplete="email"
+          aria-describedby="sf-email-hint"
+        />
+        <span class="hint" id="sf-email-hint">We reply to this address. It is never shown.</span>
+      </div>
+      <div class="field">
+        <label for="sf-role">Your role</label>
+        <input
+          id="sf-role"
+          name={F.role}
+          required
+          maxlength={L.role}
+          autocomplete="organization-title"
+          aria-describedby="sf-role-hint"
+        />
+        <span class="hint" id="sf-role-hint">For example: {EX.role}</span>
+      </div>
+      <div class="field">
+        <label for="sf-linkedin">LinkedIn profile (optional)</label>
+        <input
+          id="sf-linkedin"
+          name={F.linkedin}
+          type="text"
+          inputmode="url"
+          autocomplete="url"
+          maxlength={L.link}
+          pattern={LINKEDIN_PATTERN}
+          placeholder="linkedin.com/in/"
+          title="Use your profile link on linkedin.com"
+          aria-describedby="sf-linkedin-hint"
+        />
+        <span class="hint" id="sf-linkedin-hint">Shown on your card only if you give it. The site never opens it.</span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your company</legend>
+      <div class="field">
+        <label for="sf-company">Company name</label>
+        <input id="sf-company" name={F.company} required maxlength={L.company} autocomplete="organization" />
+      </div>
+      <div class="field">
+        <label for="sf-company-website">Company website</label>
+        <input
+          id="sf-company-website"
+          name={F.companyWebsite}
+          type="text"
+          inputmode="url"
+          required
+          maxlength={L.link}
+          pattern={SPOTLIGHT_WEBSITE_PATTERN}
+          placeholder="https://"
+          title="An https address, like https://example.com"
+          aria-describedby="sf-company-website-hint"
+        />
+        <span class="hint" id="sf-company-website-hint">An https address. The site never opens it.</span>
+      </div>
+      <div class="field">
+        <label for="sf-city">City or region in Colorado</label>
+        <input
+          id="sf-city"
+          name={F.city}
+          required
+          maxlength={L.city}
+          autocomplete="address-level2"
+          aria-describedby="sf-city-hint"
+        />
+        <span class="hint" id="sf-city-hint">For example: {EX.city}, Summit County, the Western Slope.</span>
+      </div>
+      <div class="field">
+        <label for="sf-building">What you are building, in one line</label>
+        <input
+          id="sf-building"
+          name={F.building}
+          required
+          maxlength={L.building}
+          aria-describedby="sf-building-hint"
+          data-count-source
+        />
+        <span class="hint" id="sf-building-hint">
+          At most {L.building} characters. For example: {EX.building}
+        </span>
+        <span class="hint count" aria-hidden="true" data-count={L.building}></span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your agreement</legend>
+      <p class="hint">Both boxes are needed. Without them we save nothing.</p>
+      <div class="check">
+        <input id="sf-founder" name={F.founder} type="checkbox" required />
+        <label for="sf-founder">{SPOTLIGHT_CONSENT.founder}</label>
+      </div>
+      <div class="check">
+        <input id="sf-consent-show" name={F.consentShow} type="checkbox" required />
+        <label for="sf-consent-show">{SPOTLIGHT_CONSENT.show}</label>
+      </div>
+    </fieldset>
+
+    <Turnstile />
+    <Button type="submit">Ask to be featured</Button>
+    <p class="meta after" id="spotlight-after">
+      A person reviews every request. Sending this does not guarantee a spot. Your email is never shown.
+    </p>
+  </form>
+</div>
+
+<script>
+  import { clearDraft, draftFrom, markInvalidFields, readDraft, saveDraft } from "../apply/client";
+  import { showErrorMessage, stampLoadTime } from "../forms/form-status";
+
+  stampLoadTime(document);
+
+  const search = window.location.search;
+  const code = new URLSearchParams(search).get("error");
+  const form = document.querySelector<HTMLFormElement>("[data-spotlight-form]");
+  let labels: string[] = [];
+  if (form) {
+    // The draft's key and skipped fields come from SPOTLIGHT_DRAFT, rendered
+    // into the form, so this script never bundles the parser or zod.
+    const store = { key: form.dataset.draftKey ?? "", skip: new Set((form.dataset.draftSkip ?? "").split(" ")) };
+    // After a rejected request (?error=), bring back this tab's draft. Any
+    // other visit starts clean and drops an old draft.
+    const draft = code ? readDraft(store) : null;
+    if (!draft) clearDraft(store);
+    for (const [name, value] of Object.entries(draft ?? {})) {
+      const el = form.elements.namedItem(name);
+      if (el instanceof HTMLInputElement && el.type !== "checkbox") el.value = value;
+    }
+
+    // A visible count for the one-line answer. Screen readers get the hint
+    // and the field's maxlength instead of a count on every key.
+    const line = form.querySelector<HTMLInputElement>("[data-count-source]");
+    const count = form.querySelector<HTMLElement>("[data-count]");
+    if (line && count) {
+      const show = () => (count.textContent = `${line.value.length} of ${count.dataset.count}`);
+      line.addEventListener("input", show);
+      show();
+    }
+
+    if (code === "invalid") labels = markInvalidFields(form, search);
+    form.addEventListener("submit", () => saveDraft(draftFrom(new FormData(form), store), store));
+  }
+
+  // An invalid request names the fields the Worker flagged.
+  showErrorMessage(document, code, (message) => {
+    if (labels.length > 0 && message.dataset.fieldsText) {
+      message.textContent = message.dataset.fieldsText.replace("{fields}", labels.join(", "));
+    }
+  });
+</script>
+
+<style>
+  /* Fieldsets, hints, checks and hidden fields: the Forms section of
+     global.css (#195). */
+  .noscript-note {
+    max-width: 42rem;
+    font-weight: 700;
+  }
+  .after {
+    max-width: 42rem;
+    margin: var(--s-3) 0 0;
+  }
+  .count {
+    justify-self: end;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Each consent box and its label make one 44 px target on a phone. */
+  .check {
+    min-height: var(--size-tap);
+    align-items: center;
+  }
+  .check label {
+    padding-block: var(--s-2);
+    cursor: pointer;
+  }
+  /* A field the Worker named after a rejection (?field=). */
+  input[aria-invalid="true"] {
+    border-color: var(--c-danger);
+  }
+</style>

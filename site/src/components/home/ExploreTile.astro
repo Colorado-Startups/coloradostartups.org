@@ -7,7 +7,11 @@ interface Props {
   label: string;
   icon: "book" | "trophy" | "calendar" | "compass";
 }
+import { countUp, countUpAttrs } from "./count-up";
+
 const { href, count, label, icon } = Astro.props;
+// The count stays as text; global.css may count up over it as it scrolls in.
+const counting = countUp(count);
 
 const PATHS: Record<Props["icon"], string[]> = {
   book: ["M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z", "M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"],
@@ -17,11 +21,11 @@ const PATHS: Record<Props["icon"], string[]> = {
 };
 ---
 
-<a class="explore panel" href={href}>
+<a class="explore panel" href={href} data-reveal>
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     {PATHS[icon].map((d) => <path d={d} />)}
   </svg>
-  <span class="explore__count">{count}</span>
+  <span class="explore__count" {...(counting ? countUpAttrs(counting) : {})}><span class="count__text">{count}</span></span>
   <span class="explore__label">{label}</span>
 </a>
 

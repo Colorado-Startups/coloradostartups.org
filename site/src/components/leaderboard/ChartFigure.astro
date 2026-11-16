@@ -26,6 +26,8 @@ const { id, title, summary, svg, narrowSvg, columns, rows, note } = Astro.props;
   <h3 id={`${id}-title`}>{title}</h3>
   <div class:list={["plot", narrowSvg && "plot--wide"]} set:html={svg} />
   {narrowSvg && <div class="plot plot--narrow" set:html={narrowSvg} />}
+  {/* Optional extras under the chart, e.g. the map's city panel (CityPanel). */}
+  <slot />
   <figcaption>{summary}</figcaption>
   <details>
     <summary>Show the data for “{title}”</summary>

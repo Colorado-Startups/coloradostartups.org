@@ -71,8 +71,10 @@ const fullTitle = title === "Colorado Startups" ? title : `${title} | Colorado S
     {/* Cloudflare Web Analytics sets no cookies, as privacy.md promises. The edge's automatic injection did not
         reach the Worker's static assets on launch night, so the beacon is in the page. The token is public by
         design, and the CSP allows both hosts (worker/lib/security-headers.ts, public/_headers). The secret scans'
-        allow marker on its line holds wherever the line moves (#767, 04_tools/gitleaks_allow.json); it renders nothing. */}
-    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "58c9c5c3a6b843ec87df6970cbbc0d97"}'></script>{/* gitleaks:allow */}
+        allow marker on its line holds wherever the line moves (#767, 04_tools/gitleaks_allow.json); it renders nothing.
+        Only a production build carries the tag, so `astro dev` counts no visit, and the test server takes it out of
+        every page it sends (scripts/strip-beacon.mjs, #66). */}
+    {import.meta.env.PROD && <script is:inline defer data-cs-beacon src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "58c9c5c3a6b843ec87df6970cbbc0d97"}'></script>}{/* gitleaks:allow */}
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

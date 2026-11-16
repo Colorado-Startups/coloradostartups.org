@@ -15,4 +15,18 @@ summary: >-
 cities: [Boulder, Golden, Arvada, Denver]
 nearby: [Louisville, Lafayette, Superior, Erie, Longmont, Niwot, Lyons, Nederland, Broomfield, Westminster, Thornton, Lakewood, Wheat Ridge, Evergreen, Englewood, Littleton, Centennial, Greenwood Village, Aurora, Parker, Lone Tree, Highlands Ranch, Castle Rock]
 art: brand/boulder
+# Hotspots on brand/boulder (step W3a; W3b draws them). x and y are percent of
+# the painting from its top left. Each sits on a painted feature: the lit
+# house on the left, the bridge where people gather, the lit arches on the
+# right, and the great tree above the slabs. W3b checked each by eye on the
+# 1440 px painting and on the clip's first, middle and last frames. The tree
+# point moved down to the trunk, since y 11 sat in the strip a 21:9 desktop
+# crop hides, and the clip draws the trunk a little lower than the still. The arches
+# point moved up and in, clear of the Pause button on a phone. No place hotspot until a source
+# shows the landmark is not a place that matters to the Ute or other tribes.
+hotspots:
+  - { x: 14, y: 46, kind: companies, label: Who builds here }
+  - { x: 45, y: 81, kind: event, label: Next event }
+  - { x: 87, y: 55, kind: resources, label: Where to get help }
+  - { x: 55, y: 23, kind: seat, label: The organizer seat }
 order: 1

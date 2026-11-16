@@ -1,0 +1,31 @@
+---
+// Why Colorado: three panels, each headed by its region's real map, with
+// three figures from facts.yaml and their source lines (home-data.ts). No
+// figure without a source. The paintings are each region page's full art.
+import { themes } from "../home-data";
+import ThemePanel from "../ThemePanel.astro";
+---
+
+<section class="section section--band" aria-labelledby="why">
+  <div class="wrap">
+    <h2 id="why">Why Colorado</h2>
+    <div class="themes">
+      {themes().map((theme) => <ThemePanel theme={theme} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .themes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
+    margin-top: var(--s-5);
+  }
+
+  @media (max-width: 960px) {
+    .themes {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -45,7 +45,13 @@ test("the home page's Join the Slack opens /slack/, which _redirects sends to th
   expect(rules).toMatch(/^\/slack\/ https:\/\/docs\.google\.com\/forms\/\S+ 302$/m);
 });
 
-test("the founders page has no form at all", async ({ page }) => {
+// Step F1: the one form in main is the waitlist, and the first screen's
+// "Join the waitlist" link takes the keyboard to it.
+test("the founders page's one form is the waitlist, and Join the waitlist jumps to it", async ({ page }) => {
   await page.goto("/founders/");
-  await expect(page.locator("form, input, textarea, select")).toHaveCount(0);
+  await expect(page.locator("main form")).toHaveCount(1);
+  await expect(page.locator("main form")).toHaveAttribute("action", "/api/waitlist");
+  await page.locator("main").getByRole("link", { name: "Join the waitlist", exact: true }).click();
+  await expect(page).toHaveURL(/#waitlist$/);
+  await expect(page.locator("#waitlist form")).toBeInViewport();
 });

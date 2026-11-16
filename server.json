@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Colorado-Startups/coloradostartups",
+  "title": "Colorado Startups",
+  "description": "Read-only search of Colorado startup resources, events, regions and Leaderboard companies. No key.",
+  "repository": {
+    "url": "https://github.com/Colorado-Startups/coloradostartups.org",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://coloradostartups.org/mcp"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+---
+// Explore: live counts from the same data the pages use.
+import { WAYS_IN } from "@cs/shared";
+
+import ExploreTile from "../ExploreTile.astro";
+import { homeCounts } from "../home-data";
+
+const counts = await homeCounts();
+---
+
+<section class="section section--lit" aria-labelledby="explore">
+  <div class="wrap">
+    <h2 id="explore">Explore</h2>
+    <ul class="explore-grid" role="list">
+      <li><ExploreTile href={WAYS_IN.canvas} count={counts.resources} label="Startup Resources" icon="book" /></li>
+      <li><ExploreTile href={WAYS_IN.leaderboard} count={counts.companies} label="Leaderboard companies" icon="trophy" /></li>
+      <li><ExploreTile href={WAYS_IN.events} count={counts.events} label="Upcoming events" icon="calendar" /></li>
+      <li><ExploreTile href="/guides/" count={counts.guides} label="Founder guides" icon="compass" /></li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* A list gets the reading measure by default (global.css); this one is a grid. */
+  .explore-grid {
+    max-width: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-4);
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 960px) {
+    .explore-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

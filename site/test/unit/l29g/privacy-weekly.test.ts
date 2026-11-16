@@ -60,7 +60,7 @@ describe("Bot protection: Turnstile receives your IP address", () => {
     const checks = /\b(?:verifyTurnstile|turnstileError)\(/;
     const routes = filesUnder("worker/routes").filter((f) => checks.test(read(f)));
     expect(routes.map((f) => path.basename(f)).sort()).toEqual(
-      ["apply.ts", "ask.ts", "nominate.ts", "subscribe.ts", "suggest-resource.ts"],
+      ["apply.ts", "ask.ts", "join.ts", "nominate.ts", "spotlight.ts", "subscribe.ts", "suggest-resource.ts", "waitlist.ts"],
     );
     expect(bot).toContain("Our forms and the Resourcus question box use Cloudflare Turnstile");
   });
@@ -98,6 +98,45 @@ describe("the weekly job", () => {
       `If your nomination is still waiting for an edition when it is ${days} days old, a weekly job deletes the figures, your name and your email (our commitment).`,
     );
     expect(POLICY).toContain(`keeps its figures, name or email longer than ${days + 7} days (our commitment).`);
+  });
+
+  it("the Slack join requests bullet states the code's limit, and the limit plus one week", () => {
+    const days = constant("worker/routes/join.ts", "JOIN_REQUEST_RETENTION_DAYS");
+    expect(days).toBe(90);
+    expect(POLICY).toContain(`A weekly job deletes each request ${days} days after you send it`);
+    expect(POLICY).toContain(`No request stays in our database longer than ${days + 7} days (our commitment).`);
+  });
+
+  it("scheduled() runs the Slack join requests purge", () => {
+    expect(retention).toContain("purgeJoinRequests(db)");
+  });
+
+  it("the founders waitlist bullet states the code's limit, and the limit plus one week", () => {
+    const days = constant("worker/routes/waitlist.ts", "WAITLIST_RETENTION_DAYS");
+    expect(days).toBe(365);
+    expect(POLICY).toContain(`A weekly job deletes each entry ${days} days after you join, whether or not the forum has opened (our commitment).`);
+    expect(POLICY).toContain(`No entry stays in our database longer than ${days + 7} days (our commitment).`);
+  });
+
+  it("the waitlist form's line says the same limit in months", () => {
+    // 365 days is the "12 months" the form promises under its button.
+    const days = constant("worker/routes/waitlist.ts", "WAITLIST_RETENTION_DAYS");
+    expect(read("src/components/founders/WaitlistForm.astro")).toContain(`We keep your details for up to ${Math.round(days / 30.4)} months.`);
+  });
+
+  it("scheduled() runs the founders waitlist purge", () => {
+    expect(retention).toContain("purgeWaitlist(db)");
+  });
+
+  it("the Get featured bullet states the code's limit, and the limit plus one week", () => {
+    const days = constant("worker/routes/spotlight.ts", "SPOTLIGHT_RETENTION_DAYS");
+    expect(days).toBe(180);
+    expect(POLICY).toContain(`A weekly job deletes each request ${days} days after you send it, whether or not we featured you.`);
+    expect(POLICY).toContain(`No request stays in our database longer than ${days + 7} days (our commitment). If we feature you`);
+  });
+
+  it("scheduled() runs the Get featured purge", () => {
+    expect(retention).toContain("purgeSpotlightRequests(db)");
   });
 
   it("the security-reports bullet states the code's limit", () => {

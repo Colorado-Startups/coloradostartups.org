@@ -7,9 +7,12 @@ import * as ask from "./ask"; // L4 Resourcus
 import * as cspReport from "./csp-report"; // orchestrator
 import * as e from "./e"; // M1a anonymous events
 import * as health from "./health"; // L4 Worker
+import * as join from "./join"; // L6 Comms, Slack join requests (P5a)
 import * as nominate from "./nominate"; // L2 Leaderboard
+import * as spotlight from "./spotlight"; // orchestrator, "Get featured" for home spotlights (P3a)
 import * as subscribe from "./subscribe"; // L6 Comms
 import * as suggestResource from "./suggest-resource"; // L3 Canvas
+import * as waitlist from "./waitlist"; // L1, the founders forum waitlist (F1)
 
 type RouteHandler = (request: Request, env: Env, ctx: ExecutionContext) => Promise<Response>;
 
@@ -24,6 +27,9 @@ export const ROUTES: Readonly<Record<string, Route>> = {
   "/api/nominate": { methods: ["POST"], handle: nominate.handle },
   "/api/suggest-resource": { methods: ["POST"], handle: suggestResource.handle },
   "/api/apply": { methods: ["POST"], handle: apply.handle },
+  "/api/join": { methods: ["POST"], handle: join.handle },
+  "/api/waitlist": { methods: ["POST"], handle: waitlist.handle },
+  "/api/spotlight": { methods: ["POST"], handle: spotlight.handle },
   "/api/csp-report": { methods: ["POST"], handle: cspReport.handle },
   "/api/e": { methods: ["POST"], handle: e.handle },
   "/api/health": { methods: ["GET", "HEAD"], handle: health.handle },

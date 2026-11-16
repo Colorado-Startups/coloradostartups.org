@@ -43,12 +43,14 @@ describe("/ecosystem-canvas/ is titled Startup Resources", () => {
 });
 
 describe("the first result follows the filters (#143)", () => {
-  // The title, the filters, the count and the Resourcus disclosure share the
-  // first section (step F, 2026-11-15).
-  const find = canvas.querySelector<HTMLElement>("section[aria-labelledby='canvas-title']")!;
+  // Step L1b (2026-11-16): the filters, the count and the rows share the full
+  // list behind "Show all"; the title, one line and the Resourcus disclosure
+  // share the first section, before the picks.
+  const find = canvas.querySelector<HTMLElement>("[data-canvas-full]")!;
+  const top = canvas.querySelector<HTMLElement>("section[aria-labelledby='canvas-title']")!;
   const form = find.querySelector("form[data-canvas-filters]")!;
   const status = find.querySelector("[data-canvas-count]")!;
-  const ask = find.querySelector<HTMLDetailsElement>("details[data-canvas-ask]");
+  const ask = top.querySelector<HTMLDetailsElement>("details[data-canvas-ask]");
 
   it("keeps the count right under the filters, as a polite live region", () => {
     expect(follows(form, status)).toBe(true);
@@ -56,10 +58,10 @@ describe("the first result follows the filters (#143)", () => {
     expect(status.getAttribute("aria-live")).toBe("polite");
   });
 
-  it("puts Resourcus behind a closed Ask a question instead disclosure, after the count", () => {
+  it("puts Resourcus behind a closed Ask a question instead disclosure, before the picks", () => {
     expect(ask?.querySelector(":scope > summary")?.textContent?.trim()).toBe("Ask a question instead");
     expect(ask?.hasAttribute("open")).toBe(false);
-    expect(follows(status, ask!)).toBe(true);
+    expect(follows(ask!, canvas.querySelector("[data-canvas-picks]")!)).toBe(true);
     const panels = [...canvas.querySelectorAll("main [data-resourcus]")];
     expect(panels).toHaveLength(1);
     expect(panels[0].closest("details[data-canvas-ask]")).toBe(ask);
@@ -68,7 +70,7 @@ describe("the first result follows the filters (#143)", () => {
   });
 
   it("goes straight from the filters to the first stage", () => {
-    expect(find.nextElementSibling?.querySelector("section")?.id).toBe("idea");
+    expect(find.querySelector(".canvas-find")?.nextElementSibling?.id).toBe("idea");
     const first = canvas.querySelector("main [data-resource]")!;
     expect(first.closest("section")?.id).toBe("idea");
   });
@@ -86,7 +88,7 @@ describe("the first result follows the filters (#143)", () => {
     expect(link?.textContent?.trim()).toBe("Back to filters");
     expect(link?.getAttribute("href")).toBe("#find-title");
     expect(link?.classList.contains("btn--quiet")).toBe(true);
-    expect(canvas.getElementById("find-title")?.closest("section")).toBe(find);
+    expect(canvas.getElementById("find-title")?.closest("[data-canvas-full]")).toBe(find);
   });
 
   it("gives the back link a 44 px tap target through .btn--quiet", () => {

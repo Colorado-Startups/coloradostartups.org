@@ -6,6 +6,7 @@
 // renders them and passes the ItemList of those five to BaseLayout.
 import type { GetStaticPaths } from "astro";
 
+import AskAi from "../../components/ai/AskAi.astro";
 import GuidePage from "../../components/guides/GuidePage.astro";
 import { guideInput } from "../../components/guides/guide-data";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -31,4 +32,9 @@ const site = Astro.site!;
   {/* The /ask/ search filters by this type (Pagefind). */}
   <span data-pagefind-filter="type:Guides"></span>
   <GuidePage guide={guide} rows={rows} start={start} browse={browse} date={input.date} others={otherGuides(slug)} />
+  <section class="section section--band" aria-labelledby="ask-ai">
+    <div class="wrap">
+      <AskAi subject={guide.title} path={guide.path} />
+    </div>
+  </section>
 </BaseLayout>

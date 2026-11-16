@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "coloradostartups": {
+      "type": "http",
+      "url": "https://coloradostartups.org/mcp"
+    }
+  }
+}

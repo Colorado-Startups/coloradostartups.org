@@ -15,11 +15,20 @@
 #   /guides/ (card #150). A door shows at most three steps and keeps the
 #   forum, so the guide takes the place of the Startup Resources stage link.
 #   The desk's Resourcus line still links Startup Resources.
+# - door, slack_thread and picks_stage feed the home page's "Pick your door"
+#   band only (step P4): the door's short label, the weekly Slack thread to
+#   start in (mon or wed, from threads.yaml), and the stage whose picks the
+#   door links. A door with no picks_stage links Startup Resources itself.
+#   Picks are never commercial (top-picks.ts), so service providers and
+#   investors get no stage: their door opens the whole directory.
 
 # Founders
 
 - id: idea
   label: I have an idea for a company
+  door: Idea
+  slack_thread: mon
+  picks_stage: idea
   recommends:
     - kind: guide-start
       note: The guide covers the first steps, from learning the basics and testing the idea to registering the company.
@@ -30,6 +39,9 @@
 
 - id: building
   label: I'm building a company
+  door: Building
+  slack_thread: wed
+  picks_stage: launch
   recommends:
     - kind: slack
       note: Bring your ask to the Wednesday Asks and Offers thread in the Slack. Founders there answer founders.
@@ -40,6 +52,9 @@
 
 - id: hiring
   label: I'm hiring for my startup
+  door: Hiring
+  slack_thread: wed
+  picks_stage: growth
   recommends:
     - kind: slack
       note: Post each open role in the Wednesday Asks and Offers thread in the Slack.
@@ -52,6 +67,8 @@
 
 - id: talent
   label: I want to work at a startup
+  door: Job seeker
+  slack_thread: wed
   recommends:
     - kind: slack
       note: Founders post open roles in the Wednesday Asks and Offers thread in the Slack.
@@ -60,6 +77,8 @@
 
 - id: investing
   label: I invest in or lend to startups
+  door: Investor or lender
+  slack_thread: mon
   recommends:
     - kind: events
       note: Meet Colorado founders in person at community events.
@@ -68,6 +87,8 @@
 
 - id: service-provider
   label: I offer services to startups
+  door: Services
+  slack_thread: wed
   recommends:
     - kind: slack
       note: Share your offer in the Wednesday Asks and Offers thread in the Slack. It is the one place for offers.
@@ -79,6 +100,9 @@
 
 - id: student
   label: I'm a student
+  door: Student
+  slack_thread: mon
+  picks_stage: idea
   recommends:
     - kind: canvas
       canvas_stage: idea
@@ -88,6 +112,8 @@
 
 - id: curious
   label: I'm just curious
+  door: Curious
+  slack_thread: mon
   recommends:
     - kind: newsletter
       note: The Startupers newsletter is the easiest way to follow along.

@@ -5,6 +5,8 @@ import { expect, test } from "@playwright/test";
 // usability reviews found each one below the fold.
 
 const PAGES = [
+  // Step F1: the waitlist link is the main action; the Slack stays beside it.
+  { route: "/founders/", action: { role: "link", name: "Join the waitlist" } },
   { route: "/founders/", action: { role: "link", name: "Join the Slack" } },
   { route: "/regions/photon-mountain/", action: { role: "link", name: "Join the Slack" } },
   { route: "/regions/space-peak/", action: { role: "link", name: "Join the Slack" } },
@@ -14,7 +16,8 @@ const PAGES = [
   // #723 and #724: the calendar's two ways in, and the directory's own task.
   { route: "/event-calendar/", action: { role: "link", name: "See our events on Luma" } },
   { route: "/event-calendar/", action: { role: "link", name: "Add to Google Calendar" } },
-  // Step F (2026-11-15): the directory opens on its search box.
+  // Step F (2026-11-15): the directory opens on its search box, which stays
+  // above the picks since step L1b (PR #89 review).
   { route: "/ecosystem-canvas/", action: { role: "searchbox", name: "Search" } },
 ] as const;
 
