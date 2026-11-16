@@ -1,9 +1,21 @@
 ---
-// A slot on the region page that renders nothing yet. Step P2b of the
-// 2026-11-15 engagement plan fills it. Owner: L8.
+// This week on the region page (step P2b of the 2026-11-15 engagement plan),
+// right after the first section: home's strip (components/events/ThisWeek.astro)
+// with only the events placed in this region, the same weekly threads, and the
+// one Slack join link. The strip carries the region's next event, so What's
+// here no longer names it: the page shows each event once. Owner: L8.
 import type { Region } from "@cs/shared";
+
+import ThisWeek from "../../events/ThisWeek.astro";
 
 interface Props {
   region: Region;
 }
+
+const { region } = Astro.props;
+
+/** The visible note under the hero's Join the Slack button (Hero.astro). */
+const SLACK_NOTE = "slack-note-top";
 ---
+
+<ThisWeek region={region} slackNoteId={SLACK_NOTE} />
