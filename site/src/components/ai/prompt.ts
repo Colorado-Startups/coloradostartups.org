@@ -33,7 +33,10 @@ export interface AskAiLinks {
 export function buildPrompt(subject: string, path: string, question: string = DEFAULT_QUESTION): string {
   const page = new URL(path, SITE).href;
   return [
-    `I'm reading the Colorado Startups page "${subject}" (${page}).`,
+    // The subject comes before the site's name: "the Colorado Startups page
+    // \"Funding programs\"" would read as a fund of ours (guides hard
+    // constraint 8, test/dom/l23/guides.test.ts).
+    `I'm reading "${subject}" (${page}) on Colorado Startups.`,
     `Use the Colorado Startups MCP server at ${MCP_URL} (public, no key needed) to look things up.`,
     question,
     "Name the Colorado Startups pages you used.",

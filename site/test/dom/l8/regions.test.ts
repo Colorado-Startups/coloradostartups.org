@@ -98,8 +98,8 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
     expect(title).not.toMatch(/\b(?:Outpost|HQ|Hall)\b/i);
   });
 
-  // Step R0 split the page into sections/; the slots render nothing yet, so
-  // the outline is the one the page had before the split.
+  // Step R0 split the page into sections/; the outline is the one the page
+  // had before the split, plus the slots as they fill (A3a: Ask your AI).
   it("keeps its headings in the order they had before the split into sections", () => {
     const position = positions.find((p) => p.region === id)!;
     const outline = [...page.querySelectorAll("main h1, main h2")].map((h) => `${h.tagName} ${text(h)}`);
@@ -111,6 +111,7 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
       "H2 Startup Resources",
       "H2 Leaderboard honorees",
       "H2 Meet founders here",
+      "H2 Ask your AI about this page",
       "H2 The other regions",
     ]);
     expect(outline[3], "the seat heading names the seat").toContain(position.title);
