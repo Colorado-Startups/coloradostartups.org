@@ -86,14 +86,15 @@ describe("topPicks", () => {
       "Statewide Startup Week",
     ]);
     expect(idea.picks.every((p) => p.reason === "statewide")).toBe(true);
-    // Launch's statewide cards are commercial, so its first-need programs lead
-    // and one commercial card fills the last slot.
+    // Launch's statewide cards are commercial, and it has four non-commercial
+    // programs, so all three picks are programs and no firm appears.
     expect(launch.picks.map((p) => p.card.name)).toEqual([
       "Denver Venture Lab",
       "Loveland Launchpad",
-      "Colorado Seed Fund",
+      "Front Range Accelerator",
     ]);
-    expect(launch.picks.map((p) => p.reason)).toEqual(["first-need", "first-need", "statewide"]);
+    expect(launch.picks.map((p) => p.reason)).toEqual(["first-need", "first-need", "first-need"]);
+    // Growth has two non-commercial cards, so one commercial card fills the last slot.
     expect(growth.picks.map((p) => p.card.name)).toEqual([
       "Colorado Business News",
       "Springs Scale Program",
@@ -102,9 +103,11 @@ describe("topPicks", () => {
     expect(support.picks[0].card.name).toBe("State Office of Economic Development");
   });
 
-  it("never repeats a type in a stage while another type is left", () => {
+  it("never repeats a type in a stage while another non-commercial type is left", () => {
     for (const s of topPicks(FIXTURE)) {
-      expect(new Set(s.picks.map((p) => p.card.type)).size).toBe(s.picks.length);
+      const available = new Set(FIXTURE.filter((c) => c.stage === s.stage && !COMMERCIAL.has(c.type)).map((c) => c.type));
+      const programs = s.picks.filter((p) => !COMMERCIAL.has(p.card.type));
+      expect(new Set(programs.map((p) => p.card.type)).size).toBe(Math.min(programs.length, available.size));
     }
   });
 
@@ -157,8 +160,9 @@ describe("topPicks", () => {
     expect(idea.picks[0].card.name).toBe("Fort Collins Makers");
     expect(idea.picks[0].reason).toBe("your-region");
     const launchRegion = launch.picks.filter((p) => p.reason === "your-region").map((p) => p.card.name);
-    expect(launchRegion).toEqual(["Loveland Launchpad", "Fort Collins Coworking"]);
-    expect(new Set(launch.picks.map((p) => p.card.type)).size).toBe(3);
+    // Fort Collins Coworking is in the region but commercial, so programs take every slot.
+    expect(launchRegion).toEqual(["Loveland Launchpad"]);
+    expect(launch.picks.some((p) => COMMERCIAL.has(p.card.type))).toBe(false);
     // A stage with nothing in the region falls back to the statewide order.
     expect(growth.picks.map((p) => p.reason)).not.toContain("your-region");
     expect(growth.picks[0].reason).toBe("statewide");
@@ -233,6 +237,34 @@ describe("topPicks", () => {
     // A region does not lift the cap.
     const regional = topPicks([...cards, card("launch", "Fort Collins Law", "service-provider", "Fort Collins")], { region: FUSION_CANYON })[1];
     expect(regional.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator", "Fort Collins Law"]);
+  });
+
+  it("picks a non-commercial card before a commercial one that spread and reach would favor", () => {
+    // Idea uses Denver, so the spread rule alone would take the statewide
+    // investor first. The pick order is asserted as returned, with no reorder.
+    const cards = [
+      card("idea", "Denver Founders Meetup", "community", "Denver"),
+      card("launch", "Acme Capital", "investor", "statewide"),
+      card("launch", "Zed Accelerator", "accelerator", "Denver"),
+    ];
+    const launch = topPicks(cards)[1];
+    expect(launch.picks.map((p) => p.card.name)).toEqual(["Zed Accelerator", "Acme Capital"]);
+  });
+
+  it("picks no commercial card when a stage has 3 or more non-commercial cards", () => {
+    // Same type and same city on purpose: no spread rule may let a firm in.
+    const cards = [
+      card("launch", "Acme Capital", "investor", "statewide"),
+      card("launch", "Aardvark Law", "service-provider", "statewide"),
+      card("launch", "Able Desks", "coworking", "Fort Collins"),
+      card("launch", "Xeno Accelerator", "accelerator", "Denver"),
+      card("launch", "Yolo Accelerator", "accelerator", "Denver"),
+      card("launch", "Zed Accelerator", "accelerator", "Denver"),
+    ];
+    for (const options of [{}, { region: FUSION_CANYON }]) {
+      const launch = topPicks(cards, options)[1];
+      expect(launch.picks.map((p) => p.card.name)).toEqual(["Xeno Accelerator", "Yolo Accelerator", "Zed Accelerator"]);
+    }
   });
 
   it("breaks ties by name", () => {

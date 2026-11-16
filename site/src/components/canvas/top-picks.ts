@@ -9,20 +9,22 @@
 //
 // Commercial types (COMMERCIAL below) are firms that sell to founders. A
 // featured pick reads as an endorsement, so they never appear in a first-need
-// list, get at most one pick a stage between them, and rank after every
-// non-commercial card.
+// list, and a stage shows one at most, only to fill a slot that its
+// non-commercial cards cannot.
 //
 // How one stage is picked, slot by slot:
-//   1. Rank its cards: non-commercial first, then in the visitor's region
-//      (when one is given), then statewide reach, then the stage's
-//      first-need type order below, then name, then id.
-//   2. Skip commercial cards once the stage holds one. The commercial pick
-//      always shows after the non-commercial ones.
-//   3. Take the best-ranked card that adds a new type and a new city. Relax
-//      the rule step by step when no card fits: new type and a new city that
-//      no earlier stage used either, new type and a new city in this stage,
-//      new type, new city, then anything. "statewide" and "online" are not
-//      places, so they never use up a city.
+//   1. Rank its cards: in the visitor's region (when one is given), then
+//      statewide reach, then the stage's first-need type order below, then
+//      name, then id.
+//   2. Choose the pool. While any non-commercial card is left, the pool is
+//      the non-commercial cards only. When none is left, the pool is the
+//      commercial cards, until the stage holds one; after that it is empty
+//      and the stage stops short.
+//   3. Take the best-ranked card in the pool that adds a new type and a new
+//      city. Relax the rule step by step when no card fits: new type and a
+//      new city that no earlier stage used either, new type and a new city in
+//      this stage, new type, new city, then anything. "statewide" and
+//      "online" are not places, so they never use up a city.
 import { STAGES, type Region, type ResourceCard, type Stage } from "@cs/shared";
 
 import { cityKey, NOT_CITIES } from "../../lib/regions/match";
@@ -33,8 +35,8 @@ export const PICKS_PER_STAGE = 3;
 type ResourceType = ResourceCard["type"];
 
 /**
- * Types that sell a service, capital or space to founders. At most one pick
- * a stage between them, ranked last.
+ * Types that sell a service, capital or space to founders. A stage shows one
+ * at most between them, and only once no non-commercial card is left.
  */
 export const COMMERCIAL: ReadonlySet<ResourceType> = new Set(["service-provider", "investor", "coworking"]);
 
@@ -126,7 +128,6 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
       .filter((c) => c.stage === stage)
       .sort(
         (a, b) =>
-          Number(COMMERCIAL.has(a.type)) - Number(COMMERCIAL.has(b.type)) ||
           Number(inRegion(b)) - Number(inRegion(a)) ||
           Number(isStatewide(b)) - Number(isStatewide(a)) ||
           typeRank(a.type) - typeRank(b.type) ||
@@ -155,19 +156,19 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
       () => true,
     ];
 
-    const left = [...ranked];
+    const nonCommercial = ranked.filter((c) => !COMMERCIAL.has(c.type));
+    const commercialCards = ranked.filter((c) => COMMERCIAL.has(c.type));
     let commercial = 0;
     while (picks.length < PICKS_PER_STAGE) {
-      if (commercial >= COMMERCIAL_PER_STAGE) {
-        for (let i = left.length - 1; i >= 0; i--) if (COMMERCIAL.has(left[i].type)) left.splice(i, 1);
-      }
-      if (left.length === 0) break;
+      const pool =
+        nonCommercial.length > 0 ? nonCommercial : commercial < COMMERCIAL_PER_STAGE ? commercialCards : [];
+      if (pool.length === 0) break;
       let index = -1;
       for (const rule of rules) {
-        index = left.findIndex(rule);
+        index = pool.findIndex(rule);
         if (index >= 0) break;
       }
-      const [card] = left.splice(index, 1);
+      const [card] = pool.splice(index, 1);
       const reason: PickReason = inRegion(card)
         ? "your-region"
         : isStatewide(card)
@@ -182,9 +183,6 @@ export function topPicks(cards: readonly ResourceCard[], options: TopPicksOption
       if (place !== null) cities.add(place);
     }
     for (const c of cities) usedCities.add(c);
-    // Spread can take the commercial card before a non-commercial one; it
-    // still shows last.
-    const shown = [...picks.filter((p) => !COMMERCIAL.has(p.card.type)), ...picks.filter((p) => COMMERCIAL.has(p.card.type))];
-    return { stage, picks: shown };
+    return { stage, picks };
   });
 }
