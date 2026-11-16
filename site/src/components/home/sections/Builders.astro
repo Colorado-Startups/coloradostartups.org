@@ -1,4 +1,117 @@
 ---
-// A slot on the home page that renders nothing yet. Step P1 of the
-// 2026-11-15 engagement plan fills it (the Builders band).
+// Builders (step P1): 12 companies from the latest Leaderboard edition, right
+// under the hero, so the page's first promise ("Meet the founders building
+// companies in Colorado") shows companies at once. lib/home/builders.ts picks
+// them and turns the pick each ISO week. Companies only, never people, and
+// nothing about investing (decision 17). No logos: other companies' marks are
+// theirs.
+//
+// | Each tile shows | How |
+// | --- | --- |
+// | Name | the tile is one link to the company's row on /leaderboard/ |
+// | Region | the tile's left edge in the region's color (REGION_COLORS), as on the map legend; its name for screen readers |
+//
+// A tile makes no claim about the company beyond its name. Nothing opens on
+// hover or tap, and the band runs no script.
+import { WAYS_IN, type RegionId } from "@cs/shared";
+import { getCollection } from "astro:content";
+
+import { pickBuilders } from "../../../lib/home/builders";
+import { buildBoard, latestEdition } from "../../../lib/leaderboard/board";
+import { REGION_COLORS } from "../../../lib/regions/map";
+import { ELSEWHERE, REGIONS } from "../../../lib/regions/match";
+
+const companies = (await getCollection("companies")).map((e) => e.data);
+const edition = latestEdition((await getCollection("editions")).map((e) => e.data));
+const board = edition ? buildBoard(edition, companies).map((row) => row.company) : [];
+const builders = pickBuilders(board, REGIONS);
+const regionName = new Map<string, string>(REGIONS.map((r) => [r.id, r.name]));
+const color = (region: string) => (region === ELSEWHERE ? "var(--c-text-dim)" : REGION_COLORS[region as RegionId]);
 ---
+
+{
+  builders.length > 0 && (
+    <section class="section builders" aria-labelledby="builders">
+      <div class="wrap">
+        <h2 id="builders">Builders</h2>
+        <ul class="builders__list" role="list" data-builders>
+          {builders.map((b) => (
+            <li class="builder" style={`--region-color: ${color(b.region)}`} data-builder={b.id}>
+              <a class="builder__link" href={`${WAYS_IN.leaderboard}#company-${b.id}`}>
+                <span class="builder__name">{b.name}</span>
+                <span class="visually-hidden">, {regionName.get(b.region) ?? "outside the three regions"}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="builders__more">
+          <a href={WAYS_IN.leaderboard}>See the Leaderboard</a>{" "}
+          <a href="/leaderboard/nominate/">Nominate a company</a>
+        </p>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /* A list gets the reading measure by default (global.css); this one is a grid. */
+  .builders__list {
+    max-width: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-3);
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* The card material of the region chips: surface, hairline, a region-colored edge. */
+  .builder__link {
+    display: grid;
+    align-content: start;
+    gap: var(--s-1);
+    height: 100%;
+    min-height: var(--size-tap);
+    padding: var(--s-3) var(--s-3) var(--s-3) var(--s-4);
+    border-radius: var(--r-card);
+    border-left: var(--line-bold) solid var(--region-color);
+    background: var(--c-surface);
+    box-shadow: 0 0 0 var(--line-hair) var(--c-border);
+    color: var(--c-text);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .builder__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .builder__link:hover .builder__name,
+  .builder__link:focus-visible .builder__name {
+    text-decoration: underline;
+    text-decoration-thickness: var(--line-edge);
+  }
+
+  .builders__more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    margin: var(--s-4) 0 0;
+  }
+  .builders__more a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    font-weight: 700;
+  }
+
+  @media (max-width: 960px) {
+    .builders__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .builders__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
