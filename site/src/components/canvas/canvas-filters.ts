@@ -22,6 +22,7 @@ import {
   limitFor,
   matches,
   moreText,
+  opensOnList,
   PAGE_SIZE,
   pageOf,
   readState,
@@ -97,6 +98,21 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
   const moreRow = root.querySelector<HTMLElement>("[data-canvas-more-row]");
   const moreButton = root.querySelector<HTMLButtonElement>("[data-canvas-more]");
   const shownLine = root.querySelector<HTMLElement>("[data-canvas-shown]");
+  // Step L1b: the page opens on the picks, and the full list (with this
+  // form) waits behind "Show all N resources". It ships hidden, and a
+  // <noscript> style shows it when this script cannot run.
+  const full = root.querySelector<HTMLElement>("[data-canvas-full]");
+  const showAll = root.querySelector<HTMLButtonElement>("[data-canvas-show-all]");
+
+  /** Shows the full list and retires its control. True when it was closed. */
+  const openList = (): boolean => {
+    if (!full || !full.hidden) return false;
+    full.hidden = false;
+    showAll?.setAttribute("aria-expanded", "true");
+    const row = showAll?.closest<HTMLElement>("[data-canvas-show-row]");
+    if (row) row.hidden = true;
+    return true;
+  };
 
   const control = (name: string) => form.elements.namedItem(name) as Control | null;
   // The values a control offers: a select's options, or each radio's value.
@@ -130,6 +146,8 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     const id = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "";
     const target = id ? document.getElementById(id) : null;
     if (!target) return null;
+    // A link into the list (#launch, #r-<id>) opens it first.
+    if (full?.contains(target)) openList();
     if (target.matches("section[data-canvas-group]") && allowed.stage.has(id)) state = { ...state, stage: id };
     wanted = target.closest<HTMLElement>("[data-resource]");
     return target;
@@ -251,9 +269,18 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     void apply().then(() => scrollTo(target));
   });
 
+  // "Show all" opens the list and puts the keyboard in its search box, the
+  // first control of the list's filters.
+  showAll?.addEventListener("click", () => {
+    if (openList()) form.querySelector<HTMLElement>("[name=q]")?.focus();
+  });
+
   form.hidden = false;
   for (const back of root.querySelectorAll<HTMLElement>("[data-canvas-back]")) back.hidden = false;
-  const target = readHash();
+  // A filtered or searched URL opens on the list, as before step L1b, so a
+  // shared link or a region page's "See all" lands on its results.
+  const byUrl = opensOnList(window.location.search) && openList();
+  const target = readHash() ?? (byUrl ? full : null);
   setControls();
   void apply().then(() => scrollTo(target));
   return { apply };

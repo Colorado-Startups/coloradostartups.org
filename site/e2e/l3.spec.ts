@@ -10,29 +10,59 @@ const visibleCards = (page: Page) => page.locator("[data-resource]:not([hidden])
 // Step F (2026-11-15): stage and type are radio chips, the stage chips drawn
 // as the journey with their counts; the list shows 24 matches at a time.
 const chip = (page: Page, name: "stage" | "type", value: string) => page.locator(`input[name="${name}"][value="${value}"]`);
+// The list's own count line. The "Ask your AI" row has a status line too.
+const count = (page: Page) => page.locator("[data-canvas-count]");
+// Step L1b: the page opens on its picks; the full list waits behind this.
+const openList = async (page: Page) => {
+  await page.goto("/ecosystem-canvas/");
+  await page.getByRole("button", { name: /^Show all \d+ resources$/ }).click();
+};
 
 test.describe("/ecosystem-canvas/", () => {
-  test("shows every stage, with the anchors other lanes link to", async ({ page }) => {
+  test("opens on at most 12 picks, with the full list closed behind its control", async ({ page }) => {
     await page.goto("/ecosystem-canvas/");
+    const picks = page.locator("[data-pick]");
+    expect(await picks.count()).toBeGreaterThan(0);
+    expect(await picks.count()).toBeLessThanOrEqual(12);
+    await expect(page.locator("[data-resource]").first()).toBeHidden();
+    const show = page.getByRole("button", { name: /^Show all \d+ resources$/ });
+    await expect(show).toHaveAttribute("aria-expanded", "false");
+    await show.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByLabel("Search")).toBeFocused();
+    await expect(visibleCards(page)).toHaveCount(24);
+  });
+
+  test("shows the full list below the picks without JavaScript", async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto("/ecosystem-canvas/");
+    await expect(page.locator("[data-resource]").first()).toBeVisible();
+    await expect(page.locator("[data-canvas-show-all]")).toBeHidden();
+    await context.close();
+  });
+
+  test("shows every stage, with the anchors other lanes link to", async ({ page }) => {
+    await openList(page);
     await expect(page.getByRole("heading", { level: 1, name: "Startup Resources" })).toBeVisible();
     for (const stage of ["idea", "launch", "growth", "support"]) {
       await expect(page.locator(`section#${stage}`)).toHaveCount(1);
     }
     const closing = page.getByRole("region", { name: "Missing something?" });
     await expect(closing.getByRole("link", { name: "Founder Institute" })).toHaveAttribute("href", "https://fi.co/");
-    await expect(page.getByRole("status")).toHaveText(/^All \d+ resources\.$/);
+    await expect(count(page)).toHaveText(/^All \d+ resources\.$/);
     await expect(visibleCards(page)).toHaveCount(24);
     // Hidden means not drawn: a row past the first page takes no room.
     await expect(page.locator("[data-resource]").nth(24)).toBeHidden();
   });
 
   test("filters by stage and type in place, and keeps the filters in the URL", async ({ page }) => {
-    await page.goto("/ecosystem-canvas/");
-    const total = Number((await page.getByRole("status").textContent())?.match(/\d+/)?.[0]);
+    await openList(page);
+    const total = Number((await count(page).textContent())?.match(/\d+/)?.[0]);
     await chip(page, "stage", "launch").check();
     await chip(page, "type", "investor").check();
     await expect(page).toHaveURL(/\?stage=launch&type=investor$/);
-    await expect(page.getByRole("status")).toHaveText(/^\d+ of \d+ resources match\.$/);
+    await expect(count(page)).toHaveText(/^\d+ of \d+ resources match\.$/);
     const shown = visibleCards(page);
     expect(await shown.count()).toBeGreaterThan(0);
     expect(await shown.count()).toBeLessThanOrEqual(24);
@@ -43,11 +73,11 @@ test.describe("/ecosystem-canvas/", () => {
     }
     await expect(page.locator("section#growth")).toBeHidden();
     await page.getByRole("button", { name: "Clear", exact: true }).click();
-    await expect(page.getByRole("status")).toHaveText(`All ${total} resources.`);
+    await expect(count(page)).toHaveText(`All ${total} resources.`);
   });
 
   test("shows 24 more on Show more", async ({ page }) => {
-    await page.goto("/ecosystem-canvas/");
+    await openList(page);
     await page.getByRole("button", { name: "Show 24 more" }).click();
     await expect(visibleCards(page)).toHaveCount(48);
     await expect(page.locator("[data-resource]").nth(47)).toBeVisible();
@@ -64,18 +94,21 @@ test.describe("/ecosystem-canvas/", () => {
   });
 
   test("searches with Pagefind and treats several words as all of them", async ({ page }) => {
-    await page.goto("/ecosystem-canvas/");
+    await openList(page);
     await page.getByLabel("Search").fill("coworking boulder");
-    await expect(page.getByRole("status")).toHaveText(/^\d+ of \d+ resources match\.$/);
+    await expect(count(page)).toHaveText(/^\d+ of \d+ resources match\.$/);
     const shown = visibleCards(page);
     expect(await shown.count()).toBeGreaterThan(0);
     for (const el of await shown.all()) await expect(el).toContainText(/coworking/i);
   });
 
-  test("passes axe", async ({ page }) => {
+  test("passes axe, with the list closed and open", async ({ page }) => {
     await page.goto("/ecosystem-canvas/");
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+    const closed = await new AxeBuilder({ page }).analyze();
+    expect(closed.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+    await page.getByRole("button", { name: /^Show all \d+ resources$/ }).click();
+    const open = await new AxeBuilder({ page }).analyze();
+    expect(open.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
 });
 
