@@ -16,6 +16,12 @@
 //
 // The card uses hall.css's card classes, not Card.astro: Card sets its media
 // above or beside the whole body, and this thumbnail sits beside the name only.
+//
+// The picture carries data-agent-pic, not Portrait's data-portrait or
+// ArtImage's data-art. Those markers promise a width attribute equal to the
+// file's own width (test/dom/page-polish/art-srcset.test.ts reads it so), and
+// this one is the drawn size. The first-picture test still reads it as art,
+// by its /art/brand/ file.
 import { brandArt } from "../art/art-assets";
 import { portraitKeys } from "../art/keepers";
 import Badge from "../ui/Badge.astro";
@@ -36,14 +42,11 @@ const picture = brandArt(key);
 if (!picture) throw new Error(`/agents/: ${agent.name}'s picture ${key} is not pulled (brand.lock.json)`);
 const alt = keeper ? agent.alt : agent.cardAlt;
 const badges = keeper ? ["AI agent"] : ["AI agent", "Open source"];
-// Portrait's marker for a keeper, ArtImage's for a project's card, so the
-// first-picture test reads each as art.
-const marker = keeper ? { "data-portrait": agent.id } : { "data-art": key };
 ---
 
 <li class:list={["hall-card", keeper && "hall-card--gilded", "agent"]} data-agent={agent.id}>
   <div class="agent__head" data-agent-head>
-    <figure class:list={["agent__pic", !keeper && "agent__pic--card"]} {...marker}>
+    <figure class:list={["agent__pic", !keeper && "agent__pic--card"]} data-agent-pic={key}>
       <img
         src={picture.src}
         srcset={picture.srcset}
