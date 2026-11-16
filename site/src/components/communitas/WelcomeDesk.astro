@@ -2,7 +2,17 @@
 // The Communitas welcome desk. Owner of the internals: L5 Communitas.
 // Frozen props: L1 places it on the home page and on /community/.
 //
-//   compact?: boolean   home-page version (default false): a one-line intro
+//   compact?: boolean   home-page version (default false): the doors only
+//
+// Full (/community/): the heading, the keeper's portrait and intro, each
+// door's steps with their notes, the Resourcus handoff and the disclosure.
+// Compact (home, step P4): the same doors in the same order and one group,
+// each opening to two short rows from doorPlan() in
+// src/lib/communitas/doors.ts: the Slack thread to start in and the Startup
+// Resources picks for that visitor. No keeper portrait and no keeper name, so
+// no disclosure line either; the host band (PickDoor.astro) gives the heading
+// and the next event. The home page's 60-word band cap counts closed doors
+// too, which is why the compact rows are this short.
 //
 // Static HTML compiled at build time from data/communitas/routes.yaml through
 // deskSteps() in src/lib/communitas/route.ts. No API, no model call and no
@@ -19,9 +29,12 @@
 import { VISITOR_KINDS, WAYS_IN } from "@cs/shared";
 import { getCollection } from "astro:content";
 
+import { doorPlan } from "../../lib/communitas/doors";
 import { deskSteps } from "../../lib/communitas/route";
 import { portraitAlt } from "../art/keepers";
 import Portrait from "../art/Portrait.astro";
+import { activeCards } from "../canvas/canvas-data";
+import { topPicks } from "../canvas/top-picks";
 
 interface Props {
   compact?: boolean;
@@ -43,8 +56,67 @@ const disclosure = communitas?.data.disclosure;
 const variant = compact ? "compact" : "full";
 const headingId = `welcome-desk-heading-${variant}`;
 const group = `welcome-desk-${variant}`;
+
+// The compact doors: every route, in VISITOR_KINDS order.
+let plans: ReturnType<typeof doorPlan>[] = [];
+if (compact) {
+  const threads = (await getCollection("threads")).map((entry) => entry.data);
+  const picks = topPicks(await activeCards());
+  plans = [...routes]
+    .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0))
+    .map((route) => doorPlan(route, threads, picks));
+}
+
+// Line icons in the link colour. Each row also names its kind in words for
+// screen readers.
+const ICONS = {
+  door: ["M6 21V9a6 6 0 0 1 12 0v12", "M4 21h16", "M14.5 14.5h.01"],
+  slack: ["M4 5h16v11H9l-5 4z", "M9 9h6M9 12h4"],
+  book: ["M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z", "M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"],
+};
 ---
 
+{
+  compact && (
+    <div class="welcome-desk door-set" data-compact="true">
+      <ul class="door-set__doors" role="list">
+        {plans.map((plan) => (
+          <li>
+            <details class="doorway" name={group} data-kind={plan.kind}>
+              <summary>
+                <svg class="doorway__glyph" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  {ICONS.door.map((d) => <path d={d} />)}
+                </svg>
+                <span class="doorway__label">{plan.label}</span>
+              </summary>
+              <ul class="doorway__rows" role="list">
+                <li class="doorway__row" data-row="slack" data-thread={plan.slack.day}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    {ICONS.slack.map((d) => <path d={d} />)}
+                  </svg>
+                  <span>
+                    <span class="visually-hidden">Start in the </span>Slack, {plan.slack.dayName}
+                    <span class="visually-hidden"> thread</span>
+                  </span>
+                </li>
+                <li class="doorway__row" data-row="resources">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    {ICONS.book.map((d) => <path d={d} />)}
+                  </svg>
+                  <a href={plan.resources.href} data-stage={plan.resources.stage ?? undefined}>
+                    {plan.resources.text}
+                  </a>
+                </li>
+              </ul>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+{!compact && (
 <section class="panel welcome-desk" data-compact={String(compact)} aria-labelledby={headingId}>
   <div class="desk-head">
     {
@@ -59,16 +131,10 @@ const group = `welcome-desk-${variant}`;
       )
     }
     <h3 id={headingId}>Where do you want to start?</h3>
-    {
-      compact ? (
-        <p class="meta">Communitas, the keeper of the doors, points you to the right place.</p>
-      ) : (
-        <p class="meta">
-          Founders come first here, and everyone is welcome. Pick the door that fits you, and Communitas, the keeper of
-          the doors, points you to the right place.
-        </p>
-      )
-    }
+    <p class="meta">
+      Founders come first here, and everyone is welcome. Pick the door that fits you, and Communitas, the keeper of the
+      doors, points you to the right place.
+    </p>
   </div>
   <div class="doors">
     {
@@ -94,8 +160,137 @@ const group = `welcome-desk-${variant}`;
   </p>
   {disclosure && <p class="ai-note">{disclosure}</p>}
 </section>
+)}
 
 <style>
+  /* ---------- Compact: a row of arched doors (home, step P4) ----------
+     Each door is a tall arch with a gold keystone. Opening one fills it with
+     gold and drops its two rows beneath it, so the open door reads as lit.
+     One column of two on a phone, all eight in a row on a wide screen. */
+  .door-set__doors {
+    max-width: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: var(--s-3);
+    align-items: start;
+  }
+  .doorway summary {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    align-content: end;
+    gap: var(--s-2);
+    min-height: 6.5rem;
+    padding: var(--s-5) var(--s-2) var(--s-3);
+    list-style: none;
+    border: var(--line-edge) solid var(--c-border);
+    border-bottom-width: var(--line-bold);
+    border-radius: 50% 50% var(--r-chisel) var(--r-chisel) / 3rem 3rem var(--r-chisel) var(--r-chisel);
+    background: var(--c-ground);
+    color: var(--c-text);
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+  }
+  /* All eight in a row: taller, so each still reads as a door. */
+  @media (min-width: 60rem) {
+    .doorway summary {
+      min-height: 8.5rem;
+    }
+  }
+  .doorway summary::-webkit-details-marker {
+    display: none;
+  }
+  /* The keystone at the crown of the arch. */
+  .doorway summary::before {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--line-edge));
+    left: 50%;
+    translate: -50% 0;
+    width: 1.25rem;
+    height: 0.625rem;
+    background: var(--c-accent-deep);
+    clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
+  }
+  .doorway__glyph {
+    color: var(--ink-community, var(--c-community));
+  }
+  .doorway summary:hover {
+    border-color: var(--c-text);
+  }
+  .doorway summary:hover .doorway__label {
+    text-decoration: underline;
+  }
+  .doorway[open] summary {
+    border-color: var(--c-accent-ledge);
+    border-radius: 50% 50% 0 0 / 3rem 3rem 0 0;
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+  }
+  .doorway[open] .doorway__glyph {
+    color: var(--c-on-accent);
+  }
+  .doorway[open] summary::before {
+    background: var(--c-accent-ledge);
+  }
+  .doorway__rows {
+    list-style: none;
+    margin: 0;
+    padding: var(--s-2) var(--s-3);
+    border: var(--line-edge) solid var(--c-accent-ledge);
+    border-top: 0;
+    border-radius: 0 0 var(--r-chisel) var(--r-chisel);
+    background: var(--c-ground);
+    display: grid;
+  }
+  .doorway__row {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--size-tap);
+    font-size: var(--t-step--1);
+  }
+  .doorway__row svg {
+    flex: none;
+    color: var(--ink-community, var(--c-community));
+  }
+  .doorway__row a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-tap);
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .doorway summary {
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+    }
+    /* The rows slide open where the browser can animate to a height of auto. */
+    @supports (interpolate-size: allow-keywords) and selector(::details-content) {
+      .doorway {
+        interpolate-size: allow-keywords;
+      }
+      .doorway::details-content {
+        block-size: 0;
+        overflow-y: clip;
+        transition:
+          block-size 0.25s ease,
+          content-visibility 0.25s allow-discrete;
+      }
+      .doorway[open]::details-content {
+        block-size: auto;
+      }
+    }
+  }
+
   /* The keeper's portrait beside the heading and the line that names it.
      It floats, so on a narrow screen the intro wraps under it. */
   .desk-head {

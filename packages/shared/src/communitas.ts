@@ -71,6 +71,13 @@ export const WelcomeRouteSchema = z.object({
   id: z.enum(VISITOR_KINDS),
   label: z.string().min(1).max(60),
   recommends: z.array(RecommendationSchema).min(1).max(5),
+  // The home page's "Pick your door" band (step P4): the door's short label,
+  // the weekly Slack thread to start in (a ThreadOpener day), and the stage
+  // of Startup Resources whose picks the door links. No stage means the door
+  // links Startup Resources itself.
+  door: z.string().min(1).max(20).optional(),
+  slack_thread: z.enum(["mon", "wed", "fri"]).optional(),
+  picks_stage: z.enum(STAGES).optional(),
 });
 export type WelcomeRoute = z.infer<typeof WelcomeRouteSchema>;
 
