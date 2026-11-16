@@ -12,11 +12,12 @@
 // Joining it is not admission: we check that people are founders when the
 // forum opens. The first screen's action is "Join the waitlist", a link to
 // the form (#218); "Join the Slack" sits beside it as the second action,
-// with its note. Both are beside L6's founders scene (#212, #713). No keeper
-// is in it. On a phone the scene draws the width of .wrap, 100vw less two
-// 24 px gutters, so a 412 px screen at 1.75x fetches the 640w file and a
-// 375 px one at 2x the 720w, not the 960w: the scene is the page's LCP there
-// (cloud lab, #758). The form sits below it, so it never moves the scene.
+// with its note.
+//
+// The words lead (Paul, 2026-11-16: "they're supposed to be getting info"):
+// the first section holds no picture, so the checklist rises into the first
+// screen and the lede is the LCP. L6's founders scene (#212, #713; no keeper
+// in it) closes the page under the waitlist, lazily, at most 40rem wide.
 import { WAYS_IN } from "@cs/shared";
 
 import ArtImage from "../../components/art/ArtImage.astro";
@@ -33,28 +34,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   ogImage="founders"
 >
   <section class="section section--lit hero" aria-labelledby="founders-title">
-    <div class="wrap hero__grid">
-      <div>
-        <p class="kicker">Coming later</p>
-        <h1 id="founders-title">The founders forum</h1>
-        <p class="lede">
-          A private forum for founders building companies in Colorado. It opens later.
-        </p>
-        <div class="btn-row">
-          <Button href={`#${WAITLIST_ANCHOR}`}>Join the waitlist</Button>
-          <Button variant="secondary" href={WAYS_IN.slack} aria-describedby="slack-form-note-top">Join the Slack</Button>
-        </div>
-        <p class="meta" id="slack-form-note-top">Join the Slack opens a Google Form.</p>
+    <div class="wrap">
+      <p class="kicker">Coming later</p>
+      <h1 id="founders-title">The founders forum</h1>
+      <p class="lede">
+        A private forum for founders building companies in Colorado. It opens later.
+      </p>
+      <div class="btn-row">
+        <Button href={`#${WAITLIST_ANCHOR}`}>Join the waitlist</Button>
+        <Button variant="secondary" href={WAYS_IN.slack} aria-describedby="slack-form-note-top">Join the Slack</Button>
       </div>
-      <ArtImage
-        src="brand/founders"
-        alt="Founders build a glowing fusion core in a brass ring at a workbench in a red sandstone workshop, with the Flatirons through the window."
-        aspect="16 / 9"
-        widths={[640, 720, 960, 1280]}
-        sizes="(min-width: 64rem) 560px, calc(100vw - 48px)"
-        loading="eager"
-        class="hero__art"
-      />
+      <p class="meta" id="slack-form-note-top">Join the Slack opens a Google Form.</p>
     </div>
   </section>
 
@@ -111,6 +101,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       <div class="btn-row">
         <Button variant="secondary" href={WAYS_IN.newsletter}>Get the newsletter</Button>
       </div>
+      <ArtImage
+        src="brand/founders"
+        alt="Founders build a glowing fusion core in a brass ring at a workbench in a red sandstone workshop, with the Flatirons through the window."
+        aspect="16 / 9"
+        widths={[640, 720, 960, 1280]}
+        sizes="(min-width: 44rem) 40rem, calc(100vw - 48px)"
+        loading="lazy"
+        class="founders-art"
+      />
     </div>
   </section>
 </BaseLayout>
@@ -125,22 +124,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       radial-gradient(90% 80% at 50% 0%, color-mix(in oklab, var(--c-accent) 26%, transparent), transparent 70%),
       var(--c-ground);
   }
-  /* Text, then art; side by side from 64rem, where each column is wide
-     enough for the title in two lines. */
-  .hero__grid {
-    display: grid;
-    gap: var(--s-6);
-    align-items: center;
-  }
-  .hero__grid :global(.hero__art) {
+  /* The founders scene closes the page, at most 40rem wide. ArtImage renders
+     the figure in its own scope, so this reaches it by class. */
+  #waitlist :global(.founders-art) {
+    width: min(100%, 40rem);
+    margin-top: var(--s-6);
     border-radius: var(--r-card);
     box-shadow: var(--sh-glow);
-  }
-  @media (min-width: 64rem) {
-    .hero__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--s-7);
-    }
   }
   .grid {
     display: grid;

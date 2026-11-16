@@ -4,17 +4,20 @@
 //     first section, so it shows in the first screen. Since step F1 that is
 //     Join the waitlist, a link to the form; Join the Slack is the second.
 //   - #212: each page shows one piece of Hall art the site already ships,
-//     through ArtImage, after the text in source order so a phone reads the
-//     words and the button first. Neither shows a keeper, so neither adds an
-//     AI disclosure surface.
+//     through ArtImage. Neither shows a keeper, so neither adds an AI
+//     disclosure surface.
+//   - Paul, 2026-11-16 ("they're supposed to be getting info"): the words
+//     and the way forward lead. Each page's art closes it, lazily, after its
+//     last action, and its first section holds no picture.
 import { WAYS_IN } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
 import { readDist } from "../pages";
-import { pageCss, rulesFor } from "./css";
+import { declFor, pageCss, rulesFor } from "./css";
 
 const parse = (html: string) => new DOMParser().parseFromString(html, "text/html");
 const FOLLOWS = 4; // Node.DOCUMENT_POSITION_FOLLOWING
+const PICTURE = "img, svg[role='img'], [role='img'], video, canvas";
 
 /** The page's ArtImage figures: the asset key, its <img> and the section it sits in. */
 function artOf(doc: Document) {
@@ -26,10 +29,10 @@ function artOf(doc: Document) {
   }));
 }
 
-/** The grid columns a selector gets inside a min-width 64rem media rule. */
-function columnsAt64(css: string, selector: string) {
-  const wide = rulesFor(css, selector).find((r) => r.at.startsWith("@media") && r.at.includes("64rem"));
-  return wide?.decls["grid-template-columns"];
+/** True when nothing but text follows `el` in main: no heading, form, button or other picture. */
+function closesPage(doc: Document, el: Element) {
+  const later = [...doc.querySelector("main")!.querySelectorAll(`h1, h2, h3, h4, h5, h6, form, .btn, ${PICTURE}`)];
+  return later.every((node) => el.contains(node) || !(el.compareDocumentPosition(node) & FOLLOWS));
 }
 
 describe("/founders/ first screen (#218, #212)", () => {
@@ -77,20 +80,31 @@ describe("/founders/ first screen (#218, #212)", () => {
     expect(doc.getElementById("when")).toBeNull();
   });
 
-  it("shows the founders scene in the first section, after the button", () => {
+  it("keeps the first section to words and actions, with no picture (2026-11-16)", () => {
+    expect(hero.querySelectorAll(PICTURE)).toHaveLength(0);
+    expect(hero.querySelector("figure, [data-art], [data-portrait]")).toBeNull();
+    // The checklist comes next, so it reaches the first screen on a phone.
+    expect(hero.nextElementSibling?.querySelector("ul.checklist")).not.toBeNull();
+  });
+
+  it("closes the page with the founders scene, lazily, after the newsletter button", () => {
     const art = artOf(doc);
     // L6's scene made for this page (#713), in place of the Great Hall.
     expect(art.map((a) => a.key)).toEqual(["brand/founders"]);
     const [{ figure, img, section }] = art;
-    expect(section).toBe(hero);
+    expect(section).toBe(doc.getElementById("waitlist"));
     expect(img, "the art file exists, so no placeholder").not.toBeNull();
     expect(img!.getAttribute("alt")).toMatch(/^Founders /);
-    expect(img!.getAttribute("loading")).toBe("eager");
-    expect(hero.querySelector(".btn-row")!.compareDocumentPosition(figure) & FOLLOWS).toBeTruthy();
+    expect(img!.getAttribute("loading")).toBe("lazy");
+    expect(img!.getAttribute("fetchpriority")).not.toBe("high");
+    expect(img!.getAttribute("sizes")).toBe("(min-width: 44rem) 40rem, calc(100vw - 48px)");
+    const newsletter = doc.getElementById("waitlist")!.querySelector(`a[href="${WAYS_IN.newsletter}"]`)!;
+    expect(newsletter.compareDocumentPosition(figure) & FOLLOWS).toBeTruthy();
+    expect(closesPage(doc, figure)).toBe(true);
   });
 
-  it("sets the text and the art side by side from 64rem", () => {
-    expect(columnsAt64(pageCss(html), ".hero__grid")).toBe("repeat(2,minmax(0,1fr))");
+  it("caps the scene at 40rem wide", () => {
+    expect(declFor(pageCss(html), "#waitlist .founders-art", "width")?.replace(/\s/g, "")).toBe("min(100%,40rem)");
   });
 
   it("leaves the kicker to the global class, with no scoped override (#419)", () => {
@@ -99,11 +113,35 @@ describe("/founders/ first screen (#218, #212)", () => {
   });
 });
 
-describe("404 art (#212)", () => {
+describe("404 way back and art (#212)", () => {
   const html = readDist("404.html");
   const doc = parse(html);
+  const main = doc.querySelector("main")!;
 
-  it("shows one piece of existing Hall art after the way home", () => {
+  it("leads with a site search, a plain GET to /ask/?q= that works without JavaScript", () => {
+    const form = main.querySelector<HTMLFormElement>("form[role='search']")!;
+    expect(form).not.toBeNull();
+    expect(form.getAttribute("action")).toBe("/ask/");
+    expect(form.getAttribute("method")).toBe("get");
+    const input = form.querySelector<HTMLInputElement>("input[type='search'][name='q']")!;
+    expect(input).not.toBeNull();
+    expect(form.querySelector(`label[for="${input.id}"]`)?.textContent?.trim()).toBe("Search the site");
+    // Nothing on the page comes before the search but its words.
+    const before = [...main.querySelectorAll(`form, .btn, ${PICTURE}`)][0];
+    expect(before).toBe(form);
+  });
+
+  it("lists the home page and the header's main sections after the search", () => {
+    const form = main.querySelector("form[role='search']")!;
+    const ways = main.querySelector("nav.lost__ways")!;
+    expect(form.compareDocumentPosition(ways) & FOLLOWS).toBeTruthy();
+    const hrefs = [...ways.querySelectorAll("a")].map((a) => a.getAttribute("href"));
+    const header = [...doc.querySelectorAll("#site-nav ul > li > a")].map((a) => a.getAttribute("href"));
+    expect(header.length).toBeGreaterThan(0);
+    expect(hrefs).toEqual(["/", ...header]);
+  });
+
+  it("closes with one piece of existing Hall art, lazily, after the way home", () => {
     const art = artOf(doc);
     expect(art).toHaveLength(1);
     const [{ figure, key, img }] = art;
@@ -111,12 +149,17 @@ describe("404 art (#212)", () => {
     expect(key).toBe("brand/passage");
     expect(img, "the art file exists, so no placeholder").not.toBeNull();
     expect(img!.getAttribute("alt")?.length).toBeGreaterThan(20);
+    expect(img!.getAttribute("loading")).toBe("lazy");
+    expect(img!.getAttribute("fetchpriority")).not.toBe("high");
     const home = doc.querySelector('main a[href="/"]')!;
     expect(home.compareDocumentPosition(figure) & FOLLOWS).toBeTruthy();
+    expect(closesPage(doc, figure)).toBe(true);
   });
 
-  it("sets the text and the art side by side from 64rem, the text wider", () => {
-    expect(columnsAt64(pageCss(html), ".lost")).toBe("minmax(0,7fr) minmax(0,5fr)");
+  it("keeps the column at the reading measure, with no side-by-side grid", () => {
+    const css = pageCss(html);
+    expect(declFor(css, ".lost", "max-width")).toBe("var(--t-measure)");
+    for (const rule of rulesFor(css, ".lost")) expect(rule.decls).not.toHaveProperty("grid-template-columns");
   });
 });
 

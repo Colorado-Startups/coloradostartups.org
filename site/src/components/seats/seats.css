@@ -8,14 +8,10 @@
 .seat-hero .crumbs {
   margin-bottom: var(--s-4);
 }
-.seat-hero__art.art-image {
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-glow);
-}
 .seat-hero__plaque {
   position: relative;
   max-width: 46rem;
-  margin: calc(-1 * var(--s-8)) 0 0 var(--s-5);
+  margin: 0;
   border-top: 4px solid var(--c-accent);
 }
 .seat-hero__plaque h1 {
@@ -30,10 +26,14 @@
   font-weight: 700;
   margin-bottom: var(--s-3);
 }
-@media (max-width: 48rem) {
-  .seat-hero__plaque {
-    margin: var(--s-4) 0 0;
-  }
+/* The seat's painting, under "Why it matters" ([seat].astro): at most 40rem
+   wide, after the page's own figures. Three classes outrank ArtImage's own
+   margin: 0, so the section's gap holds above it. */
+.seat-section .seat-art.art-image {
+  width: min(100%, 40rem);
+  margin-top: var(--s-6);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-glow);
 }
 
 /* ---------- Section heads ---------- */

@@ -1,65 +1,121 @@
 ---
 // 404: every unknown path. The heading carries the Hall's voice; the help
 // below it stays literal (01_doctrine/voice.md). Owner: L13.
-// The art is L6's lantern-lit passage that ends at a blank wall (#711), made
-// for this page; no keeper is in it. It sits beside the text from 64rem and
-// after it on a phone, so the way home stays in the first screen.
+// A way back leads (Paul, 2026-11-16: "they're supposed to be getting
+// info"): a search box, a plain GET to /ask/?q= like the header's Ask
+// dialog, so it works with JavaScript off; then the home page and the
+// header's main sections (NAV, so the two lists never drift apart). The art
+// is L6's lantern-lit passage that ends at a blank wall (#711), made for
+// this page; no keeper is in it. It closes the page, lazily, at most 32rem
+// wide.
 import ArtImage from "../components/art/ArtImage.astro";
 import InfoHeader from "../components/info/InfoHeader.astro";
 import { CONTACT_EMAIL, mailto } from "../components/info/links";
+import { NAV } from "../components/ui/nav";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const ways = [{ href: "/", label: "Home" }, ...NAV];
 ---
 
 <BaseLayout title="Page not found" description="This page is not on the site." noindex>
   <section class="section section--lit" aria-labelledby="page-title">
-    <div class="wrap lost">
-      <div>
+    <div class="wrap">
+      <div class="lost">
         <InfoHeader kicker="Page not found" title="This passage leads nowhere">
           <p class="lede">
             We could not find that page. It may have moved when we rebuilt the site, or the link may have a typo.
           </p>
         </InfoHeader>
-        <div class="btn-row">
-          <a class="btn btn--gold" href="/">Go to the home page</a>
-          <a class="btn btn--stone" href="/ecosystem-canvas/">Browse Startup Resources</a>
-        </div>
+        <form class="lost__search" action="/ask/" method="get" role="search" aria-label="Site">
+          <label for="lost-q">Search the site</label>
+          <div class="lost__row">
+            <input id="lost-q" type="search" name="q" required autocomplete="off" enterkeyhint="search" />
+            <button type="submit" class="btn btn--gold">Search</button>
+          </div>
+        </form>
+        <nav class="lost__ways" aria-labelledby="lost-ways-title">
+          <p id="lost-ways-title" class="lost__label">Or go to a main section</p>
+          <ul role="list">
+            {
+              ways.map((way) => (
+                <li>
+                  <a class="tap-target" href={way.href}>
+                    {way.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
         <p class="help">
           Followed a link from another site and think it should work? Tell us at{" "}
           <a href={mailto("Broken link on coloradostartups.org")}>{CONTACT_EMAIL}</a>.
         </p>
+        <ArtImage
+          src="brand/passage"
+          alt="A cog railway runs down a lantern-lit passage of pink granite to a blank stone wall, with a brass engine on its cart and a snowy peak beyond."
+          aspect="16 / 9"
+          widths={[640, 960, 1280]}
+          sizes="(min-width: 36rem) 32rem, calc(100vw - 48px)"
+          loading="lazy"
+          class="lost__art"
+        />
       </div>
-      <ArtImage
-        src="brand/passage"
-        alt="A cog railway runs down a lantern-lit passage of pink granite to a blank stone wall, with a brass engine on its cart and a snowy peak beyond."
-        aspect="16 / 9"
-        widths={[640, 960, 1280]}
-        sizes="(min-width: 64rem) 560px, 100vw"
-        loading="eager"
-        class="lost__art"
-      />
     </div>
   </section>
 </BaseLayout>
 
 <style>
+  /* The measure sits on an inner column, not on .wrap, so the column keeps
+     the header's left gutter (#260). */
   .lost {
+    max-width: var(--t-measure);
+  }
+  .lost__search {
     display: grid;
-    gap: var(--s-6);
-    align-items: center;
+    gap: var(--s-2);
   }
-  .lost :global(.lost__art) {
-    border-radius: var(--r-card);
-    box-shadow: var(--sh-glow);
+  .lost__search label,
+  .lost__label {
+    font-weight: 700;
   }
-  /* The text column takes 7 of 12 parts, so the title breaks into two lines
-     at 1280 px, not three. */
-  @media (min-width: 64rem) {
-    .lost {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--s-7);
-    }
+  .lost__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+  .lost__row input {
+    flex: 1 1 14rem;
+    min-width: 0;
+    min-height: var(--size-control);
+    padding-inline: var(--s-3);
+    font: inherit;
+    color: var(--c-text);
+    background: var(--c-surface);
+    border: var(--line-edge) solid var(--c-border);
+    border-radius: var(--r-chisel);
+  }
+  .lost__ways {
+    margin-top: var(--s-6);
+  }
+  .lost__label {
+    margin: 0 0 var(--s-2);
+  }
+  .lost__ways ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
   .help {
     margin-top: var(--s-6);
+  }
+  .lost :global(.lost__art) {
+    width: min(100%, 32rem);
+    margin-top: var(--s-6);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-glow);
   }
 </style>

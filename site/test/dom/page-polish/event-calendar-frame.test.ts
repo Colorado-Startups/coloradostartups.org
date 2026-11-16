@@ -3,23 +3,41 @@ import { describe, expect, it } from "vitest";
 import { calendarEmbedUrl } from "../../../src/components/info/links";
 import { readDist } from "../pages";
 
-// /event-calendar/ as it ships (#227): art in the page header, and a note
-// behind the Google Calendar frame for when the frame is slow, blocked or
-// hidden. Whether the frame covers the note is a layout fact, checked in
-// Chrome by e2e/page-polish-calendar-frame.spec.ts.
+// /event-calendar/ as it ships (#227), and a note behind the Google Calendar
+// frame for when the frame is slow, blocked or hidden. Whether the frame
+// covers the note is a layout fact, checked in Chrome by
+// e2e/page-polish-calendar-frame.spec.ts. The events lead (Paul, 2026-11-16:
+// "they're supposed to be getting info"): the header holds no picture, the
+// next events follow it, and the Denver painting closes the page, lazily.
 
 const d = new DOMParser().parseFromString(readDist("event-calendar/index.html"), "text/html");
+const FOLLOWS = Node.DOCUMENT_POSITION_FOLLOWING;
 
-describe("/event-calendar/ header art", () => {
-  const img = d.querySelector(".cal-head img");
+describe("/event-calendar/ header and art", () => {
+  const header = d.querySelector("main .info-header")!;
+  const art = d.querySelectorAll<HTMLElement>("main [data-art]");
 
-  it("shows one described illustration beside the page header", () => {
-    expect(d.querySelectorAll(".cal-head img")).toHaveLength(1);
-    expect(img?.getAttribute("alt") ?? "").toMatch(/\w{4,}/);
+  it("keeps the header to the title and its two actions, with no picture", () => {
+    expect(header.querySelectorAll("img, [data-art]")).toHaveLength(0);
+    expect(header.querySelectorAll(".btn-row a.btn")).toHaveLength(2);
   });
 
-  it("loads it with the first screen, not lazily", () => {
-    expect(img?.getAttribute("loading")).toBe("eager");
+  it("shows one described painting, after the next events and the add-your-event list", () => {
+    expect(art).toHaveLength(1);
+    const figure = art[0]!;
+    expect(figure.dataset.art).toBe("brand/denver");
+    const img = figure.querySelector("img");
+    expect(img?.getAttribute("alt") ?? "").toMatch(/\w{4,}/);
+    const list = d.getElementById("add-your-event")!.parentElement!.querySelector("ul")!;
+    expect(list.compareDocumentPosition(figure) & FOLLOWS).toBeTruthy();
+    const firstEvent = d.querySelector("main .info-header ~ *")!;
+    expect(firstEvent.compareDocumentPosition(figure) & FOLLOWS).toBeTruthy();
+  });
+
+  it("loads it lazily, since it closes the page", () => {
+    const img = art[0]!.querySelector("img");
+    expect(img?.getAttribute("loading")).toBe("lazy");
+    expect(img?.getAttribute("fetchpriority")).not.toBe("high");
   });
 });
 

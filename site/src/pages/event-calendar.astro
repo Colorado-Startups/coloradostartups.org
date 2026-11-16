@@ -11,6 +11,10 @@
 // "Full calendar" disclosure so its iframe loads only when opened, and adds
 // the Ask your AI row. Step L2b (2026-11-16) names the disclosure for what it
 // opens, Google's calendar, loaded from Google only when opened.
+//
+// The events lead (Paul, 2026-11-16: "they're supposed to be getting info"):
+// the header holds the title and the two actions, and the next events follow
+// at once. The Denver painting closes the page under "Add your event", lazily.
 import AskAi from "../components/ai/AskAi.astro";
 import ArtImage from "../components/art/ArtImage.astro";
 import { PLACE_ART_ALT } from "../components/art/keepers";
@@ -34,24 +38,13 @@ const events = upcomingEvents(SNAPSHOT, new Date());
   <span data-pagefind-filter="type:Events"></span>
   <section class="section section--lit" aria-labelledby="page-title">
     <div class="wrap">
-      <div class="cal-head">
-        <InfoHeader kicker="Gatherings across Colorado" title="Event calendar">
-          {/* The page's two main actions in the first screen (#225, #723). */}
-          <div class="btn-row hero-actions">
-            <a class="btn btn--gold" href={LUMA_CS}>See our events on Luma</a>
-            <a class="btn btn--stone" href={calendarSubscribeUrl()}>Add to Google Calendar</a>
-          </div>
-        </InfoHeader>
-        <ArtImage
-          src="brand/denver"
-          alt={PLACE_ART_ALT.denver}
-          aspect="21 / 9"
-          widths={[640, 960, 1280]}
-          sizes="(min-width: 60rem) 26rem, 100vw"
-          loading="eager"
-          class="cal-art"
-        />
-      </div>
+      <InfoHeader kicker="Gatherings across Colorado" title="Event calendar">
+        {/* The page's two main actions in the first screen (#225, #723). */}
+        <div class="btn-row hero-actions">
+          <a class="btn btn--gold" href={LUMA_CS}>See our events on Luma</a>
+          <a class="btn btn--stone" href={calendarSubscribeUrl()}>Add to Google Calendar</a>
+        </div>
+      </InfoHeader>
       <NextEvents events={events} />
       <EventList events={events} />
       <h2 id="full-calendar">The full calendar</h2>
@@ -102,7 +95,7 @@ const events = upcomingEvents(SNAPSHOT, new Date());
   </section>
 
   <section class="section section--lit" aria-labelledby="add-your-event">
-    <div class="wrap">
+    <div class="wrap add-event">
       <h2 id="add-your-event">Add your event</h2>
       <p>
         Hosting a startup event in Colorado? Email the details to{" "}
@@ -115,6 +108,15 @@ const events = upcomingEvents(SNAPSHOT, new Date());
         <li>A short description and the RSVP link</li>
         <li>Who is organizing it</li>
       </ul>
+      <ArtImage
+        src="brand/denver"
+        alt={PLACE_ART_ALT.denver}
+        aspect="21 / 9"
+        widths={[640, 960, 1280]}
+        sizes="(min-width: 44rem) 40rem, calc(100vw - 48px)"
+        loading="lazy"
+        class="cal-art"
+      />
     </div>
   </section>
 </BaseLayout>
@@ -168,26 +170,17 @@ const events = upcomingEvents(SNAPSHOT, new Date());
   .hero-actions {
     margin-top: var(--s-4);
   }
-  /* The home hero, cropped to its tables and hearth. A strip under the lede on
-     phones; beside the header, in the space the lede leaves, from 60rem. */
-  .cal-head :global(.cal-art) {
-    margin-bottom: var(--s-6);
+  /* The Denver painting, cropped to its town and riders, closes the page at
+     most 40rem wide. ArtImage renders the figure in its own scope, so this
+     reaches it by class. */
+  .add-event :global(.cal-art) {
+    width: min(100%, 40rem);
+    margin-top: var(--s-6);
     border-radius: var(--r-card);
     box-shadow: var(--sh-edge);
   }
-  .cal-head :global(.cal-art img) {
+  .add-event :global(.cal-art img) {
     object-position: 72% 85%;
-  }
-  @media (min-width: 60rem) {
-    .cal-head {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 26rem;
-      gap: var(--s-6);
-      align-items: center;
-    }
-    .cal-head :global(.cal-art) {
-      aspect-ratio: 8 / 5;
-    }
   }
 
   .cards {
