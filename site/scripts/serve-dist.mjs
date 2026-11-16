@@ -71,6 +71,7 @@ const TYPES = {
   ".otf": "font/otf",
   ".pdf": "application/pdf",
   ".zip": "application/zip",
+  ".ics": "text/calendar; charset=utf-8",
   ".webmanifest": "application/manifest+json",
 };
 const contentType = (path) => {
