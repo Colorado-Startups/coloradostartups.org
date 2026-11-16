@@ -1,8 +1,8 @@
 // Generates site/worker/mcp/ui/apps.generated.ts: the two MCP Apps cards the
 // /mcp server returns from resources/read, each one self-contained HTML
-// document with its CSS, its script and its map inline. Runs on predev and
-// prebuild, after sync-brand.mjs. The output is committed so the Worker
-// builds without this step, but it is never edited by hand:
+// document with its CSS, its script and its map inline. Run it by hand,
+// `cd site && node scripts/build-mcp-ui.mjs`, and commit the output; the
+// build does not run it. The output is never edited by hand:
 // test/unit/mcp/ui.test.ts regenerates it in memory and fails on any difference.
 //
 // Inputs, each read from its one source:

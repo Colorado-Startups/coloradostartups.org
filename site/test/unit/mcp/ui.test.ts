@@ -19,11 +19,14 @@ const CARDS = { thisWeek: THIS_WEEK_HTML, region: REGION_HTML };
 const NAMES = { "photon-mountain": "Photon Mountain", "space-peak": "Space Peak", "fusion-canyon": "Fusion Canyon" };
 
 describe("generated cards", () => {
+  // The generator runs by hand, not in the build: this test is what keeps its output current.
+  const STALE = "site/worker/mcp/ui/apps.generated.ts is stale. Run: cd site && node scripts/build-mcp-ui.mjs";
+
   it("apps.generated.ts equals a fresh render of its sources", () => {
-    expect(readFileSync(TARGET, "utf8")).toBe(renderModule());
+    expect(readFileSync(TARGET, "utf8"), STALE).toBe(renderModule());
     const fresh = renderCards();
-    expect(THIS_WEEK_HTML).toBe(fresh.thisWeek);
-    expect(REGION_HTML).toBe(fresh.region);
+    expect(THIS_WEEK_HTML, STALE).toBe(fresh.thisWeek);
+    expect(REGION_HTML, STALE).toBe(fresh.region);
   });
 
   for (const [name, html] of Object.entries(CARDS)) {

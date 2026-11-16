@@ -26,4 +26,10 @@ flowchart LR
 | Each card under 40 KB, ASCII only, no outside load or fetch | The generator throws; both test files check |
 | Text results unchanged, `_meta.ui` on two tools only | `test/worker/mcp/mcp.test.ts` |
 
-The generator runs on `predev` and `prebuild`, after `sync-brand.mjs`. The spec is MCP Apps 2026-01-26 ([`apps.mdx`](https://github.com/modelcontextprotocol/ext-apps/blob/v2.1.0/specification/2026-01-26/apps.mdx)). The official View library bundles to 546 KB, so `bridge.mjs` implements the few messages the cards use and quotes the spec for each.
+The generator runs by hand, not in the build. After changing `view.mjs`, `bridge.mjs`, the brand tokens or `data/geo/`, run it from the repo root and commit the output:
+
+```sh
+cd site && node scripts/build-mcp-ui.mjs
+```
+
+If you forget, `test/unit/mcp/ui.test.ts` fails in CI and names that command. The spec is MCP Apps 2026-01-26 ([`apps.mdx`](https://github.com/modelcontextprotocol/ext-apps/blob/v2.1.0/specification/2026-01-26/apps.mdx)). The official View library bundles to 546 KB, so `bridge.mjs` implements the few messages the cards use and quotes the spec for each.
