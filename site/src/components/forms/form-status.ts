@@ -1,10 +1,62 @@
 // The status half of the site's forms (card "Shared CSS patterns", #195): the
-// load stamp the Worker's speed check reads (worker/lib/forms.ts), and the
-// one message that matches the ?error= code the Worker sends back.
+// load stamp the Worker's speed check reads (worker/lib/forms.ts), the one
+// message that matches the ?error= code the Worker sends back, and the
+// submit event (step M1c).
+//
+// The submit event. A posted form gets its answer as a new page: the thanks
+// page when the Worker took the post, or the form's own page with ?error=
+// when it did not. So the event goes from that page. The form, and the
+// thanks page's section, name it in data-submit-event (join_submit or
+// newsletter_submit). Its `where` is the form's page as a slug (whereOf), so
+// both answers to one form share it.
+
+import { track } from "../../lib/track";
+import { whereOf } from "../../lib/track-attrs";
 
 // Only querySelectorAll: the Workers types give Element an append() that
 // HTMLFormElement cannot match, so a whole ParentNode type refuses a form.
 type Root = Pick<ParentNode, "querySelectorAll">;
+
+/** Sends the submit event `el` names in data-submit-event, for the form on the page at `path`. */
+export function trackSubmit(el: Element | null | undefined, path: string, ok: boolean): boolean {
+  const name = el?.getAttribute("data-submit-event");
+  return name ? track(name, { where: whereOf(path), ok }) : false;
+}
+
+/**
+ * The form's page when this page is a fresh arrival from it, as a thanks page
+ * is right after the Worker's 303: same origin, another page, and neither a
+ * reload nor a back or forward step. Null otherwise, so a reload or a shared
+ * link counts nothing.
+ */
+export function cameFrom(referrer: string, here: Pick<Location, "origin" | "href">, navType: string | undefined): string | null {
+  if (navType !== undefined && navType !== "navigate") return null;
+  try {
+    const from = new URL(referrer);
+    return from.origin === here.origin && from.href !== here.href ? from.pathname : null;
+  } catch {
+    return null;
+  }
+}
+
+function navigationType(): string | undefined {
+  try {
+    return (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined)?.type;
+  } catch {
+    return undefined;
+  }
+}
+
+/** On a thanks page: sends its submit event with ok true, right after the post. */
+export function trackAccepted(
+  root: Pick<ParentNode, "querySelector"> = document,
+  referrer: string = document.referrer,
+  here: Pick<Location, "origin" | "href"> = location,
+  navType: string | undefined = navigationType(),
+): boolean {
+  const path = cameFrom(referrer, here, navType);
+  return path ? trackSubmit(root.querySelector("[data-submit-event]"), path, true) : false;
+}
 
 /** Stamps each form's hidden "ts" input under `root` with the load time. */
 export function stampLoadTime(root: Root, now: number = Date.now()): void {

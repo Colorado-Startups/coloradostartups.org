@@ -10,10 +10,17 @@
 //
 // DOM calls use appendChild, not append: site/ loads the Workers runtime
 // types, whose Element.append is HTMLRewriter's and rejects DOM nodes.
+//
+// Events (step M1c), where "<page>-resourcus": an answer sends ask_used
+// with kind "resourcus", a card's link is marked resource_out for the click
+// listener, and the keyword search sends search_used with its hit count.
+// Never the question or the answer.
 
 import type { AskResponse, ResourceCard } from "@cs/shared";
 
 import { loadPagefind } from "../../lib/pagefind";
+import { track } from "../../lib/track";
+import { shortSlug, whereOf } from "../../lib/track-attrs";
 
 const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const CANVAS_PATH = "/ecosystem-canvas/";
@@ -193,6 +200,8 @@ class Panel {
   private readonly thread: HTMLElement;
   private readonly compact: boolean;
   private readonly turnstile: TurnstileToken;
+  /** The events' `where`: this page and the panel, such as "ask-resourcus". */
+  private readonly where = shortSlug(`${whereOf(location.pathname)}-resourcus`);
   private history: Turn[] = [];
   private busy = false;
 
@@ -288,6 +297,7 @@ class Panel {
     this.history.push({ role: "user", content: question }, { role: "assistant", content: body.answer });
     this.history = this.history.slice(-MAX_HISTORY);
     this.renderAnswer(question, body);
+    track("ask_used", { where: this.where, kind: "resourcus" });
   }
 
   private renderAnswer(question: string, res: AskResponse): void {
@@ -318,6 +328,10 @@ class Panel {
       const link = el("a", undefined, card.name);
       link.href = href;
       link.rel = "noopener noreferrer";
+      // The click listener (track.ts) reads these. The id is ours, never the URL.
+      link.dataset.track = "resource_out";
+      link.dataset.trackWhere = this.where;
+      link.dataset.trackResource = shortSlug(card.id);
       title.appendChild(link);
     } else {
       title.textContent = card.name;
@@ -338,6 +352,7 @@ class Panel {
       const results = el("div");
       try {
         const hits = await pagefindSearch(question);
+        track("search_used", { where: this.where, results: hits.length });
         if (hits.length === 0) {
           results.appendChild(el("p", "resourcus__note", "Keyword search found nothing for those words."));
         } else {

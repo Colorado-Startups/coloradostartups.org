@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // L3's two islands in jsdom: the directory filter and the suggest-form helper.
 // Pagefind is replaced by a fake, so these run without a build.
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { initCanvasFilters } from "../../../src/components/canvas/canvas-filters";
 import {
@@ -271,6 +271,19 @@ describe("initCanvasFilters", () => {
     const { apply } = initCanvasFilters(root(), async () => null);
     await apply();
     expect(shown()).toEqual(["seedco"]);
+  });
+
+  // M1c: each run hands the search_used reporter the query and the match
+  // count (lib/search-used.ts sends only the count, once the query settles).
+  it("reports each run's query and match count for search_used", async () => {
+    window.history.replaceState(null, "", "/ecosystem-canvas/?q=seed%20venture");
+    const report = vi.fn();
+    const { apply } = initCanvasFilters(root(), async () => null, report);
+    await apply();
+    expect(report).toHaveBeenLastCalledWith("seed venture", 1);
+    choose("type", "investor");
+    await settle();
+    expect(report).toHaveBeenLastCalledWith("seed venture", 1);
   });
 
   it("keeps each stage's count badge in step with the filters (#220)", async () => {

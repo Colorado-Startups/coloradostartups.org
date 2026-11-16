@@ -6,8 +6,10 @@
 //    is this page, so a second form elsewhere on the page stays quiet. Codes
 //    outside the known list are ignored, so nothing from the URL reaches a
 //    selector.
+// 3. With that message, sends newsletter_submit with ok false (step M1c). The
+//    thanks page sends ok true (form-status.ts).
 
-import { stampLoadTime } from "../forms/form-status";
+import { stampLoadTime, trackSubmit } from "../forms/form-status";
 import { newsletterCopy, type NewsletterErrorCode } from "./copy";
 
 const isKnownCode = (value: string | null): value is NewsletterErrorCode =>
@@ -23,5 +25,6 @@ export function initNewsletterForms(doc: Document, loc: Pick<Location, "pathname
     if (!message) continue;
     message.hidden = false;
     form.querySelector<HTMLInputElement>('input[name="email"]')?.setAttribute("aria-invalid", "true");
+    trackSubmit(form, loc.pathname, false);
   }
 }

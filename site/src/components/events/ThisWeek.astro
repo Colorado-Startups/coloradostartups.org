@@ -23,6 +23,8 @@
 //
 // Slack. One join link (join.ts), described by the page's own visible note:
 // home's hero renders SLACK_JOIN.noteId, and a region page passes its hero's.
+// Both join links count as join_click (step M1c): "home-week" on home,
+// "regions-<id>-week" on a region page.
 //
 import { WAYS_IN, type Region } from "@cs/shared";
 import { getCollection } from "astro:content";
@@ -31,6 +33,7 @@ import { clampWords } from "../../lib/communitas/doors";
 import { SLACK_JOIN } from "../../lib/communitas/join";
 import { placeRegion } from "../../lib/data/open-data";
 import { ELSEWHERE } from "../../lib/regions/match";
+import { joinAttrs } from "../../lib/track-attrs";
 import { countdown } from "./countdown";
 import { dateParts, endsAt, SNAPSHOT, startsAt, upcomingEvents } from "./events";
 import { filterQuery } from "./list-filter";
@@ -54,6 +57,8 @@ const now = Date.now();
 const placed = upcomingEvents(SNAPSHOT, new Date(now)).map((event) => ({ event, place: placeRegion(event.location) }));
 const events = (region ? placed.filter((p) => p.place === region.id) : placed).slice(0, KEEP);
 /** Where the titles go: the event calendar, or on a region page its list filtered to the region. */
+/** The band, as join_click's `where`. */
+const where = region ? `regions-${region.id}-week` : "home-week";
 const eventsHref = region ? `${WAYS_IN.events}${filterQuery({ region: region.id, when: "", type: "" })}#all-events` : WAYS_IN.events;
 
 const DAYS = [
@@ -123,8 +128,8 @@ const rhythm = DAYS.flatMap(({ day, label }) => {
           }
         </ul>
         <p class="this-week__ways">
-          Weekly in the <a href={SLACK_JOIN.href} aria-describedby={slackNoteId} data-link="slack">Slack</a> and the{" "}
-          <a href={WAYS_IN["linkedin-group"]} rel="noopener" data-link="linkedin-group">LinkedIn Group</a>
+          Weekly in the <a href={SLACK_JOIN.href} aria-describedby={slackNoteId} data-link="slack" {...joinAttrs(where)}>Slack</a> and the{" "}
+          <a href={WAYS_IN["linkedin-group"]} rel="noopener" data-link="linkedin-group" {...joinAttrs(where, "linkedin-group")}>LinkedIn Group</a>
         </p>
       </div>
     </div>

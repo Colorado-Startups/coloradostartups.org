@@ -35,6 +35,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { buildBoard, latestEdition } from "../../lib/leaderboard/board";
 import { REGIONS } from "../../lib/regions/match";
 import { andList, honoreesIn, inRegion, organizerFor, summaryAfterLede } from "../../lib/regions/page";
+import { joinAttrs } from "../../lib/track-attrs";
 
 // The map draws in the hero's right column, 3 of 5 parts of .wrap (100vw less
 // two 24 px gutters, at most 1180 px) less the 48 px gap; under 760 px, the
@@ -107,7 +108,7 @@ const others = regions.filter((r) => r.id !== region.id);
         {region.slack_channel && <> {region.name} founders gather in #{region.slack_channel}.</>}
       </p>
       <div class="btn-row">
-        <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note">Join the Slack</a>
+        <a class="btn btn--gold" href={WAYS_IN.slack} aria-describedby="slack-note" {...joinAttrs(`regions-${region.id}-meet`)}>Join the Slack</a>
         <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
       </div>
       <p class="meta" id="slack-note">Join the Slack opens a Google Form.</p>

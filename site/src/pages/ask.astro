@@ -6,8 +6,11 @@
 // (worker/mcp/). #connect stays for old links; the worker now sends a browser
 // that opens /mcp to /connect/. Pagefind indexes dist/ after the build, so the search is empty in
 // `astro dev`.
+// Each search's result count goes out as search_used (search-used.ts, step
+// M1c), never its words. See how to connect counts as connect_click.
 import ResourcusPanel from "../components/resourcus/ResourcusPanel.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { trackAttrs } from "../lib/track-attrs";
 ---
 
 <BaseLayout
@@ -40,29 +43,34 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <section class="section section--lit" id="connect" aria-labelledby="connect-title" data-pagefind-ignore>
     <div class="wrap stack">
       <h2 id="connect-title">Connect your AI</h2>
-      <p>Claude, OpenCode or any MCP app. Free, no key. <a href="/connect/">See how to connect yours</a>.</p>
+      <p>Claude, OpenCode or any MCP app. Free, no key. <a href="/connect/" {...trackAttrs("connect_click", { where: "ask", target: "connect-page" })}>See how to connect yours</a>.</p>
     </div>
   </section>
 </BaseLayout>
 
 <script>
+  import { watchPagefind } from "../lib/search-used";
+
+  type Ui = Parameters<typeof watchPagefind>[1];
+
   // A search from another page (the home page's Ask box) arrives as ?q=.
   // Put the words in Pagefind's box and fire an input event, so it searches.
   // Pagefind draws its box after the page loads, so look for it a few times.
+  // The count watch starts first, so the ?q= search counts too.
   const q = new URLSearchParams(location.search).get("q")?.trim();
-  if (q) {
-    void customElements.whenDefined("pagefind-input").then(() => {
-      const fill = (tries: number) => {
-        const host = document.querySelector("[data-ask-search] pagefind-input");
-        const input = host?.querySelector("input") ?? host?.shadowRoot?.querySelector("input");
-        if (input) {
-          input.value = q;
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-        } else if (tries > 0) setTimeout(() => fill(tries - 1), 100);
-      };
-      fill(30);
-    });
-  }
+  void customElements.whenDefined("pagefind-input").then(() => {
+    watchPagefind("ask", (window as Window & { PagefindComponents?: Ui }).PagefindComponents);
+    if (!q) return;
+    const fill = (tries: number) => {
+      const host = document.querySelector("[data-ask-search] pagefind-input");
+      const input = host?.querySelector("input") ?? host?.shadowRoot?.querySelector("input");
+      if (input) {
+        input.value = q;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      } else if (tries > 0) setTimeout(() => fill(tries - 1), 100);
+    };
+    fill(30);
+  });
 </script>
 
 <style>

@@ -1,16 +1,18 @@
 ---
 // /join/slack/thanks/: where /api/join sends a successful post (step P5a).
 // Out of the sitemap (astro.config.mjs SITEMAP_EXCLUDE matches /thanks/) and
-// noindex. Clears the form's sessionStorage draft. The two links come from
-// WAYS_IN, the community's one list of ways in.
+// noindex. Clears the form's sessionStorage draft, and sends join_submit with
+// ok true (form-status.ts, step M1c). The two links come from WAYS_IN, the
+// community's one list of ways in.
 import { WAYS_IN } from "@cs/shared";
 
 import { JOIN_DRAFT } from "../../../components/join/fields";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { joinAttrs } from "../../../lib/track-attrs";
 ---
 
 <BaseLayout title="Request received" description="Thank you for asking to join the Colorado Startups Slack." noindex>
-  <section class="section section--lit" data-clear-draft={JOIN_DRAFT.key}>
+  <section class="section section--lit" data-clear-draft={JOIN_DRAFT.key} data-submit-event="join_submit">
     <div class="wrap stack">
       <h1>Thank you</h1>
       <p class="lede">We have your request.</p>
@@ -20,7 +22,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       </p>
       <p>While you wait, meet the community in two other places.</p>
       <div class="btn-row">
-        <a class="btn btn--gold" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</a>
+        <a class="btn btn--gold" href={WAYS_IN["linkedin-group"]} {...joinAttrs("join-slack-thanks", "linkedin-group")}>Join the LinkedIn Group</a>
         <a class="btn btn--stone" href={WAYS_IN.events}>See upcoming events</a>
       </div>
     </div>
@@ -30,6 +32,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 <script>
   // The request went through, so this tab's draft of it is no longer needed.
   import { clearNamedDrafts } from "../../../components/apply/client";
+  import { trackAccepted } from "../../../components/forms/form-status";
 
   clearNamedDrafts(document);
+  trackAccepted();
 </script>

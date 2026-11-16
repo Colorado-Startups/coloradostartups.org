@@ -6,6 +6,8 @@
 // in Colorado, shows the message for ?error=, names the fields the Worker
 // rejected (?field=), and keeps a draft of the answers in this tab so a
 // rejection does not clear them (the apply form's helpers, apply/client.ts).
+// A rejection sends join_submit with ok false; the thanks page sends ok true
+// (form-status.ts, step M1c).
 import Turnstile from "../forms/Turnstile.astro";
 import Button from "../ui/Button.astro";
 import {
@@ -59,6 +61,7 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
     method="post"
     action={JOIN_ENDPOINT}
     data-join-form
+    data-submit-event="join_submit"
     data-draft-key={JOIN_DRAFT.key}
     data-draft-skip={[...JOIN_DRAFT.skip].join(" ")}
   >
@@ -172,7 +175,7 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
 
 <script>
   import { clearDraft, draftFrom, markInvalidFields, readDraft, saveDraft } from "../apply/client";
-  import { showErrorMessage, stampLoadTime } from "../forms/form-status";
+  import { showErrorMessage, stampLoadTime, trackSubmit } from "../forms/form-status";
 
   stampLoadTime(document);
 
@@ -212,11 +215,12 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
   }
 
   // An invalid request names the fields the Worker flagged.
-  showErrorMessage(document, code, (message) => {
+  const shown = showErrorMessage(document, code, (message) => {
     if (labels.length > 0 && message.dataset.fieldsText) {
       message.textContent = message.dataset.fieldsText.replace("{fields}", labels.join(", "));
     }
   });
+  if (shown) trackSubmit(form, window.location.pathname, false);
 </script>
 
 <style>

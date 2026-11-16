@@ -2,9 +2,11 @@
 // One resource in the directory, as a row: its name (linked to its own site),
 // its type and city, then one line of description. Owner: L3. Built from our
 // own data at build time; the heading's id is the anchor Pagefind, the guides
-// and Resourcus link to.
+// and Resourcus link to. A click on its link counts as resource_out, with
+// the id cut to 40 characters (shortSlug), never the URL (step M1c).
 import type { ResourceCard } from "@cs/shared";
 
+import { shortSlug, trackAttrs } from "../../lib/track-attrs";
 import { cityLabel, TYPE_LABELS } from "./labels";
 
 interface Props {
@@ -12,6 +14,7 @@ interface Props {
 }
 
 const { card } = Astro.props;
+const out = trackAttrs("resource_out", { where: "ecosystem-canvas", resource: shortSlug(card.id) });
 ---
 
 <li
@@ -23,7 +26,7 @@ const { card } = Astro.props;
   data-type={card.type}
   data-city={card.city}
 >
-  <h3 id={`r-${card.id}`} class="canvas-row__name"><a href={card.url}>{card.name}</a></h3>
+  <h3 id={`r-${card.id}`} class="canvas-row__name"><a href={card.url} {...out}>{card.name}</a></h3>
   <p class="meta canvas-row__facts">{TYPE_LABELS[card.type]}, {cityLabel(card.city)}</p>
   <p class="canvas-row__desc">{card.description}</p>
 </li>

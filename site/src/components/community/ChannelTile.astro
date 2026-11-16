@@ -1,9 +1,11 @@
 ---
 // One channel tile on /community/: an icon, the channel's name, one line and
 // its way in. The Slack tile's button is the page's one gold action, and the
-// note under it says it opens a Google Form (#128).
+// note under it says it opens a Google Form (#128). The Slack and LinkedIn
+// Group buttons count as join_click (step M1c).
 import type { Channel } from "../hall/channels";
 import Button from "../ui/Button.astro";
+import { joinAttrs } from "../../lib/track-attrs";
 import Card from "../ui/Card.astro";
 import { communityIcon } from "./icons";
 
@@ -14,6 +16,7 @@ interface Props {
 const { channel } = Astro.props;
 const slack = channel.id === "slack";
 const noteId = `${channel.id}-note`;
+const join = slack ? joinAttrs("community") : channel.id === "linkedin-group" ? joinAttrs("community", "linkedin-group") : {};
 ---
 
 <Card element="li" title={channel.name} class="channel" data-channel={channel.id} mediaInset>
@@ -22,11 +25,11 @@ const noteId = `${channel.id}-note`;
   <Fragment slot="actions">
     {
       slack ? (
-        <Button href={channel.action.href} aria-describedby={noteId}>
+        <Button href={channel.action.href} aria-describedby={noteId} {...join}>
           {channel.action.label}
         </Button>
       ) : (
-        <Button variant="secondary" href={channel.action.href}>
+        <Button variant="secondary" href={channel.action.href} {...join}>
           {channel.action.label}
         </Button>
       )

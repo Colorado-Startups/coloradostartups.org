@@ -9,6 +9,10 @@
 // and Open in Claude. A bad record throws, so the build stops before a card
 // ships wrong. test/dom/connect.test.ts pins the tool and prompt counts to
 // worker/mcp/server.ts.
+// Every copy button counts as connect_copy and the skill download as
+// connect_click (step M1c). `target` names what was copied: the URL
+// ("mcp-url"), a card's command (its id), its plugin commands
+// ("<id>-plugin") or the OpenCode config ("opencode-config").
 import { parse } from "yaml";
 import { z } from "zod";
 
@@ -16,6 +20,7 @@ import clientsRaw from "../../../data/ai-clients.yaml?raw";
 import AskAi from "../components/ai/AskAi.astro";
 import Button from "../components/ui/Button.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { trackAttrs } from "../lib/track-attrs";
 
 const SERVER_ID = "coloradostartups";
 const mcpUrl = new URL("/mcp", Astro.site!).toString();
@@ -60,6 +65,11 @@ const openCodeConfig = JSON.stringify(
 
 const EFFORT = { "one-command": "One command", guided: "A few steps" } as const;
 
+/** A copy button's click mark. */
+const copied = (target: string, where = "connect") => trackAttrs("connect_copy", { where, target });
+/** The skill download's click mark. */
+const skillAttrs = (id: string) => trackAttrs("connect_click", { where: "connect", target: `${id}-skill` });
+
 const facts = [
   ["Cost", "Free"],
   ["Key or sign in", "None"],
@@ -98,7 +108,7 @@ const asks = [
       </dl>
       <div class="connect-url">
         <pre class="connect-code"><code id="mcp-url" data-mcp-url>{mcpUrl}</code></pre>
-        <Button variant="secondary" data-copy="mcp-url">Copy URL</Button>
+        <Button variant="secondary" data-copy="mcp-url" {...copied("mcp-url")}>Copy URL</Button>
       </div>
       <p class="meta">
         The this_week and region tools also show a card in apps that support MCP Apps. Listed in the MCP Registry as{" "}
@@ -122,7 +132,7 @@ const asks = [
                   {c.command && (
                     <>
                       <pre class="connect-code"><code id={`cmd-${c.id}`}>{c.command.replace("{url}", mcpUrl)}</code></pre>
-                      <Button variant="secondary" data-copy={`cmd-${c.id}`}>
+                      <Button variant="secondary" data-copy={`cmd-${c.id}`} {...copied(c.id)}>
                         Copy command
                       </Button>
                     </>
@@ -138,7 +148,7 @@ const asks = [
                     <details>
                       <summary>Or install the plugin</summary>
                       <pre class="connect-code"><code id={`plugin-${c.id}`}>{c.plugin.join("\n")}</code></pre>
-                      <Button variant="secondary" data-copy={`plugin-${c.id}`}>
+                      <Button variant="secondary" data-copy={`plugin-${c.id}`} {...copied(`${c.id}-plugin`)}>
                         Copy commands
                       </Button>
                     </details>
@@ -147,14 +157,14 @@ const asks = [
                     <details>
                       <summary>Or add it to opencode.jsonc</summary>
                       <pre class="connect-code"><code id="cfg-opencode">{openCodeConfig}</code></pre>
-                      <Button variant="secondary" data-copy="cfg-opencode">
+                      <Button variant="secondary" data-copy="cfg-opencode" {...copied("opencode-config")}>
                         Copy config
                       </Button>
                     </details>
                   )}
                   {c.skill && (
                     <p>
-                      Then <a href={c.skill}>download the skill</a> and add it as a skill.
+                      Then <a href={c.skill} {...skillAttrs(c.id)}>download the skill</a> and add it as a skill.
                     </p>
                   )}
                   {c.note && <p class="meta">{c.note}</p>}
@@ -176,7 +186,7 @@ const asks = [
       </ul>
       <div class="connect-url">
         <pre class="connect-code"><code id="mcp-url-any">{mcpUrl}</code></pre>
-        <Button variant="secondary" data-copy="mcp-url-any">Copy URL</Button>
+        <Button variant="secondary" data-copy="mcp-url-any" {...copied("mcp-url", "connect-any")}>Copy URL</Button>
       </div>
     </div>
   </section>
@@ -188,7 +198,7 @@ const asks = [
         {
           asks.map((question, i) => (
             <li class="panel">
-              <AskAi subject="Connect your AI" path="/connect/" question={question} id={`ask-${i + 1}`} compact />
+              <AskAi subject="Connect your AI" path="/connect/" question={question} id={`ask-${i + 1}`} where="connect-asks" compact />
             </li>
           ))
         }

@@ -7,6 +7,7 @@ import { getCollection } from "astro:content";
 
 import { GUIDES_INDEX } from "../../lib/guides/guides";
 import { andList } from "../../lib/text";
+import { joinAttrs } from "../../lib/track-attrs";
 import { POSTAL_ADDRESS } from "../info/links";
 
 const keepers = (await getCollection("dwarves")).map((entry) => entry.data.name);
@@ -22,8 +23,8 @@ const keeperList = andList(keepers);
     <nav aria-label="Community">
       <p class="head">Join in</p>
       <ul>
-        <li><a class="community" href={WAYS_IN.slack}>Slack</a></li>
-        <li><a class="community" href={WAYS_IN["linkedin-group"]}>LinkedIn Group</a></li>
+        <li><a class="community" href={WAYS_IN.slack} {...joinAttrs("footer")}>Slack</a></li>
+        <li><a class="community" href={WAYS_IN["linkedin-group"]} {...joinAttrs("footer", "linkedin-group")}>LinkedIn Group</a></li>
         <li><a class="community" href={WAYS_IN["linkedin-page"]}>LinkedIn Page</a></li>
         <li><a class="community" href={WAYS_IN.newsletter}>Newsletter</a></li>
         <li><a class="community" href={WAYS_IN.events}>Events</a></li>

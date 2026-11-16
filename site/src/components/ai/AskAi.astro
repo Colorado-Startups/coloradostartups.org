@@ -7,6 +7,11 @@
 // The prompt sits in a box too, so a visitor without JavaScript, or whose
 // browser refuses the copy, can select it by hand. The copy button stays
 // hidden until the bundled script runs. Owner: A3a.
+// Both actions count (step M1c): Open in Claude as connect_click, target
+// "claude"; Copy prompt as connect_copy, target "prompt", or in the Ask
+// dialog as ask_used, kind "copy". `where` is the page's path as a slug
+// unless the caller names the band.
+import { trackAttrs, whereOf } from "../../lib/track-attrs";
 import { askAiLinks } from "./prompt";
 
 interface Props {
@@ -23,9 +28,18 @@ interface Props {
    * h3 heading, and the intro line and long note become one short note.
    */
   compact?: boolean;
+  /** The band, as the click events' `where`; the page's path as a slug when omitted. */
+  where?: string;
+  /** The Ask dialog's copy of the row: Copy prompt counts as ask_used. */
+  dialog?: boolean;
 }
 
-const { subject, path, question, id = "ask-ai", compact = false } = Astro.props;
+const { subject, path, question, id = "ask-ai", compact = false, dialog = false } = Astro.props;
+const where = Astro.props.where ?? whereOf(path);
+const copyAttrs = dialog
+  ? trackAttrs("ask_used", { where, kind: "copy" })
+  : trackAttrs("connect_copy", { where, target: "prompt" });
+const claudeAttrs = trackAttrs("connect_click", { where, target: "claude" });
 const { prompt, claude } = askAiLinks({ subject, path, question });
 const field = `${id}-prompt`;
 const COMPACT_NOTE = "In OpenCode or an open-weight model, paste the copied prompt.";
@@ -42,8 +56,8 @@ const NOTE = `Open in Claude fills the prompt in a new tab. ${COMPACT_NOTE}`;
     )
   }
   <div class="btn-row">
-    <button type="button" class="btn btn--gold" data-ask-copy hidden>Copy prompt</button>
-    <a class="btn btn--stone" href={claude} data-ask-claude target="_blank" rel="noopener" aria-describedby={`${id}-note`}>
+    <button type="button" class="btn btn--gold" data-ask-copy hidden {...copyAttrs}>Copy prompt</button>
+    <a class="btn btn--stone" href={claude} data-ask-claude target="_blank" rel="noopener" aria-describedby={`${id}-note`} {...claudeAttrs}>
       Open in Claude
     </a>
   </div>

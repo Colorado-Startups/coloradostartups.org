@@ -9,6 +9,7 @@ import { WAYS_IN } from "@cs/shared";
 import { SPOTLIGHT_DRAFT } from "../../components/spotlight/fields";
 import Button from "../../components/ui/Button.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { joinAttrs } from "../../lib/track-attrs";
 ---
 
 <BaseLayout title="Request received" description="Thank you for asking to be featured by Colorado Startups." noindex>
@@ -22,7 +23,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       </p>
       <p>While you wait, meet the community in two other places.</p>
       <div class="btn-row">
-        <Button href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
+        <Button href={WAYS_IN["linkedin-group"]} {...joinAttrs("get-featured-thanks", "linkedin-group")}>Join the LinkedIn Group</Button>
         <Button variant="secondary" href={WAYS_IN.events}>See upcoming events</Button>
       </div>
     </div>

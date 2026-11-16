@@ -57,6 +57,7 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
     method="post"
     action={WAITLIST_ENDPOINT}
     data-waitlist-form
+    data-submit-event="join_submit"
     data-draft-key={WAITLIST_DRAFT.key}
     data-draft-skip={[...WAITLIST_DRAFT.skip].join(" ")}
     aria-describedby="waitlist-after"
@@ -156,7 +157,7 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
 
 <script>
   import { clearDraft, draftFrom, markInvalidFields, readDraft, saveDraft } from "../apply/client";
-  import { showErrorMessage, stampLoadTime } from "../forms/form-status";
+  import { showErrorMessage, stampLoadTime, trackSubmit } from "../forms/form-status";
 
   stampLoadTime(document);
 
@@ -183,12 +184,14 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
     form.addEventListener("submit", () => saveDraft(draftFrom(new FormData(form), store), store));
   }
 
-  // An invalid entry names the fields the Worker flagged.
-  showErrorMessage(document, code, (message) => {
+  // An invalid entry names the fields the Worker flagged. A rejection sends
+  // join_submit with ok false; the thanks page sends ok true (step M1c).
+  const shown = showErrorMessage(document, code, (message) => {
     if (labels.length > 0 && message.dataset.fieldsText) {
       message.textContent = message.dataset.fieldsText.replace("{fields}", labels.join(", "));
     }
   });
+  if (shown) trackSubmit(form, window.location.pathname, false);
 </script>
 
 <style>

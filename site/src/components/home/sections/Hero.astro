@@ -16,6 +16,7 @@
 import { WAYS_IN } from "@cs/shared";
 
 import { SLACK_JOIN } from "../../../lib/communitas/join";
+import { joinAttrs } from "../../../lib/track-attrs";
 import Button from "../../ui/Button.astro";
 ---
 
@@ -27,8 +28,8 @@ import Button from "../../ui/Button.astro";
     </div>
     <div class="hero__join">
       <div class="btn-row">
-        <Button size="lg" href={SLACK_JOIN.href} aria-describedby={SLACK_JOIN.noteId}>{SLACK_JOIN.label}</Button>
-        <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]}>Join the LinkedIn Group</Button>
+        <Button size="lg" href={SLACK_JOIN.href} aria-describedby={SLACK_JOIN.noteId} {...joinAttrs("home-hero")}>{SLACK_JOIN.label}</Button>
+        <Button size="lg" variant="secondary" href={WAYS_IN["linkedin-group"]} {...joinAttrs("home-hero", "linkedin-group")}>Join the LinkedIn Group</Button>
       </div>
       <p class="meta" id={SLACK_JOIN.noteId}>{SLACK_JOIN.note}</p>
     </div>

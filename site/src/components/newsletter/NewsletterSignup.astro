@@ -10,6 +10,8 @@
 // the "ts" load stamp and the Turnstile widget. The Worker answers with a 303
 // to /newsletter/thanks/ or back here with ?error=<code>; signup.ts shows the
 // matching message. Styling uses existing tokens only until Gate A v2.
+// A rejection sends newsletter_submit with ok false (signup.ts); the thanks
+// page sends ok true (form-status.ts, step M1c).
 import Turnstile from "../forms/Turnstile.astro";
 import { newsletterCopy as copy } from "./copy";
 
@@ -27,7 +29,7 @@ const uid = `nl-${crypto.randomUUID().slice(0, 8)}`;
   <p class="meta">{copy.description}</p>
   {variant === "full" && copy.why.map((line) => <p>{line}</p>)}
 
-  <form method="post" action="/api/subscribe" data-newsletter data-return-to={returnTo}>
+  <form method="post" action="/api/subscribe" data-newsletter data-return-to={returnTo} data-submit-event="newsletter_submit">
     <div class="field">
       <label for={`${uid}-email`}>Email</label>
       <input

@@ -10,8 +10,11 @@
 // Never a vendor directory (voice.md): no ranking words, and the cards keep
 // the order the logic gives. The band is left out of the search index, so a
 // search lands on the resource's row in the full list, not on its pick.
+// A click on a pick counts as resource_out, where "ecosystem-canvas-picks"
+// (step M1c).
 import type { ResourceCard } from "@cs/shared";
 
+import { shortSlug, trackAttrs } from "../../lib/track-attrs";
 import Badge from "../ui/Badge.astro";
 import Card from "../ui/Card.astro";
 import { browseHref } from "./filter-logic";
@@ -26,6 +29,7 @@ const { cards } = Astro.props;
 // A stage with no picks (all its cards sell to founders) shows a browse row:
 // one link per substage, its count computed here from the data.
 const stages = topPicks(cards).map((s) => ({ ...s, browse: s.picks.length > 0 ? [] : substageCounts(cards, s.stage) }));
+const pickAttrs = (id: string) => trackAttrs("resource_out", { where: "ecosystem-canvas-picks", resource: shortSlug(id) });
 const kindText = (substage: string, count: number) => {
   const label = (SUBSTAGE_LABELS[substage] ?? substage).toLowerCase();
   return `${count} ${count === 1 && label.endsWith("s") ? label.slice(0, -1) : label}`;
@@ -59,7 +63,7 @@ const kindText = (substage: string, count: number) => {
             )}
             {s.picks.length > 0 && <ul class="start-here__cards">
               {s.picks.map(({ card, reason }) => (
-                <Card element="li" as="h4" title={card.name} href={card.url} data-pick data-id={card.id}>
+                <Card element="li" as="h4" title={card.name} href={card.url} data-pick data-id={card.id} linkAttrs={pickAttrs(card.id)}>
                   <Fragment slot="badges">
                     <Badge>{TYPE_LABELS[card.type]}</Badge>
                     <Badge>{cityLabel(card.city)}</Badge>
