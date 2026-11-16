@@ -59,10 +59,30 @@ export const REGION_ART_ALT = {
 export type RegionArtId = keyof typeof REGION_ART_ALT;
 
 /**
- * A region's brand clip (brand/<clip>.webm and .mp4, brand v4.2.0), when the
- * brand has one. It plays over the region's painting on its page (RegionArt).
+ * Each region's brand clip (brand/<clip>.webm and .mp4, brand v4.3.0). It plays
+ * over the region's painting on its page (RegionArt). The brand's dist/README.md
+ * pairs each clip with its still: photonics on Boulder, fusion on Fort Collins,
+ * space on Colorado Springs, the same paintings as REGION_ART_ALT.
  */
-export const REGION_CLIP: Partial<Record<RegionArtId, string>> = { "photon-mountain": "photonics" };
+export const REGION_CLIP: Partial<Record<RegionArtId, string>> = {
+  "photon-mountain": "photonics",
+  "space-peak": "space",
+  "fusion-canyon": "fusion",
+};
+
+/**
+ * Alt text for each region's crest (brand dist/crests/<id>-512.png, brand v4.3.0,
+ * decision 60), from the brand's own field and charge table in dist/README.md.
+ * The brand says to show a crest at 32 px and up; RegionChip does.
+ */
+export const REGION_CREST_ALT: Record<RegionArtId, string> = {
+  "photon-mountain": "Photon Mountain's crest: a white-and-gold light dragon on a violet shield.",
+  "space-peak": "Space Peak's crest: a golden eagle under a white star on a pink granite shield.",
+  "fusion-canyon": "Fusion Canyon's crest: a ring of fire in a red sandstone canyon.",
+};
+
+/** Art key for a region's crest (art-assets.ts brandArt). */
+export const regionCrestKey = (id: RegionArtId) => `brand/${id}-512`;
 
 /** A region scene's alt. Throws for a region with no entry, so no scene ships an undisclosed alt. */
 export function regionArtAlt(id: string): string {

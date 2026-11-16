@@ -4,9 +4,12 @@
 // are the map's legend and its list alternative; on a region page they are
 // the other two regions. Lay them out in a <ul class="region-chips">. The
 // seat is a person's (decision 43): the chip names the holder or says it is
-// open. Owner: L8.
+// open. The region's crest (brand v4.3.0) leads the chip at 40 px; the brand
+// says crests show at 32 px and up. Owner: L8.
 import type { Region } from "@cs/shared";
 
+import { brandArt } from "../art/art-assets";
+import { REGION_CREST_ALT, regionCrestKey } from "../art/keepers";
 import { REGION_COLORS } from "../../lib/regions/map";
 import { andList, type Organizer, seatRole } from "../../lib/regions/page";
 
@@ -18,12 +21,26 @@ interface Props {
 const { region, organizer } = Astro.props;
 const { position, holder } = organizer;
 const role = seatRole(position, region.name);
+const crest = brandArt(regionCrestKey(region.id));
+if (!crest) throw new Error(`no crest for region "${region.id}"; add it to brand.lock.json`);
 ---
 
 <li class="region-chip" data-region={region.id} style={`--region-color: ${REGION_COLORS[region.id]}`}>
   <a href={`/regions/${region.id}/`}>
-    <span class="region-chip__swatch" aria-hidden="true"></span>
-    <span class="region-chip__name">{region.name}</span>
+    <img
+      class="region-chip__crest"
+      src={crest.src}
+      srcset={crest.srcset}
+      sizes="40px"
+      width="40"
+      height="40"
+      alt={REGION_CREST_ALT[region.id]}
+      loading="lazy"
+      decoding="async"
+    />
+    <span class="region-chip__name"
+      ><span class="region-chip__swatch" aria-hidden="true"></span>{region.name}</span
+    >
     <span class="region-chip__cities">{andList(region.cities)}</span>
     <span class:list={["hall-badge", !holder && "hall-badge--pine", "region-chip__seat"]}>
       {holder ? `${role}: ${holder.name}` : `${role} seat open`}
@@ -47,7 +64,15 @@ const role = seatRole(position, region.name);
     color: var(--c-text);
     text-decoration: none;
   }
+  .region-chip__crest {
+    grid-row: 1 / span 3;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
   .region-chip__swatch {
+    display: inline-block;
+    margin-inline-end: var(--s-2);
+    vertical-align: middle;
     width: 14px;
     height: 14px;
     border-radius: var(--r-chisel);
