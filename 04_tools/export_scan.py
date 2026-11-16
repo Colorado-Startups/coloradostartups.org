@@ -81,8 +81,9 @@ LINK_RES = [
     ("claude-artifact", re.compile(r"claude\.ai/(?:public/)?artifacts?/|claude\.ai/code/artifact", re.I)),
     ("google-doc", re.compile(r"docs\.google\.com/(?:spreadsheets|document|presentation|forms)/d/|drive\.google\.com/", re.I)),
     # /home/ counts only at the start of a path: site/src/components/home/sections is a repo folder, not a home
-    # folder, and a pull request body that named it failed the Quality pages build (#93).
-    ("home-path", re.compile(r"/Users/(?!someone\b)[A-Za-z0-9._-]+|(?<![A-Za-z0-9._-])/home/(?!someone\b|runner\b)[A-Za-z0-9._-]+"
+    # folder, and a pull request body that named it failed the Quality pages build (#93). An escaped newline, tab
+    # or return before it (JSON text) still starts a path.
+    ("home-path", re.compile(r"/Users/(?!someone\b)[A-Za-z0-9._-]+|(?:(?<![A-Za-z0-9._-])|(?<=\\[nrt]))/home/(?!someone\b|runner\b)[A-Za-z0-9._-]+"
                              r"|-Users-(?!someone-)[A-Za-z0-9._]+-|~/(?:Developer|Claude|Documents|Library|Compute)\b")),
     ("session-id", re.compile(r"\blocal_[0-9a-f]{8}-[0-9a-f]{4}-")),
 ]
@@ -361,6 +362,8 @@ def self_test():
             "e.md": "We never name the Zorblax fund.\n",
             # A home folder after a scheme or a quote is still a home folder.
             "m.md": "open file:///home/alice/y\n",
+            # So is one after an escaped newline in JSON text; the n is not part of a file name.
+            "n.json": "{\"log\": \"saved\\n/home/alice/z\"}\n",
         }
         clean = {
             "data/fixtures/team/people.yaml": "- name: Jane Sampleperson\n",
@@ -404,7 +407,7 @@ def self_test():
         terms = [("sample-fund", re.compile(r"\bzorblax\b", re.I))]
         findings, _ = scan(tmp, names=["Jane Sampleperson"], private_repos=["secret-repo"], terms=terms)
         got = collections.Counter(f[0] for f in findings)
-        want = {"emails": 2, "phones": 1, "names": 1, "profiles": 1, "keys": 1, "private-links": 12,
+        want = {"emails": 2, "phones": 1, "names": 1, "profiles": 1, "keys": 1, "private-links": 13,
                 "private-terms": 1, "image-metadata": 8}
         if dict(got) != want:
             wrong.append("known-bad gave %s, want %s" % (dict(got), want))
