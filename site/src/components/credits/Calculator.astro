@@ -1,7 +1,8 @@
 ---
 // The startup credits calculator (step L4, 2026-11-15). A founder ticks their
-// stage and what they build with, and sees the programs that fit and an "up
-// to" total. The full tables stay below it on the page as the complete list.
+// stage and what they build with, and sees the programs that may fit and an
+// "up to" total. The full tables stay below it on the page as the complete
+// list.
 //
 // With JavaScript off the whole tool stays hidden (the `hidden` attribute,
 // which the script removes), so the page reads exactly as it did: the tables
@@ -16,7 +17,7 @@
 // the live sentence says so.
 import { amountLine, COVER_LABELS, shortProvider, sourceLabel, type Cover, type Program } from "../../lib/guides/credits";
 import { statedMax } from "../../lib/guides/credits-chart";
-import { calculate, COVER_MEANS, type CalcProgram } from "./calc";
+import { calculate, COVER_MEANS, creditOf, type CalcProgram } from "./calc";
 
 interface Props {
   programs: readonly Program[];
@@ -29,6 +30,7 @@ const byId = new Map(programs.map((p) => [p.id, p]));
 const calcPrograms: CalcProgram[] = programs.map((p) => ({
   id: p.id,
   provider: shortProvider(p.provider),
+  creditOf: creditOf(p.id, shortProvider(p.provider)),
   bucket: p.bucket,
   covers: p.covers,
   amount: statedMax(p),
@@ -36,13 +38,16 @@ const calcPrograms: CalcProgram[] = programs.map((p) => ({
 const COVERS = Object.keys(COVER_LABELS) as Cover[];
 // Every program, in the order the result shows them.
 const ordered = calculate(calcPrograms, { company: true, funded: true, covers: COVERS }).programs;
-const START = "Tick at least one kind of tool to see the programs that fit.";
+const START = "Tick at least one kind of tool to see the programs that may fit.";
 ---
 
 <section class="calc panel" aria-labelledby="calc-title" data-credits-calc data-checked={checked} hidden>
   <div class="calc__intro stack">
-    <h2 id="calc-title">Find the credits that fit you</h2>
-    <p>Tick where your company is and what you build with. The list and the total change as you tick.</p>
+    <h2 id="calc-title">Find the credits that may fit you</h2>
+    <p>
+      Tick where your company is and what you build with to see the programs that may fit. The list and the total change
+      as you tick.
+    </p>
   </div>
   <form class="calc__form" data-calc-form aria-label="Your company and tools">
     <fieldset>
@@ -85,7 +90,7 @@ const START = "Tick at least one kind of tool to see the programs that fit.";
       <span class="calc__amount" data-calc-amount></span>
     </p>
     <p class="calc__status" role="status" aria-live="polite" data-calc-status>{START}</p>
-    <ul class="calc__list" aria-label="Programs that fit" data-calc-list>
+    <ul class="calc__list" aria-label="Programs that may fit" data-calc-list>
       {
         ordered.map((cp) => {
           const p = byId.get(cp.id)!;
@@ -95,6 +100,7 @@ const START = "Tick at least one kind of tool to see the programs that fit.";
               data-bucket={cp.bucket}
               data-covers={cp.covers.join(" ")}
               data-provider={cp.provider}
+              data-credit-of={cp.creditOf}
               data-amount={cp.amount ?? ""}
               hidden
             >
@@ -112,8 +118,8 @@ const START = "Tick at least one kind of tool to see the programs that fit.";
       }
     </ul>
     <p class="meta">
-      Each name opens its row in the tables below, with what it needs and its terms. An "up to" total is not a promise:
-      each provider decides who gets what.
+      Each name opens its row in the tables below, with what it needs and its terms. An "up to" total is not a promise
+      of money: each provider decides who gets what.
     </p>
   </div>
 </section>
@@ -129,6 +135,7 @@ const START = "Tick at least one kind of tool to see the programs that fit.";
     const programs: CalcProgram[] = items.map((li) => ({
       id: li.dataset.calcProgram!,
       provider: li.dataset.provider!,
+      creditOf: li.dataset.creditOf!,
       bucket: li.dataset.bucket as Bucket,
       covers: (li.dataset.covers ?? "").split(" ").filter(Boolean) as Cover[],
       amount: li.dataset.amount ? Number(li.dataset.amount) : null,
@@ -148,7 +155,7 @@ const START = "Tick at least one kind of tool to see the programs that fit.";
       const r = calculate(programs, sel);
       const fit = new Set(r.programs.map((p) => p.id));
       for (const li of items) li.hidden = !fit.has(li.dataset.calcProgram!);
-      total.hidden = r.providers === 0;
+      total.hidden = r.sources === 0;
       amount.textContent = `$${r.upTo.toLocaleString("en-US")}`;
       status.textContent = summary(r, sel, checked);
     };

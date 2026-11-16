@@ -1,5 +1,5 @@
 // The startup credits calculator (step L4, 2026-11-15): a founder ticks their
-// stage and the kinds of tools they use, and sees the programs that fit and
+// stage and the kinds of tools they use, and sees the programs that may fit and
 // an "up to" total. Pure logic with no runtime imports, so the browser bundle
 // stays tiny: credits.ts pulls in zod and credits-chart.ts pulls in Plot, and
 // neither belongs in client JavaScript. Calculator.astro shapes each program
@@ -10,6 +10,11 @@
 // a program covers, the provider and the amount its own page states. A total
 // computed here never counts; the chart's statedMax rule (credits-chart.ts)
 // is the one this follows.
+//
+// Some programs restate another company's credit: FounderPass and Secret
+// list AWS credits, Stripe Atlas lists Cloudflare's, Ramp lists Google
+// Cloud's and Mercury lists Supabase's. The total counts each credit once,
+// by whose credit it is (creditOf), not by who lists it (review of PR #81).
 import type { Cover, Program } from "../../lib/guides/credits";
 
 export type Bucket = Program["bucket"];
@@ -17,8 +22,10 @@ export type Bucket = Program["bucket"];
 /** One program, as the calculator needs it. */
 export interface CalcProgram {
   id: string;
-  /** The provider as a sentence names it ("Google Cloud"); totals take one credit per provider. */
+  /** The provider as a sentence names it ("Google"). */
   provider: string;
+  /** Whose credit it is ("aws", "cloudflare"): the total takes one credit per key. See creditOf. */
+  creditOf: string;
   bucket: Bucket;
   covers: readonly Cover[];
   /** The largest amount the provider's own page states, in US dollars, or null when it states none. */
@@ -36,16 +43,17 @@ export interface Selection {
 }
 
 export interface CalcResult {
-  /** The programs that fit, largest stated amount first, then those with none. */
+  /** The programs that may fit, largest stated amount first, then those with none. */
   programs: CalcProgram[];
   /**
-   * The sum, over providers, of the largest amount any fitting program of that
-   * provider states. One credit per provider, because a provider's tiers
-   * replace each other rather than stack. Always shown as "up to".
+   * The sum, over credit sources, of the largest amount any fitting program
+   * states for that source. One credit per source, because a provider's tiers
+   * replace each other, and a partner's listing restates the provider's own
+   * credit rather than adding to it. Always shown as "up to".
    */
   upTo: number;
-  /** How many providers that sum counts. */
-  providers: number;
+  /** How many credit sources that sum counts. */
+  sources: number;
   /** How many fitting programs state no dollar amount, so the sum leaves them out. */
   unstated: number;
 }
@@ -57,6 +65,40 @@ export const COVER_MEANS: Record<Cover, string> = {
   inference: "calls to a hosted AI model",
   other: "storage, databases and developer tools",
 };
+
+/**
+ * Programs whose stated amount is another company's credit, or a product
+ * credit apart from its provider's cloud credit, by program id. Each was set
+ * by reading the program's name, provider and amount note on the page
+ * (data/credits/startup-programs.json, every row, 2026-11-15).
+ */
+export const CREDIT_OF: Readonly<Record<string, string>> = {
+  // "AWS Activate Credits for Mercury customers."
+  "aws-activate-mercury": "aws",
+  // "$25,000 to $100,000 in AWS credits, set by an unnamed partner."
+  "founderpass-aws": "aws",
+  // "Up to $100,000 in AWS credits ... through an unnamed AWS partner."
+  "secret-aws": "aws",
+  // Its largest stated figure is "$100,000 of Cloudflare product credits".
+  "stripe-atlas": "cloudflare",
+  // "$350 in Google Cloud credits at sign-up."
+  "ramp-perks": "google",
+  // "$300 in Supabase credits over one year."
+  "mercury-perks": "supabase",
+  // Kiro seats, not AWS cloud credits; the provider reads "Amazon Web Services (Kiro)".
+  "kiro-startup": "kiro",
+};
+
+/** The key of whose credit a program states: CREDIT_OF, else its provider's short name as a slug. */
+export function creditOf(id: string, provider: string): string {
+  return CREDIT_OF[id] ?? slug(provider);
+}
+
+const PROVIDER_KEYS: Readonly<Record<string, string>> = { "amazon web services": "aws" };
+function slug(provider: string): string {
+  const low = provider.toLowerCase().trim();
+  return PROVIDER_KEYS[low] ?? low.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
 
 /**
  * The groups a founder can apply to. Anyone can claim the first; a company
@@ -75,13 +117,13 @@ export function fits(p: CalcProgram, sel: Selection): boolean {
   return eligibleBuckets(sel).has(p.bucket) && p.covers.some((c) => sel.covers.includes(c));
 }
 
-/** The programs that fit and the "up to" total. */
+/** The programs that may fit and the "up to" total. */
 export function calculate(programs: readonly CalcProgram[], sel: Selection): CalcResult {
   const fit = programs.filter((p) => fits(p, sel));
   const best = new Map<string, number>();
   for (const p of fit) {
     if (p.amount === null) continue;
-    best.set(p.provider, Math.max(best.get(p.provider) ?? 0, p.amount));
+    best.set(p.creditOf, Math.max(best.get(p.creditOf) ?? 0, p.amount));
   }
   let upTo = 0;
   for (const n of best.values()) upTo += n;
@@ -89,7 +131,7 @@ export function calculate(programs: readonly CalcProgram[], sel: Selection): Cal
   return {
     programs: sorted,
     upTo,
-    providers: best.size,
+    sources: best.size,
     unstated: fit.filter((p) => p.amount === null).length,
   };
 }
@@ -102,12 +144,12 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
  * source in the same sentence ("computed here", "per each provider's page").
  */
 export function summary(r: CalcResult, sel: Selection, checked: string): string {
-  if (sel.covers.length === 0) return "Tick at least one kind of tool to see the programs that fit.";
-  if (r.programs.length === 0) return "No program on this page fits those choices. Try ticking another kind of tool.";
-  const fit = `${plural(r.programs.length, "program fits", "programs fit")}.`;
+  if (sel.covers.length === 0) return "Tick at least one kind of tool to see the programs that may fit.";
+  if (r.programs.length === 0) return "No program on this page may fit those choices. Try ticking another kind of tool.";
+  const fit = `${plural(r.programs.length, "program may fit", "programs may fit")}.`;
   const total =
-    r.providers > 0
-      ? ` Up to ${usd(r.upTo)} in credits, computed here from the largest amount each of ${plural(r.providers, "provider", "providers")} states on its own page, checked by ${checked}.`
+    r.sources > 0
+      ? ` Up to ${usd(r.upTo)} in credits, after each program's requirements, computed here from the largest amount stated for each of ${plural(r.sources, "credit source", "credit sources")}, per each program's own page, checked by ${checked}.`
       : "";
   const none =
     r.unstated > 0 ? ` ${plural(r.unstated, "program states", "programs state")} no dollar amount, so the total leaves ${r.unstated === 1 ? "it" : "them"} out.` : "";
