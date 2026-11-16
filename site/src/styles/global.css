@@ -463,7 +463,10 @@ input[type="radio"] {
         count-g4 round(down, var(--count) / 1000000000, 1);
       animation: count-up linear both;
       animation-timeline: view();
-      animation-range: entry 0% cover 45%;
+      /* Ends when the figure is fully in view, a point every figure reaches.
+         A range that ends deeper in the page (cover 45%) left a figure low
+         on the first screen, or near a short page's end, on a partial number. */
+      animation-range: entry 0% entry 100%;
     }
     [data-count-up] > .count__text {
       opacity: calc(1 - var(--count-on));

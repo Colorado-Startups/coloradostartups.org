@@ -133,6 +133,12 @@ describe("scroll reveals and count-up (W1.2, W1.3)", () => {
     for (const b of copies) expect(b.body).toMatch(/\/ ""\s*;/);
   });
 
+  it("ends the count when the figure is fully in view, so none stops on a partial number", () => {
+    const counters = where((b) => b.head === "[data-count-up]");
+    expect(counters.length).toBe(1);
+    expect(counters[0].body).toMatch(/animation-range:\s*entry 0% entry 100%\s*;/);
+  });
+
   it("never replaces or recolors the real number's text", () => {
     for (const b of where((b) => b.head.includes(".count__text"))) {
       expect(b.body).not.toMatch(/content\s*:|color\s*:|display\s*:\s*none|visibility/);
