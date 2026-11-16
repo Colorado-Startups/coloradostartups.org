@@ -5,10 +5,12 @@
 //      visitor presses "Explore the live map", so the page's entry script
 //      stays small. The chips under it are its legend and list alternative:
 //      color, cities and the Connector seat.
-//   2. What each region builds: the home page's three theme panels
+//   2. The regions side by side (Tallies, step W6): three sourced tallies per
+//      region, in data order, never ranked.
+//   3. What each region builds: the home page's three theme panels
 //      (ThemePanel and themes()), each headed by its region's map, each figure
 //      with its source.
-//   3. How the regions work, in captions, and a line for founders elsewhere in
+//   4. How the regions work, in captions, and a line for founders elsewhere in
 //      Colorado (decision 45).
 // Each region's Connector seat is a person's; the keepers, AI agents, never
 // take it (decision 43). Owner: L8.
@@ -20,6 +22,7 @@ import ThemePanel from "../../components/home/ThemePanel.astro";
 import ColoradoMap from "../../components/map/ColoradoMap.astro";
 import LiveMaps from "../../components/map/LiveMaps.astro";
 import RegionChip from "../../components/regions/RegionChip.astro";
+import Tallies from "../../components/regions/Tallies.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { REGIONS } from "../../lib/regions/match";
 import { organizerFor } from "../../lib/regions/page";
@@ -50,6 +53,14 @@ const statewideSeat = positions.find((p) => p.id === "community-organizer");
           </ul>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="section section--lit" aria-labelledby="side-by-side">
+    <div class="wrap">
+      <h2 id="side-by-side">The regions side by side</h2>
+      <p class="lede">Three equals, in their fixed order. Each bar compares one tally across the three.</p>
+      <Tallies regions={REGIONS} />
     </div>
   </section>
 
