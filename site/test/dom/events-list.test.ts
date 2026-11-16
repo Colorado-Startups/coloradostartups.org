@@ -7,7 +7,7 @@ import { REGION_IDS } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
 import { applyFilter, denverDay, filterQuery, initEventList, NO_FILTER, readFilter, weekEnd } from "../../src/components/events/list-filter";
-import { loadFrames } from "../../src/components/info/calendar-defer";
+import { loadFrames, wireDeferredFrames } from "../../src/components/info/calendar-defer";
 import { calendarEmbedUrl } from "../../src/components/info/links";
 import { readDist } from "./pages";
 
@@ -57,9 +57,23 @@ describe("the events list", () => {
       expect(text(li.querySelector(".ev__title"))).not.toBe("");
       expect(text(li.querySelector(".ev__time"))).not.toBe("");
       expect(Number.isNaN(Date.parse(li.dataset.ends ?? ""))).toBe(false);
-      expect(["in-person", "online"]).toContain(li.dataset.type);
+      // L2b: the formats a row has, space-separated; "" when its place is not announced.
+      expect(["in-person", "online", "in-person online", ""]).toContain(li.dataset.type);
       expect(regions.has(li.dataset.region ?? "missing")).toBe(true);
       if (li.dataset.type === "online") expect(li.dataset.region).toBe("");
+      expect(li.querySelector(".ev__time time")?.getAttribute("datetime")).toBeTruthy();
+    }
+  });
+
+  // The tie on start time is pinned with fixed events in test/unit/events-format.test.ts.
+  it("orders the events within one day by start time, then title", () => {
+    for (const group of list.querySelectorAll<HTMLElement>("[data-day-group]")) {
+      const rows = items(group).map((li) => ({
+        start: Date.parse(li.querySelector(".ev__time time")!.getAttribute("datetime")!),
+        title: text(li.querySelector(".ev__title")),
+      }));
+      const sorted = [...rows].sort((a, b) => a.start - b.start || a.title.localeCompare(b.title));
+      expect(rows).toEqual(sorted);
     }
   });
 
@@ -88,7 +102,7 @@ describe("the filter chips", () => {
     expect(group("when").map((r) => r.value)).toEqual(["", "week"]);
     const inData = new Set(items(list).map((li) => li.dataset.region).filter(Boolean));
     for (const r of group("region").filter((r) => r.value)) expect(inData.has(r.value)).toBe(true);
-    const types = new Set(items(list).map((li) => li.dataset.type));
+    const types = new Set(items(list).flatMap((li) => (li.dataset.type ?? "").split(" ").filter(Boolean)));
     expect(group("type").length > 0).toBe(types.size > 1);
   });
 
@@ -116,7 +130,7 @@ describe("filtering the built list", () => {
   it("by format shows only online events, and hides days left empty", () => {
     const root = fresh().querySelector("[data-event-list]")!;
     applyFilter(root, { ...NO_FILTER, type: "online" }, NOW);
-    expect(visible(root).every((li) => li.dataset.type === "online")).toBe(true);
+    expect(visible(root).every((li) => li.dataset.type!.split(" ").includes("online"))).toBe(true);
     for (const g of root.querySelectorAll<HTMLElement>("[data-day-group]")) {
       expect(g.hidden).toBe(visible(g).length === 0);
     }
@@ -137,6 +151,13 @@ describe("filtering the built list", () => {
     expect(applyFilter(root, NO_FILTER, later)).toEqual({ shown: 0, upcoming: 0 });
     expect(root.querySelector<HTMLElement>("[data-events-empty]")!.hidden).toBe(false);
     expect(root.querySelector<HTMLElement>("[data-list-none]")!.hidden).toBe(true);
+  });
+
+  it("links the empty message to the full calendar disclosure", () => {
+    const link = list.querySelector("[data-events-empty] a")!;
+    expect(link.getAttribute("href")).toBe("#full-calendar");
+    expect(page.getElementById("full-calendar")).not.toBeNull();
+    expect(page.querySelector("details[data-full-calendar]")!.getAttribute("data-open-on")).toBe("full-calendar");
   });
 
   it("offers a way back when the filters match nothing", () => {
@@ -162,7 +183,7 @@ describe("the filter in the URL", () => {
     initEventList(root, () => NOW);
     const checked = (name: string) => root.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
     expect(checked("type")).toBe("online");
-    expect(visible(root).every((li) => li.dataset.type === "online")).toBe(true);
+    expect(visible(root).every((li) => li.dataset.type!.split(" ").includes("online"))).toBe(true);
 
     const week = root.querySelector<HTMLInputElement>('input[name="when"][value="week"]')!;
     week.checked = true;
@@ -176,9 +197,9 @@ describe("the full calendar disclosure", () => {
   const details = main.querySelector<HTMLDetailsElement>("details[data-full-calendar]")!;
   const frame = details.querySelector("iframe")!;
 
-  it("is closed, labeled Full calendar, under the full-calendar heading", () => {
+  it("is closed, says it opens Google's calendar from Google, under the full-calendar heading", () => {
     expect(details.hasAttribute("open")).toBe(false);
-    expect(text(details.querySelector("summary"))).toBe("Full calendar");
+    expect(text(details.querySelector("summary"))).toBe("Show Google's calendar (it loads from Google when you open it)");
     expect(follows(page.getElementById("full-calendar")!, details)).toBe(true);
   });
 
@@ -193,6 +214,33 @@ describe("the full calendar disclosure", () => {
     expect(loadFrames(copy)).toBe(1);
     expect(copy.querySelector("iframe")!.getAttribute("src")).toBe(calendarEmbedUrl());
     expect(loadFrames(copy)).toBe(0);
+  });
+
+  // L2b: the toggle itself, wired as the page wires it (calendar-defer.ts).
+  it("has no src until the disclosure opens, then loads Google's frame once", () => {
+    window.history.replaceState(null, "", "/event-calendar/");
+    document.body.innerHTML = details.outerHTML;
+    const live = document.querySelector<HTMLDetailsElement>("details[data-full-calendar]")!;
+    const liveFrame = live.querySelector("iframe")!;
+    wireDeferredFrames(document);
+    expect(liveFrame.hasAttribute("src")).toBe(false);
+    live.open = true;
+    live.dispatchEvent(new Event("toggle"));
+    expect(liveFrame.getAttribute("src")).toBe(calendarEmbedUrl());
+    live.open = false;
+    live.dispatchEvent(new Event("toggle"));
+    expect(liveFrame.getAttribute("src")).toBe(calendarEmbedUrl());
+  });
+
+  it("opens itself on a link to #full-calendar", () => {
+    window.history.replaceState(null, "", "/event-calendar/#full-calendar");
+    document.body.innerHTML = details.outerHTML;
+    const live = document.querySelector<HTMLDetailsElement>("details[data-full-calendar]")!;
+    wireDeferredFrames(document);
+    expect(live.open).toBe(true);
+    live.dispatchEvent(new Event("toggle"));
+    expect(live.querySelector("iframe")!.getAttribute("src")).toBe(calendarEmbedUrl());
+    window.history.replaceState(null, "", "/event-calendar/");
   });
 });
 

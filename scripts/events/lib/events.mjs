@@ -37,8 +37,8 @@ export function cleanText(text) {
 }
 
 const URL_ONLY = /^(?:https?:\/\/|www\.)\S+$/i;
-const VIRTUAL = /\b(?:virtual(?:ly)?|online|zoom|webinar|livestream(?:ed)?|live\s+stream|google\s+meet|(?:ms|microsoft)\s+teams)\b/i;
-const IN_PERSON = /\bin[\s-]?person\b|\bhybrid\b/i;
+export const VIRTUAL = /\b(?:virtual(?:ly)?|online|zoom|webinar|livestream(?:ed)?|live\s+stream|google\s+meet|(?:ms|microsoft)\s+teams)\b/i;
+export const IN_PERSON = /\bin[\s-]?person\b|\bhybrid\b/i;
 // A ZIP code, or ", CO" / ", Colorado" after a place: enough to give Google
 // a postal address rather than a venue nickname.
 const ADDRESS = /\b\d{5}(?:-\d{4})?\b|,\s*(?:CO|Colorado)\b/;

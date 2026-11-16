@@ -35,6 +35,15 @@ export function calendarSubscribeUrl(id: string = CALENDAR_ID): string {
   return url.toString();
 }
 
+/**
+ * The calendar's public iCal feed, the one scripts/events/fetch-ics.mjs reads
+ * (its feedUrl), as a webcal:// link so a visitor's calendar app subscribes to
+ * it and stays current. Same host and path; only the scheme differs.
+ */
+export function calendarFeedSubscribeUrl(id: string = CALENDAR_ID): string {
+  return `webcal://calendar.google.com/calendar/ical/${encodeURIComponent(id)}/public/basic.ics`;
+}
+
 /** Where Colorado Startups posts the events it hosts (the old page's Luma link, now on luma.com). */
 export const LUMA_CS = "https://luma.com/coloradostartups";
 

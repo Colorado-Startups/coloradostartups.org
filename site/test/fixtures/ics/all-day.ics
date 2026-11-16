@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Colorado Startups//Event calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:2026-12-24-0c45eee87267@coloradostartups.org
+DTSTAMP:20261102T235057Z
+DTSTART;VALUE=DATE:20261224
+DTEND;VALUE=DATE:20261227
+SUMMARY:Office closed\; back Monday
+URL:https://coloradostartups.org/event-calendar/
+DESCRIPTION:From the Colorado Startups event calendar (https://coloradostar
+ tups.org/event-calendar/). Check with the host before you go.
+END:VEVENT
+END:VCALENDAR
