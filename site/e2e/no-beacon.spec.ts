@@ -9,7 +9,8 @@ for (const path of ["/", "/get-involved/apply/", "/ask/"]) {
   test(`${path} sends nothing to Cloudflare Web Analytics from a test run`, async ({ page }) => {
     const hits: string[] = [];
     page.on("request", (request) => {
-      if (request.url().includes("cloudflareinsights.com")) hits.push(request.url());
+      const host = new URL(request.url()).hostname;
+      if (host === "cloudflareinsights.com" || host.endsWith(".cloudflareinsights.com")) hits.push(request.url());
     });
     await page.goto(path);
     await page.waitForLoadState("networkidle");
