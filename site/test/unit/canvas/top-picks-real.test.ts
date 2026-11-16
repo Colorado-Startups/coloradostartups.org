@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
 import { cityLabel, PICK_REASON_LABELS, showAllText, TYPE_LABELS } from "../../../src/components/canvas/labels";
-import { isCommercial, topPicks } from "../../../src/components/canvas/top-picks";
+import { isCommercial, PICKS_PER_STAGE, substageCounts, topPicks } from "../../../src/components/canvas/top-picks";
 
 const DATA = path.resolve(import.meta.dirname, "..", "..", "..", "..", "data", "resources");
 const active = readdirSync(DATA, { withFileTypes: true })
@@ -25,10 +25,9 @@ describe("topPicks on the real records", () => {
   const result = topPicks(active);
   const picks = result.flatMap((s) => s.picks);
 
-  it("gives at most 3 picks a stage, 12 in all, each an active record", () => {
+  it("gives at most 3 picks a stage, each an active record", () => {
     expect(result.map((s) => s.stage)).toEqual([...STAGES]);
-    for (const s of result) expect(s.picks.length).toBeLessThanOrEqual(3);
-    expect(picks.length).toBeLessThanOrEqual(12);
+    for (const s of result) expect(s.picks.length).toBeLessThanOrEqual(PICKS_PER_STAGE);
     const ids = new Set(active.map((c) => c.id));
     for (const p of picks) expect(ids.has(p.card.id)).toBe(true);
     const lines = result.map(
@@ -52,9 +51,24 @@ describe("topPicks on the real records", () => {
       const leftOut = active.filter((c) => c.stage === s.stage && !isCommercial(c) && !picked.has(c.id));
       const commercial = s.picks.filter((p) => isCommercial(p.card)).map((p) => p.card.name);
       if (leftOut.length > 0) expect(commercial, s.stage).toEqual([]);
-      // A stage with no non-commercial card shows one commercial pick at most.
-      else expect(commercial.length, s.stage).toBeLessThanOrEqual(1);
     }
+  });
+
+  // PR #89 review: every Growth record is an investor or a service provider,
+  // so Growth gets no pick; the page shows a browse row with these counts.
+  it("gives Growth no pick, and browse counts that equal the data", () => {
+    const growth = result.find((s) => s.stage === "growth")!;
+    expect(growth.picks).toEqual([]);
+    const counts = substageCounts(active, "growth");
+    expect(counts.length).toBeGreaterThan(0);
+    for (const { substage, count } of counts) {
+      expect(count, substage).toBe(active.filter((c) => c.stage === "growth" && c.substage === substage).length);
+    }
+    expect(counts.reduce((n, c) => n + c.count, 0)).toBe(active.filter((c) => c.stage === "growth").length);
+  });
+
+  it("never picks a commercial card", () => {
+    for (const p of picks) expect(isCommercial(p.card), p.card.name).toBe(false);
   });
 
   it("labels each reason and the control without ranking words", () => {

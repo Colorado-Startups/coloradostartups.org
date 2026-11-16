@@ -84,6 +84,7 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
     facts: {
       id: el.dataset.id ?? "",
       stage: el.dataset.stage ?? "",
+      substage: el.dataset.substage ?? "",
       type: el.dataset.type ?? "",
       city: el.dataset.city ?? "",
       text: el.textContent ?? "",
@@ -127,7 +128,13 @@ export function initCanvasFilters(root: HTMLElement, search: Search = pagefindId
         )
         .filter(Boolean),
     );
-  const allowed = { stage: optionsOf("stage"), type: optionsOf("type"), city: optionsOf("city") };
+  const allowed = {
+    stage: optionsOf("stage"),
+    // No control offers substages; the rows' own values are the allowed ones.
+    substage: new Set(cards.map((c) => c.facts.substage).filter(Boolean)),
+    type: optionsOf("type"),
+    city: optionsOf("city"),
+  };
   const pagePath = window.location.pathname;
 
   let state: FilterState = readState(window.location.search, allowed);

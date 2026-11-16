@@ -19,11 +19,10 @@ const openList = async (page: Page) => {
 };
 
 test.describe("/ecosystem-canvas/", () => {
-  test("opens on at most 12 picks, with the full list closed behind its control", async ({ page }) => {
+  test("opens on its picks, with the full list closed behind its control", async ({ page }) => {
     await page.goto("/ecosystem-canvas/");
     const picks = page.locator("[data-pick]");
     expect(await picks.count()).toBeGreaterThan(0);
-    expect(await picks.count()).toBeLessThanOrEqual(12);
     await expect(page.locator("[data-resource]").first()).toBeHidden();
     const show = page.getByRole("button", { name: /^Show all \d+ resources$/ });
     await expect(show).toHaveAttribute("aria-expanded", "false");
@@ -41,6 +40,17 @@ test.describe("/ecosystem-canvas/", () => {
     await expect(count(page)).toHaveText(/^\d+ of \d+ resources match\.$/);
     await expect(page.locator("[data-canvas-picks]")).toBeHidden();
     expect(await visibleCards(page).count()).toBeGreaterThan(0);
+  });
+
+  test("a browse row link opens the list filtered to its stage and substage", async ({ page }) => {
+    await page.goto("/ecosystem-canvas/");
+    const link = page.locator("[data-browse-row] a[data-substage]").first();
+    const substage = await link.getAttribute("data-substage");
+    const n = Number(await link.getAttribute("data-count"));
+    await link.click();
+    await expect(page.locator("[data-canvas-full]")).toBeVisible();
+    await expect(count(page)).toHaveText(new RegExp(`^${n} of \\d+ resources match\\.$`));
+    for (const el of await visibleCards(page).all()) await expect(el).toHaveAttribute("data-substage", substage!);
   });
 
   test("opens the full list on a link to a resource that is not a pick", async ({ page }) => {

@@ -3,6 +3,11 @@
 
 export interface FilterState {
   stage: string;
+  /**
+   * Only from a link, such as a Start here browse row (step L1b): no control
+   * sets it, so the next filter change clears it.
+   */
+  substage?: string;
   type: string;
   city: string;
   q: string;
@@ -11,12 +16,13 @@ export interface FilterState {
 export interface CardFacts {
   id: string;
   stage: string;
+  substage?: string;
   type: string;
   city: string;
   text: string;
 }
 
-const KEYS = ["stage", "type", "city", "q"] as const;
+const KEYS = ["stage", "substage", "type", "city", "q"] as const;
 
 // Support sits alongside every level of the journey, so a chosen level also
 // shows the Support group. Choosing Support itself shows only that group.
@@ -26,13 +32,24 @@ const ALONGSIDE = "support";
 export const PAGE_SIZE = 24;
 
 /** Reads a filter state from a query string, keeping only allowed values. */
-export function readState(search: string, allowed: { stage: Set<string>; type: Set<string>; city: Set<string> }): FilterState {
+export function readState(
+  search: string,
+  allowed: { stage: Set<string>; substage?: Set<string>; type: Set<string>; city: Set<string> },
+): FilterState {
   const params = new URLSearchParams(search);
   const pick = (key: "stage" | "type" | "city") => {
     const v = params.get(key) ?? "";
     return allowed[key].has(v) ? v : "";
   };
-  return { stage: pick("stage"), type: pick("type"), city: pick("city"), q: (params.get("q") ?? "").slice(0, 100) };
+  const substage = params.get("substage") ?? "";
+  const state: FilterState = { stage: pick("stage"), type: pick("type"), city: pick("city"), q: (params.get("q") ?? "").slice(0, 100) };
+  if (substage && allowed.substage?.has(substage)) state.substage = substage;
+  return state;
+}
+
+/** The directory filtered to one stage and substage, for a browse row's link. */
+export function browseHref(stage: string, substage: string): string {
+  return `/ecosystem-canvas/${writeState({ stage, substage, type: "", city: "", q: "" })}`;
 }
 
 // Every parameter that narrows the list. "region" comes from a region page's
@@ -73,6 +90,7 @@ export function terms(q: string): string[] {
  */
 export function matches(card: CardFacts, state: FilterState, searchHits: Set<string> | null): boolean {
   if (state.stage && card.stage !== state.stage && card.stage !== ALONGSIDE) return false;
+  if (state.substage && card.substage !== state.substage) return false;
   if (state.type && card.type !== state.type) return false;
   if (state.city && card.city !== state.city) return false;
   if (!state.q.trim()) return true;

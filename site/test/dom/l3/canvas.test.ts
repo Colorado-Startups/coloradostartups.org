@@ -168,9 +168,8 @@ describe("/ecosystem-canvas/ Start here", () => {
     expect(band.querySelector("#start-title")?.textContent?.trim()).toBe("Start here");
   });
 
-  it("shows at most 12 picks, at most 3 a stage, each a resource in the full list", () => {
+  it("shows at most 3 picks a stage, each a resource in the full list", () => {
     expect(picks.length).toBeGreaterThan(0);
-    expect(picks.length).toBeLessThanOrEqual(12);
     for (const stage of band.querySelectorAll(".start-here__stage")) {
       expect(stage.querySelectorAll("[data-pick]").length).toBeLessThanOrEqual(3);
     }
@@ -191,6 +190,28 @@ describe("/ecosystem-canvas/ Start here", () => {
     expect(how).toMatch(/simple rules/);
     expect(how).toMatch(/No one pays/);
     expect(how).toMatch(/full list below/);
+  });
+
+  // PR #89 review: a stage with no picks shows one link per substage, its
+  // count from the data, each opening the list filtered to that substage.
+  it("shows a browse row with the data's counts for a stage with no picks", () => {
+    const rows = [...band.querySelectorAll<HTMLElement>("[data-browse-row]")];
+    expect(rows.map((r) => r.dataset.stage)).toContain("growth");
+    const all = [...listed.values()];
+    for (const row of rows) {
+      const stage = row.dataset.stage!;
+      expect(row.closest(".start-here__stage")?.querySelectorAll("[data-pick]").length, stage).toBe(0);
+      expect(row.textContent, stage).not.toMatch(/first need/i);
+      const links = [...row.querySelectorAll<HTMLAnchorElement>("a[data-substage]")];
+      expect(links.length, stage).toBeGreaterThan(0);
+      for (const a of links) {
+        const substage = a.dataset.substage!;
+        const n = all.filter((c) => c.dataset.stage === stage && c.dataset.substage === substage).length;
+        expect(Number(a.dataset.count), substage).toBe(n);
+        expect(a.textContent?.trim(), substage).toMatch(new RegExp(`^${n} `));
+        expect(a.getAttribute("href"), substage).toBe(`/ecosystem-canvas/?stage=${stage}&substage=${substage}`);
+      }
+    }
   });
 
   it("uses no ranking words in the band or the control", () => {
