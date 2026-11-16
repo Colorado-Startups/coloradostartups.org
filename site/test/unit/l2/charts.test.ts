@@ -155,16 +155,22 @@ describe("the city map's announcements", () => {
 // the dots' buttons hide and a row of city buttons at least 24 px tall shows.
 describe("CityPanel's phone row", () => {
   const css = readFileSync(new URL("../../../src/components/leaderboard/CityPanel.astro", import.meta.url), "utf8");
-  const rule = (selector: string) => css.match(new RegExp(`${selector.replace(/[.()[\]]/g, "\\$&")}\\)?\\s*\\{([^}]*)\\}`))?.[1] ?? "";
+  /** The body of the first rule whose selector is exactly `selector`, found by plain string search. */
+  const rule = (selector: string) => {
+    const start = css.indexOf(`${selector} {`);
+    if (start === -1) return "";
+    const open = start + selector.length + 2;
+    return css.slice(open, css.indexOf("}", open));
+  };
 
   it("hides the dots' buttons below 40rem and shows the row there only", () => {
     expect(css).toMatch(/@media \(max-width: 40rem\) \{\s*:global\(\.city-map__layer\) \{\s*display: none;/);
     expect(css).toMatch(/@media \(max-width: 40rem\) and \(scripting: enabled\) \{\s*:global\(\.city-map__chips\) \{\s*display: flex;/);
-    expect(rule(":global(.city-map__chips")).toMatch(/display: none;[^}]*flex-wrap: wrap;/);
+    expect(rule(":global(.city-map__chips)")).toMatch(/display: none;[^}]*flex-wrap: wrap;/);
   });
 
   it("makes each row button at least 24 px tall (--s-6 is 32 px)", () => {
-    expect(rule(":global(.city-map__chip")).toContain("min-block-size: var(--s-6);");
+    expect(rule(":global(.city-map__chip)")).toContain("min-block-size: var(--s-6);");
     const tokens = readFileSync(new URL("../../../src/styles/tokens.css", import.meta.url), "utf8");
     expect(Number(tokens.match(/--s-6: (\d+)px;/)?.[1])).toBeGreaterThanOrEqual(24);
   });
