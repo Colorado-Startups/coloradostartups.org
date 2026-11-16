@@ -1,12 +1,13 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 
+import { REGION_IDS } from "@cs/shared";
 import { describe, expect, it } from "vitest";
 
 import { DIST_DIR, readDist } from "../pages";
 
-// Photon Mountain's brand clip (brand v4.2.0, RegionArt.astro): it plays over
-// the region page's hero painting, muted and looped, loads nothing until it
+// Photon Mountain's brand clip (RegionArt.astro; brand v4.2.0, and every
+// region has one since v4.3.0): it plays over the region page's hero painting, muted and looped, loads nothing until it
 // nears the screen, and leaves the painting as the image and its alt text.
 // The home page's Why Colorado panels carry maps, not paintings, so no clip.
 const page = new DOMParser().parseFromString(readDist("regions/photon-mountain/index.html"), "text/html");
@@ -33,9 +34,14 @@ describe("Photon Mountain's hero clip", () => {
     for (const src of sources) expect(existsSync(path.join(DIST_DIR, src)), src).toBe(true);
   });
 
-  it("offers a Pause button, and the home page has no clip", () => {
-    expect(media.querySelector("button[data-clip-toggle]")?.textContent?.trim()).toBe("Pause");
+  it("offers a Pause button on every region page, and the home page has no clip", () => {
     // Space Peak and Fusion Canyon got their clips in brand v4.3.0 (brand-v43.test.ts).
+    for (const id of REGION_IDS) {
+      const region = new DOMParser().parseFromString(readDist(`regions/${id}/index.html`), "text/html");
+      const toggle = region.querySelector(".region-art__media button[data-clip-toggle]");
+      expect(toggle?.getAttribute("type"), id).toBe("button");
+      expect(toggle?.textContent?.trim(), id).toBe("Pause");
+    }
     expect(readDist("index.html")).not.toContain("data-region-clip");
   });
 });
