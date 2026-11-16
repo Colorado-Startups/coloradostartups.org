@@ -196,24 +196,44 @@ const asks = [
       <p class="meta"><a href="/data/">The open data</a> behind it is free under CC BY 4.0.</p>
     </div>
   </section>
+  <p class="visually-hidden" role="status" data-copy-status></p>
 </BaseLayout>
 
 <script>
-  // Each copy button copies the element its data-copy names.
+  // Each copy button copies the element its data-copy names. The buttons stay
+  // hidden until this runs, so a visitor without JavaScript sees only the text,
+  // which they can select and copy by hand. The result is announced in one
+  // status line for screen readers. If the browser refuses the copy, the text
+  // is selected so the visitor can copy it from the keyboard.
   import { copyText } from "../components/kit/copy";
 
+  const status = document.querySelector<HTMLElement>("[data-copy-status]");
   for (const button of document.querySelectorAll<HTMLButtonElement>("button[data-copy]")) {
     const label = button.textContent ?? "";
+    button.dataset.ready = "";
     button.addEventListener("click", async () => {
-      const text = document.getElementById(button.dataset.copy ?? "")?.textContent ?? "";
-      const ok = await copyText(text, navigator.clipboard);
-      button.textContent = ok ? "Copied" : "Select and copy it";
+      const target = document.getElementById(button.dataset.copy ?? "");
+      const ok = await copyText(target?.textContent ?? "", navigator.clipboard);
+      if (!ok && target) {
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+      const message = ok ? "Copied." : "Your browser blocked the copy. The text is selected; copy it from the keyboard.";
+      button.textContent = ok ? "Copied" : "Copy blocked";
+      if (status) status.textContent = message;
       setTimeout(() => (button.textContent = label), 2000);
     });
   }
 </script>
 
 <style>
+  /* Copy buttons wait for their script (data-ready), so they never show when they cannot work. */
+  :global(button[data-copy]:not([data-ready])) {
+    display: none;
+  }
   .connect-facts {
     display: grid;
     gap: var(--s-3);

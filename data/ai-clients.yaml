@@ -24,7 +24,7 @@
     - Customize › Connectors › + Add › Add custom connector
     - Name it, paste the URL, then Continue
     - "Authentication: No sign in, then Add"
-  note: Claude Desktop shows the connectors you add on claude.ai, so the same steps work there.
+  note: Custom connectors are set up in your Claude account and work in Claude Desktop too.
   skill: /downloads/colorado-startups-skill.zip
   docs: https://support.claude.com
   read: 2026-11-15

@@ -35,6 +35,11 @@ describe("/connect/", () => {
     expect(fact("Key or sign in")).toBe("None");
   });
 
+  it("announces a copy in one status line, and its buttons wait for the script", () => {
+    expect(page.querySelectorAll("[data-copy-status][role='status']").length).toBe(1);
+    for (const button of page.querySelectorAll("button[data-copy]")) expect(button.hasAttribute("data-ready")).toBe(false);
+  });
+
   it("shows the /mcp URL with a copy button", () => {
     expect(page.querySelector("[data-mcp-url]")?.textContent).toBe(MCP_URL);
     expect(page.querySelector('button[data-copy="mcp-url"]')).not.toBeNull();
