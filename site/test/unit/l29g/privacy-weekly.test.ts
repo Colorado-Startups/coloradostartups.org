@@ -100,6 +100,17 @@ describe("the weekly job", () => {
     expect(POLICY).toContain(`keeps its figures, name or email longer than ${days + 7} days (our commitment).`);
   });
 
+  it("the Slack join requests bullet states the code's limit, and the limit plus one week", () => {
+    const days = constant("worker/routes/join.ts", "JOIN_REQUEST_RETENTION_DAYS");
+    expect(days).toBe(90);
+    expect(POLICY).toContain(`A weekly job deletes each request ${days} days after you send it`);
+    expect(POLICY).toContain(`No request stays in our database longer than ${days + 7} days (our commitment).`);
+  });
+
+  it("scheduled() runs the Slack join requests purge", () => {
+    expect(retention).toContain("purgeJoinRequests(db)");
+  });
+
   it("the security-reports bullet states the code's limit", () => {
     const days = constant("worker/routes/csp-report.ts", "CSP_REPORT_RETENTION_DAYS");
     expect(days).toBe(90);

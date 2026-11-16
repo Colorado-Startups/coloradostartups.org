@@ -2,13 +2,14 @@
 // migration applied, Turnstile through MSW (L3's handlers), the notice email
 // through a fake FORM_EMAIL binding, and the never-fetch rule (BRIEF hard
 // constraint 12). Fixtures use example.org and invented names only.
-import { createExecutionContext, SELF, waitOnExecutionContext } from "cloudflare:test";
+import { createExecutionContext, createScheduledController, SELF, waitOnExecutionContext } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { BASED_CHOICES, DESCRIBES_CHOICES, HEARD_CHOICES } from "../../src/components/join/fields";
-import { handle } from "../../worker/routes/join";
+import worker from "../../worker/index";
+import { handle, JOIN_REQUEST_RETENTION_DAYS, purgeJoinRequests } from "../../worker/routes/join";
 import { expectLimitedBeforeRead, sendBrokenUploads } from "./broken-upload";
 import { turnstileAccepting, turnstileDown } from "./l3/turnstile-handlers";
 import { burstOver, FORM_LIMIT } from "./rate-limit";
@@ -246,17 +247,35 @@ describe("POST /api/join", () => {
     expect(errors.mock.calls.some((c) => String(c[0]).startsWith("notify failed:"))).toBe(true);
   });
 
-  it("tells the visitor when the row cannot be stored, and sends no email", async () => {
+  it("tells the visitor when the row cannot be stored, sends no email, and logs the failure without the person's details", async () => {
     server.use(turnstileAccepting(GOOD));
     const email = fakeEmail();
+    const errors = vi.spyOn(console, "error");
     const brokenDb = {
       prepare() {
         throw new Error("D1 unavailable");
       },
     } as unknown as D1Database;
-    const res = await call(valid(), { DB: brokenDb, FORM_EMAIL: email.binding as unknown as SendEmail });
+    const fields = valid();
+    const res = await call(fields, { DB: brokenDb, FORM_EMAIL: email.binding as unknown as SendEmail });
     expect(res.headers.get("Location")).toBe(`${FORM_PAGE}?error=delivery`);
     expect(email.sent).toHaveLength(0);
+    const logged = errors.mock.calls.map((c) => c.map(String).join(" "));
+    const line = logged.find((l) => l.startsWith("join: insert failed:"));
+    expect(line).toBe("join: insert failed: D1 unavailable");
+    for (const value of [fields.first_name, fields.last_name, fields.email, fields.linkedin]) {
+      expect(logged.join("\n")).not.toContain(value);
+    }
+  });
+
+  it("still saves the request and thanks the visitor when the email binding is not set, and logs the skip", async () => {
+    server.use(turnstileAccepting(GOOD));
+    const log = vi.spyOn(console, "log");
+    const fields = valid();
+    const res = await call(fields, { FORM_EMAIL: undefined });
+    expect(res.headers.get("Location")).toBe(THANKS);
+    expect(await rowFor(fields.last_name)).toMatchObject({ status: "new" });
+    expect(log.mock.calls.some((c) => String(c[0]) === "notify skipped: FORM_EMAIL binding not configured")).toBe(true);
   });
 
   it("rejects a body over the form byte cap (decision 35)", async () => {
@@ -319,5 +338,47 @@ describe("the slack_join_requests table's CHECKs", () => {
   it("stores no IP address", async () => {
     const cols = await env.DB.prepare("SELECT name FROM pragma_table_info('slack_join_requests')").all<{ name: string }>();
     expect(cols.results.map((c) => c.name).filter((c) => /ip|addr/i.test(c))).toEqual([]);
+  });
+});
+
+// Retention (privacy policy, Asking to join our Slack on this site): the
+// weekly job deletes each request 90 days after it arrives, whatever its
+// status.
+describe("the weekly slack_join_requests purge", () => {
+  const DAY = 86_400_000;
+  const NOW = new Date("2026-11-16T12:00:00Z");
+  const insert = (createdAt: string, lastName: string, status = "new") =>
+    env.DB.prepare(
+      "INSERT INTO slack_join_requests (created_at, status, first_name, last_name, email, linkedin, based, city, describes) VALUES (?, ?, 'Purge', ?, 'purge@example.org', 'https://www.linkedin.com/in/purge', 'other', NULL, 'other')",
+    )
+      .bind(createdAt, status, lastName)
+      .run();
+
+  it("keeps 90 days", () => {
+    expect(JOIN_REQUEST_RETENTION_DAYS).toBe(90);
+  });
+
+  it("deletes a request older than 90 days, whatever its status, and keeps one at 89 days", async () => {
+    await env.DB.prepare("DELETE FROM slack_join_requests").run();
+    await insert(new Date(NOW.getTime() - 91 * DAY).toISOString(), "Purge Old New");
+    await insert(new Date(NOW.getTime() - 91 * DAY).toISOString(), "Purge Old Invited", "invited");
+    await insert(new Date(NOW.getTime() - 89 * DAY).toISOString(), "Purge Recent");
+    expect(await purgeJoinRequests(env.DB, NOW)).toBe(2);
+    expect(await rowFor("Purge Old New")).toBeNull();
+    expect(await rowFor("Purge Old Invited")).toBeNull();
+    expect(await rowFor("Purge Recent")).not.toBeNull();
+    expect(await purgeJoinRequests(env.DB, NOW)).toBe(0);
+  });
+
+  it("runs in the scheduled handler's RETENTION jobs and logs a count only", async () => {
+    await env.DB.prepare("DELETE FROM slack_join_requests").run();
+    await insert(new Date(Date.now() - 100 * DAY).toISOString(), "Purge Scheduled");
+    const log = vi.spyOn(console, "log");
+    const ctx = createExecutionContext();
+    await worker.scheduled!(createScheduledController({ cron: "17 9 * * 1" }), env, ctx);
+    await waitOnExecutionContext(ctx);
+    const lines = log.mock.calls.map((c) => c.map(String).join(" ")).filter((l) => l.startsWith("slack_join_requests purge"));
+    expect(lines).toEqual(["slack_join_requests purge: 1 deleted"]);
+    expect(await rowFor("Purge Scheduled")).toBeNull();
   });
 });

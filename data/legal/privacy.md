@@ -69,9 +69,11 @@ How we use what you send:
 - We use your request only to decide whether to invite you to our Slack. We send the invite to the email you give.
 - Paul Foley reads every request. We do not sell or share it, and it never leaves Colorado Startups.
 - The site stores your LinkedIn link as text and never visits it. Paul opens it himself to check it.
-- Each request sends Paul one email with your answers, so he can decide and send the invite. That email stays in his inbox.
+- Each request sends Paul one email with your answers, so he can decide and send the invite. That email stays in his inbox. You can ask us to delete it, as under "Delete or correct" below.
 - We sign you up for the Startupers newsletter only if you tick its box.
-- To have your request deleted, write to info@coloradostartups.org.
+- A weekly job deletes each request 90 days after you send it, whether or not we have answered it. No request stays in our database longer than 97 days (our commitment).
+- Deleted requests can stay in Cloudflare's restore points of our database for up to 30 days (Cloudflare's D1 Time Travel documentation, read 2026-10-18).
+- To have your request deleted sooner, write to info@coloradostartups.org.
 
 **Communitas in our Slack.** Communitas is an AI agent in the Colorado Startups Slack. It sends one welcome message when you join, and it reads only messages that mention it. When it passes a question to Resourcus, it replaces your Slack user ID with a one-way code first. Slack's own privacy policy covers your Slack account.
 
@@ -107,7 +109,7 @@ Each of these services handles information under its own privacy policy. We do n
 
 When we change this policy in a way that matters, we update the date at the top of this page and tell newsletter subscribers in our next email.
 
-**November 16, 2026.** We added the join request form for our Slack on this site: what it collects, who reads it, and the email Paul gets for each request.
+**November 16, 2026.** We added the join request form for our Slack on this site: what it collects, who reads it, and the email Paul gets for each request. A weekly job deletes each request 90 days after it arrives.
 
 **November 2, 2026.** The nomination form now asks for the company's HQ city and its founding year. We added that we store the city with the nomination, show it in Paul's notice email and use it to check the HQ.
 
