@@ -317,7 +317,8 @@ describe.each([undefined, ...REGION_IDS])("mapFileSvg(%s)", (zone) => {
     const stops = [...root.querySelectorAll("stop")].map((s) => s.getAttribute("stop-color"));
     expect(stops).toHaveLength(3);
     for (const color of stops) expect(color).toMatch(/^#[0-9a-f]{6}$/i);
-    expect(svg).not.toMatch(/NaN|undefined|\[object/);
+    // The relief's base64 can spell anything, so read the file without it.
+    expect(svg.replace(/href="data:[^"]+"/, "")).not.toMatch(/NaN|undefined|\[object/);
   });
 
   it("names itself, and credits its sources", () => {
