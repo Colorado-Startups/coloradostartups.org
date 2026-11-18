@@ -5,7 +5,7 @@ stage: idea
 substage: educate
 city: Denver
 type: community
-description: A Denver nonprofit for agile and lean practice. It holds monthly meetups. It has special interest groups such as Agile Boulder and Human-Centered AI. It also has a member Slack community.
+description: A Denver nonprofit for agile and lean practice. It holds monthly meetups. It has special interest groups, such as Agile Boulder and Human-Centered AI, and a member Slack community.
 tags:
   - meetup
 source: canvas-2026

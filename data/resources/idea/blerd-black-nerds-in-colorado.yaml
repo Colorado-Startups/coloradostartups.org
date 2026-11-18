@@ -5,7 +5,7 @@ stage: idea
 substage: validate
 city: Boulder
 type: community
-description: Meetup where Black nerds in Colorado get advice, start projects and advance their careers.
+description: A meetup where Black nerds in Colorado get advice, start projects and advance their careers.
 tags:
   - team
   - meetup
