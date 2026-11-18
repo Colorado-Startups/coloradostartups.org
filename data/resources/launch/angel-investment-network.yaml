@@ -5,7 +5,7 @@ stage: launch
 substage: develop
 city: statewide
 type: investor
-description: An online platform where Colorado entrepreneurs pitch business ideas. Angel investors hear the pitches. Founders seek capital, advice and contacts.
+description: An online platform where Colorado entrepreneurs pitch business ideas to angel investors. Founders seek capital, advice and contacts.
 tags:
   - investors
   - networking
