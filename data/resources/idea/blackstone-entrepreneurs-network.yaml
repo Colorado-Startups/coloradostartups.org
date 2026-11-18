@@ -5,7 +5,7 @@ stage: idea
 substage: validate
 city: statewide
 type: community
-description: A Colorado network. It is now BEN Colorado (Bridge Entrepreneurs Network). It picks advisors for founders who want growth. Its Signature Program, Denver ScaleUp Network, Inclusive Impact Catalyst and Rural Reach do so.
+description: A Colorado network, now called BEN Colorado (Bridge Entrepreneurs Network). It picks advisors for founders who want growth. It does this through its Signature Program, Denver ScaleUp Network, Inclusive Impact Catalyst and Rural Reach.
 tags:
   - team
 source: canvas-2026

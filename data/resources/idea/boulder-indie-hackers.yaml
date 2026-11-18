@@ -5,7 +5,7 @@ stage: idea
 substage: validate
 city: Boulder
 type: community
-description: Meetup for people who build products in Boulder.
+description: A meetup for people who build products in Boulder.
 tags:
   - product
   - meetup

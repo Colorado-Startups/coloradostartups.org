@@ -5,7 +5,7 @@ stage: idea
 substage: validate
 city: Boulder
 type: community
-description: An informal Boulder group for the startup and tech community. Its morning coffee meetups alternate between Rayback Collective and online. Each opens with intros, announcements and a moderated discussion.
+description: An informal Boulder group for the startup and tech community. Its morning coffee meetups alternate between Rayback Collective and online. Each one opens with intros, announcements and a moderated discussion.
 tags:
   - team
   - meetup
