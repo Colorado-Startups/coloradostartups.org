@@ -5,7 +5,7 @@ stage: launch
 substage: develop
 city: Denver
 type: event
-description: Event or group that connects founders with investors in Denver. Listed in the Ecosystem Canvas for founders at the launch stage.
+description: A Denver event or group that connects founders with investors. The Ecosystem Canvas lists it for founders at the launch stage.
 tags:
   - investors
   - networking

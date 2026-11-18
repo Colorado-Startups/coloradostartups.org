@@ -5,7 +5,7 @@ stage: launch
 substage: develop
 city: Boulder
 type: incubator
-description: Early-stage venture investor that backs founders from inception, with in-person founder communities at its New York, San Francisco and Austin offices.
+description: An early-stage venture investor that backs founders from inception. It runs in-person founder communities at its New York, San Francisco and Austin offices.
 tags:
   - incubator
 source: canvas-2026

@@ -5,7 +5,7 @@ stage: launch
 substage: service-providers
 city: Denver
 type: coworking
-description: A Denver coworking space. It has private offices, dedicated desks and meeting rooms. It is for emerging founders and small businesses.
+description: A Denver coworking space with private offices, dedicated desks and meeting rooms. It is for emerging founders and small businesses.
 tags:
   - coworking
 source: canvas-2026
