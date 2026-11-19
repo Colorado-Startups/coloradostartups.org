@@ -6,9 +6,11 @@
 // <body>. The search is a plain GET to /ask/?q=, the page that runs Pagefind.
 // Resourcus is named with "an AI agent" wherever it appears
 // (.claude/rules/ai-disclosure.md).
-// Each way to ask counts as ask_used, where "ask-dialog" (step M1c): the
-// Search button (pressing Enter in the box clicks it too) with kind "search",
-// the Resourcus link with "resourcus", and Copy prompt with "copy".
+// Each way to ask counts as ask_used, where "ask-dialog" (step M1c): a search
+// with kind "search", the Resourcus link with "resourcus", and Copy prompt
+// with "copy". The Search button's mark counts when the form submits, by the
+// button or by Enter in the box (track.ts). An empty box submits nothing, so
+// it counts nothing.
 import { trackAttrs } from "../../lib/track-attrs";
 import AskAi from "../ai/AskAi.astro";
 

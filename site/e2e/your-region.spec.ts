@@ -62,6 +62,44 @@ for (const width of [1200, 1440]) {
   });
 }
 
+// Home's This week holds the row of its hidden "Showing <region> first" line,
+// so a pick restored on load moves nothing below it. Each region's line is
+// written here as initRegionFirst writes it (this-week.ts), so the check
+// needs no event in any region; the unit tests cover when the line shows.
+const below = (page: Page) =>
+  page.locator('section[aria-labelledby="this-week"]').evaluate((section) => {
+    // Measured from the section's top, so art loading above it changes nothing.
+    const top = section.getBoundingClientRect().top;
+    const from = (el: Element | null) => (el ? Math.round(el.getBoundingClientRect().top - top) : null);
+    return {
+      line: Math.round(section.querySelector("[data-region-first]")!.getBoundingClientRect().height),
+      section: Math.round(section.getBoundingClientRect().height),
+      threads: from(section.querySelector(".this-week__threads")),
+      next: from(section.nextElementSibling),
+    };
+  });
+
+for (const width of [320, 375, 760, 1440]) {
+  test(`at ${width} px home's region line keeps its row hidden, so showing it moves nothing`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/");
+    const line = page.locator('section[aria-labelledby="this-week"] [data-region-first]');
+    await expect(line).toBeHidden();
+    const before = await below(page);
+    expect(before.line).toBeGreaterThan(0);
+    const names = Object.values(JSON.parse((await line.getAttribute("data-region-names")) ?? "{}") as Record<string, string>);
+    expect(names.length).toBeGreaterThan(0);
+    for (const name of names) {
+      await line.evaluate((el, n) => {
+        el.querySelector("[data-region-first-text]")!.textContent = `Showing ${n} first.`;
+        el.hidden = false;
+      }, name);
+      await expect(line).toBeVisible();
+      expect(await below(page), name).toEqual(before);
+    }
+  });
+}
+
 test("in the phone menu, Escape closes the chooser and the menu stays open", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");

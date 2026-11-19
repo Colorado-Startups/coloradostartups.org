@@ -6,16 +6,23 @@
 //    is this page, so a second form elsewhere on the page stays quiet. Codes
 //    outside the known list are ignored, so nothing from the URL reaches a
 //    selector.
-// 3. With that message, sends newsletter_submit with ok false (step M1c). The
-//    thanks page sends ok true (form-status.ts).
+// 3. With that message, sends newsletter_submit with ok false (step M1c),
+//    only right after the post, so a reload counts nothing. The thanks page
+//    sends ok true (form-status.ts).
 
-import { stampLoadTime, trackSubmit } from "../forms/form-status";
+import { stampLoadTime, trackRejected } from "../forms/form-status";
 import { newsletterCopy, type NewsletterErrorCode } from "./copy";
 
 const isKnownCode = (value: string | null): value is NewsletterErrorCode =>
   value !== null && Object.hasOwn(newsletterCopy.errors, value);
 
-export function initNewsletterForms(doc: Document, loc: Pick<Location, "pathname" | "search">): void {
+/** `referrer` and `navType` default to this page's; a test passes its own. */
+export function initNewsletterForms(
+  doc: Document,
+  loc: Pick<Location, "origin" | "pathname" | "search">,
+  referrer: string = doc.referrer,
+  navType?: string,
+): void {
   const error = new URLSearchParams(loc.search).get("error");
   for (const form of doc.querySelectorAll<HTMLFormElement>("form[data-newsletter]")) {
     stampLoadTime(form);
@@ -25,6 +32,6 @@ export function initNewsletterForms(doc: Document, loc: Pick<Location, "pathname
     if (!message) continue;
     message.hidden = false;
     form.querySelector<HTMLInputElement>('input[name="email"]')?.setAttribute("aria-invalid", "true");
-    trackSubmit(form, loc.pathname, false);
+    trackRejected(form, referrer, loc, navType);
   }
 }

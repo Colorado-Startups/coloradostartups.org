@@ -8,22 +8,43 @@ import { track } from "./track";
 /** How long a query must stand before it counts, so typing a word sends one event, not one per pause. */
 export const SEARCH_SETTLE_MS = 1000;
 
-/** A reporter: call it after each run with the query and its result count. */
-export function searchReporter(where: string, wait: number = SEARCH_SETTLE_MS): (query: string, results: number) => void {
+/** Where pagehide fires: the window, or a stand-in in tests. */
+type LeavingPage = { addEventListener(type: "pagehide", listener: () => void): void };
+
+/**
+ * A reporter: call it after each run with the query and its result count.
+ * A visitor who leaves before the query settles still counts: on pagehide a
+ * waiting count goes out at once (sendBeacon survives the page), never twice.
+ */
+export function searchReporter(
+  where: string,
+  wait: number = SEARCH_SETTLE_MS,
+  page: LeavingPage | null = typeof window === "undefined" ? null : window,
+): (query: string, results: number) => void {
   let last = "";
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let waiting: (() => void) | null = null;
+  const send = () => {
+    clearTimeout(timer);
+    const count = waiting;
+    waiting = null;
+    count?.();
+  };
+  page?.addEventListener("pagehide", send);
   return (query, results) => {
     clearTimeout(timer);
+    waiting = null;
     const q = query.trim();
     if (!q) {
       last = "";
       return;
     }
     if (q === last) return;
-    timer = setTimeout(() => {
+    waiting = () => {
       last = q;
       track("search_used", { where, results });
-    }, wait);
+    };
+    timer = setTimeout(send, wait);
   };
 }
 

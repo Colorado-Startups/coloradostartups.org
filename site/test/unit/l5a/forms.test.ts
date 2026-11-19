@@ -5,10 +5,12 @@ import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  cameBack,
   cameFrom,
   showErrorMessage,
   stampLoadTime,
   trackAccepted,
+  trackRejected,
   trackSubmit,
 } from "../../../src/components/forms/form-status";
 import { track } from "../../../src/lib/track";
@@ -138,7 +140,51 @@ describe("trackAccepted", () => {
       expect(src(file), file).toMatch(/trackAccepted\(\)/);
     }
     for (const file of ["components/join/SlackJoinForm.astro", "components/founders/WaitlistForm.astro", "components/newsletter/signup.ts"]) {
-      expect(src(file), file).toMatch(/trackSubmit\([^)]*false\)/);
+      expect(src(file), file).toMatch(/trackRejected\(form\b/);
+      // Never sent straight from the ?error= code, which a reload repeats.
+      expect(src(file), file).not.toMatch(/trackSubmit\(/);
     }
+  });
+});
+
+// The rejection side guards a reload as the thanks side does (cameFrom): the
+// form's page with ?error= counts only right after its own form's post.
+describe("cameBack", () => {
+  const here = { origin: "https://coloradostartups.org", pathname: "/join/slack/" };
+
+  it("is true right after the post from this page's form, a second rejection included", () => {
+    expect(cameBack("https://coloradostartups.org/join/slack/", here, "navigate")).toBe(true);
+    expect(cameBack("https://coloradostartups.org/join/slack/?error=invalid&field=email", here, "navigate")).toBe(true);
+    expect(cameBack("https://coloradostartups.org/join/slack/", here, undefined)).toBe(true);
+  });
+
+  it("is false for a reload, a back step, another site, another page or no referrer (known bad)", () => {
+    expect(cameBack("https://coloradostartups.org/join/slack/", here, "reload")).toBe(false);
+    expect(cameBack("https://coloradostartups.org/join/slack/", here, "back_forward")).toBe(false);
+    expect(cameBack("https://example.org/join/slack/", here, "navigate")).toBe(false);
+    expect(cameBack("https://coloradostartups.org/founders/", here, "navigate")).toBe(false);
+    expect(cameBack("", here, "navigate")).toBe(false);
+  });
+});
+
+describe("trackRejected", () => {
+  beforeEach(() => {
+    vi.mocked(track).mockClear();
+    document.body.innerHTML = `<form data-submit-event="join_submit"></form>`;
+  });
+  const here = new URL("https://coloradostartups.org/join/slack/?error=ratelimit");
+  const form = () => document.querySelector("form");
+
+  it("sends the form's event with ok false right after the post", () => {
+    expect(trackRejected(form(), "https://coloradostartups.org/join/slack/", here, "navigate")).toBe(true);
+    expect(track).toHaveBeenCalledWith("join_submit", { where: "join-slack", ok: false });
+  });
+
+  it("sends nothing when the ?error= page is reloaded, stepped back to or opened from a link", () => {
+    expect(trackRejected(form(), "https://coloradostartups.org/join/slack/", here, "reload")).toBe(false);
+    expect(trackRejected(form(), "https://coloradostartups.org/join/slack/", here, "back_forward")).toBe(false);
+    expect(trackRejected(form(), "", here, "navigate")).toBe(false);
+    expect(trackRejected(form(), "https://example.org/", here, "navigate")).toBe(false);
+    expect(track).not.toHaveBeenCalled();
   });
 });

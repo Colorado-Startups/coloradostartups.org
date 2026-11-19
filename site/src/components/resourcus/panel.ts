@@ -62,6 +62,17 @@ export function sitePath(url: string): string | null {
   return url.startsWith("/") && !url.startsWith("//") && !url.includes("\\") ? url : null;
 }
 
+const PANEL_SUFFIX = "-resourcus";
+
+/**
+ * The panel's events' `where` on the page at `path`, such as "ask-resourcus".
+ * A long page slug is cut to leave room for the suffix, which always stays,
+ * so the 40-character prop still says the panel sent it.
+ */
+export function panelWhere(path: string): string {
+  return `${shortSlug(whereOf(path), 40 - PANEL_SUFFIX.length)}${PANEL_SUFFIX}`;
+}
+
 function storageGet(key: string): string | null {
   try {
     return sessionStorage.getItem(key);
@@ -201,7 +212,7 @@ class Panel {
   private readonly compact: boolean;
   private readonly turnstile: TurnstileToken;
   /** The events' `where`: this page and the panel, such as "ask-resourcus". */
-  private readonly where = shortSlug(`${whereOf(location.pathname)}-resourcus`);
+  private readonly where = panelWhere(location.pathname);
   private history: Turn[] = [];
   private busy = false;
 

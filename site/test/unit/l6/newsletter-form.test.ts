@@ -30,6 +30,8 @@ describe("newsletter copy", () => {
   });
 });
 
+const ORIGIN = "https://coloradostartups.org";
+
 function page(returnTo: string): Document {
   document.body.innerHTML = `
     <form data-newsletter data-return-to="${returnTo}" data-submit-event="newsletter_submit">
@@ -44,19 +46,19 @@ const shown = (doc: Document) =>
 describe("initNewsletterForms", () => {
   it("stamps the load time", () => {
     const doc = page("/");
-    initNewsletterForms(doc, { pathname: "/", search: "" });
+    initNewsletterForms(doc, { origin: ORIGIN, pathname: "/", search: "" });
     expect(Number(doc.querySelector<HTMLInputElement>('[name="ts"]')!.value)).toBeGreaterThan(0);
   });
   it("shows the message for a known code on this page's form", () => {
     const doc = page("/community/");
-    initNewsletterForms(doc, { pathname: "/community/", search: "?error=delivery" });
+    initNewsletterForms(doc, { origin: ORIGIN, pathname: "/community/", search: "?error=delivery" });
     expect(shown(doc)).toEqual(["delivery"]);
     expect(doc.querySelector('[name="email"]')!.getAttribute("aria-invalid")).toBe("true");
   });
   it("stays quiet for an unknown code or another page's form", () => {
     const doc = page("/community/");
-    initNewsletterForms(doc, { pathname: "/community/", search: '?error="]x' });
-    initNewsletterForms(doc, { pathname: "/", search: "?error=invalid" });
+    initNewsletterForms(doc, { origin: ORIGIN, pathname: "/community/", search: '?error="]x' });
+    initNewsletterForms(doc, { origin: ORIGIN, pathname: "/", search: "?error=invalid" });
     expect(shown(doc)).toEqual([]);
   });
 
@@ -64,11 +66,23 @@ describe("initNewsletterForms", () => {
   it("sends newsletter_submit with ok false for a rejection on this page's form, and nothing otherwise", () => {
     vi.mocked(track).mockClear();
     const doc = page("/newsletter/");
-    initNewsletterForms(doc, { pathname: "/newsletter/", search: "" });
-    initNewsletterForms(doc, { pathname: "/", search: "?error=invalid" });
+    const from = `${ORIGIN}/newsletter/`;
+    initNewsletterForms(doc, { origin: ORIGIN, pathname: "/newsletter/", search: "" }, from, "navigate");
+    initNewsletterForms(doc, { origin: ORIGIN, pathname: "/", search: "?error=invalid" }, from, "navigate");
     expect(track).not.toHaveBeenCalled();
-    initNewsletterForms(doc, { pathname: "/newsletter/", search: "?error=ratelimit" });
+    initNewsletterForms(doc, { origin: ORIGIN, pathname: "/newsletter/", search: "?error=ratelimit" }, from, "navigate");
     expect(track).toHaveBeenCalledTimes(1);
     expect(track).toHaveBeenCalledWith("newsletter_submit", { where: "newsletter", ok: false });
+  });
+
+  it("sends nothing when the ?error= page is reloaded or opened from a link, and still shows the message", () => {
+    vi.mocked(track).mockClear();
+    const doc = page("/newsletter/");
+    const loc = { origin: ORIGIN, pathname: "/newsletter/", search: "?error=ratelimit" };
+    initNewsletterForms(doc, loc, `${ORIGIN}/newsletter/?error=ratelimit`, "reload");
+    initNewsletterForms(doc, loc, "", "navigate");
+    initNewsletterForms(doc, loc, "https://example.org/", "navigate");
+    expect(track).not.toHaveBeenCalled();
+    expect(shown(doc)).toEqual(["ratelimit"]);
   });
 });

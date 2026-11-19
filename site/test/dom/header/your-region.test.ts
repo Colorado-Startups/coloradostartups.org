@@ -88,6 +88,17 @@ describe("the chooser", () => {
     expect(text(forget.querySelector("button"))).toBe("Forget my region");
   });
 
+  it("ships two notes: the device keeps the pick, or it lasts for this page, the second hidden", () => {
+    const notes = [...template.content.querySelectorAll<HTMLElement>("[data-region-note]")];
+    expect(notes.map((n) => [n.dataset.regionNote, n.hidden])).toEqual([
+      ["kept", false],
+      ["view", true],
+    ]);
+    expect(text(notes[0])).toContain("keeps your pick on this device");
+    expect(text(notes[1])).toContain("until you leave this page");
+    for (const n of notes) expect(text(n)).toContain("It is never sent to us.");
+  });
+
   it("with no pick, the island shows the Pick your region button", () => {
     const page = parse(readDist("index.html"));
     const live = page.querySelector<HTMLElement>(".site-header [data-your-region]")!;
@@ -120,20 +131,34 @@ describe("This week on home", () => {
     expect(root.querySelector<HTMLElement>("[data-region-first]")!.hidden).toBe(true);
   });
 
-  it("with a pick, puts that region's events first when it has one ahead", () => {
-    const now = Date.now();
-    const root = strip(parse(readDist("index.html")));
-    const ahead = [...root.querySelectorAll<HTMLElement>("li[data-event-region]")].find((li) => Date.parse(li.dataset.ends!) > now);
-    if (!ahead) {
-      console.info("index.html: no event in This week has a region; the pick changes nothing");
-      return;
-    }
-    const region = ahead.dataset.eventRegion!;
-    initRegionFirst(root, memory({ [YOUR_REGION_KEY]: region }));
-    const first = root.querySelector<HTMLElement>("li[data-starts]:not([hidden])")!;
-    expect(first.dataset.eventRegion).toBe(region);
-    const line = root.querySelector<HTMLElement>("[data-region-first]")!;
-    expect(line.hidden).toBe(false);
-    expect(text(line)).toBe(`Showing ${REGIONS.find((r) => r.id === region)!.name} first. Show all`);
-  });
+  // The built strip, with its events swapped for a fixture: one event in each
+  // region, the picked one last. So this asserts whatever the build's event
+  // snapshot holds, even no event at all.
+  for (const { id, name } of REGIONS) {
+    it(`with ${id} picked, puts its event first and says so`, () => {
+      const root = strip(parse(readDist("index.html")));
+      const doc = root.ownerDocument;
+      const list = root.querySelector("ol") ?? root.insertBefore(doc.createElement("ol"), root.firstChild);
+      const day = 86_400_000;
+      const soon = Date.now() + day;
+      const order = [...REGIONS.filter((r) => r.id !== id), { id }].map((r) => r.id);
+      list.replaceChildren(
+        ...order.map((region, i) => {
+          const li = doc.createElement("li");
+          li.dataset.starts = new Date(soon + i * day).toISOString();
+          li.dataset.ends = new Date(soon + i * day + 3_600_000).toISOString();
+          li.dataset.eventRegion = region;
+          li.hidden = i >= Number(root.dataset.count);
+          li.innerHTML = `<time data-countdown>soon</time><a href="/event-calendar/">Event in ${region}</a>`;
+          return li;
+        }),
+      );
+      initRegionFirst(root, memory({ [YOUR_REGION_KEY]: id }));
+      const first = root.querySelector<HTMLElement>("li[data-starts]:not([hidden])")!;
+      expect(first.dataset.eventRegion).toBe(id);
+      const line = root.querySelector<HTMLElement>("[data-region-first]")!;
+      expect(line.hidden).toBe(false);
+      expect(text(line)).toBe(`Showing ${name} first. Show all`);
+    });
+  }
 });

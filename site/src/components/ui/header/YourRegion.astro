@@ -11,7 +11,9 @@
 // The chooser lists every region as an equal: the same size, A to Z by name,
 // which on the map also reads north to south. Each shows its crest, its name
 // and its core cities. It ships in a <template>, as the Ask dialog does, so
-// its crests load only when a visitor opens it.
+// its crests load only when a visitor opens it. Its note promises the device
+// keeps the pick only while that holds: with no storage, or after a save
+// fails, it says the pick lasts for this page.
 //
 // From 1200 px the header is one row with little room to spare (#424). There
 // the slot holds 60 px in every state, so restoring a pick never moves the
@@ -73,7 +75,10 @@ const regions = [...REGIONS]
             <button type="submit" class="btn btn--stone">Close</button>
           </form>
         </div>
-        <p class="region-chooser__note">Your browser keeps your pick on this device. It is never sent to us.</p>
+        <p class="region-chooser__note" data-region-note="kept">Your browser keeps your pick on this device. It is never sent to us.</p>
+        <p class="region-chooser__note" data-region-note="view" hidden>
+          This browser is not keeping site data. Your pick lasts until you leave this page. It is never sent to us.
+        </p>
         <ul class="region-chooser__list" role="list">
           {
             regions.map((r) => (

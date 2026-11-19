@@ -175,7 +175,7 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
 
 <script>
   import { clearDraft, draftFrom, markInvalidFields, readDraft, saveDraft } from "../apply/client";
-  import { showErrorMessage, stampLoadTime, trackSubmit } from "../forms/form-status";
+  import { showErrorMessage, stampLoadTime, trackRejected } from "../forms/form-status";
 
   stampLoadTime(document);
 
@@ -220,7 +220,8 @@ const INVALID_FIELDS = "These answers need a fix: {fields}. Correct them, then s
       message.textContent = message.dataset.fieldsText.replace("{fields}", labels.join(", "));
     }
   });
-  if (shown) trackSubmit(form, window.location.pathname, false);
+  // Only right after the post: a reload of the ?error= page counts nothing.
+  if (shown) trackRejected(form);
 </script>
 
 <style>
