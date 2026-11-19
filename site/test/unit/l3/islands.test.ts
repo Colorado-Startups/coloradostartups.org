@@ -48,7 +48,7 @@ const PAGE = `
     ${card("ignite", "idea", "event", "Boulder", "Ignite Boulder, open startup gathering")}
   </ul></section>
   <section id="launch" data-canvas-group><span data-group-count></span><ul>
-    ${card("angels", "launch", "investor", "Denver", "Denver Angels, angel investor group")}
+    ${card("angels", "launch", "investor", "Denver", "Peak Angels, angel investor group")}
     ${card("seedco", "launch", "investor", "Boulder", "Seed Co, seed venture firm")}
   </ul></section>
   <section id="support" data-canvas-group><span data-group-count></span><ul>
