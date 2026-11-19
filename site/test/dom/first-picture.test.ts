@@ -85,6 +85,11 @@ const TITLE_HEADER = "header, hgroup, .info-header";
 // The wide screen drawnWidth measures on, in CSS px, and one rem.
 const WIDE = 1280;
 const UNIT_PX: Readonly<Record<string, number>> = { px: 1, rem: 16, vw: WIDE / 100 };
+// A media condition's units: em and rem are both 16 px there.
+const QUERY_PX: Readonly<Record<string, number>> = { px: 1, rem: 16, em: 16 };
+// A `sizes` length drawnWidth can read, and a max-width condition before one.
+const LENGTH = /^(\d+(?:\.\d+)?)(px|rem|vw)$/;
+const MAX_WIDTH = /^\(\s*max-width\s*:\s*(\d+(?:\.\d+)?)(px|rem|em)\s*\)\s+(.+)$/;
 
 /** False when the element does not show on load. */
 function shown(el: Element): boolean {
@@ -165,17 +170,31 @@ function artLeads(main: Element): string | null {
 }
 
 /**
- * How wide a picture draws on a 1280 px screen, in CSS px. The browser picks
- * the file by `sizes`, so its last entry, the one with no media condition,
- * says it when it is a plain px, rem or vw length. Otherwise the width
- * attribute does, and a picture with neither counts as unbounded.
+ * How wide a picture draws on a 1280 px screen, in CSS px. With `sizes`, the
+ * browser draws the first entry whose media condition holds there. An entry
+ * under (max-width: N) with N below 1280 px cannot hold, so it is skipped.
+ * Every other entry must be a plain px, rem or vw length, alone or under a
+ * max-width that holds. Anything else counts as unbounded, so too wide: a
+ * min-width or other condition, or a length such as calc(), min(), em, % or
+ * vh. The width attribute counts only when `sizes` is absent, and a picture
+ * with neither is unbounded too.
  */
 function drawnWidth(el: Element): number {
-  const last = (el.getAttribute("sizes") ?? "").split(",").at(-1)?.trim() ?? "";
-  const length = /^(\d+(?:\.\d+)?)(px|rem|vw)$/.exec(last);
-  if (length) return Number(length[1]) * UNIT_PX[length[2]!]!;
-  const width = Number(el.getAttribute("width"));
-  return width > 0 ? width : Number.POSITIVE_INFINITY;
+  const sizes = el.getAttribute("sizes");
+  if (sizes === null) {
+    const width = Number(el.getAttribute("width"));
+    return width > 0 ? width : Number.POSITIVE_INFINITY;
+  }
+  let drawn: number | undefined;
+  for (const entry of sizes.split(",").map((e) => e.trim())) {
+    const under = MAX_WIDTH.exec(entry);
+    if (under && Number(under[1]) * QUERY_PX[under[2]!]! < WIDE) continue;
+    const length = LENGTH.exec(under ? under[3]! : entry);
+    if (!length) return Number.POSITIVE_INFINITY;
+    drawn ??= Number(length[1]) * UNIT_PX[length[2]!]!;
+  }
+  // No entry holds: the browser draws it 100vw.
+  return drawn ?? WIDE;
 }
 
 /** What breaks an exemption, in words, or null: the leading art raises its priority or draws wider than allowed. */
@@ -186,7 +205,8 @@ function exemptProblem(main: Element, widest: number): string | null {
   const problems: string[] = [];
   if (first.getAttribute("fetchpriority") === "high") problems.push('its leading art has fetchpriority="high"');
   const drawn = drawnWidth(first);
-  if (drawn > widest) problems.push(`its leading art draws ${drawn} px wide, past the ${widest} px its exemption allows`);
+  const wide = Number.isFinite(drawn) ? `${drawn} px wide` : "at a width its sizes do not bound";
+  if (drawn > widest) problems.push(`its leading art draws ${wide}, past the ${widest} px its exemption allows`);
   return problems.length > 0 ? problems.join("; ") : null;
 }
 
@@ -227,9 +247,15 @@ describe("first picture: the rule on known samples", () => {
     expect(sample("<h1>T</h1><p>Words only.</p><h2>x</h2>")).toBeNull();
   });
 
+  // Rule 3 alone: each art waits (rule 1) and follows real content (rule 2),
+  // so only what follows it can fail it. Without that, each passes.
   it("flags art that closes nothing: a heading or a picture follows it", () => {
-    expect(sample('<h1>T</h1><figure data-art="brand/passage"><img loading="lazy"></figure><nav><h2 class="visually-hidden">More</h2></nav>')).not.toBeNull();
-    expect(sample('<h1>T</h1><figure data-art="brand/passage"><img loading="lazy"></figure><img src="/maps/statewide.svg" alt="Map">')).not.toBeNull();
+    const withForm = '<h1>T</h1><p class="lede">L</p><form><input name="q"></form><figure data-art="brand/passage"><img loading="lazy"></figure>';
+    const withList = '<h1>T</h1><p class="lede">L</p><ul><li>One</li><li>Two</li></ul><figure data-art="brand/passage"><img loading="lazy"></figure>';
+    expect(sample(withForm)).toBeNull();
+    expect(sample(withList)).toBeNull();
+    expect(sample(`${withForm}<nav><h2 class="visually-hidden">More</h2></nav>`)).toMatch(/brand\/passage/);
+    expect(sample(`${withList}<img src="/maps/statewide.svg" alt="Map">`)).toMatch(/brand\/passage/);
   });
 
   // Fix 1: closing art used to need only no loading="eager" and no raised priority.
@@ -268,6 +294,52 @@ describe("first picture: the rule on known samples", () => {
     // So does a thumbnail with a raised priority, or one with no sizes from a 320 px file.
     expect(exempt(`<h1>T</h1><figure data-portrait="communitas"><img sizes="7rem" width="112" loading="eager" fetchpriority="high"></figure>`, 128)).toMatch(/fetchpriority/);
     expect(exempt(`<h1>T</h1><figure data-portrait="communitas"><img width="320" height="320" loading="lazy"></figure>`, 128)).toMatch(/320 px wide/);
+  });
+
+  // Fix 5: drawnWidth used to read only the last sizes entry, and fell back
+  // to the width attribute when it could not read that.
+  it("reads the drawn width from every sizes entry that can hold on a wide screen", () => {
+    const drawn = (attrs: string) => drawnWidth(mainOf(`<main><img ${attrs}></main>`)!.querySelector("img")!);
+    expect(drawn('sizes="7rem" width="112"')).toBe(112);
+    expect(drawn('sizes="64px"')).toBe(64);
+    expect(drawn('sizes="100vw"')).toBe(WIDE);
+    // A max-width entry below 1280 px cannot hold there, whatever its length.
+    expect(drawn('sizes="(max-width: 40rem) 90vw, 30rem"')).toBe(480);
+    expect(drawn('sizes="(max-width: 711px) calc(100vw - 52px), (max-width: 1055px) calc(50vw - 40px), 380px"')).toBe(380);
+    // One that reaches 1280 px holds, so its length draws.
+    expect(drawn('sizes="(max-width: 1440px) 50vw, 7rem"')).toBe(640);
+    expect(drawn('sizes="(max-width: 90em) 40rem, 7rem"')).toBe(640);
+  });
+
+  it("counts a min-width entry, another condition or a length it cannot read as unbounded, whatever the width attribute says", () => {
+    const drawn = (attrs: string) => drawnWidth(mainOf(`<main><img ${attrs}></main>`)!.querySelector("img")!);
+    for (const sizes of [
+      "(min-width: 60rem) 6rem, 7rem",
+      "7rem, (min-width: 60rem) 6rem",
+      "(orientation: portrait) 7rem, 7rem",
+      "calc(7rem + 2px)",
+      "min(7rem, 20vw)",
+      "7em",
+      "10%",
+      "10vh",
+      "(max-width: 2000px) calc(50vw - 40px), 7rem",
+      "auto",
+      "",
+    ]) {
+      expect(drawn(`sizes="${sizes}" width="112" height="112"`), sizes).toBe(Number.POSITIVE_INFINITY);
+    }
+    const thumb = (sizes: string) =>
+      `<h1>AI agents</h1><figure data-portrait="communitas"><img sizes="${sizes}" width="112" height="112" loading="lazy"></figure>`;
+    expect(exemptProblem(mainOf(`<main>${thumb("calc(7rem + 2px)")}</main>`)!, 128)).toMatch(/sizes do not bound/);
+    expect(exemptProblem(mainOf(`<main>${thumb("(min-width: 60rem) 6rem, 7rem")}</main>`)!, 128)).toMatch(/sizes do not bound/);
+  });
+
+  it("reads the width attribute only when sizes is absent", () => {
+    const drawn = (attrs: string) => drawnWidth(mainOf(`<main><img ${attrs}></main>`)!.querySelector("img")!);
+    expect(drawn('width="112" height="112"')).toBe(112);
+    expect(drawn('sizes="7rem" width="1440" height="1440"')).toBe(112);
+    expect(drawn('sizes="7em" width="112" height="112"')).toBe(Number.POSITIVE_INFINITY);
+    expect(drawn("")).toBe(Number.POSITIVE_INFINITY);
   });
 
   // Fix 4: a page with no <main> used to yield an empty one and pass.

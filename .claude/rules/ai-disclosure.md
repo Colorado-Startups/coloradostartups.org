@@ -7,6 +7,7 @@ paths:
   - "site/src/components/resourcus/**"
   - "site/src/components/communitas/**"
   - "site/src/components/hall/**"
+  - "site/src/components/agents/**"
   - "site/src/components/home/KeeperStrip.astro"
   - "site/src/components/ui/SiteFooter.astro"
   - "site/src/pages/community/**"

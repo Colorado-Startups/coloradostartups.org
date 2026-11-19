@@ -10,13 +10,13 @@
 // each picture is a thumbnail of at most THUMB_MAX px beside the agent's name,
 // and the page's first picture sits in the first keeper's card, with that
 // keeper's name, job and link.
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
 import { disclosureProblems, SHOWN_CHARACTERS, SOURCE_CHARACTERS, SOURCE_KEEPERS } from "../agents-source";
-import { DIST_DIR, readDist, sitemapPaths } from "./pages";
+import { DIST_DIR, readDist, SITE_DIR, sitemapPaths } from "./pages";
 
 const doc = (rel: string) => new DOMParser().parseFromString(readDist(rel), "text/html");
 const text = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
@@ -26,6 +26,12 @@ const AI_HOSTS = new Set(["claude.ai", "claude.com", "www.claude.com", "code.cla
 const APPS = new Set(["Claude Code", "Claude Desktop", "claude.ai", "OpenCode"]);
 // The widest an agent's thumbnail may be, in CSS px: a small picture that identifies it, never a hero.
 const THUMB_MAX = 128;
+// Each brand picture's pulled widths, as scripts/brand/pull.mjs records them
+// and brandArt() (src/components/art/art-assets.ts) reads them.
+const BRAND_SIZES = JSON.parse(readFileSync(path.join(SITE_DIR, "public/art/brand/sizes.json"), "utf8")) as Record<
+  string,
+  { width: number; widths: number[] }
+>;
 
 const page = doc("agents/index.html");
 const main = page.querySelector("main")!;
@@ -98,6 +104,41 @@ describe("/agents/", () => {
       const head = img.closest("[data-agent-head]");
       expect(head?.parentElement, card.dataset.agent).toBe(card);
       expect(text(head?.querySelector(".hall-card__title")), card.dataset.agent).toBe(text(card.querySelector(".hall-card__title")));
+    }
+  });
+
+  it("orders every card's lines: name, then job, then link, then disclosure", () => {
+    for (const card of cards) {
+      const lines = [
+        card.querySelector(".hall-card__title"),
+        card.querySelector("[data-what]"),
+        card.querySelector("a[data-where], a[data-repo]"),
+        card.querySelector("[data-disclosure]"),
+      ];
+      expect(lines.map((el) => el !== null), card.dataset.agent).toEqual([true, true, true, true]);
+      for (let i = 1; i < lines.length; i += 1) {
+        expect(lines[i - 1]!.compareDocumentPosition(lines[i]!) & Node.DOCUMENT_POSITION_FOLLOWING, `${card.dataset.agent}: line ${i + 1}`).toBeTruthy();
+      }
+    }
+  });
+
+  // art-srcset.test.ts reads only data-art and data-portrait, whose width is
+  // the file's own. These thumbnails carry data-agent-pic and the drawn
+  // width, so their srcset is checked here against the pulled files.
+  it("lists in each thumbnail's srcset only widths the brand pulled for its file", () => {
+    for (const card of cards) {
+      const pic = card.querySelector<HTMLElement>("[data-agent-pic]");
+      const name = (pic?.dataset.agentPic ?? "").replace(/^brand\//, "");
+      const pulled = Object.hasOwn(BRAND_SIZES, name) ? BRAND_SIZES[name] : undefined;
+      expect(pulled, `${card.dataset.agent}: ${name} is not in sizes.json`).toBeDefined();
+      const entries = (pic!.querySelector("img")?.getAttribute("srcset") ?? "").split(",").map((e) => e.trim().split(/\s+/));
+      expect(entries.length, card.dataset.agent).toBeGreaterThan(0);
+      for (const [url, w] of entries) {
+        const width = Number.parseInt(w ?? "", 10);
+        expect(url, card.dataset.agent).toBe(`/art/brand/${name}-${width}.webp`);
+        expect(pulled!.widths, `${card.dataset.agent}: ${width}w`).toContain(width);
+        expect(width, `${card.dataset.agent}: ${width}w`).toBeLessThanOrEqual(pulled!.width);
+      }
     }
   });
 
