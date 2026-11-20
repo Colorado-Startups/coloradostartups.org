@@ -105,12 +105,9 @@ export const KEEPER_HOMES: Readonly<Record<KeeperId, { href: string; label: stri
  * GitHub (gh api repos/<repo>/readme, read 2026-11-16; Linken's entry re-read
  * 2026-11-20, after its rename from Link). Only Claude and OpenCode paths are
  * kept (01_doctrine/ai_recommend.yaml). Legallas has no entry: its repo is
- * private, and the brand sets agents_page: false.
- *
- * A key is the brand's `repo` for that character, so Linken's still reads
- * Colorado-Startups/link until a brand release (brand.lock.json) says
- * Colorado-Startups/linken. Then rename its key and its `steps` URL to match;
- * the tests tie both to the brand's value.
+ * private, and the brand sets agents_page: false. A key is the brand's `repo`
+ * for that character (brand v4.5.0 moved Linken's to Colorado-Startups/linken);
+ * the tests tie the key and each `steps` URL to it.
  */
 export const PROJECT_README: Readonly<Record<string, { what: string; note: string; install: readonly InstallPath[] }>> = {
   "Colorado-Startups/claudius": {
@@ -126,7 +123,7 @@ export const PROJECT_README: Readonly<Record<string, { what: string; note: strin
       },
     ],
   },
-  "Colorado-Startups/link": {
+  "Colorado-Startups/linken": {
     // README's "Clean up" row, then its second tagline sentence. Note: the repo's "macOS" and the README's last line.
     what: "Keeps the contacts who matter, removes clear spam, paced. Nothing posts until you click.",
     note: "macOS only. Not affiliated with LinkedIn or Anthropic.",
@@ -135,8 +132,7 @@ export const PROJECT_README: Readonly<Record<string, { what: string; note: strin
         app: "Claude Code",
         // README "Install", step 1.
         commands: ["/plugin install linken --marketplace Colorado-Startups/linken"],
-        // Stays on the brand's repo value (a test needs steps to start with repoUrl); GitHub redirects link to linken.
-        steps: "https://github.com/Colorado-Startups/link#install",
+        steps: "https://github.com/Colorado-Startups/linken#install",
       },
     ],
   },
