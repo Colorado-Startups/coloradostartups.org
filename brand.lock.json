@@ -1,7 +1,7 @@
 {
-  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.4.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
+  "comment": "The brand release the site uses, read by scripts/brand/pull.mjs. Hashes from the release's own table (v4.5.0 notes). Change the tag and hashes together, then run npm run brand:pull.",
   "repo": "Colorado-Startups/brand",
-  "tag": "v4.4.0",
+  "tag": "v4.5.0",
   "files": {
     "dist/places/boulder.jpg": "2816f12e39305c407c7e400702f734c79440429f52ef3724a5971d066bf9072c",
     "dist/places/golden.jpg": "10737f40c1cdff6ec90255fe2c25e68f8ef8a72e2724e9b15dc908bf9092b3c9",
@@ -38,6 +38,6 @@
     "dist/social/claudius.jpg": "d38b196831b5375e57f4123692ecb1fec376e173c99cbdff9b50495898df252a",
     "dist/social/link.jpg": "1693346786b3bb69625c8892fc89bb3979ef2e5d50cde975b0da4c324eafdf13",
     "dist/social/legallas.jpg": "d1ee9b2beb722474b50cc8aa0c1eaa6b331b2ff9932fc5ff68f68af8c1a90834",
-    "dist/brand.json": "64397a0cec579720910396e60fa869407e25f3da1f06f9fc4f5753392b5bdb8d"
+    "dist/brand.json": "04c24d81674f761e3d78cec3fcbc1fcc5c22a7f3c1116e3e412923690ca356bb"
   }
 }
