@@ -102,11 +102,15 @@ export const KEEPER_HOMES: Readonly<Record<KeeperId, { href: string; label: stri
 
 /**
  * Each project's line and install paths, keyed by repo, from its README on
- * GitHub (gh api repos/<repo>/readme, read 2026-11-16). Only Claude and
- * OpenCode paths are kept (01_doctrine/ai_recommend.yaml). Left out: Link's
- * "By hand, any host" row, which names no app, and the word "Cowork" from its
- * Claude Code row. Legallas has no entry: its repo is private, and the brand
- * sets agents_page: false.
+ * GitHub (gh api repos/<repo>/readme, read 2026-11-16; Linken's entry re-read
+ * 2026-11-20, after its rename from Link). Only Claude and OpenCode paths are
+ * kept (01_doctrine/ai_recommend.yaml). Legallas has no entry: its repo is
+ * private, and the brand sets agents_page: false.
+ *
+ * A key is the brand's `repo` for that character, so Linken's still reads
+ * Colorado-Startups/link until a brand release (brand.lock.json) says
+ * Colorado-Startups/linken. Then rename its key and its `steps` URL to match;
+ * the tests tie both to the brand's value.
  */
 export const PROJECT_README: Readonly<Record<string, { what: string; note: string; install: readonly InstallPath[] }>> = {
   "Colorado-Startups/claudius": {
@@ -123,14 +127,15 @@ export const PROJECT_README: Readonly<Record<string, { what: string; note: strin
     ],
   },
   "Colorado-Startups/link": {
-    // README line 3, its first sentence. Note: the rest of that paragraph.
-    what: "A local MCP server that lets Claude post and comment on LinkedIn for you, through LinkedIn's official API, with every write approved by you in a macOS dialog.",
+    // README's "Clean up" row, then its second tagline sentence. Note: the repo's "macOS" and the README's last line.
+    what: "Keeps the contacts who matter, removes clear spam, paced. Nothing posts until you click.",
     note: "macOS only. Not affiliated with LinkedIn or Anthropic.",
     install: [
       {
         app: "Claude Code",
-        // README "Install", the "Claude Code or Cowork" row.
-        commands: ["/plugin install link --marketplace Colorado-Startups/link"],
+        // README "Install", step 1.
+        commands: ["/plugin install linken --marketplace Colorado-Startups/linken"],
+        // Stays on the brand's repo value (a test needs steps to start with repoUrl); GitHub redirects link to linken.
         steps: "https://github.com/Colorado-Startups/link#install",
       },
     ],
