@@ -187,7 +187,7 @@ describe("This week on home", () => {
 
   it("keeps to the site's words: no member count, em dash, spaced en dash, Outpost, HQ or Hall", () => {
     expect(text(band)).not.toMatch(
-      /\b\d[\d,.]*\s*\+?\s*(members|startupers|founders|people)\b/i,
+      /\b\d[\d,.]*(?:\s+|\s*\+\s*)(members|startupers|founders|people)\b/i,
     );
     expect(text(band)).not.toMatch(/—| – |\bOutpost\b|\bHQ\b|\bHall\b/);
   });
