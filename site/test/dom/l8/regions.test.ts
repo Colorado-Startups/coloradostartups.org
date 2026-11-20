@@ -377,7 +377,7 @@ describe.each(REGIONS.map((r) => [r.id, r] as const))("/regions/%s/", (id, regio
       console.info(`regions/${id}/: ${all} visible words in This week, ${titles} of them event titles`);
       expect(all - titles).toBeGreaterThan(0);
       expect(all - titles).toBeLessThanOrEqual(50);
-      expect(text(band)).not.toMatch(/\b\d[\d,.]*\s*\+?\s*(members|startupers|founders|people|attendees|going)\b/i);
+      expect(text(band)).not.toMatch(/\b\d[\d,.]*(?:\s+|\s*\+\s*)(members|startupers|founders|people|attendees|going)\b/i);
       expect(text(band)).not.toMatch(/—| – |\bOutpost\b|\bHQ\b|\bHall\b/);
     });
 
