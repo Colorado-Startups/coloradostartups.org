@@ -298,7 +298,9 @@ describe.each(Object.keys(PAGES) as PageKey[])("%s page, every page rule", (key)
   });
 
   it("states no member count", () => {
-    expect(text(page.querySelector("main"))).not.toMatch(/\b\d[\d,.]*\s*\+?\s*(members|startupers|founders|people)\b/i);
+    // A space or a + must sit between the number and the word: textContent joins a date and the next event's title
+    // with no separator ("Dec 1Founders & Friends"), which is not a count.
+    expect(text(page.querySelector("main"))).not.toMatch(/\b\d[\d,.]*(?:\s+|\s*\+\s*)(members|startupers|founders|people)\b/i);
   });
 
   it("links only to pages that exist or that another lane builds, and to known outside hosts", () => {
