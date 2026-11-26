@@ -81,7 +81,7 @@ jobs:
           permission-members: read
           permission-organization-projects: read
 
-      - uses: SoulCraft-Org/git-crafter/actions/pages@8023bd4683416f6d420bd20d137960b09c06b91e # v7.0.2
+      - uses: SoulCraft-Org/git-crafter/actions/pages@6ad6259ac745e3ca4ac3be70177bc7a9a2e719ae # v7.2.0
         with:
           pages: process quality
           config: quality/process/config.json
