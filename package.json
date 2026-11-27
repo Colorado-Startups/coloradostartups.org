@@ -35,8 +35,8 @@
   "devDependencies": {
     "@fontsource/aileron": "5.3.0",
     "@secretlint/secretlint-rule-preset-recommend": "13.1.0",
-    "@vitest/coverage-v8": "5.0.5",
-    "knip": "6.44.0",
+    "@vitest/coverage-v8": "5.1.0",
+    "knip": "6.45.1",
     "secretlint": "13.1.0",
     "typescript": "6.0.3"
   },
@@ -49,6 +49,6 @@
     "msw": false,
     "fsevents": false,
     "esbuild@0.28.2": true,
-    "workerd@1.20261023.1": true
+    "workerd@1.20261110.1": true
   }
 }
